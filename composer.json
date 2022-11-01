@@ -14,8 +14,11 @@
             "email": "hello@joedixon.co.uk"
         }
     ],
-    "require": {},
-    "require-dev": {},
+    "require": {
+        "cboden/ratchet": "^0.4.4",
+        "illuminate/console": "^9.38",
+        "illuminate/support": "^9.37"
+    },
     "autoload": {
         "psr-4": {
             "Reverb\\": "src/"
@@ -29,7 +32,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Reverb\\ReverbServiceProvider"
+                "Reverb\\ServiceProvider"
             ]
         }
     },
