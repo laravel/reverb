@@ -1,0 +1,41 @@
+{
+    "name": "laravel/reverb",
+    "description": "Laravel Reverb brings real-time WebSocket communication for Laravel applications.",
+    "keywords": [
+        "laravel",
+        "websocket",
+        "websockets",
+        "real-time"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joe Dixon",
+            "email": "hello@joedixon.co.uk"
+        }
+    ],
+    "require": {},
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "Reverb\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Reverb\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Reverb\\ReverbServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
