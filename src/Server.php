@@ -20,17 +20,9 @@ class Server
      */
     public function open(Connection $connection)
     {
-        $this->manager->add($connection);
+        Pusher::handle($connection, 'pusher:connection_established');
 
         echo "New connection: ({$connection->id()})".PHP_EOL;
-
-        $connection->send(json_encode([
-            'event' => 'pusher:connection_established',
-            'data' => json_encode([
-                'socket_id' => $connection->id(),
-                'activity_timeout' => 30,
-            ]),
-        ]));
     }
 
     /**
@@ -45,7 +37,7 @@ class Server
         $event = json_decode($message, true);
 
         if (Str::contains($event['event'], 'pusher:')) {
-            $from->send($this->handlePusherMessage($event, $from));
+            Pusher::handle($from, $event['event'], $event['data'] ?? []);
         }
 
         echo 'Message from '.$from->id().': '.$message.PHP_EOL;
@@ -72,24 +64,5 @@ class Server
     public function error(Connection $connection, Exception $e)
     {
         echo 'Error: '.$e->getMessage().PHP_EOL;
-    }
-
-    /**
-     * Handle a Pusher protocol message.
-     *
-     * @param  array  $event
-     * @param  \Reverb\Connection  $connection
-     * @return string
-     */
-    protected function handlePusherMessage(array $event, Connection $connection)
-    {
-        if ($event['event'] === 'pusher:ping') {
-            return json_encode([
-                'event' => 'pusher:pong',
-                'data' => json_encode([
-                    'socket_id' => $connection->id(),
-                ]),
-            ]);
-        }
     }
 }
