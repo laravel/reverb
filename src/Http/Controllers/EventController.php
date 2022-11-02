@@ -12,11 +12,7 @@ class EventController implements HttpServerInterface
 {
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
     {
-        $event = json_decode($request->getBody(), true);
-
-        $client = app(Client::class);
-
-        $client->publish(
+        app(Client::class)->publish(
             'websockets',
             (string) $request->getBody()
         );
