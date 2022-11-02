@@ -6,13 +6,13 @@ Laravel Reverb brings real-time WebSocket communication for Laravel applications
 
 ## Getting Started
 
-Install into your Laravel application
+## Installation
 
 ```shell
 composer require laravel/reverb
 ```
 
-Run the server
+### Run Socket Server
 
 ```shell
 php artisan reverb:run
@@ -20,7 +20,7 @@ php artisan reverb:run
 
 This will start the server running on localhost port 8080.
 
-Add the following environment variables in your application.
+### Update Environment.
 
 ```
 PUSHER_APP_ID=123
@@ -45,7 +45,7 @@ MIX_PUSHER_SCHEME="${PUSHER_SCHEME}"
 MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 ```
 
-Update your Echo configuration
+## Update Echo Configuration
 
 ```javascript
 // Using Vite
