@@ -18,7 +18,7 @@ php artisan reverb:run
 
 This will start the server running on localhost port 8080.
 
-### Update Environment.
+### Update Environment
 
 ```
 PUSHER_APP_ID=123
@@ -43,7 +43,7 @@ MIX_PUSHER_SCHEME="${PUSHER_SCHEME}"
 MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 ```
 
-## Update Echo Configuration
+### Update Echo Configuration
 
 ```javascript
 // Using Vite
