@@ -2,10 +2,10 @@
 
 namespace Reverb\Http\Controllers;
 
+use Clue\React\Redis\Client;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
-use Reverb\Contracts\ChannelManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController implements HttpServerInterface
@@ -14,13 +14,12 @@ class EventController implements HttpServerInterface
     {
         $event = json_decode($request->getBody(), true);
 
-        foreach (app(ChannelManager::class)->all() as $connection) {
-            $connection->send(json_encode([
-                'event' => $event['name'],
-                'channel' => $event['channel'],
-                'data' => $event['data'],
-            ]));
-        }
+        $client = app(Client::class);
+
+        $client->publish(
+            'websockets',
+            (string) $request->getBody()
+        );
 
         tap($conn)->send(new JsonResponse((object) []))->close();
     }

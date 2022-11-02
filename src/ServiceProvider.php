@@ -4,6 +4,7 @@ namespace Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Reverb\ChannelManagers\ArrayManager;
+use Reverb\Console\Commands\RedisSubscribe;
 use Reverb\Console\Commands\RunServer;
 use Reverb\Contracts\ChannelManager;
 
@@ -13,6 +14,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                RedisSubscribe::class,
                 RunServer::class,
             ]);
         }

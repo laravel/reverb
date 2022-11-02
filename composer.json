@@ -16,7 +16,10 @@
     ],
     "require": {
         "cboden/ratchet": "^0.4.4",
+        "clue/redis-react": "^2.6",
         "illuminate/console": "^9.38",
+        "illuminate/http": "^9.38",
+        "illuminate/redis": "^9.38",
         "illuminate/support": "^9.37"
     },
     "autoload": {
