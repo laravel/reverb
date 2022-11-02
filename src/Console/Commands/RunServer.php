@@ -64,7 +64,12 @@ class RunServer extends Command
         $server->run();
     }
 
-    protected function redisUrl()
+    /**
+     * Get the connection URL for Redis.
+     *
+     * @return string
+     */
+    protected function redisUrl(): string
     {
         $config = config('database.redis.default');
 
@@ -86,7 +91,13 @@ class RunServer extends Command
         return "redis://{$host}:{$port}".($query ? "?{$query}" : '');
     }
 
-    protected function bindRedis(LoopInterface $loop)
+    /**
+     * Bind the Redis client to the container.
+     *
+     * @param  \React\EventLoop\LoopInterface  $loop
+     * @return void
+     */
+    protected function bindRedis(LoopInterface $loop): void
     {
         $this->laravel->singleton(Client::class, function () use ($loop) {
             return (new Factory($loop))->createLazyClient(
@@ -95,7 +106,13 @@ class RunServer extends Command
         });
     }
 
-    protected function subscribe(LoopInterface $loop)
+    /**
+     * Subscribe to the Redis pub/sub channel.
+     *
+     * @param  \React\EventLoop\LoopInterface  $loop
+     * @return void
+     */
+    protected function subscribe(LoopInterface $loop): void
     {
         $redis = (new Factory($loop))->createLazyClient(
             $this->redisUrl()
@@ -108,7 +125,7 @@ class RunServer extends Command
             $channels = isset($event['channel']) ? [$event['channel']] : $event['channels'];
 
             foreach ($channels as $channel) {
-                foreach (app(ChannelManager::class)->all() as $connection) {
+                foreach (app(ConnectionManager::class)->all() as $connection) {
                     $connection->send(json_encode([
                         'event' => $event['name'],
                         'channel' => $channel,
@@ -119,6 +136,11 @@ class RunServer extends Command
         });
     }
 
+    /**
+     * Generate the routes required to handle Pusher requests.
+     *
+     * @return \Symfony\Component\Routing\RouteCollection
+     */
     protected function generateRoutes(): RouteCollection
     {
         $routes = new RouteCollection();

@@ -3,10 +3,9 @@
 namespace Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Reverb\ChannelManagers\ArrayManager;
-use Reverb\Console\Commands\RedisSubscribe;
+use Reverb\ConnectionManagers\ArrayManager;
 use Reverb\Console\Commands\RunServer;
-use Reverb\Contracts\ChannelManager;
+use Reverb\Contracts\ConnectionManager;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -14,7 +13,6 @@ class ServiceProvider extends BaseServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                RedisSubscribe::class,
                 RunServer::class,
             ]);
         }
@@ -26,7 +24,7 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/reverb.php', 'reverb'
         );
 
-        $this->app->singleton(ChannelManager::class, function ($app) {
+        $this->app->singleton(ConnectionManager::class, function ($app) {
             // @TODO use the manager pattern here.
             return new ArrayManager;
         });

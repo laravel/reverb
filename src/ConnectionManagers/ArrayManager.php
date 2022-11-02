@@ -1,0 +1,50 @@
+<?php
+
+namespace Reverb\ConnectionManagers;
+
+use Ratchet\ConnectionInterface;
+use Reverb\Contracts\ConnectionManager;
+use SplObjectStorage;
+use Traversable;
+
+class ArrayManager implements ConnectionManager
+{
+    protected $connections;
+
+    public function __construct()
+    {
+        $this->connections = new SplObjectStorage;
+    }
+
+    /**
+     * Add a connection.
+     *
+     * @param  \Ratchet\ConnectionInterface  $connection
+     * @return void
+     */
+    public function add(ConnectionInterface $connection): void
+    {
+        $this->connections->attach($connection);
+    }
+
+    /**
+     * Remove a connection.
+     *
+     * @param  \Ratchet\ConnectionInterface  $connection
+     * @return void
+     */
+    public function remove(ConnectionInterface $connection): void
+    {
+        $this->connections->detach($connection);
+    }
+
+    /**
+     * Get all connections.
+     *
+     * @return Traversable
+     */
+    public function all(): Traversable
+    {
+        return $this->connections;
+    }
+}

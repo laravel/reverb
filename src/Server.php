@@ -4,7 +4,7 @@ namespace Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
-use Reverb\Contracts\ChannelManager;
+use Reverb\Contracts\ConnectionManager;
 
 class Server
 {
@@ -12,7 +12,7 @@ class Server
 
     public function __construct()
     {
-        $this->manager = app(ChannelManager::class);
+        $this->manager = app(ConnectionManager::class);
     }
 
     public function open($connection)
