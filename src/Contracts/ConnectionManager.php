@@ -2,7 +2,7 @@
 
 namespace Reverb\Contracts;
 
-use Ratchet\ConnectionInterface;
+use Reverb\Connection;
 use Traversable;
 
 interface ConnectionManager
@@ -10,18 +10,18 @@ interface ConnectionManager
     /**
      * Add a connection.
      *
-     * @param  \Ratchet\ConnectionInterface  $connection
+     * @param  \Reverb\Connection  $connection
      * @return void
      */
-    public function add(ConnectionInterface $connection): void;
+    public function add(Connection $connection): void;
 
     /**
      * Remove a connection.
      *
-     * @param  \Ratchet\ConnectionInterface  $connection
+     * @param  \Reverb\Connection  $connection
      * @return void
      */
-    public function remove(ConnectionInterface $connection): void;
+    public function remove(Connection $connection): void;
 
     /**
      * Get all connections.

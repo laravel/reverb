@@ -8,31 +8,39 @@ use Reverb\Contracts\ConnectionManager;
 
 class Server
 {
-    protected $manager;
-
-    public function __construct()
+    public function __construct(protected ConnectionManager $manager)
     {
-        $this->manager = app(ConnectionManager::class);
     }
 
-    public function open($connection)
+    /**
+     * Handle the a client connection.
+     *
+     * @param  \Reverb\Connection  $connection
+     * @return void
+     */
+    public function open(Connection $connection)
     {
         $this->manager->add($connection);
 
-        $this->generateSocketId($connection);
-
-        echo "New connection: ({$connection->socketId})".PHP_EOL;
+        echo "New connection: ({$connection->id()})".PHP_EOL;
 
         $connection->send(json_encode([
             'event' => 'pusher:connection_established',
             'data' => json_encode([
-                'socket_id' => $connection->socketId,
+                'socket_id' => $connection->id(),
                 'activity_timeout' => 30,
             ]),
         ]));
     }
 
-    public function message($from, $message)
+    /**
+     * Handle a new message received by the connected client.
+     *
+     * @param  \Reverb\Connection  $connection
+     * @param  string  $message
+     * @return void
+     */
+    public function message(Connection $from, string $message)
     {
         $event = json_decode($message, true);
 
@@ -40,37 +48,48 @@ class Server
             $from->send($this->handlePusherMessage($event, $from));
         }
 
-        echo 'Message from '.$from->socketId.': '.$message.PHP_EOL;
+        echo 'Message from '.$from->id().': '.$message.PHP_EOL;
     }
 
-    public function close($connection)
+    /**
+     * Handle a client disconnection.
+     *
+     * @param  \Reverb\Connection  $connection
+     * @return void
+     */
+    public function close(Connection $connection)
     {
-        echo "Connection {$connection->socketId} has disconnected".PHP_EOL;
+        echo "Connection {$connection->id()} has disconnected".PHP_EOL;
     }
 
-    public function error($connection, Exception $e)
+    /**
+     * Handle an error.
+     *
+     * @param  \Reverb\ConnectionInterface  $connection
+     * @param  \Exception  $e
+     * @return void
+     */
+    public function error(Connection $connection, Exception $e)
     {
         echo 'Error: '.$e->getMessage().PHP_EOL;
     }
 
-    protected function handlePusherMessage(array $event, $connection)
+    /**
+     * Handle a Pusher protocol message.
+     *
+     * @param  array  $event
+     * @param  \Reverb\Connection  $connection
+     * @return string
+     */
+    protected function handlePusherMessage(array $event, Connection $connection)
     {
         if ($event['event'] === 'pusher:ping') {
             return json_encode([
                 'event' => 'pusher:pong',
                 'data' => json_encode([
-                    'socket_id' => $connection->socketId,
+                    'socket_id' => $connection->id(),
                 ]),
             ]);
         }
-    }
-
-    protected function generateSocketId($connection)
-    {
-        $socketId = sprintf('%d.%d', random_int(1, 1000000000), random_int(1, 1000000000));
-
-        $connection->socketId = $socketId;
-
-        return $this;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Reverb\ConnectionManagers;
 
-use Ratchet\ConnectionInterface;
+use Reverb\Connection;
 use Reverb\Contracts\ConnectionManager;
 use SplObjectStorage;
 use Traversable;
@@ -19,10 +19,10 @@ class ArrayManager implements ConnectionManager
     /**
      * Add a connection.
      *
-     * @param  \Ratchet\ConnectionInterface  $connection
+     * @param  \Reverb\Connection  $connection
      * @return void
      */
-    public function add(ConnectionInterface $connection): void
+    public function add(Connection $connection): void
     {
         $this->connections->attach($connection);
     }
@@ -30,10 +30,10 @@ class ArrayManager implements ConnectionManager
     /**
      * Remove a connection.
      *
-     * @param  \Ratchet\ConnectionInterface  $connection
+     * @param  \Reverb\Connection  $connection
      * @return void
      */
-    public function remove(ConnectionInterface $connection): void
+    public function remove(Connection $connection): void
     {
         $this->connections->detach($connection);
     }

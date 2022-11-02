@@ -15,6 +15,7 @@ use React\Socket\SocketServer;
 use Reverb\Contracts\ConnectionManager;
 use Reverb\Http\Controllers\EventController;
 use Reverb\Ratchet\Server;
+use Reverb\Server as ReverbServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -145,7 +146,7 @@ class RunServer extends Command
     protected function generateRoutes(): RouteCollection
     {
         $routes = new RouteCollection();
-        $routes->add('sockets', new Route('/app/{appId}', ['_controller' => new WsServer(new Server(new \Reverb\Server()))], [], [], null, [], ['GET']));
+        $routes->add('sockets', new Route('/app/{appId}', ['_controller' => new WsServer(new Server(app(ReverbServer::class)))], [], [], null, [], ['GET']));
         $routes->add('events', new Route('/apps/{appId}/events', ['_controller' => EventController::class], [], [], null, [], ['POST']));
 
         return $routes;
