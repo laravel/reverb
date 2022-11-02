@@ -12,6 +12,7 @@ use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
+use Reverb\Contracts\ConnectionManager;
 use Reverb\Http\Controllers\EventController;
 use Reverb\Ratchet\Server;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
