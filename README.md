@@ -4,9 +4,7 @@
 
 Laravel Reverb brings real-time WebSocket communication for Laravel applications.
 
-## Getting Started
-
-## Installation
+### Installation
 
 ```shell
 composer require laravel/reverb
