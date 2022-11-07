@@ -14,6 +14,7 @@ use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Reverb\Contracts\ConnectionManager;
 use Reverb\Http\Controllers\EventController;
+use Reverb\Http\Controllers\StatsController;
 use Reverb\Ratchet\Server;
 use Reverb\Server as ReverbServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -73,7 +74,7 @@ class RunServer extends Command
      */
     protected function redisUrl(): string
     {
-        $config = config('database.redis.default');
+        $config = $this->laravel->config['database.redis.default'];
 
         $host = $config['host'];
         $port = $config['port'] ?: 6379;
@@ -127,7 +128,7 @@ class RunServer extends Command
             $channels = isset($event['channel']) ? [$event['channel']] : $event['channels'];
 
             foreach ($channels as $channel) {
-                foreach (app(ConnectionManager::class)->all() as $connection) {
+                foreach ($this->laravel->make(ConnectionManager::class)->all() as $connection) {
                     $connection->send(json_encode([
                         'event' => $event['name'],
                         'channel' => $channel,
@@ -146,9 +147,25 @@ class RunServer extends Command
     protected function generateRoutes(): RouteCollection
     {
         $routes = new RouteCollection();
-        $routes->add('sockets', new Route('/app/{appId}', ['_controller' => new WsServer(new Server(app(ReverbServer::class)))], [], [], null, [], ['GET']));
+        $routes->add('sockets', new Route('/app/{appId}', ['_controller' => $this->buildWebSocketServer()], [], [], null, [], ['GET']));
         $routes->add('events', new Route('/apps/{appId}/events', ['_controller' => EventController::class], [], [], null, [], ['POST']));
+        $routes->add('stats', new Route('/stats', ['_controller' => StatsController::class], [], [], null, [], ['GET']));
 
         return $routes;
+    }
+
+    /**
+     * Build the WebSocket server.
+     *
+     * @return \Ratchet\WebSocket\WsServer
+     */
+    protected function buildWebSocketServer()
+    {
+        return new WsServer(
+            new Server(
+                $this->laravel->make(ReverbServer::class),
+                $this->laravel->make(ConnectionManager::class)
+            )
+        );
     }
 }

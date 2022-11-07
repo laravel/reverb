@@ -3,9 +3,11 @@
 namespace Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Reverb\ConnectionManagers\ArrayManager;
 use Reverb\Console\Commands\RunServer;
+use Reverb\Contracts\ChannelManager;
 use Reverb\Contracts\ConnectionManager;
+use Reverb\Managers\Channels\Collection as ChannelCollection;
+use Reverb\Managers\Connections\Collection as ConnectionCollection;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -26,7 +28,12 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->app->singleton(ConnectionManager::class, function ($app) {
             // @TODO use the manager pattern here.
-            return new ArrayManager;
+            return new ConnectionCollection;
+        });
+
+        $this->app->singleton(ChannelManager::class, function ($app) {
+            // @TODO use the manager pattern here.
+            return new ChannelCollection;
         });
     }
 }

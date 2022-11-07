@@ -13,20 +13,28 @@ interface ConnectionManager
      * @param  \Reverb\Connection  $connection
      * @return void
      */
-    public function add(Connection $connection): void;
+    public function connect(Connection $connection): Connection;
 
     /**
      * Remove a connection.
      *
-     * @param  \Reverb\Connection  $connection
+     * @param  string  $identifier
      * @return void
      */
-    public function remove(Connection $connection): void;
+    public function disconnect(Connection $connection): void;
 
     /**
      * Get all connections.
      *
-     * @return Traversable
+     * @return \Traversable
      */
     public function all(): Traversable;
+
+    /**
+     * Get a connection by its identifier.
+     *
+     * @param  string  $identifier
+     * @return \Reverb\Connection  $connection
+     */
+    public function get(string $identifier): ?Connection;
 }

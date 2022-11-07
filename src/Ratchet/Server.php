@@ -5,11 +5,12 @@ namespace Reverb\Ratchet;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 use Reverb\Connection;
+use Reverb\Contracts\ConnectionManager;
 use Reverb\Server as ReverbServer;
 
 class Server implements MessageComponentInterface
 {
-    public function __construct(protected ReverbServer $server)
+    public function __construct(protected ReverbServer $server, protected ConnectionManager $manager)
     {
     }
 
@@ -77,8 +78,14 @@ class Server implements MessageComponentInterface
      */
     protected function connection(ConnectionInterface $connection): Connection
     {
-        return new Connection(function ($message) use ($connection) {
-            $connection->send($message);
-        });
+        if (! $managedConnection = $this->manager->get($connection->resourceId)) {
+            $managedConnection = $this->manager->connect(
+                new Connection($connection->resourceId, function ($message) use ($connection) {
+                    $connection->send($message);
+                })
+            );
+        }
+
+        return $managedConnection;
     }
 }

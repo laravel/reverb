@@ -8,8 +8,13 @@ class Connection
 {
     protected $id;
 
-    public function __construct(protected Closure $sendUsing)
+    public function __construct(protected string $identifier, protected Closure $sendUsing)
     {
+    }
+
+    public function identifier()
+    {
+        return $this->identifier;
     }
 
     public function id()

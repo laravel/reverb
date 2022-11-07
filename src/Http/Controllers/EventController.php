@@ -3,6 +3,7 @@
 namespace Reverb\Http\Controllers;
 
 use Clue\React\Redis\Client;
+use Illuminate\Support\Facades\App;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
@@ -12,7 +13,7 @@ class EventController implements HttpServerInterface
 {
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
     {
-        app(Client::class)->publish(
+        App::make(Client::class)->publish(
             'websockets',
             (string) $request->getBody()
         );

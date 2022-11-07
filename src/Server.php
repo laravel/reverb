@@ -3,12 +3,13 @@
 namespace Reverb;
 
 use Exception;
-use Illuminate\Support\Str;
+use Reverb\Contracts\ChannelManager;
 use Reverb\Contracts\ConnectionManager;
+use Reverb\Exceptions\PusherException;
 
 class Server
 {
-    public function __construct(protected ConnectionManager $manager)
+    public function __construct(protected ConnectionManager $connections, protected ChannelManager $channels)
     {
     }
 
@@ -34,13 +35,29 @@ class Server
      */
     public function message(Connection $from, string $message)
     {
+        echo 'Message from '.$from->id().': '.$message.PHP_EOL;
+
         $event = json_decode($message, true);
 
-        if (Str::contains($event['event'], 'pusher:')) {
+        try {
             Pusher::handle($from, $event['event'], $event['data'] ?? []);
-        }
 
-        echo 'Message from '.$from->id().': '.$message.PHP_EOL;
+            echo 'Message from '.$from->id().' handled'.PHP_EOL;
+        } catch (PusherException $e) {
+            $from->send(json_encode($e->payload()));
+
+            echo 'Message from '.$from->id().' resulted in a pusher error'.PHP_EOL;
+        } catch (Exception $e) {
+            $from->send(json_encode([
+                'event' => 'pusher:error',
+                'data' => [
+                    'code' => 4200,
+                    'message' => $e->getMessage(),
+                ],
+            ]));
+
+            echo 'Message from '.$from->id().' resulted in an unknown error'.PHP_EOL;
+        }
     }
 
     /**
@@ -51,7 +68,10 @@ class Server
      */
     public function close(Connection $connection)
     {
-        echo "Connection {$connection->id()} has disconnected".PHP_EOL;
+        $this->connections->disconnect($connection);
+        $this->channels->unsubscribeFromAll($connection);
+
+        echo "Disconnected: ({$connection->id()})".PHP_EOL;
     }
 
     /**
