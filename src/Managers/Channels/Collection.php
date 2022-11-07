@@ -7,6 +7,7 @@ use Reverb\Channels\Channel;
 use Reverb\Channels\ChannelBroker;
 use Reverb\Connection;
 use Reverb\Contracts\ChannelManager;
+use Reverb\Contracts\ConnectionManager;
 use Traversable;
 
 class Collection implements ChannelManager
@@ -18,7 +19,7 @@ class Collection implements ChannelManager
      */
     protected $channels;
 
-    public function __construct()
+    public function __construct(protected ConnectionManager $connections)
     {
         $this->channels = new IlluminateCollection;
     }
@@ -90,5 +91,20 @@ class Collection implements ChannelManager
         $connections = $this->channels->first(fn ($value, $key) => $key === $channel->name(), collect());
 
         return collect($connections->toArray());
+    }
+
+    /**
+     * Send a message to all connections subscribed to the given channel.
+     *
+     * @param  \Reverb\Channels\Channel  $channel
+     * @param  array  $payload
+     * @return void
+     */
+    public function broadcast(Channel $channel, array $payload = []): void
+    {
+        $this->connections($channel)->each(function ($identifier) use ($payload) {
+            $this->connections->get($identifier)
+                ->send(json_encode($payload));
+        });
     }
 }

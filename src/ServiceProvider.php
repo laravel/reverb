@@ -33,7 +33,9 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->app->singleton(ChannelManager::class, function ($app) {
             // @TODO use the manager pattern here.
-            return new ChannelCollection;
+            return new ChannelCollection(
+                $this->app->make(ConnectionManager::class)
+            );
         });
     }
 }

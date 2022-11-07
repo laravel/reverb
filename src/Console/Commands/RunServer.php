@@ -12,6 +12,9 @@ use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
+use Reverb\Channels\Channel;
+use Reverb\Channels\ChannelBroker;
+use Reverb\Contracts\ChannelManager;
 use Reverb\Contracts\ConnectionManager;
 use Reverb\Http\Controllers\EventController;
 use Reverb\Http\Controllers\StatsController;
@@ -128,13 +131,14 @@ class RunServer extends Command
             $channels = isset($event['channel']) ? [$event['channel']] : $event['channels'];
 
             foreach ($channels as $channel) {
-                foreach ($this->laravel->make(ConnectionManager::class)->all() as $connection) {
-                    $connection->send(json_encode([
+                $channel = ChannelBroker::create($channel);
+
+                $this->laravel->make(ChannelManager::class)
+                    ->broadcast($channel, [
                         'event' => $event['name'],
-                        'channel' => $channel,
+                        'channel' => $channel->name(),
                         'data' => $event['data'],
-                    ]));
-                }
+                    ]);
             }
         });
     }

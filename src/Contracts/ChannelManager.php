@@ -36,6 +36,7 @@ interface ChannelManager
     /**
      * Unsubscribe from all channels.
      *
+     * @param  \Reverb\Connection  $connection
      * @return void;
      */
     public function unsubscribeFromAll(Connection $connection): void;
@@ -43,7 +44,17 @@ interface ChannelManager
     /**
      * Get all connections subscribed to a channel.
      *
+     * @param  \Reverb\Channels\Channel  $channel
      * @return \Traversable
      */
     public function connections(Channel $channel): Traversable;
+
+    /**
+     * Send a message to all connections subscribed to the given channel.
+     *
+     * @param  \Reverb\Channels\Channel  $channel
+     * @param  array  $payload
+     * @return void
+     */
+    public function broadcast(Channel $channel, array $payload = []): void;
 }
