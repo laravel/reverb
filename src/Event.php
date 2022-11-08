@@ -8,18 +8,18 @@ use Illuminate\Support\Facades\Config;
 use Reverb\Channels\ChannelBroker;
 use Reverb\Contracts\ChannelManager;
 
-class PubSub
+class Event
 {
     /**
-     * Publish a message to a channel.
+     * Dispatch a message to a channel.
      *
      * @param  string  $payload
      * @return void
      */
-    public static function publish(string $payload): void
+    public static function dispatch(string $payload): void
     {
         if (! Config::get('reverb.pubsub.enabled')) {
-            static::notify($payload);
+            static::dispatchSynchronously($payload);
 
             return;
         }
@@ -36,7 +36,7 @@ class PubSub
      * @param  string  $payload
      * @return void
      */
-    public static function notify(string $payload): void
+    public static function dispatchSynchronously(string $payload): void
     {
         $event = json_decode($payload, true);
         $channels = isset($event['channel']) ? [$event['channel']] : $event['channels'];

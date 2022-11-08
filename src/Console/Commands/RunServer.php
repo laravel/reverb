@@ -14,9 +14,9 @@ use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Reverb\Channels\Channel;
 use Reverb\Contracts\ConnectionManager;
+use Reverb\Event;
 use Reverb\Http\Controllers\EventController;
 use Reverb\Http\Controllers\StatsController;
-use Reverb\PubSub;
 use Reverb\Ratchet\Server;
 use Reverb\Server as ReverbServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -112,7 +112,7 @@ class RunServer extends Command
     }
 
     /**
-     * Subscribe to the Redis pub/sub channel.
+     * Subscribe to the Redis pub / sub channel.
      *
      * @param  \React\EventLoop\LoopInterface  $loop
      * @return void
@@ -132,7 +132,7 @@ class RunServer extends Command
         $redis->subscribe($config['channel']);
 
         $redis->on('message', function (string $channel, string $payload) {
-            PubSub::notify($payload);
+            Event::dispatchSynchronously($payload);
         });
     }
 
