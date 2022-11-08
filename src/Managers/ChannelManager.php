@@ -67,7 +67,6 @@ class ChannelManager implements ChannelManagerInterface
     public function unsubscribeFromAll(Connection $connection): void
     {
         $this->channels()->each(function ($connections, $name) use ($connection) {
-            dump($name);
             ChannelBroker::create($name)->unsubscribe($connection);
         });
     }

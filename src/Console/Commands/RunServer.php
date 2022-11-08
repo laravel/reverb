@@ -13,11 +13,10 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Reverb\Channels\Channel;
-use Reverb\Channels\ChannelBroker;
-use Reverb\Contracts\ChannelManager;
 use Reverb\Contracts\ConnectionManager;
 use Reverb\Http\Controllers\EventController;
 use Reverb\Http\Controllers\StatsController;
+use Reverb\PubSub;
 use Reverb\Ratchet\Server;
 use Reverb\Server as ReverbServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -120,26 +119,20 @@ class RunServer extends Command
      */
     protected function subscribe(LoopInterface $loop): void
     {
+        $config = $this->laravel['config']['reverb']['pubsub'];
+
+        if (! $config['enabled']) {
+            return;
+        }
+
         $redis = (new Factory($loop))->createLazyClient(
             $this->redisUrl()
         );
 
-        $redis->subscribe('websockets');
+        $redis->subscribe($config['channel']);
 
         $redis->on('message', function (string $channel, string $payload) {
-            $event = json_decode($payload, true);
-            $channels = isset($event['channel']) ? [$event['channel']] : $event['channels'];
-
-            foreach ($channels as $channel) {
-                $channel = ChannelBroker::create($channel);
-
-                $this->laravel->make(ChannelManager::class)
-                    ->broadcast($channel, [
-                        'event' => $event['name'],
-                        'channel' => $channel->name(),
-                        'data' => $event['data'],
-                    ]);
-            }
+            PubSub::notify($payload);
         });
     }
 

@@ -31,7 +31,8 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->singleton(ConnectionManagerInterface::class, function ($app) use ($config) {
             return new ConnectionManager(
                 $app['cache']->store(
-                    $config['connection_cache']
+                    $config['connection_cache']['store'],
+                    $config['connection_cache']['prefix']
                 ),
             );
         });
@@ -39,9 +40,10 @@ class ServiceProvider extends BaseServiceProvider
         $this->app->singleton(ChannelManagerInterface::class, function ($app) use ($config) {
             return new ChannelManager(
                 $app['cache']->store(
-                    $config['channel_cache']
+                    $config['channel_cache']['store']
                 ),
-                $app->make(ConnectionManagerInterface::class)
+                $app->make(ConnectionManagerInterface::class),
+                $config['channel_cache']['prefix']
             );
         });
     }
