@@ -21,12 +21,13 @@ class ChannelManager implements ChannelManagerInterface
      *
      * @param  \Reverb\Channels\Channel  $channel
      * @param  \Reverb\Connection  $connection
+     * @param  array  $data
      * @return void
      */
-    public function subscribe(Channel $channel, Connection $connection): void
+    public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
         $connections = $this->connections($channel)
-            ->push($connection->identifier());
+            ->put($connection->identifier(), $data);
 
         $this->syncConnections($channel, $connections);
     }
@@ -66,10 +67,8 @@ class ChannelManager implements ChannelManagerInterface
     public function unsubscribeFromAll(Connection $connection): void
     {
         $this->channels()->each(function ($connections, $name) use ($connection) {
-            $this->unsubscribe(
-                ChannelBroker::create($name),
-                $connection
-            );
+            dump($name);
+            ChannelBroker::create($name)->unsubscribe($connection);
         });
     }
 
@@ -108,9 +107,12 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function broadcast(Channel $channel, array $payload = []): void
     {
-        $this->connections($channel)->each(function ($identifier) use ($payload) {
-            $this->connections->get($identifier)
-                ->send(json_encode($payload));
+        $this->connections($channel)->each(function ($data, $identifier) use ($payload) {
+            if (! $connection = $this->connections->get($identifier)) {
+                return;
+            }
+
+            $connection->send(json_encode($payload));
         });
     }
 
@@ -127,8 +129,8 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel from the cache.
      *
-     * @param  Channel  $channel
-     * @return Collection
+     * @param  \Reverb\Channels\Channel  $channel
+     * @return \Illuminate\SUpport\Collection
      */
     protected function channel(Channel $channel): Collection
     {
@@ -138,8 +140,8 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the channels from the cache.
      *
-     * @param  Channel  $channel
-     * @return Collection
+     * @param  \Reverb\Channels\Channel  $channel
+     * @return \Illuminate\SUpport\Collection
      */
     protected function channels(Channel $channel = null): Collection
     {
@@ -150,5 +152,17 @@ class ChannelManager implements ChannelManagerInterface
         }
 
         return collect($channels);
+    }
+
+    /**
+     * Get that data stored for a connection.
+     *
+     * @param  \Reverb\Channels\Channel  $channel
+     * @return array
+     */
+    public function data(Channel $channel, Connection $connection): array
+    {
+        return (array) $this->connections($channel)
+            ->get($connection->identifier(), []);
     }
 }

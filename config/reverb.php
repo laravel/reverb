@@ -16,6 +16,6 @@ return [
 
     'connection_cache' => 'array',
 
-    'channel_cache' => 'file',
+    'channel_cache' => 'array',
 
 ];

@@ -13,9 +13,10 @@ interface ChannelManager
      *
      * @param  \Reverb\Channels\Channel  $channel
      * @param  \Reverb\Connection  $connection
+     * @param  array  $data
      * @return void
      */
-    public function subscribe(Channel $channel, Connection $connection): void;
+    public function subscribe(Channel $channel, Connection $connection, $data = []): void;
 
     /**
      * Unsubscribe from a channel.

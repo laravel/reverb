@@ -13,13 +13,14 @@ class PrivateChannel extends Channel
      *
      * @param  Connection  $connection
      * @param  string  $auth
+     * @param  string  $data
      * @return bool
      */
-    public function subscribe(Connection $connection, string $auth): void
+    public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
-        $this->verify($connection, $auth);
+        $this->verify($connection, $auth, $data);
 
-        parent::subscribe($connection, $auth);
+        parent::subscribe($connection, $auth, $data);
     }
 
     /**
@@ -29,9 +30,13 @@ class PrivateChannel extends Channel
      * @param  string  $auth
      * @return bool
      */
-    protected function verify(Connection $connection, string $auth): bool
+    protected function verify(Connection $connection, string $auth, string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
+
+        if ($data) {
+            $signature .= ":{$data}";
+        }
 
         if (! hash_equals(
             hash_hmac('sha256', $signature, 'abc'),

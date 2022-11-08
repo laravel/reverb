@@ -26,13 +26,14 @@ class Channel
      * Subscribe to the given channel.
      *
      * @param  Connection  $connection
-     * @param  string  $auth
+     * @param  string|null  $auth
+     * @param  string|null  $data
      * @return bool
      */
-    public function subscribe(Connection $connection, string $auth): void
+    public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
         App::make(ChannelManager::class)
-            ->subscribe($this, $connection);
+            ->subscribe($this, $connection, $data ? json_decode($data, true) : []);
     }
 
     /**
@@ -45,5 +46,15 @@ class Channel
     {
         App::make(ChannelManager::class)
             ->unsubscribe($this, $connection);
+    }
+
+    /**
+     * Get the data associated with the channel.
+     *
+     * @return array
+     */
+    public function data()
+    {
+        return [];
     }
 }

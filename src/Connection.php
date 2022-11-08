@@ -3,6 +3,7 @@
 namespace Reverb;
 
 use Closure;
+use Throwable;
 
 class Connection
 {
@@ -28,7 +29,11 @@ class Connection
 
     public function send($message)
     {
-        ($this->sendUsing)($message);
+        try {
+            ($this->sendUsing)($message);
+        } catch (Throwable $e) {
+            echo 'Unable to send message to connection: '.$e->getMessage();
+        }
     }
 
     protected function generateId()
