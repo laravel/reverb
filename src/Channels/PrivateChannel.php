@@ -3,7 +3,7 @@
 namespace Reverb\Channels;
 
 use Illuminate\Support\Str;
-use Reverb\Connection;
+use Reverb\Contracts\Connection;
 use Reverb\Exceptions\ConnectionUnauthorized;
 
 class PrivateChannel extends Channel
@@ -11,7 +11,7 @@ class PrivateChannel extends Channel
     /**
      * Subscribe to the given channel.
      *
-     * @param  Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @param  string  $auth
      * @param  string  $data
      * @return bool
@@ -26,7 +26,7 @@ class PrivateChannel extends Channel
     /**
      * Deteremine whether the given auth token is valid.
      *
-     * @param  Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @param  string  $auth
      * @return bool
      */

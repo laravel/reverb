@@ -4,7 +4,7 @@ namespace Reverb\Contracts;
 
 use Illuminate\Support\Collection;
 use Reverb\Channels\Channel;
-use Reverb\Connection;
+use Reverb\Contracts\Connection;
 
 interface ChannelManager
 {
@@ -12,7 +12,7 @@ interface ChannelManager
      * Subscribe to a channel.
      *
      * @param  \Reverb\Channels\Channel  $channel
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @param  array  $data
      * @return void
      */
@@ -22,7 +22,7 @@ interface ChannelManager
      * Unsubscribe from a channel.
      *
      * @param  \Reverb\Channels\Channel  $channel
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function unsubscribe(Channel $channel, Connection $connection): void;
@@ -37,7 +37,7 @@ interface ChannelManager
     /**
      * Unsubscribe from all channels.
      *
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return void;
      */
     public function unsubscribeFromAll(Connection $connection): void;

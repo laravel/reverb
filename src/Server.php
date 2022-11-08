@@ -4,6 +4,7 @@ namespace Reverb;
 
 use Exception;
 use Reverb\Contracts\ChannelManager;
+use Reverb\Contracts\Connection;
 use Reverb\Contracts\ConnectionManager;
 use Reverb\Exceptions\PusherException;
 
@@ -16,7 +17,7 @@ class Server
     /**
      * Handle the a client connection.
      *
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function open(Connection $connection)
@@ -29,7 +30,7 @@ class Server
     /**
      * Handle a new message received by the connected client.
      *
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @param  string  $message
      * @return void
      */
@@ -63,7 +64,7 @@ class Server
     /**
      * Handle a client disconnection.
      *
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function close(Connection $connection)
@@ -77,7 +78,7 @@ class Server
     /**
      * Handle an error.
      *
-     * @param  \Reverb\ConnectionInterface  $connection
+     * @param  \Reverb\Contracts\ConnectionInterface  $connection
      * @param  \Exception  $e
      * @return void
      */

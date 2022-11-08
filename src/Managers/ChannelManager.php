@@ -6,7 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
 use Reverb\Channels\Channel;
 use Reverb\Channels\ChannelBroker;
-use Reverb\Connection;
+use Reverb\Contracts\Connection;
 use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Reverb\Contracts\ConnectionManager;
 
@@ -20,7 +20,7 @@ class ChannelManager implements ChannelManagerInterface
      * Subscribe to a channel.
      *
      * @param  \Reverb\Channels\Channel  $channel
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @param  array  $data
      * @return void
      */
@@ -36,7 +36,7 @@ class ChannelManager implements ChannelManagerInterface
      * Unsubscribe from a channel.
      *
      * @param  \Reverb\Channels\Channel  $channel
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function unsubscribe(Channel $channel, Connection $connection): void

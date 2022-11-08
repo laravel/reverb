@@ -4,7 +4,6 @@ namespace Reverb\Ratchet;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
-use Reverb\Connection;
 use Reverb\Contracts\ConnectionManager;
 use Reverb\Server as ReverbServer;
 
@@ -73,16 +72,14 @@ class Server implements MessageComponentInterface
     /**
      * Get a Reverb connection from a Ratchet connection.
      *
-     * @param  \Ratchet\ConnectionInterfaceConnectionInterface  $connection
-     * @return \Reverb\Connection
+     * @param  \Ratchet\ConnectionInterface  $connection
+     * @return \Reverb\Contracts\Connection
      */
     protected function connection(ConnectionInterface $connection): Connection
     {
         if (! $managedConnection = $this->manager->get($connection->resourceId)) {
             $managedConnection = $this->manager->connect(
-                new Connection($connection->resourceId, function ($message) use ($connection) {
-                    $connection->send($message);
-                })
+                new Connection($connection)
             );
         }
 

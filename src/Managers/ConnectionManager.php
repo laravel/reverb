@@ -4,7 +4,7 @@ namespace Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
-use Reverb\Connection;
+use Reverb\Contracts\Connection;
 use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Traversable;
 
@@ -30,12 +30,12 @@ class ConnectionManager implements ConnectionManagerInterface
     /**
      * Add a connection.
      *
-     * @param  \Reverb\Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function connect(Connection $connection): Connection
     {
-        $this->connections->put($connection->identifier(), $connection);
+        $this->add($connection);
 
         $this->repository->forever($this->key(), $this->connections);
 
@@ -69,12 +69,44 @@ class ConnectionManager implements ConnectionManagerInterface
      * Get a connection by its identifier.
      *
      * @param  string  $identifier
-     * @return \Reverb\Connection  $connection
+     * @return \Reverb\Contracts\Connection  $connection
      */
     public function get(string $identifier): ?Connection
     {
-        return $this->connections->firstWhere(
+        $connection = $this->connections->firstWhere(
             fn (Connection $connection) => $connection->identifier() === $identifier
         );
+
+        if (! $connection) {
+            return null;
+        }
+
+        return is_object($connection) ? $connection : unserialize($connection);
+    }
+
+    /**
+     * Add a new connection to the collection.
+     *
+     * @param  Connection  $connection
+     * @return void
+     */
+    protected function add(Connection $connection): void
+    {
+        if ($this->shouldBeSerialized($connection)) {
+            $connection = ['serialized' => serialize($connection)];
+        }
+
+        $this->connections->put($connection->identifier(), $connection);
+    }
+
+    /**
+     * Determine whether the connection should be serialized.
+     *
+     * @param  Connection  $connection
+     * @return bool
+     */
+    protected function shouldBeSerialized(Connection $connection): bool
+    {
+        return in_array(SerializesConnections::class, class_uses($connection));
     }
 }

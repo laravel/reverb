@@ -3,15 +3,15 @@
 namespace Reverb\Channels;
 
 use Illuminate\Support\Facades\App;
-use Reverb\Connection;
 use Reverb\Contracts\ChannelManager;
+use Reverb\Contracts\Connection;
 
 class PresenceChannel extends PrivateChannel
 {
     /**
      * Subscribe to the given channel.
      *
-     * @param  Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @param  string  $auth
      * @param  string  $data
      * @return bool
@@ -31,7 +31,7 @@ class PresenceChannel extends PrivateChannel
     /**
      * Unsubscribe from the given channel.
      *
-     * @param  Connection  $connection
+     * @param  \Reverb\Contracts\Connection  $connection
      * @return bool
      */
     public function unsubscribe(Connection $connection): void
