@@ -2,9 +2,9 @@
 
 namespace Reverb\Contracts;
 
+use Illuminate\Support\Collection;
 use Reverb\Channels\Channel;
 use Reverb\Connection;
-use Traversable;
 
 interface ChannelManager
 {
@@ -29,9 +29,9 @@ interface ChannelManager
     /**
      * Get all the channels.
      *
-     * @return \Traversable
+     * @return \Illuminate\Support\Collection
      */
-    public function all(): Traversable;
+    public function all(): Collection;
 
     /**
      * Unsubscribe from all channels.
@@ -45,9 +45,9 @@ interface ChannelManager
      * Get all connections subscribed to a channel.
      *
      * @param  \Reverb\Channels\Channel  $channel
-     * @return \Traversable
+     * @return \Illuminate\Support\Collection
      */
-    public function connections(Channel $channel): Traversable;
+    public function connections(Channel $channel): Collection;
 
     /**
      * Send a message to all connections subscribed to the given channel.

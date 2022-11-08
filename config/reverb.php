@@ -2,16 +2,20 @@
 
 return [
 
-    'default' => env('REVERB_DRIVER', 'server'),
+    'default' => env('REVERB_DRIVER', 'ratchet'),
 
     'drivers' => [
 
-        'server' => [],
+        'ratchet' => [
 
-        'serverless' => [],
+        ],
+
+        'api_gateway' => [],
 
     ],
 
-    'store' => 'array',
+    'connection_cache' => 'array',
+
+    'channel_cache' => 'file',
 
 ];

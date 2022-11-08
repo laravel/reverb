@@ -1,24 +1,30 @@
 <?php
 
-namespace Reverb\Managers\Connections;
+namespace Reverb\Managers;
 
-use Illuminate\Support\Collection as IlluminateCollection;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Collection;
 use Reverb\Connection;
-use Reverb\Contracts\ConnectionManager;
+use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Traversable;
 
-class Collection implements ConnectionManager
+class ConnectionManager implements ConnectionManagerInterface
 {
-    /**
-     * The connections.
-     *
-     * @var \Illuminate\Support\Collection<\Reverb\Connection>
-     */
-    protected $connections;
+    protected Collection $connections;
 
-    public function __construct()
+    public function __construct(protected Repository $repository, protected $prefix = 'reverb')
     {
-        $this->connections = new IlluminateCollection;
+        $this->connections = collect($this->repository->get($this->key(), []));
+    }
+
+    /**
+     * Determine the cache key.
+     *
+     * @return string
+     */
+    protected function key()
+    {
+        return "{$this->prefix}:connections";
     }
 
     /**
@@ -30,6 +36,8 @@ class Collection implements ConnectionManager
     public function connect(Connection $connection): Connection
     {
         $this->connections->put($connection->identifier(), $connection);
+
+        $this->repository->forever($this->key(), $this->connections);
 
         return $connection;
     }
@@ -43,6 +51,8 @@ class Collection implements ConnectionManager
     public function disconnect(Connection $connection): void
     {
         $this->connections->forget($connection->identifier());
+
+        $this->repository->forever($this->key(), $this->connections);
     }
 
     /**

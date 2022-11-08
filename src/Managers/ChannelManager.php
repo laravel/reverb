@@ -1,0 +1,154 @@
+<?php
+
+namespace Reverb\Managers;
+
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Collection;
+use Reverb\Channels\Channel;
+use Reverb\Channels\ChannelBroker;
+use Reverb\Connection;
+use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Reverb\Contracts\ConnectionManager;
+
+class ChannelManager implements ChannelManagerInterface
+{
+    public function __construct(protected Repository $repository, protected ConnectionManager $connections, protected $prefix = 'reverb')
+    {
+    }
+
+    /**
+     * Subscribe to a channel.
+     *
+     * @param  \Reverb\Channels\Channel  $channel
+     * @param  \Reverb\Connection  $connection
+     * @return void
+     */
+    public function subscribe(Channel $channel, Connection $connection): void
+    {
+        $connections = $this->connections($channel)
+            ->push($connection->identifier());
+
+        $this->syncConnections($channel, $connections);
+    }
+
+    /**
+     * Unsubscribe from a channel.
+     *
+     * @param  \Reverb\Channels\Channel  $channel
+     * @param  \Reverb\Connection  $connection
+     * @return void
+     */
+    public function unsubscribe(Channel $channel, Connection $connection): void
+    {
+        $connections = $this->connections($channel)
+            ->reject(fn ($identifier) => $identifier === $connection->identifier());
+
+        $this->syncConnections($channel, $connections);
+    }
+
+    /**
+     * Get all the channels.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function all(): Collection
+    {
+        return $this->channels()->map(function ($connections, $name) {
+            return ChannelBroker::create($name);
+        });
+    }
+
+    /**
+     * Unsubscribe from all channels.
+     *
+     * @return void
+     */
+    public function unsubscribeFromAll(Connection $connection): void
+    {
+        $this->channels()->each(function ($connections, $name) use ($connection) {
+            $this->unsubscribe(
+                ChannelBroker::create($name),
+                $connection
+            );
+        });
+    }
+
+    /**
+     * Get all connections subscribed to a channel.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function connections(Channel $channel): Collection
+    {
+        return $this->channel($channel);
+    }
+
+    /**
+     * Sync the connections for a channel.
+     *
+     * @param  Channel  $channel
+     * @param  Collection  $connections
+     * @return void
+     */
+    protected function syncConnections(Channel $channel, Collection $connections): void
+    {
+        $channels = $this->channels();
+
+        $channels[$channel->name()] = $connections;
+
+        $this->repository->forever($this->key(), $channels);
+    }
+
+    /**
+     * Send a message to all connections subscribed to the given channel.
+     *
+     * @param  \Reverb\Channels\Channel  $channel
+     * @param  array  $payload
+     * @return void
+     */
+    public function broadcast(Channel $channel, array $payload = []): void
+    {
+        $this->connections($channel)->each(function ($identifier) use ($payload) {
+            $this->connections->get($identifier)
+                ->send(json_encode($payload));
+        });
+    }
+
+    /**
+     * Get the key for the channels.
+     *
+     * @return string
+     */
+    protected function key(): string
+    {
+        return 'reverb:channels';
+    }
+
+    /**
+     * Get the given channel from the cache.
+     *
+     * @param  Channel  $channel
+     * @return Collection
+     */
+    protected function channel(Channel $channel): Collection
+    {
+        return $this->channels($channel);
+    }
+
+    /**
+     * Get the channels from the cache.
+     *
+     * @param  Channel  $channel
+     * @return Collection
+     */
+    protected function channels(Channel $channel = null): Collection
+    {
+        $channels = $this->repository->get($this->key(), []);
+
+        if ($channel) {
+            return collect($channels[$channel->name()] ?? []);
+        }
+
+        return collect($channels);
+    }
+}

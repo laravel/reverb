@@ -4,10 +4,10 @@ namespace Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Reverb\Console\Commands\RunServer;
-use Reverb\Contracts\ChannelManager;
-use Reverb\Contracts\ConnectionManager;
-use Reverb\Managers\Channels\Collection as ChannelCollection;
-use Reverb\Managers\Connections\Collection as ConnectionCollection;
+use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
+use Reverb\Managers\ChannelManager;
+use Reverb\Managers\ConnectionManager;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -26,15 +26,22 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/reverb.php', 'reverb'
         );
 
-        $this->app->singleton(ConnectionManager::class, function ($app) {
-            // @TODO use the manager pattern here.
-            return new ConnectionCollection;
+        $config = $this->app['config']['reverb'];
+
+        $this->app->singleton(ConnectionManagerInterface::class, function ($app) use ($config) {
+            return new ConnectionManager(
+                $app['cache']->store(
+                    $config['connection_cache']
+                ),
+            );
         });
 
-        $this->app->singleton(ChannelManager::class, function ($app) {
-            // @TODO use the manager pattern here.
-            return new ChannelCollection(
-                $this->app->make(ConnectionManager::class)
+        $this->app->singleton(ChannelManagerInterface::class, function ($app) use ($config) {
+            return new ChannelManager(
+                $app['cache']->store(
+                    $config['channel_cache']
+                ),
+                $app->make(ConnectionManagerInterface::class)
             );
         });
     }
