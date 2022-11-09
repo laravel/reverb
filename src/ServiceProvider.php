@@ -3,11 +3,14 @@
 namespace Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use InvalidArgumentException;
 use Reverb\Console\Commands\RunServer;
 use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Reverb\Managers\ChannelManager;
 use Reverb\Managers\ConnectionManager;
+use Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
+use Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -18,6 +21,10 @@ class ServiceProvider extends BaseServiceProvider
                 RunServer::class,
             ]);
         }
+
+        $this->publishes([
+            __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
+        ]);
     }
 
     public function register()
@@ -46,5 +53,26 @@ class ServiceProvider extends BaseServiceProvider
                 $config['channel_cache']['prefix']
             );
         });
+
+        $this->app->register(
+            $this->getServerProvider($config['default'])
+        );
+    }
+
+    /**
+     * Register the server provider.
+     *
+     * @param  string  $server
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getServerProvider($name)
+    {
+        return match ($name) {
+            'ratchet' => RatchetServiceProvider::class,
+            'api_gateway' => ApiGatewayServiceProvider::class,
+            default => throw new InvalidArgumentException("Server provider [{$name}] is not supported."),
+        };
     }
 }

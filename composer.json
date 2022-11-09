@@ -15,6 +15,7 @@
         }
     ],
     "require": {
+        "aws/aws-sdk-php": "^3.241",
         "cboden/ratchet": "^0.4.4",
         "clue/redis-react": "^2.6",
         "illuminate/cache": "^9.38",

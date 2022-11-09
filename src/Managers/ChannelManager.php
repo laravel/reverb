@@ -6,8 +6,8 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
 use Reverb\Channels\Channel;
 use Reverb\Channels\ChannelBroker;
-use Reverb\Contracts\Connection;
 use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Reverb\Contracts\Connection;
 use Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
@@ -108,6 +108,8 @@ class ChannelManager implements ChannelManagerInterface
     {
         $this->connections($channel)->each(function ($data, $identifier) use ($payload) {
             if (! $connection = $this->connections->get($identifier)) {
+                info('We be returning early...');
+
                 return;
             }
 

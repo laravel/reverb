@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Ratchet;
+namespace Reverb\Servers\Ratchet;
 
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Reverb\Concerns\GeneratesPusherIdentifiers;

@@ -26,7 +26,7 @@ class Pusher
                 $connection,
                 $payload['channel'],
                 $payload['auth'],
-                $payload['channel_data']
+                $payload['channel_data'] ?? null
             ),
             'unsubscribe' => self::unsubscribe($connection, $payload['channel']),
             'ping' => self::ping($connection),
@@ -56,7 +56,7 @@ class Pusher
      * @param  string  $auth
      * @return void
      */
-    public static function subscribe(Connection $connection, string $channel, string $auth, string $data): void
+    public static function subscribe(Connection $connection, string $channel, string $auth, ?string $data = null): void
     {
         $channel = ChannelBroker::create($channel);
 

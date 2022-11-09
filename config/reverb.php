@@ -27,7 +27,11 @@ return [
         ],
 
         'api_gateway' => [
-            //
+
+            'region' => 'us-east-1',
+
+            'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
+
         ],
 
     ],
