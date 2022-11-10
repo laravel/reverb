@@ -49,6 +49,24 @@ class Channel
     }
 
     /**
+     * Send a message to all connections subscribed to the channel.
+     *
+     * @param  array  $payload
+     * @return void
+     */
+    public function broadcast(array $payload = [])
+    {
+        App::make(ChannelManager::class)
+            ->connections($this)->each(function ($data, $identifier) use ($payload) {
+                if (! $connection = $this->connections->get($identifier)) {
+                    return;
+                }
+
+                $connection->send(json_encode($payload));
+            });
+    }
+
+    /**
      * Get the data associated with the channel.
      *
      * @return array

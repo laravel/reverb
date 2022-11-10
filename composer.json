@@ -24,6 +24,10 @@
         "illuminate/redis": "^9.38",
         "illuminate/support": "^9.37"
     },
+    "require-dev": {
+        "orchestra/testbench": "^7.11",
+        "pestphp/pest-plugin-laravel": "^1.3"
+    },
     "autoload": {
         "psr-4": {
             "Reverb\\": "src/"
@@ -42,11 +46,11 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "require-dev": {
-        "phpunit/phpunit": "^9.5"
-    }
+    "prefer-stable": true
 }
