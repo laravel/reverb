@@ -20,12 +20,11 @@ class PresenceChannel extends PrivateChannel
     {
         parent::subscribe($connection, $auth, $data);
 
-        App::make(ChannelManager::class)
-            ->broadcast($this, [
-                'event' => 'pusher_internal:member_added',
-                'data' => $data ? json_decode($data, true) : [],
-                'channel' => $this->name(),
-            ]);
+        $this->broadcast([
+            'event' => 'pusher_internal:member_added',
+            'data' => $data ? json_decode($data, true) : [],
+            'channel' => $this->name(),
+        ]);
     }
 
     /**
@@ -39,12 +38,11 @@ class PresenceChannel extends PrivateChannel
         $data = App::make(ChannelManager::class)
             ->data($this, $connection);
 
-        App::make(ChannelManager::class)
-            ->broadcast($this, [
-                'event' => 'pusher_internal:member_removed',
-                'data' => ['user_id' => $data['user_id']],
-                'channel' => $this->name(),
-            ]);
+        $this->broadcast([
+            'event' => 'pusher_internal:member_removed',
+            'data' => ['user_id' => $data['user_id']],
+            'channel' => $this->name(),
+        ]);
 
         parent::unsubscribe($connection);
     }

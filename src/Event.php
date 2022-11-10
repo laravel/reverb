@@ -6,7 +6,6 @@ use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Reverb\Channels\ChannelBroker;
-use Reverb\Contracts\ChannelManager;
 
 class Event
 {
@@ -44,12 +43,11 @@ class Event
         foreach ($channels as $channel) {
             $channel = ChannelBroker::create($channel);
 
-            App::make(ChannelManager::class)
-                ->broadcast($channel, [
-                    'event' => $event['name'],
-                    'channel' => $channel->name(),
-                    'data' => $event['data'],
-                ]);
+            $channel->broadcast([
+                'event' => $event['name'],
+                'channel' => $channel->name(),
+                'data' => $event['data'],
+            ]);
         }
     }
 }

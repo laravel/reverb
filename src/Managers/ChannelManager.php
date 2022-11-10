@@ -12,8 +12,11 @@ use Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
 {
-    public function __construct(protected Repository $repository, protected ConnectionManager $connections, protected $prefix = 'reverb')
-    {
+    public function __construct(
+        protected Repository $repository,
+        protected ConnectionManager $connections,
+        protected $prefix = 'reverb'
+    ) {
     }
 
     /**
@@ -98,33 +101,13 @@ class ChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Send a message to all connections subscribed to the given channel.
-     *
-     * @param  \Reverb\Channels\Channel  $channel
-     * @param  array  $payload
-     * @return void
-     */
-    public function broadcast(Channel $channel, array $payload = []): void
-    {
-        $this->connections($channel)->each(function ($data, $identifier) use ($payload) {
-            if (! $connection = $this->connections->get($identifier)) {
-                info('We be returning early...');
-
-                return;
-            }
-
-            $connection->send(json_encode($payload));
-        });
-    }
-
-    /**
      * Get the key for the channels.
      *
      * @return string
      */
     protected function key(): string
     {
-        return 'reverb:channels';
+        return "{$this->prefix}:channels";
     }
 
     /**

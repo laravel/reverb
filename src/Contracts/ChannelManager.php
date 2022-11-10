@@ -4,7 +4,6 @@ namespace Reverb\Contracts;
 
 use Illuminate\Support\Collection;
 use Reverb\Channels\Channel;
-use Reverb\Contracts\Connection;
 
 interface ChannelManager
 {
@@ -49,13 +48,4 @@ interface ChannelManager
      * @return \Illuminate\Support\Collection
      */
     public function connections(Channel $channel): Collection;
-
-    /**
-     * Send a message to all connections subscribed to the given channel.
-     *
-     * @param  \Reverb\Channels\Channel  $channel
-     * @param  array  $payload
-     * @return void
-     */
-    public function broadcast(Channel $channel, array $payload = []): void;
 }
