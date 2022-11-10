@@ -5,6 +5,7 @@ namespace Reverb\Channels;
 use Illuminate\Support\Facades\App;
 use Reverb\Contracts\ChannelManager;
 use Reverb\Contracts\Connection;
+use Reverb\Contracts\ConnectionManager;
 
 class Channel
 {
@@ -58,7 +59,7 @@ class Channel
     {
         App::make(ChannelManager::class)
             ->connections($this)->each(function ($data, $identifier) use ($payload) {
-                if (! $connection = $this->connections->get($identifier)) {
+                if (! $connection = App::make(ConnectionManager::class)->get($identifier)) {
                     return;
                 }
 
