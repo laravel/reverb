@@ -4,6 +4,7 @@ namespace Reverb\Console\Commands;
 
 use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
+use Exception;
 use Illuminate\Console\Command;
 use Ratchet\Http\HttpServer;
 use Ratchet\Http\Router;
@@ -136,6 +137,10 @@ class RunServer extends Command
         dump($redis->subscribe($config['channel']));
 
         dump($redis->listeners());
+
+        $redis->on('error', function (Exception $e) {
+            echo 'Error: '.$e->getMessage().PHP_EOL;
+        });
 
         $redis->on('message', function (string $channel, string $payload) {
             Event::dispatchSynchronously($payload);
