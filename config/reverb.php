@@ -28,7 +28,7 @@ return [
 
         'api_gateway' => [
 
-            'region' => 'us-east-1',
+            'region' => env('REVERB_API_GATEWAY_REGION', 'us-east-1'),
 
             'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
 
@@ -46,9 +46,9 @@ return [
 
     'connection_cache' => [
 
-        'store' => 'array',
+        'store' => env('REVERB_CONNECTION_CACHE', 'array'),
 
-        'prefix' => 'reverb',
+        'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
 
     ],
 
@@ -62,9 +62,9 @@ return [
 
     'channel_cache' => [
 
-        'store' => 'array',
+        'store' => env('REVERB_CHANNEL_CACHE', 'array'),
 
-        'prefix' => 'reverb',
+        'prefix' => env('REVERB_CHANNEL_CACHE_PREFIX', 'reverb'),
 
     ],
 
@@ -78,9 +78,9 @@ return [
 
     'pubsub' => [
 
-        'enabled' => false,
+        'enabled' => env('REVERB_PUBSUB_ENABLED', false),
 
-        'channel' => 'reverb',
+        'channel' => env('REVERB_PUBSUB_CHANNEL', 'reverb'),
 
     ],
 
