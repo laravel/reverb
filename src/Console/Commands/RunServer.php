@@ -106,7 +106,7 @@ class RunServer extends Command
     protected function bindRedis(LoopInterface $loop): void
     {
         $this->laravel->singleton(Client::class, function () use ($loop) {
-            return (new Factory($loop))->createClient(
+            return (new Factory($loop))->createLazyClient(
                 $this->redisUrl()
             );
         });
