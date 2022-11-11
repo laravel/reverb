@@ -105,8 +105,6 @@ class RunServer extends Command
      */
     protected function bindRedis(LoopInterface $loop): void
     {
-        dump($this->redisUrl());
-
         $this->laravel->singleton(Client::class, function () use ($loop) {
             return (new Factory($loop))->createClient(
                 $this->redisUrl()
@@ -125,26 +123,30 @@ class RunServer extends Command
         $config = $this->laravel['config']['reverb']['pubsub'];
 
         if (! $config['enabled']) {
-            dump('Returning too soon');
-
             return;
         }
 
-        $redis = (new Factory($loop))->createClient(
-            $this->redisUrl()
-        );
+        try {
+            $redis = (new Factory($loop))->createClient(
+                $this->redisUrl()
+            );
 
-        dump($redis->subscribe($config['channel']));
+            dd($redis);
+        } catch (Exception $e) {
+            dd($e->getMessage());
+        }
 
-        dump($redis->listeners());
+        // dump($redis->subscribe($config['channel']));
 
-        $redis->on('error', function (Exception $e) {
-            echo 'Error: '.$e->getMessage().PHP_EOL;
-        });
+        // dump($redis->listeners());
 
-        $redis->on('message', function (string $channel, string $payload) {
-            Event::dispatchSynchronously($payload);
-        });
+        // $redis->on('error', function (Exception $e) {
+        //     echo 'Error: '.$e->getMessage().PHP_EOL;
+        // });
+
+        // $redis->on('message', function (string $channel, string $payload) {
+        //     Event::dispatchSynchronously($payload);
+        // });
     }
 
     /**
