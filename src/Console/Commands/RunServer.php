@@ -124,6 +124,8 @@ class RunServer extends Command
         $config = $this->laravel['config']['reverb']['pubsub'];
 
         if (! $config['enabled']) {
+            dump('Returning too soon');
+
             return;
         }
 
@@ -132,6 +134,8 @@ class RunServer extends Command
         );
 
         $redis->subscribe($config['channel']);
+
+        dump($redis->listeners());
 
         $redis->on('message', function (string $channel, string $payload) {
             Event::dispatchSynchronously($payload);

@@ -26,10 +26,14 @@ class Event
 
         dump('Sending pubsub message');
 
-        dump(App::make(Client::class)->publish(
+        $redis = App::make(Client::class);
+
+        dump($redis->listeners());
+
+        $redis->publish(
             Config::get('reverb.pubsub.channel'),
             $payload
-        ));
+        );
     }
 
     /**
