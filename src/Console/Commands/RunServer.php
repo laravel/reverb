@@ -126,27 +126,19 @@ class RunServer extends Command
             return;
         }
 
-        try {
-            $redis = (new Factory($loop))->createClient(
-                $this->redisUrl()
-            );
+        $redis = (new Factory($loop))->createLazyClient(
+            $this->redisUrl()
+        );
 
-            dd($redis);
-        } catch (Exception $e) {
-            dd($e->getMessage());
-        }
+        $redis->subscribe($config['channel']);
 
-        // dump($redis->subscribe($config['channel']));
+        $redis->on('error', function (Exception $e) {
+            echo 'Error: '.$e->getMessage().PHP_EOL;
+        });
 
-        // dump($redis->listeners());
-
-        // $redis->on('error', function (Exception $e) {
-        //     echo 'Error: '.$e->getMessage().PHP_EOL;
-        // });
-
-        // $redis->on('message', function (string $channel, string $payload) {
-        //     Event::dispatchSynchronously($payload);
-        // });
+        $redis->on('message', function (string $channel, string $payload) {
+            Event::dispatchSynchronously($payload);
+        });
     }
 
     /**

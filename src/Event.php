@@ -18,17 +18,12 @@ class Event
     public static function dispatch(string $payload): void
     {
         if (! Config::get('reverb.pubsub.enabled')) {
-            dump('Not asynchronous');
             static::dispatchSynchronously($payload);
 
             return;
         }
 
-        dump('Sending pubsub message');
-
         $redis = App::make(Client::class);
-
-        dump($redis->listeners());
 
         $redis->publish(
             Config::get('reverb.pubsub.channel'),
