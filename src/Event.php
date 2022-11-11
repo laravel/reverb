@@ -40,6 +40,8 @@ class Event
      */
     public static function dispatchSynchronously(string $payload): void
     {
+        dump('Notifying channel subscribers');
+
         $event = json_decode($payload, true);
         $channels = isset($event['channel']) ? [$event['channel']] : $event['channels'];
 
