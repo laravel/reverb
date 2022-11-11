@@ -108,7 +108,7 @@ class RunServer extends Command
         dump($this->redisUrl());
 
         $this->laravel->singleton(Client::class, function () use ($loop) {
-            return (new Factory($loop))->createLazyClient(
+            return (new Factory($loop))->createClient(
                 $this->redisUrl()
             );
         });
@@ -130,7 +130,7 @@ class RunServer extends Command
             return;
         }
 
-        $redis = (new Factory($loop))->createLazyClient(
+        $redis = (new Factory($loop))->createClient(
             $this->redisUrl()
         );
 
