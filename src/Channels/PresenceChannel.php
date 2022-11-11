@@ -38,11 +38,13 @@ class PresenceChannel extends PrivateChannel
         $data = App::make(ChannelManager::class)
             ->data($this, $connection);
 
-        $this->broadcast([
-            'event' => 'pusher_internal:member_removed',
-            'data' => ['user_id' => $data['user_id']],
-            'channel' => $this->name(),
-        ]);
+        if (isset($data['user_id'])) {
+            $this->broadcast([
+                'event' => 'pusher_internal:member_removed',
+                'data' => ['user_id' => $data['user_id']],
+                'channel' => $this->name(),
+            ]);
+        }
 
         parent::unsubscribe($connection);
     }
