@@ -133,7 +133,7 @@ class RunServer extends Command
             $this->redisUrl()
         );
 
-        $redis->subscribe($config['channel']);
+        dump($redis->subscribe($config['channel']));
 
         dump($redis->listeners());
 
