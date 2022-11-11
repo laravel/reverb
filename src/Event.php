@@ -26,10 +26,10 @@ class Event
 
         dump('Sending pubsub message');
 
-        App::make(Client::class)->publish(
+        dump(App::make(Client::class)->publish(
             Config::get('reverb.pubsub.channel'),
             $payload
-        );
+        ));
     }
 
     /**
