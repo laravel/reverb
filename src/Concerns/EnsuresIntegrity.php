@@ -30,12 +30,22 @@ trait EnsuresIntegrity
     }
 
     /**
-     * Get the mutex key.
+     * Get the mutex category key.
      *
      * @return string
      */
     protected function key(): string
     {
         return 'mutex';
+    }
+
+    /**
+     * Get the mutex key.
+     *
+     * @return string
+     */
+    protected function mutexKey(): string
+    {
+        return "{$this->key()}:mutex";
     }
 }
