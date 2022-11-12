@@ -134,14 +134,14 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function channels(Channel $channel = null): Collection
     {
-        $this->mutex(function () use ($channel) {
+        return $this->mutex(function () use ($channel) {
             $channels = $this->repository->get($this->key(), []);
 
             if ($channel) {
                 return collect($channels[$channel->name()] ?? []);
             }
 
-            return collect($channels);
+            return collect($channels ?: []);
         });
     }
 
