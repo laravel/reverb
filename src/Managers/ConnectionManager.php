@@ -127,7 +127,7 @@ class ConnectionManager implements ConnectionManagerInterface
     protected function connections(): Collection
     {
         return $this->mutex(function () {
-            collect($this->repository->get($this->key(), []));
+            return collect($this->repository->get($this->key(), []));
         });
     }
 }
