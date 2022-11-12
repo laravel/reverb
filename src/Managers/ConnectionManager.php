@@ -4,17 +4,21 @@ namespace Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
+use Reverb\Concerns\EnsuresIntegrity;
 use Reverb\Contracts\Connection;
 use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Traversable;
 
 class ConnectionManager implements ConnectionManagerInterface
 {
+    use EnsuresIntegrity;
+
     protected Collection $connections;
 
-    public function __construct(protected Repository $repository, protected $prefix = 'reverb')
-    {
-        $this->connections = collect($this->repository->get($this->key(), []));
+    public function __construct(
+        protected Repository $repository,
+        protected $prefix = 'reverb'
+    ) {
     }
 
     /**
@@ -37,8 +41,6 @@ class ConnectionManager implements ConnectionManagerInterface
     {
         $this->add($connection);
 
-        $this->repository->forever($this->key(), $this->connections);
-
         return $connection;
     }
 
@@ -50,9 +52,14 @@ class ConnectionManager implements ConnectionManagerInterface
      */
     public function disconnect(Connection $connection): void
     {
-        $this->connections->forget($connection->identifier());
+        $connections = $this->connections()->forget($connection->identifier());
 
-        $this->repository->forever($this->key(), $this->connections);
+        $this->mutex(function () use ($connections) {
+            $this->repository->forever(
+                $this->key(),
+                $connections
+            );
+        });
     }
 
     /**
@@ -62,7 +69,7 @@ class ConnectionManager implements ConnectionManagerInterface
      */
     public function all(): Traversable
     {
-        return $this->connections;
+        return $this->connections();
     }
 
     /**
@@ -73,7 +80,7 @@ class ConnectionManager implements ConnectionManagerInterface
      */
     public function get(string $identifier): ?Connection
     {
-        $connection = $this->connections->firstWhere(
+        $connection = $this->connections()->firstWhere(
             fn (Connection $connection) => $connection->identifier() === $identifier
         );
 
@@ -96,7 +103,14 @@ class ConnectionManager implements ConnectionManagerInterface
             $connection = ['serialized' => serialize($connection)];
         }
 
-        $this->connections->put($connection->identifier(), $connection);
+        $connections = $this->connections()->put($connection->identifier(), $connection);
+
+        $this->mutex(function () use ($connections) {
+            $this->repository->forever(
+                $this->key(),
+                $connections
+            );
+        });
     }
 
     /**
@@ -108,5 +122,12 @@ class ConnectionManager implements ConnectionManagerInterface
     protected function shouldBeSerialized(Connection $connection): bool
     {
         return in_array(SerializesConnections::class, class_uses($connection));
+    }
+
+    protected function connections(): Collection
+    {
+        return $this->mutex(function () {
+            collect($this->repository->get($this->key(), []));
+        });
     }
 }

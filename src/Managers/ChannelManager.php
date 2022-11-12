@@ -6,12 +6,15 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
 use Reverb\Channels\Channel;
 use Reverb\Channels\ChannelBroker;
+use Reverb\Concerns\EnsuresIntegrity;
 use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Reverb\Contracts\Connection;
 use Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
 {
+    use EnsuresIntegrity;
+
     public function __construct(
         protected Repository $repository,
         protected ConnectionManager $connections,
@@ -95,9 +98,11 @@ class ChannelManager implements ChannelManagerInterface
     {
         $channels = $this->channels();
 
-        $channels[$channel->name()] = $connections;
+        $this->mutex(function () use ($channel, $connections, $channels) {
+            $channels[$channel->name()] = $connections;
 
-        $this->repository->forever($this->key(), $channels);
+            $this->repository->forever($this->key(), $channels);
+        });
     }
 
     /**
@@ -129,13 +134,15 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function channels(Channel $channel = null): Collection
     {
-        $channels = $this->repository->get($this->key(), []);
+        $this->mutex(function () use ($channel) {
+            $channels = $this->repository->get($this->key(), []);
 
-        if ($channel) {
-            return collect($channels[$channel->name()] ?? []);
-        }
+            if ($channel) {
+                return collect($channels[$channel->name()] ?? []);
+            }
 
-        return collect($channels);
+            return collect($channels);
+        });
     }
 
     /**
