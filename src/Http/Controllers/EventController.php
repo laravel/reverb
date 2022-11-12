@@ -12,8 +12,6 @@ class EventController implements HttpServerInterface
 {
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
     {
-        dump((string) $request->getBody());
-
         Event::dispatch(
             (string) $request->getBody()
         );
