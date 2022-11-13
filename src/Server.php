@@ -51,13 +51,14 @@ class Server
         } catch (Exception $e) {
             $from->send(json_encode([
                 'event' => 'pusher:error',
-                'data' => [
+                'data' => json_encode([
                     'code' => 4200,
-                    'message' => $e->getMessage(),
-                ],
+                    'message' => 'Invalid message format',
+                ]),
             ]));
 
             echo 'Message from '.$from->id().' resulted in an unknown error'.PHP_EOL;
+            echo $e->getMessage().PHP_EOL;
         }
     }
 

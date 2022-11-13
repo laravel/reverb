@@ -2,6 +2,7 @@
 
 namespace Reverb\Channels;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Reverb\Contracts\Connection;
 use Reverb\Exceptions\ConnectionUnauthorized;
@@ -39,7 +40,11 @@ class PrivateChannel extends Channel
         }
 
         if (! hash_equals(
-            hash_hmac('sha256', $signature, 'abc'),
+            hash_hmac(
+                'sha256',
+                $signature,
+                App::make('config')->get('broadcasting.connections.pusher.secret')
+            ),
             Str::after($auth, ':')
         )) {
             throw new ConnectionUnauthorized;

@@ -14,10 +14,10 @@ abstract class PusherException extends Exception
     {
         return [
             'event' => 'pusher:error',
-            'data' => [
+            'data' => json_encode([
                 'code' => $this->code,
                 'message' => $this->message,
-            ],
+            ]),
         ];
     }
 }
