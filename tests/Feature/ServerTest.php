@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Testing\Assert;
-use Reverb\Contracts\ChannelManager;
-use Reverb\Contracts\Connection as ConnectionInterface;
-use Reverb\Contracts\ConnectionManager;
-use Reverb\Server;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Server;
 
 beforeEach(function () {
     $this->connectionManager = Mockery::spy(ConnectionManager::class);

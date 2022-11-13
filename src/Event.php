@@ -1,11 +1,11 @@
 <?php
 
-namespace Reverb;
+namespace Laravel\Reverb;
 
 use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Channels\ChannelBroker;
 
 class Event
 {

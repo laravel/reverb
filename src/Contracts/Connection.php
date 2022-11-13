@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Contracts;
+namespace Laravel\Reverb\Contracts;
 
 interface Connection
 {

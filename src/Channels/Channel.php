@@ -1,11 +1,11 @@
 <?php
 
-namespace Reverb\Channels;
+namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Facades\App;
-use Reverb\Contracts\ChannelManager;
-use Reverb\Contracts\Connection;
-use Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\ConnectionManager;
 
 class Channel
 {
@@ -26,7 +26,7 @@ class Channel
     /**
      * Subscribe to the given channel.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string|null  $auth
      * @param  string|null  $data
      * @return bool
@@ -40,7 +40,7 @@ class Channel
     /**
      * Unsubscribe from the given channel.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return bool
      */
     public function unsubscribe(Connection $connection): void

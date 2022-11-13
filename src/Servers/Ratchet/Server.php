@@ -1,11 +1,11 @@
 <?php
 
-namespace Reverb\Servers\Ratchet;
+namespace Laravel\Reverb\Servers\Ratchet;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
-use Reverb\Contracts\ConnectionManager;
-use Reverb\Server as ReverbServer;
+use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Server as ReverbServer;
 
 class Server implements MessageComponentInterface
 {
@@ -73,7 +73,7 @@ class Server implements MessageComponentInterface
      * Get a Reverb connection from a Ratchet connection.
      *
      * @param  \Ratchet\ConnectionInterface  $connection
-     * @return \Reverb\Contracts\Connection
+     * @return \Laravel\Reverb\Contracts\Connection
      */
     protected function connection(ConnectionInterface $connection): Connection
     {

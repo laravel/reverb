@@ -1,17 +1,17 @@
 <?php
 
-namespace Reverb\Contracts;
+namespace Laravel\Reverb\Contracts;
 
 use Illuminate\Support\Collection;
-use Reverb\Channels\Channel;
+use Laravel\Reverb\Channels\Channel;
 
 interface ChannelManager
 {
     /**
      * Subscribe to a channel.
      *
-     * @param  \Reverb\Channels\Channel  $channel
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  array  $data
      * @return void
      */
@@ -20,8 +20,8 @@ interface ChannelManager
     /**
      * Unsubscribe from a channel.
      *
-     * @param  \Reverb\Channels\Channel  $channel
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function unsubscribe(Channel $channel, Connection $connection): void;
@@ -36,7 +36,7 @@ interface ChannelManager
     /**
      * Unsubscribe from all channels.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void;
      */
     public function unsubscribeFromAll(Connection $connection): void;
@@ -44,7 +44,7 @@ interface ChannelManager
     /**
      * Get all connections subscribed to a channel.
      *
-     * @param  \Reverb\Channels\Channel  $channel
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\Support\Collection
      */
     public function connections(Channel $channel): Collection;

@@ -1,19 +1,19 @@
 <?php
 
-namespace Reverb;
+namespace Laravel\Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
-use Reverb\Channels\Channel;
-use Reverb\Channels\ChannelBroker;
-use Reverb\Contracts\Connection;
+use Laravel\Reverb\Channels\Channel;
+use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\Connection;
 
 class Pusher
 {
     /**
      * Handle a pusher event.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $event
      * @param  array  $data
      * @return void
@@ -37,7 +37,7 @@ class Pusher
     /**
      * Acknowledge the connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public static function acknowledge(Connection $connection)
@@ -51,7 +51,7 @@ class Pusher
     /**
      * Subscribe to the given channel.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $channel
      * @param  string  $auth
      * @return void
@@ -68,7 +68,7 @@ class Pusher
     /**
      * Unsubscribe from the given channel.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $channel
      * @return void
      */
@@ -81,7 +81,7 @@ class Pusher
     /**
      * Respond to a ping.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      */
     public static function ping(Connection $connection): void
     {
@@ -91,7 +91,7 @@ class Pusher
     /**
      * Send a response to the given connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $event
      * @param  array  $data
      * @return void
@@ -106,7 +106,7 @@ class Pusher
     /**
      * Send an internal response to the given connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $event
      * @param  string  $channel
      * @param  array  $data
@@ -122,7 +122,7 @@ class Pusher
     /**
      * Send an error response to the given connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public static function error(Connection $connection)

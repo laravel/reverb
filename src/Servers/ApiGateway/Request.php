@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Servers\ApiGateway;
+namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Illuminate\Support\Arr;
 

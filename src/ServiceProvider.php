@@ -1,16 +1,16 @@
 <?php
 
-namespace Reverb;
+namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use InvalidArgumentException;
-use Reverb\Console\Commands\RunServer;
-use Reverb\Contracts\ChannelManager as ChannelManagerInterface;
-use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
-use Reverb\Managers\ChannelManager;
-use Reverb\Managers\ConnectionManager;
-use Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
-use Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
+use Laravel\Reverb\Console\Commands\RunServer;
+use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
+use Laravel\Reverb\Managers\ChannelManager;
+use Laravel\Reverb\Managers\ConnectionManager;
+use Laravel\Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
+use Laravel\Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {

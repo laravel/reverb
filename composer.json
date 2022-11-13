@@ -30,18 +30,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Reverb\\": "src/"
+            "Laravel\\Reverb\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Reverb\\Tests\\": "tests/"
+            "Laravel\\Reverb\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Reverb\\ServiceProvider"
+                "Laravel\\Reverb\\ServiceProvider"
             ]
         }
     },

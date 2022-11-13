@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Concerns;
+namespace Laravel\Reverb\Concerns;
 
 trait GeneratesPusherIdentifiers
 {

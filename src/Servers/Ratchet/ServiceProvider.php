@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Servers\Ratchet;
+namespace Laravel\Reverb\Servers\Ratchet;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 

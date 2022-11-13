@@ -1,12 +1,12 @@
 <?php
 
-namespace Reverb\Servers\ApiGateway;
+namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Aws\ApiGatewayManagementApi\ApiGatewayManagementApiClient;
 use Illuminate\Support\Facades\Config;
-use Reverb\Concerns\GeneratesPusherIdentifiers;
-use Reverb\Concerns\SerializesConnections;
-use Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
+use Laravel\Reverb\Concerns\SerializesConnections;
+use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
 use Throwable;
 
 class Connection implements ConnectionInterface

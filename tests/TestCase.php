@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Tests;
+namespace Laravel\Reverb\Tests;
 
 use Orchestra\Testbench\TestCase as TestbenchTestCase;
 

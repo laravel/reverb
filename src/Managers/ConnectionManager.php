@@ -1,12 +1,12 @@
 <?php
 
-namespace Reverb\Managers;
+namespace Laravel\Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
-use Reverb\Concerns\EnsuresIntegrity;
-use Reverb\Contracts\Connection;
-use Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
+use Laravel\Reverb\Concerns\EnsuresIntegrity;
+use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Traversable;
 
 class ConnectionManager implements ConnectionManagerInterface
@@ -34,7 +34,7 @@ class ConnectionManager implements ConnectionManagerInterface
     /**
      * Add a connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function connect(Connection $connection): Connection
@@ -76,7 +76,7 @@ class ConnectionManager implements ConnectionManagerInterface
      * Get a connection by its identifier.
      *
      * @param  string  $identifier
-     * @return \Reverb\Contracts\Connection  $connection
+     * @return \Laravel\Reverb\Contracts\Connection  $connection
      */
     public function get(string $identifier): ?Connection
     {

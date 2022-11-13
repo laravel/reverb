@@ -1,13 +1,13 @@
 <?php
 
-namespace Reverb\Http\Controllers;
+namespace Laravel\Reverb\Http\Controllers;
 
 use Illuminate\Support\Facades\App;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
-use Reverb\Contracts\ChannelManager;
-use Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class StatsController implements HttpServerInterface

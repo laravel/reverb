@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Channels;
+namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Str;
 
@@ -10,7 +10,7 @@ class ChannelBroker
      * Return the relevant channel instance.
      *
      * @param  string  $name
-     * @return \Reverb\Channels\Channel
+     * @return \Laravel\Reverb\Channels\Channel
      */
     public static function create(string $name): Channel
     {

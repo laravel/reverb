@@ -1,12 +1,12 @@
 <?php
 
-namespace Reverb\Servers\ApiGateway;
+namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Reverb\Event;
+use Laravel\Reverb\Event;
 
 class ServiceProvider extends BaseServiceProvider
 {

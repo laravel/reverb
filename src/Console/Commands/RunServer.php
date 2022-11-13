@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Console\Commands;
+namespace Laravel\Reverb\Console\Commands;
 
 use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
@@ -13,13 +13,13 @@ use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
-use Reverb\Channels\Channel;
-use Reverb\Contracts\ConnectionManager;
-use Reverb\Event;
-use Reverb\Http\Controllers\EventController;
-use Reverb\Http\Controllers\StatsController;
-use Reverb\Server as ReverbServer;
-use Reverb\Servers\Ratchet\Server;
+use Laravel\Reverb\Channels\Channel;
+use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Event;
+use Laravel\Reverb\Http\Controllers\EventController;
+use Laravel\Reverb\Http\Controllers\StatsController;
+use Laravel\Reverb\Server as ReverbServer;
+use Laravel\Reverb\Servers\Ratchet\Server;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;

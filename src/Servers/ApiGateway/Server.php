@@ -1,9 +1,9 @@
 <?php
 
-namespace Reverb\Servers\ApiGateway;
+namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Reverb\Contracts\ConnectionManager;
-use Reverb\Server as ReverbServer;
+use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Server as ReverbServer;
 
 class Server
 {
@@ -14,7 +14,7 @@ class Server
     /**
      * Handle the incoming API Gateway request.
      *
-     * @param  \Reverb\Servers\ApiGateway\Request  $request
+     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
      * @return void
      */
     public function handle(Request $request)
@@ -37,7 +37,7 @@ class Server
      * Get a Reverb connection from the API Gateway request.
      *
      * @param  string  $connectionId
-     * @return \Reverb\Contracts\Connection
+     * @return \Laravel\Reverb\Contracts\Connection
      */
     protected function connection(string $connectionId): Connection
     {

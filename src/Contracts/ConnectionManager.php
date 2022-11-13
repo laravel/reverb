@@ -1,8 +1,8 @@
 <?php
 
-namespace Reverb\Contracts;
+namespace Laravel\Reverb\Contracts;
 
-use Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Traversable;
 
 interface ConnectionManager
@@ -10,7 +10,7 @@ interface ConnectionManager
     /**
      * Add a connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function connect(Connection $connection): Connection;
@@ -34,7 +34,7 @@ interface ConnectionManager
      * Get a connection by its identifier.
      *
      * @param  string  $identifier
-     * @return \Reverb\Contracts\Connection  $connection
+     * @return \Laravel\Reverb\Contracts\Connection  $connection
      */
     public function get(string $identifier): ?Connection;
 }

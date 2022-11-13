@@ -1,12 +1,12 @@
 <?php
 
-namespace Reverb;
+namespace Laravel\Reverb;
 
 use Exception;
-use Reverb\Contracts\ChannelManager;
-use Reverb\Contracts\Connection;
-use Reverb\Contracts\ConnectionManager;
-use Reverb\Exceptions\PusherException;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Exceptions\PusherException;
 
 class Server
 {
@@ -17,7 +17,7 @@ class Server
     /**
      * Handle the a client connection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function open(Connection $connection)
@@ -30,7 +30,7 @@ class Server
     /**
      * Handle a new message received by the connected client.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $message
      * @return void
      */
@@ -65,7 +65,7 @@ class Server
     /**
      * Handle a client disconnection.
      *
-     * @param  \Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
     public function close(Connection $connection)
@@ -79,7 +79,7 @@ class Server
     /**
      * Handle an error.
      *
-     * @param  \Reverb\Contracts\ConnectionInterface  $connection
+     * @param  \Laravel\Reverb\Contracts\ConnectionInterface  $connection
      * @param  \Exception  $e
      * @return void
      */

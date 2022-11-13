@@ -1,11 +1,11 @@
 <?php
 
-namespace Reverb\Http\Controllers;
+namespace Laravel\Reverb\Http\Controllers;
 
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
-use Reverb\Event;
+use Laravel\Reverb\Event;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController implements HttpServerInterface

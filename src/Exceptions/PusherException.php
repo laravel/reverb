@@ -1,6 +1,6 @@
 <?php
 
-namespace Reverb\Exceptions;
+namespace Laravel\Reverb\Exceptions;
 
 use Exception;
 
