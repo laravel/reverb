@@ -31,7 +31,7 @@ class Connection implements ConnectionInterface
      */
     public function identifier(): string
     {
-        return $this->identifier;
+        return (string) $this->identifier;
     }
 
     /**

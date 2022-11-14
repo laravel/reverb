@@ -2,9 +2,9 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
-use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Throwable;
 
 class Connection implements ConnectionInterface
@@ -29,7 +29,7 @@ class Connection implements ConnectionInterface
      */
     public function identifier(): string
     {
-        return $this->connection->resourceId;
+        return (string) $this->connection->resourceId;
     }
 
     /**
