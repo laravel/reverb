@@ -9,7 +9,6 @@ use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
 {
@@ -17,7 +16,6 @@ class ChannelManager implements ChannelManagerInterface
 
     public function __construct(
         protected Repository $repository,
-        protected ConnectionManager $connections,
         protected $prefix = 'reverb'
     ) {
     }

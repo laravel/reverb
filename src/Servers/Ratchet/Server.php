@@ -2,10 +2,10 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
-use Ratchet\ConnectionInterface;
-use Ratchet\WebSocket\MessageComponentInterface;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
+use Ratchet\ConnectionInterface;
+use Ratchet\WebSocket\MessageComponentInterface;
 
 class Server implements MessageComponentInterface
 {
@@ -77,12 +77,6 @@ class Server implements MessageComponentInterface
      */
     protected function connection(ConnectionInterface $connection): Connection
     {
-        if (! $managedConnection = $this->manager->get($connection->resourceId)) {
-            $managedConnection = $this->manager->connect(
-                new Connection($connection)
-            );
-        }
-
-        return $managedConnection;
+        return new Connection($connection);
     }
 }

@@ -39,11 +39,11 @@ class Connection implements ConnectionInterface
      */
     public function id(): string
     {
-        if (! $this->id) {
-            $this->id = $this->generateId();
+        if (! $this->connection->id) {
+            $this->connection->id = $this->generateId();
         }
 
-        return $this->id;
+        return $this->connection->id;
     }
 
     /**
