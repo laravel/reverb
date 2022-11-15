@@ -49,7 +49,6 @@ class ServiceProvider extends BaseServiceProvider
                 $app['cache']->store(
                     $config['channel_cache']['store']
                 ),
-                $app->make(ConnectionManagerInterface::class),
                 $config['channel_cache']['prefix']
             );
         });
