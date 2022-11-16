@@ -6,9 +6,7 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use InvalidArgumentException;
 use Laravel\Reverb\Console\Commands\StartServer;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
-use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Managers\ChannelManager;
-use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
 use Laravel\Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
 
@@ -35,14 +33,6 @@ class ServiceProvider extends BaseServiceProvider
 
         $config = $this->app['config']['reverb'];
 
-        $this->app->singleton(ConnectionManagerInterface::class, function ($app) use ($config) {
-            return new ConnectionManager(
-                $app['cache']->store(
-                    $config['connection_cache']['store'],
-                    $config['connection_cache']['prefix']
-                ),
-            );
-        });
 
         $this->app->singleton(ChannelManagerInterface::class, function ($app) use ($config) {
             return new ChannelManager(

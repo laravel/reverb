@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Contracts\SerializableConnection;
 use Throwable;
 
-class Connection implements ConnectionInterface
+class Connection implements ConnectionInterface, SerializableConnection
 {
     use GeneratesPusherIdentifiers, SerializesConnections;
 

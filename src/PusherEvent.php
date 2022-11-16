@@ -4,11 +4,10 @@ namespace Laravel\Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\Connection;
 
-class Pusher
+class PusherEvent
 {
     /**
      * Handle a pusher event.
@@ -16,20 +15,19 @@ class Pusher
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $event
      * @param  array  $data
-     * @return void
      */
-    public static function handle(Connection $connection, string $event, array $payload = []): void
+    public static function handle(Connection $connection, string $event, array $payload = [], string $channel = null)
     {
         match (Str::after($event, 'pusher:')) {
             'connection_established' => self::acknowledge($connection),
             'subscribe' => self::subscribe(
                 $connection,
                 $payload['channel'],
-                $payload['auth'],
+                $payload['auth'] ?? null,
                 $payload['channel_data'] ?? null
             ),
             'unsubscribe' => self::unsubscribe($connection, $payload['channel']),
-            'ping' => self::ping($connection),
+            'ping' => self::pong($connection),
             default => throw new Exception('Unknown Pusher event: '.$event),
         };
     }
@@ -53,10 +51,11 @@ class Pusher
      *
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $channel
-     * @param  string  $auth
+     * @param  string|null  $auth
+     * @param  string|null  $data
      * @return void
      */
-    public static function subscribe(Connection $connection, string $channel, string $auth, ?string $data = null): void
+    public static function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
     {
         $channel = ChannelBroker::create($channel);
 
@@ -83,7 +82,7 @@ class Pusher
      *
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      */
-    public static function ping(Connection $connection): void
+    public static function pong(Connection $connection): void
     {
         static::send($connection, 'pong');
     }

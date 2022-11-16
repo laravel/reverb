@@ -3,14 +3,14 @@
 namespace Laravel\Reverb;
 
 use Exception;
+use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\PusherException;
 
 class Server
 {
-    public function __construct(protected ConnectionManager $connections, protected ChannelManager $channels)
+    public function __construct(protected ChannelManager $channels)
     {
     }
 
@@ -22,7 +22,7 @@ class Server
      */
     public function open(Connection $connection)
     {
-        Pusher::handle($connection, 'pusher:connection_established');
+        PusherEvent::handle($connection, 'pusher:connection_established');
 
         echo "New connection: ({$connection->id()})".PHP_EOL;
     }
@@ -41,7 +41,15 @@ class Server
         $event = json_decode($message, true);
 
         try {
-            Pusher::handle($from, $event['event'], $event['data'] ?? []);
+            match (Str::startsWith($event['event'], 'pusher:')) {
+                true => PusherEvent::handle(
+                    $from,
+                    $event['event'],
+                    $event['data'] ?? [],
+                    $event['channel'] ?? null
+                ),
+                default => ClientEvent::handle($from, $event)
+            };
 
             echo 'Message from '.$from->id().' handled'.PHP_EOL;
         } catch (PusherException $e) {
@@ -70,7 +78,6 @@ class Server
      */
     public function close(Connection $connection)
     {
-        $this->connections->disconnect($connection);
         $this->channels->unsubscribeFromAll($connection);
 
         echo "Disconnected: ({$connection->id()})".PHP_EOL;

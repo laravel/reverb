@@ -2,14 +2,13 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 
 class Server implements MessageComponentInterface
 {
-    public function __construct(protected ReverbServer $server, protected ConnectionManager $manager)
+    public function __construct(protected ReverbServer $server)
     {
     }
 

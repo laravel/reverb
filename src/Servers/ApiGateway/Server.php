@@ -2,12 +2,11 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
 
 class Server
 {
-    public function __construct(protected ReverbServer $server, protected ConnectionManager $manager)
+    public function __construct(protected ReverbServer $server)
     {
     }
 

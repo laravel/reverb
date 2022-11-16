@@ -9,6 +9,7 @@ use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\SerializableConnection;
 
 class ChannelManager implements ChannelManagerInterface
 {
@@ -31,7 +32,10 @@ class ChannelManager implements ChannelManagerInterface
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
         $connections = $this->connections($channel)
-            ->put($connection->identifier(), $data);
+            ->put($connection->identifier(), [
+                'connection' => $this->shouldBeSerialized($connection) ? serialize($connection) : $connection,
+                'data' => $data,
+            ]);
 
         $this->syncConnections($channel, $connections);
     }
@@ -144,14 +148,28 @@ class ChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get that data stored for a connection.
+     * Get the data stored for a connection.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return array
      */
     public function data(Channel $channel, Connection $connection): array
     {
-        return (array) $this->connections($channel)
-            ->get($connection->identifier(), []);
+        if (! $connection = $this->connections($channel)->get($connection->identifier())) {
+            return [];
+        }
+
+        return (array) $connection['data'];
+    }
+
+    /**
+     * Determine whether the connection should be serialized.
+     *
+     * @param  Connection  $connection
+     * @return bool
+     */
+    protected function shouldBeSerialized(Connection $connection): bool
+    {
+        return $connection instanceof SerializableConnection;
     }
 }

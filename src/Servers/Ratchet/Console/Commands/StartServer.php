@@ -7,7 +7,6 @@ use Clue\React\Redis\Factory;
 use Exception;
 use Illuminate\Console\Command;
 use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
@@ -171,8 +170,7 @@ class StartServer extends Command
     {
         return new WsServer(
             new Server(
-                $this->laravel->make(ReverbServer::class),
-                $this->laravel->make(ConnectionManager::class)
+                $this->laravel->make(ReverbServer::class)
             )
         );
     }

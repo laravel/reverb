@@ -57,12 +57,15 @@ class PresenceChannel extends PrivateChannel
     public function data()
     {
         $connections = App::make(ChannelManager::class)
-            ->connections($this);
+            ->connections($this)
+            ->map(function ($connection) {
+                return $connection['data'];
+            });
 
         return [
             'presence' => [
                 'count' => $connections->count(),
-                'ids' => $connections->map->user_id->values(),
+                'ids' => $connections->map(fn ($connection) => $connection['user_id']),
                 'hash' => $connections->keyBy('user_id')->map->user_info,
             ],
         ];
