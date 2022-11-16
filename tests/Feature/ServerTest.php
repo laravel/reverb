@@ -3,13 +3,10 @@
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server;
 
 beforeEach(function () {
-    $this->connectionManager = Mockery::spy(ConnectionManager::class);
     $this->channelManager = Mockery::spy(ChannelManager::class);
-    $this->app->singleton(ConnectionManager::class, fn () => $this->connectionManager);
     $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 
     $this->server = $this->app->make(Server::class);
@@ -30,7 +27,6 @@ it('can handle a connection', function () {
 it('can handle a disconnection', function () {
     $this->server->close(new Connection);
 
-    $this->connectionManager->shouldHaveReceived('disconnect');
     $this->channelManager->shouldHaveReceived('unsubscribeFromAll');
 });
 
@@ -59,14 +55,6 @@ it('can handle a new message', function () {
         'data' => json_encode([]),
         'channel' => 'test-channel',
     ]);
-});
-
-it('removes a connection from the manager on disconnection', function () {
-    $this->server->close($connection = new Connection);
-
-    $this->connectionManager->shouldHaveReceived('disconnect')
-        ->once()
-        ->with($connection);
 });
 
 it('sends an error if something fails', function () {
@@ -176,9 +164,6 @@ it('unsubscribes a user from a channel on disconnection', function () {
 
     $this->server->close($connection);
 
-    $this->connectionManager->shouldHaveReceived('disconnect')
-        ->once()
-        ->with($connection);
     $this->channelManager->shouldHaveReceived('unsubscribeFromAll')
         ->once()
         ->with($connection);
@@ -197,9 +182,6 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 
     $this->server->close($connection);
 
-    $this->connectionManager->shouldHaveReceived('disconnect')
-        ->once()
-        ->with($connection);
     $this->channelManager->shouldHaveReceived('unsubscribeFromAll')
         ->once()
         ->with($connection);
