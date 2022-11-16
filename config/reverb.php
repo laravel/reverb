@@ -23,7 +23,11 @@ return [
     'servers' => [
 
         'ratchet' => [
-            //
+
+            'host' => env('REVERB_RATCHET_HOST', '127.0.0.1'),
+
+            'port' => env('REVERB_RATCHET_PORT', 8080),
+
         ],
 
         'api_gateway' => [

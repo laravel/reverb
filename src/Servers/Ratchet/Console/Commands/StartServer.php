@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Console\Commands;
+namespace Laravel\Reverb\Servers\Ratchet\Console\Commands;
 
 use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
@@ -25,21 +25,23 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RunServer extends Command
+class StartServer extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'reverb:run';
+    protected $signature = 'ratchet:start
+                {--host=}
+                {--port=}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Run the Reverb server';
+    protected $description = 'Start the Ratchet Reverb server';
 
     /**
      * Execute the console command.
@@ -48,12 +50,16 @@ class RunServer extends Command
      */
     public function handle()
     {
+        $config = $this->laravel['config']['reverb.servers.ratchet'];
+        $host = $this->option('host') ?: $config['host'];
+        $port = $this->option('port') ?: $config['port'];
+
         $loop = Loop::get();
 
         $this->bindRedis($loop);
         $this->subscribe($loop);
 
-        $socket = new SocketServer('127.0.0.1:8080', [], $loop);
+        $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
         $app = new Router(
             new UrlMatcher($this->generateRoutes(), new RequestContext())
@@ -65,7 +71,7 @@ class RunServer extends Command
             $loop
         );
 
-        echo 'Starting server on port 8080'.PHP_EOL;
+        $this->components->info("Starting server on {$host}:{$port}");
 
         $server->run();
     }

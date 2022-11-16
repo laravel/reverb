@@ -4,7 +4,7 @@ namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use InvalidArgumentException;
-use Laravel\Reverb\Console\Commands\RunServer;
+use Laravel\Reverb\Console\Commands\StartServer;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Managers\ChannelManager;
@@ -18,7 +18,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                RunServer::class,
+                StartServer::class,
             ]);
         }
 
