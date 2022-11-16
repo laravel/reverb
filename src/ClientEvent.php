@@ -3,7 +3,6 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\Connection;
 
 class ClientEvent
@@ -20,13 +19,12 @@ class ClientEvent
             return;
         }
 
-        if (! $channel = $event['channel'] ?? null) {
+        if (! isset($event['channel'])) {
             return;
         }
 
         return self::whisper(
             $connection,
-            $channel,
             $event
         );
     }
@@ -39,9 +37,11 @@ class ClientEvent
      * @param  array  $payload
      * @return void
      */
-    public static function whisper(Connection $connection, string $channel, array $payload): void
+    public static function whisper(Connection $connection, array $payload): void
     {
-        ChannelBroker::create($channel)
-            ->broadcast($payload, $connection);
+        Event::dispatch(
+            json_encode($payload),
+            $connection
+        );
     }
 }
