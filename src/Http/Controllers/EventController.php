@@ -2,19 +2,23 @@
 
 namespace Laravel\Reverb\Http\Controllers;
 
+use Laravel\Reverb\Event;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;
-use Laravel\Reverb\Event;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController implements HttpServerInterface
 {
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
     {
-        Event::dispatch(
-            (string) $request->getBody()
-        );
+        $payload = json_decode($request->getBody()->getContents(), true);
+
+        Event::dispatch([
+            'event' => $payload['name'],
+            'channel' => $payload['channel'],
+            'data' => $payload['data'],
+        ]);
 
         tap($conn)->send(new JsonResponse((object) []))->close();
     }

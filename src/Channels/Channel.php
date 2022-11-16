@@ -64,6 +64,10 @@ class Channel
                     return;
                 }
 
+                if (isset($payload['except']) && $payload['except'] === $connection->identifier()) {
+                    return;
+                }
+
                 $connection->send(json_encode($payload));
             });
     }
