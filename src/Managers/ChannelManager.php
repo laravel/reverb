@@ -46,7 +46,7 @@ class ChannelManager implements ChannelManagerInterface
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
         $connections = $this->connections($channel)
-            ->reject(fn ($data, $identifier) => $identifier === $connection->identifier());
+            ->reject(fn ($data, $identifier) => (string) $identifier === $connection->identifier());
 
         $this->syncConnections($channel, $connections);
     }
