@@ -36,23 +36,15 @@ return [
 
             'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
 
+            'connection_cache' => [
+
+                'store' => env('REVERB_CONNECTION_CACHE', 'array'),
+
+                'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
+
+            ],
+
         ],
-
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Connection Cache Store
-    |--------------------------------------------------------------------------
-    |
-    |
-    */
-
-    'connection_cache' => [
-
-        'store' => env('REVERB_CONNECTION_CACHE', 'array'),
-
-        'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
 
     ],
 
