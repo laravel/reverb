@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Testing\Assert;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
 use Laravel\Reverb\Server;
+use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
     $this->channelManager = Mockery::spy(ChannelManager::class);
@@ -188,40 +187,20 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
-    //
-})->skip();
+    $this->channelManager->shouldReceive('connections')->andReturn(collect());
+    $this->server->message(
+        $connection = new Connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:presence-test-channel', 'pusher-secret'),
+            ],
+        ]));
 
-it('notifies all connections on subscription to a presence channel', function () {
-    //
-})->skip();
+    $this->server->close($connection);
 
-it('notifies all connections on unsubscribe from a presence channel', function () {
-    //
-})->skip();
-
-class Connection implements ConnectionInterface
-{
-    public $messages = [];
-
-    public function identifier(): string
-    {
-        return '19c1c8e8-351b-4eb5-b6d9-6cbfc54a3446';
-    }
-
-    public function id(): string
-    {
-        return '10000.00001';
-    }
-
-    public function send(string $message): void
-    {
-        dump($message);
-        $this->messages[] = $message;
-    }
-
-    public function assertSent(array $message): void
-    {
-        dump(json_encode($message));
-        Assert::assertContains(json_encode($message), $this->messages);
-    }
-}
+    $this->channelManager->shouldHaveReceived('unsubscribeFromAll')
+        ->once()
+        ->with($connection);
+});

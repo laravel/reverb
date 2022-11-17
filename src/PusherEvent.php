@@ -119,21 +119,6 @@ class PusherEvent
     }
 
     /**
-     * Send an error response to the given connection.
-     *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
-     * @return void
-     */
-    public static function error(Connection $connection)
-    {
-        $connection->send(
-            static::formatPayload('pusher:error', [
-                'data' => [],
-            ])
-        );
-    }
-
-    /**
      * Format the payload for the given event.
      *
      * @param  string  $event
