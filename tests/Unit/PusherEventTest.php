@@ -34,7 +34,6 @@ it('can subscribe to a channel', function () {
 
     $this->connection->assertSent([
         'event' => 'pusher_internal:subscription_succeeded',
-        'data' => json_encode([]),
         'channel' => 'test-channel',
     ]);
 });
@@ -78,7 +77,6 @@ it('can correctly format a payload', function () {
 
     expect($payload)->toBe(json_encode([
         'event' => 'pusher:foo',
-        'data' => json_encode([]),
     ]));
 });
 
@@ -100,6 +98,5 @@ it('can correctly format an internal payload', function () {
 
     expect($payload)->toBe(json_encode([
         'event' => 'pusher_internal:foo',
-        'data' => json_encode([]),
     ]));
 });

@@ -1,22 +1,107 @@
 <?php
 
+use Illuminate\Support\Facades\Cache;
+use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Managers\ChannelManager as Manager;
+use Laravel\Reverb\Tests\Connection;
+
+beforeEach(function () {
+    $this->connection = new Connection;
+    $this->channel = ChannelBroker::create('test-channel');
+    $this->channelManager = $this->app->make(ChannelManager::class);
+});
+
 it('can subscribe to a channel', function () {
-})->skip();
+    connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
+        $this->channel,
+        $connection['connection'],
+        $connection['data'])
+    );
+
+    expect($this->channelManager->connections($this->channel))->toHaveCount(5);
+});
 
 it('can unsubscribe from a channel', function () {
-})->skip();
+    $connections = connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
+        $this->channel,
+        $connection['connection'],
+        $connection['data'])
+    );
+
+    $this->channelManager->unsubscribe($this->channel, $connections->first()['connection']);
+
+    expect($this->channelManager->connections($this->channel))->toHaveCount(4);
+});
 
 it('can get all channels', function () {
-})->skip();
+    $channels = collect(['test-channel-1', 'test-channel-2', 'test-channel-3'])
+        ->map(fn ($name) => ChannelBroker::create($name));
+
+    $channels->each(fn ($channel) => $this->channelManager->subscribe(
+        $channel,
+        $this->connection
+    ));
+
+    $this->channelManager->all()->values()->each(function ($channel, $index) {
+        expect($channel->name())->toBe('test-channel-'.($index + 1));
+    });
+    expect($this->channelManager->all())->toHaveCount(3);
+});
 
 it('can get all connections subscribed to a channel', function () {
-})->skip();
+    $connections = connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
+        $this->channel,
+        $connection['connection'],
+        $connection['data'])
+    );
+
+    $this->channelManager->connections($this->channel)->each(function ($connection, $index) {
+        expect($connection['connection']->identifier())
+            ->toBe($index);
+    });
+});
 
 it('can unsubscribe a connection for all channels', function () {
-})->skip();
+    $channels = collect(['test-channel-1', 'test-channel-2', 'test-channel-3'])
+        ->map(fn ($name) => ChannelBroker::create($name));
+
+    $channels->each(fn ($channel) => $this->channelManager->subscribe(
+        $channel,
+        $this->connection
+    ));
+
+    $channels->each(fn ($channel) => expect($this->channelManager->connections($channel))->toHaveCount(1));
+
+    $this->channelManager->unsubscribeFromAll($this->connection);
+
+    $channels->each(fn ($channel) => expect($this->channelManager->connections($channel))->toHaveCount(0));
+});
 
 it('can use a custom cache prefix', function () {
-})->skip();
+    $channelManager = new Manager(
+        Cache::store('array'),
+        'reverb-test'
+    );
+
+    $channelManager->subscribe(
+        $this->channel,
+        new Connection
+    );
+
+    expect(Cache::get('reverb-test:channels'))
+        ->toHaveCount(1);
+});
 
 it('can get the data for a connection subscribed to a channel', function () {
-})->skip();
+    $connections = connections(5, ['name' => 'Joe'])->each(fn ($connection) => $this->channelManager->subscribe(
+        $this->channel,
+        $connection['connection'],
+        $connection['data'])
+    );
+
+    $this->channelManager->connections($this->channel)->values()->each(function ($connection, $index) {
+        expect($connection['data'])
+            ->toBe(['name' => 'Joe', 'user_id' => $index + 1]);
+    });
+});

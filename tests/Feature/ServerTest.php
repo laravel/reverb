@@ -51,7 +51,6 @@ it('can handle a new message', function () {
 
     $connection->assertSent([
         'event' => 'pusher_internal:subscription_succeeded',
-        'data' => json_encode([]),
         'channel' => 'test-channel',
     ]);
 });
@@ -102,7 +101,6 @@ it('can subscribe a user to a channel', function () {
 
     $connection->assertSent([
         'event' => 'pusher_internal:subscription_succeeded',
-        'data' => json_encode([]),
         'channel' => 'test-channel',
     ]);
 });
@@ -120,7 +118,6 @@ it('can subscribe a user to a private channel', function () {
 
     $connection->assertSent([
         'event' => 'pusher_internal:subscription_succeeded',
-        'data' => json_encode([]),
         'channel' => 'private-test-channel',
     ]);
 });

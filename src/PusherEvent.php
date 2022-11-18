@@ -132,7 +132,7 @@ class PusherEvent
         return json_encode(
             array_filter([
                 'event' => $prefix.$event,
-                'data' => json_encode($data),
+                'data' => empty($data) ? null : json_encode($data),
                 'channel' => $channel,
             ])
         );

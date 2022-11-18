@@ -65,8 +65,8 @@ class PresenceChannel extends PrivateChannel
         return [
             'presence' => [
                 'count' => $connections->count(),
-                'ids' => $connections->map(fn ($connection) => $connection['user_id']),
-                'hash' => $connections->keyBy('user_id')->map->user_info,
+                'ids' => $connections->map(fn ($connection) => $connection['user_id'])->toArray(),
+                'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
             ],
         ];
     }
