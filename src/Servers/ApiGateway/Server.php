@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Connection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
@@ -50,7 +49,7 @@ class Server
      * Get a Reverb connection from the API Gateway request.
      *
      * @param  string  $connectionId
-     * @return \Laravel\Reverb\Contracts\Connection
+     * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
     protected function connection(string $connectionId): Connection
     {
