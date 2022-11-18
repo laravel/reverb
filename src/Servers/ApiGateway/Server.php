@@ -35,12 +35,7 @@ class Server
             'CONNECT' => $this->server->open(
                 $this->connection($request->connectionId())
             ),
-            'DISCONNECT' => function () use ($request) {
-                $this->server->close(
-                    $this->connection($request->connectionId())
-                );
-                $this->mutex(fn () => $this->repository->forget("{$this->key()}:{$request->connectionId()}"));
-            },
+            'DISCONNECT' => $this->disconnect($request->connectionId()),
             'MESSAGE' => $this->server->message(
                 $this->connection($request->connectionId()),
                 $request->message()
@@ -62,6 +57,23 @@ class Server
                 fn () => new Connection($connectionId)
             );
         });
+    }
+
+    /**
+     * Disconnect a connection.
+     *
+     * @param  string  $connectionId
+     * @return void
+     */
+    protected function disconnect(string $connectionId)
+    {
+        $this->server->close(
+            $this->connection($connectionId)
+        );
+
+        $this->repository->forget(
+            "{$this->key()}:{$connectionId}"
+        );
     }
 
     /**

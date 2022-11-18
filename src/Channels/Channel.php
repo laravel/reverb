@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Channels;
 
+use Exception;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
@@ -68,7 +69,11 @@ class Channel
                     return;
                 }
 
-                $connection->send(json_encode($payload));
+                try {
+                    $connection->send(json_encode($payload));
+                } catch (Exception $e) {
+                    echo $e->getMessage().PHP_EOL;
+                }
             });
     }
 

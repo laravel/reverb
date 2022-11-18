@@ -13,7 +13,11 @@ class ServiceProvider extends BaseServiceProvider
     public function register()
     {
         Route::post('/apps/{appId}/events', function (Request $request) {
-            Event::dispatch($request->getContent());
+            Event::dispatch([
+                'event' => $request->name,
+                'channel' => $request->channel,
+                'data' => $request->data,
+            ]);
 
             return new JsonResponse((object) []);
         });
