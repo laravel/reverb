@@ -35,9 +35,12 @@ class Server
             'CONNECT' => $this->server->open(
                 $this->connection($request->connectionId())
             ),
-            'DISCONNECT' => $this->server->close(
-                $this->connection($request->connectionId())
-            ),
+            'DISCONNECT' => function () use ($request) {
+                $this->server->close(
+                    $this->connection($request->connectionId())
+                );
+                $this->mutex(fn () => $this->repository->forget("{$this->key()}:{$request->connectionId()}"));
+            },
             'MESSAGE' => $this->server->message(
                 $this->connection($request->connectionId()),
                 $request->message()
