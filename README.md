@@ -13,10 +13,10 @@ composer require laravel/reverb
 ### Run Socket Server
 
 ```shell
-php artisan reverb:run
+php artisan reverb:start
 ```
 
-This will start the server running on localhost port 8080.
+This will start the server running on localhost port 8080. You may use the `--host` and `--port` should you wish.
 
 ### Update Environment
 
