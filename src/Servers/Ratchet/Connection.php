@@ -64,7 +64,7 @@ class Connection implements ConnectionInterface
         }
     }
 
-    public function application(): Application
+    public function app(): Application
     {
         return $this->application;
     }

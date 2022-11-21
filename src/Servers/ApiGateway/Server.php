@@ -86,7 +86,7 @@ class Server
         $this->server->close($connection);
 
         $this->repository->forget(
-            "{$this->key($connection->application()->id())}:{$request->connectionId()}"
+            "{$this->key($connection->app()->id())}:{$request->connectionId()}"
         );
     }
 

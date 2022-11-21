@@ -16,10 +16,25 @@ class ChannelManager implements ChannelManagerInterface
 {
     use EnsuresIntegrity;
 
+    protected $application;
+
     public function __construct(
         protected Repository $repository,
         protected $prefix = 'reverb'
     ) {
+    }
+
+    /**
+     * Set an the application to scope the channel manager to.
+     *
+     * @param  \Laravel\Reverb\Application  $application
+     * @return self
+     */
+    public function for(Application $application): self
+    {
+        $this->application = $application;
+
+        return $this;
     }
 
     /**
@@ -32,13 +47,13 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
-        $connections = $this->connections($connection->application(), $channel)
+        $connections = $this->connections($channel)
             ->put($connection->identifier(), [
                 'connection' => $this->shouldBeSerialized($connection) ? serialize($connection) : $connection,
                 'data' => $data,
             ]);
 
-        $this->syncConnections($connection->application(), $channel, $connections);
+        $this->syncConnections($channel, $connections);
     }
 
     /**
@@ -50,10 +65,10 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
-        $connections = $this->connections($connection->application(), $channel)
+        $connections = $this->connections($channel)
             ->reject(fn ($data, $identifier) => (string) $identifier === $connection->identifier());
 
-        $this->syncConnections($connection->application(), $channel, $connections);
+        $this->syncConnections($channel, $connections);
     }
 
     /**
@@ -61,9 +76,9 @@ class ChannelManager implements ChannelManagerInterface
      *
      * @return \Illuminate\Support\Collection
      */
-    public function all(Application $app): Collection
+    public function all(): Collection
     {
-        return $this->channels($app)->map(function ($connections, $name) {
+        return $this->channels()->map(function ($connections, $name) {
             return ChannelBroker::create($name);
         });
     }
@@ -75,7 +90,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribeFromAll(Connection $connection): void
     {
-        $this->channels($connection->application())->each(function ($connections, $name) use ($connection) {
+        $this->channels()->each(function ($connections, $name) use ($connection) {
             ChannelBroker::create($name)->unsubscribe($connection);
         });
     }
@@ -85,9 +100,9 @@ class ChannelManager implements ChannelManagerInterface
      *
      * @return \Illuminate\Support\Collection
      */
-    public function connections(Application $app, Channel $channel): Collection
+    public function connections(Channel $channel): Collection
     {
-        return $this->channel($app, $channel);
+        return $this->channel($channel);
     }
 
     /**
@@ -97,14 +112,14 @@ class ChannelManager implements ChannelManagerInterface
      * @param  Collection  $connections
      * @return void
      */
-    protected function syncConnections(Application $app, Channel $channel, Collection $connections): void
+    protected function syncConnections(Channel $channel, Collection $connections): void
     {
-        $channels = $this->channels($app);
+        $channels = $this->channels();
 
-        $this->mutex(function () use ($app, $channel, $connections, $channels) {
+        $this->mutex(function () use ($channel, $connections, $channels) {
             $channels[$channel->name()] = $connections;
 
-            $this->repository->forever($this->key($app->id()), $channels);
+            $this->repository->forever($this->key(), $channels);
         });
     }
 
@@ -113,9 +128,15 @@ class ChannelManager implements ChannelManagerInterface
      *
      * @return string
      */
-    protected function key($appId): string
+    protected function key(): string
     {
-        return "{$this->prefix}:channels:{$appId}";
+        $key = "{$this->prefix}:channels";
+
+        if ($this->application) {
+            $key .= ":{$this->application->id()}";
+        }
+
+        return $key;
     }
 
     /**
@@ -124,9 +145,9 @@ class ChannelManager implements ChannelManagerInterface
      * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\SUpport\Collection
      */
-    protected function channel(Application $app, Channel $channel): Collection
+    protected function channel(Channel $channel): Collection
     {
-        return $this->channels($app, $channel);
+        return $this->channels($channel);
     }
 
     /**
@@ -135,10 +156,10 @@ class ChannelManager implements ChannelManagerInterface
      * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\SUpport\Collection
      */
-    protected function channels(Application $app, Channel $channel = null): Collection
+    protected function channels(Channel $channel = null): Collection
     {
-        return $this->mutex(function () use ($app, $channel) {
-            $channels = $this->repository->get($this->key($app->id()), []);
+        return $this->mutex(function () use ($channel) {
+            $channels = $this->repository->get($this->key(), []);
 
             if ($channel) {
                 return collect($channels[$channel->name()] ?? []);
@@ -156,7 +177,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function data(Channel $channel, Connection $connection): array
     {
-        if (! $connection = $this->connections($connection->application(), $channel)->get($connection->identifier())) {
+        if (! $connection = $this->connections($channel)->get($connection->identifier())) {
             return [];
         }
 

@@ -35,6 +35,7 @@ class Channel
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
         App::make(ChannelManager::class)
+            ->for($connection->app())
             ->subscribe($this, $connection, $data ? json_decode($data, true) : []);
     }
 
@@ -47,6 +48,7 @@ class Channel
     public function unsubscribe(Connection $connection): void
     {
         App::make(ChannelManager::class)
+            ->for($connection->app())
             ->unsubscribe($this, $connection);
     }
 
@@ -59,7 +61,8 @@ class Channel
     public function broadcast(Application $app, array $payload, Connection $except = null)
     {
         App::make(ChannelManager::class)
-            ->connections($app, $this)->each(function ($data) use ($payload, $except) {
+            ->for($app)
+            ->connections($this)->each(function ($data) use ($payload, $except) {
                 $connection = is_object($data['connection']) ? $data['connection'] : unserialize($data['connection']);
 
                 if ($except && $except->identifier() === $connection->identifier()) {

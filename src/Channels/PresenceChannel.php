@@ -21,13 +21,11 @@ class PresenceChannel extends PrivateChannel
     {
         parent::subscribe($connection, $auth, $data);
 
-        $this->broadcast(
-            $connection->application(),
-            [
-                'event' => 'pusher_internal:member_added',
-                'data' => $data ? json_decode($data, true) : [],
-                'channel' => $this->name(),
-            ]);
+        $this->broadcast($connection->app(), [
+            'event' => 'pusher_internal:member_added',
+            'data' => $data ? json_decode($data, true) : [],
+            'channel' => $this->name(),
+        ]);
     }
 
     /**
@@ -39,16 +37,15 @@ class PresenceChannel extends PrivateChannel
     public function unsubscribe(Connection $connection): void
     {
         $data = App::make(ChannelManager::class)
+            ->for($connection->app())
             ->data($this, $connection);
 
         if (isset($data['user_id'])) {
-            $this->broadcast(
-                $connection->application(),
-                [
-                    'event' => 'pusher_internal:member_removed',
-                    'data' => ['user_id' => $data['user_id']],
-                    'channel' => $this->name(),
-                ]);
+            $this->broadcast($connection->app(), [
+                'event' => 'pusher_internal:member_removed',
+                'data' => ['user_id' => $data['user_id']],
+                'channel' => $this->name(),
+            ]);
         }
 
         parent::unsubscribe($connection);
@@ -62,7 +59,8 @@ class PresenceChannel extends PrivateChannel
     public function data(Application $app)
     {
         $connections = App::make(ChannelManager::class)
-            ->connections($app, $this)
+            ->for($app)
+            ->connections($this)
             ->map(function ($connection) {
                 return $connection['data'];
             });

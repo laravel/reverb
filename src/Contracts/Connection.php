@@ -28,5 +28,5 @@ interface Connection
      */
     public function send(string $message): void;
 
-    public function application(): Application;
+    public function app(): Application;
 }

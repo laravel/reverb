@@ -8,6 +8,8 @@ use Laravel\Reverb\Channels\Channel;
 
 interface ChannelManager
 {
+    public function for(Application $application): self;
+
     /**
      * Subscribe to a channel.
      *
@@ -32,7 +34,7 @@ interface ChannelManager
      *
      * @return \Illuminate\Support\Collection
      */
-    public function all(Application $app): Collection;
+    public function all(): Collection;
 
     /**
      * Unsubscribe from all channels.
@@ -48,5 +50,5 @@ interface ChannelManager
      * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\Support\Collection
      */
-    public function connections(Application $app, Channel $channel): Collection;
+    public function connections(Channel $channel): Collection;
 }

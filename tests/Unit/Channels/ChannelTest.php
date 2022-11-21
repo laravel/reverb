@@ -8,6 +8,8 @@ use Laravel\Reverb\Tests\Connection;
 beforeEach(function () {
     $this->connection = new Connection();
     $this->channelManager = Mockery::spy(ChannelManager::class);
+    $this->channelManager->shouldReceive('for')
+        ->andReturn($this->channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 });
 

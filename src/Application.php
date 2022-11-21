@@ -8,16 +8,46 @@ use Laravel\Reverb\Exceptions\InvalidApplication;
 
 class Application
 {
+    /**
+     * Collection of app configurations.
+     *
+     * @var \Illuminate\Support\Collection
+     */
     protected Collection $applications;
 
+    /**
+     * The application ID.
+     *
+     * @var string
+     */
     protected string $id;
 
+    /**
+     * The application Ikey.
+     *
+     * @var string
+     */
     protected string $key;
 
+    /**
+     * The application secret.
+     *
+     * @var string
+     */
     protected string $secret;
 
+    /**
+     * The capacity of connections the application can handle.
+     *
+     * @var string
+     */
     protected ?int $capacity;
 
+    /**
+     * The allowed origins from which the application can be connected.
+     *
+     * @var array
+     */
     protected array $allowedOrigins;
 
     public function __construct()
@@ -25,7 +55,15 @@ class Application
         $this->applications = collect(Config::get('reverb.apps'));
     }
 
-    public static function find(string $key)
+    /**
+     * Get an application instance by key.
+     *
+     * @param  string  $key
+     * @return \Laravel\Reverb\Application
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
+    public static function find(string $key): Application
     {
         $application = new static;
 
@@ -44,27 +82,52 @@ class Application
         return $application;
     }
 
+    /**
+     * Get the application ID.
+     *
+     * @return string
+     */
     public function id(): string
     {
         return $this->id;
     }
 
-    public function key()
+    /**
+     * Get the application key.
+     *
+     * @return string
+     */
+    public function key(): string
     {
         return $this->key;
     }
 
-    public function secret()
+    /**
+     * Get the application secret.
+     *
+     * @return string
+     */
+    public function secret(): string
     {
         return $this->secret;
     }
 
-    public function capacity()
+    /**
+     * Get the application capacity.
+     *
+     * @return int
+     */
+    public function capacity(): string
     {
         return $this->capacity;
     }
 
-    public function allowedOrigins()
+    /**
+     * Get the allowed origins.
+     *
+     * @return array
+     */
+    public function allowedOrigins(): array
     {
         return $this->allowedOrigins;
     }

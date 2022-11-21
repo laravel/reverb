@@ -46,7 +46,7 @@ class Connection implements ConnectionInterface
         Assert::assertEmpty($this->messages);
     }
 
-    public function application(): Application
+    public function app(): Application
     {
         return Application::find('pusher-key');
     }

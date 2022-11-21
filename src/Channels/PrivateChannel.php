@@ -42,7 +42,7 @@ class PrivateChannel extends Channel
             hash_hmac(
                 'sha256',
                 $signature,
-                $connection->application()->secret(),
+                $connection->app()->secret(),
             ),
             Str::after($auth, ':')
         )) {

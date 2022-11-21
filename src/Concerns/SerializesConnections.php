@@ -14,7 +14,7 @@ trait SerializesConnections
         return [
             'id' => $this->id(),
             'identifier' => $this->identifier(),
-            'application' => $this->application(),
+            'application' => $this->app(),
         ];
     }
 

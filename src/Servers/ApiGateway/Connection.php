@@ -78,7 +78,7 @@ class Connection implements ConnectionInterface, SerializableConnection
         });
     }
 
-    public function application(): Application
+    public function app(): Application
     {
         return $this->application;
     }
