@@ -55,7 +55,9 @@ class Channel
     /**
      * Send a message to all connections subscribed to the channel.
      *
+     * @param  \Laravel\Reverb\Application  $app
      * @param  array  $payload
+     * @param  \Laravel\Reverb\Contracts\Connection|null  $except
      * @return void
      */
     public function broadcast(Application $app, array $payload, Connection $except = null)
@@ -84,6 +86,7 @@ class Channel
     /**
      * Get the data associated with the channel.
      *
+     * @param  \Laravel\Reverb\Application  $app
      * @return array
      */
     public function data(Application $app)

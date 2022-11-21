@@ -28,5 +28,10 @@ interface Connection
      */
     public function send(string $message): void;
 
+    /**
+     * Get the application the connection belongs to.
+     *
+     * @return \Laravel\Reverb\Application
+     */
     public function app(): Application;
 }

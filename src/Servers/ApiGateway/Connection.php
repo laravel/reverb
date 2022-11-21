@@ -78,6 +78,11 @@ class Connection implements ConnectionInterface, SerializableConnection
         });
     }
 
+    /**
+     * Get the application the connection belongs to.
+     *
+     * @return \Laravel\Reverb\Application
+     */
     public function app(): Application
     {
         return $this->application;

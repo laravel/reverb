@@ -8,7 +8,13 @@ use Laravel\Reverb\Channels\Channel;
 
 interface ChannelManager
 {
-    public function for(Application $application): self;
+    /**
+     * The application the channel manager should be scoped to.
+     *
+     * @param  \Laravel\Reverb\Application  $application
+     * @return \Laravel\Reverb\Contracts\ChannelManager
+     */
+    public function for(Application $application): ChannelManager;
 
     /**
      * Subscribe to a channel.

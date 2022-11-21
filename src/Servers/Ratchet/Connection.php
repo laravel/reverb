@@ -64,6 +64,11 @@ class Connection implements ConnectionInterface
         }
     }
 
+    /**
+     * Get the application the connection belongs to.
+     *
+     * @return \Laravel\Reverb\Application
+     */
     public function app(): Application
     {
         return $this->application;

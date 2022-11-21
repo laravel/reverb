@@ -54,6 +54,7 @@ class PresenceChannel extends PrivateChannel
     /**
      * Get the data associated with the channel.
      *
+     * @param  \Laravel\Reverb\Application  $app
      * @return array
      */
     public function data(Application $app)

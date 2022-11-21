@@ -13,7 +13,7 @@ class PrivateChannel extends Channel
      *
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $auth
-     * @param  string  $data
+     * @param  string|null  $data
      * @return bool
      */
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
@@ -28,9 +28,10 @@ class PrivateChannel extends Channel
      *
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $auth
+     * @param  string|null  $data
      * @return bool
      */
-    protected function verify(Connection $connection, string $auth, string $data = null): bool
+    protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
 

@@ -13,14 +13,15 @@ class Event
     /**
      * Dispatch a message to a channel.
      *
+     * @param  \Laravel\Reverb\Application  $app
      * @param  array  $payload
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
-    public static function dispatch(Application $application, array $payload, Connection $connection = null): void
+    public static function dispatch(Application $app, array $payload, Connection $connection = null): void
     {
         if (! Config::get('reverb.pubsub.enabled')) {
-            static::dispatchSynchronously($application, $payload, $connection);
+            static::dispatchSynchronously($app, $payload, $connection);
 
             return;
         }
@@ -30,7 +31,7 @@ class Event
         $redis->publish(
             Config::get('reverb.pubsub.channel'),
             json_encode([
-                'application' => $application,
+                'application' => $app,
                 'payload' => $payload,
             ])
         );
@@ -39,18 +40,19 @@ class Event
     /**
      * Notify all connections subscribed to the given channel.
      *
+     * @param  \Laravel\Reverb\Application  $app
      * @param  array  $payload
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
-    public static function dispatchSynchronously(Application $application, array $payload, Connection $connection = null): void
+    public static function dispatchSynchronously(Application $app, array $payload, Connection $connection = null): void
     {
         $channels = isset($payload['channel']) ? [$payload['channel']] : $payload['channels'];
 
         foreach ($channels as $channel) {
             $channel = ChannelBroker::create($channel);
 
-            $channel->broadcast($application, $payload, $connection);
+            $channel->broadcast($app, $payload, $connection);
         }
     }
 }

@@ -16,6 +16,11 @@ class ChannelManager implements ChannelManagerInterface
 {
     use EnsuresIntegrity;
 
+    /**
+     * The appliation instance.
+     *
+     * @var \Laravel\Reverb\Application
+     */
     protected $application;
 
     public function __construct(
@@ -25,12 +30,12 @@ class ChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Set an the application to scope the channel manager to.
+     * The application the channel manager should be scoped to.
      *
      * @param  \Laravel\Reverb\Application  $application
-     * @return self
+     * @return \Laravel\Reverb\Contracts\ChannelManager
      */
-    public function for(Application $application): self
+    public function for(Application $application): ChannelManagerInterface
     {
         $this->application = $application;
 

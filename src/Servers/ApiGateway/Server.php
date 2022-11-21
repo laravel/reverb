@@ -100,6 +100,12 @@ class Server
         return "{$this->prefix}:{$appId}:connections";
     }
 
+    /**
+     * Get the application instance for the request.
+     *
+     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
+     * @return \Laravel\Reverb\Application
+     */
     protected function application(Request $request): Application
     {
         parse_str($request->serverVariables['QUERY_STRING'], $queryString);
