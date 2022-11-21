@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Channels;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
@@ -43,7 +42,7 @@ class PrivateChannel extends Channel
             hash_hmac(
                 'sha256',
                 $signature,
-                App::make('config')->get('broadcasting.connections.pusher.secret')
+                $connection->application()->secret(),
             ),
             Str::after($auth, ':')
         )) {

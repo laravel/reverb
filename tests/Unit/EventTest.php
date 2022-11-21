@@ -2,6 +2,7 @@
 
 use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\Config;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Event;
 
@@ -13,7 +14,7 @@ it('can broadcast a pubsub event when enabled', function () {
 
     $this->app->bind(Client::class, fn () => $redis);
 
-    Event::dispatch(['channel' => 'test-channel']);
+    Event::dispatch(Application::find('pusher-key'), ['channel' => 'test-channel']);
 });
 
 it('can broadcast an event directly when pubsub disabled', function () {
@@ -24,5 +25,5 @@ it('can broadcast an event directly when pubsub disabled', function () {
 
     $this->app->bind(ChannelManager::class, fn () => $channelManager);
 
-    Event::dispatch(['channel' => 'test-channel']);
+    Event::dispatch(Application::find('pusher-key'), ['channel' => 'test-channel']);
 });

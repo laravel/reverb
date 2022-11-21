@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Server as ReverbServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
@@ -76,6 +77,17 @@ class Server implements MessageComponentInterface
      */
     protected function connection(ConnectionInterface $connection): Connection
     {
-        return new Connection($connection);
+        return new Connection(
+            $connection,
+            $this->application($connection)
+        );
+    }
+
+    protected function application(ConnectionInterface $connection): Application
+    {
+        $request = $connection->httpRequest;
+        parse_str($request->getUri()->getQuery(), $queryString);
+
+        return Application::find($queryString['appId']);
     }
 }

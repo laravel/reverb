@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Tests;
 
 use Illuminate\Testing\Assert;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
 
 class Connection implements ConnectionInterface
@@ -43,5 +44,10 @@ class Connection implements ConnectionInterface
     public function assertNothingSent(): void
     {
         Assert::assertEmpty($this->messages);
+    }
+
+    public function application(): Application
+    {
+        return Application::find('pusher-key');
     }
 }

@@ -61,7 +61,7 @@ class PusherEvent
 
         $channel->subscribe($connection, $auth, $data);
 
-        self::sendInternally($connection, 'subscription_succeeded', $channel->name(), $channel->data());
+        self::sendInternally($connection, 'subscription_succeeded', $channel->name(), $channel->data($connection->application()));
     }
 
     /**

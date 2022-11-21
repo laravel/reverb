@@ -43,7 +43,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(['foo' => 'bar']);
+    $channel->broadcast($connections->first()['connection']->application(), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
 });

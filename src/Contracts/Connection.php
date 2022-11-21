@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Contracts;
 
+use Laravel\Reverb\Application;
+
 interface Connection
 {
     /**
@@ -25,4 +27,6 @@ interface Connection
      * @return void
      */
     public function send(string $message): void;
+
+    public function application(): Application;
 }

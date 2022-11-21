@@ -19,7 +19,7 @@ it('can subscribe to a channel', function () {
         $connection['data'])
     );
 
-    expect($this->channelManager->connections($this->channel))->toHaveCount(5);
+    expect($this->channelManager->connections($this->connection->application(), $this->channel))->toHaveCount(5);
 });
 
 it('can unsubscribe from a channel', function () {
@@ -31,7 +31,7 @@ it('can unsubscribe from a channel', function () {
 
     $this->channelManager->unsubscribe($this->channel, $connections->first()['connection']);
 
-    expect($this->channelManager->connections($this->channel))->toHaveCount(4);
+    expect($this->channelManager->connections($this->connection->application(), $this->channel))->toHaveCount(4);
 });
 
 it('can get all channels', function () {
@@ -43,10 +43,10 @@ it('can get all channels', function () {
         $this->connection
     ));
 
-    $this->channelManager->all()->values()->each(function ($channel, $index) {
+    $this->channelManager->all($this->connection->application())->values()->each(function ($channel, $index) {
         expect($channel->name())->toBe('test-channel-'.($index + 1));
     });
-    expect($this->channelManager->all())->toHaveCount(3);
+    expect($this->channelManager->all($this->connection->application()))->toHaveCount(3);
 });
 
 it('can get all connections subscribed to a channel', function () {
@@ -56,7 +56,7 @@ it('can get all connections subscribed to a channel', function () {
         $connection['data'])
     );
 
-    $this->channelManager->connections($this->channel)->each(function ($connection, $index) {
+    $this->channelManager->connections($this->connection->application(), $this->channel)->each(function ($connection, $index) {
         expect($connection['connection']->identifier())
             ->toBe($index);
     });
@@ -71,11 +71,11 @@ it('can unsubscribe a connection for all channels', function () {
         $this->connection
     ));
 
-    $channels->each(fn ($channel) => expect($this->channelManager->connections($channel))->toHaveCount(1));
+    $channels->each(fn ($channel) => expect($this->channelManager->connections($this->connection->application(), $channel))->toHaveCount(1));
 
     $this->channelManager->unsubscribeFromAll($this->connection);
 
-    $channels->each(fn ($channel) => expect($this->channelManager->connections($channel))->toHaveCount(0));
+    $channels->each(fn ($channel) => expect($this->channelManager->connections($this->connection->application(), $channel))->toHaveCount(0));
 });
 
 it('can use a custom cache prefix', function () {
@@ -86,10 +86,10 @@ it('can use a custom cache prefix', function () {
 
     $channelManager->subscribe(
         $this->channel,
-        new Connection
+        $connection = new Connection
     );
 
-    expect(Cache::get('reverb-test:channels'))
+    expect(Cache::get("reverb-test:channels:{$connection->application()->id()}"))
         ->toHaveCount(1);
 });
 
@@ -100,7 +100,7 @@ it('can get the data for a connection subscribed to a channel', function () {
         $connection['data'])
     );
 
-    $this->channelManager->connections($this->channel)->values()->each(function ($connection, $index) {
+    $this->channelManager->connections($connections->first()['connection']->application(), $this->channel)->values()->each(function ($connection, $index) {
         expect($connection['data'])
             ->toBe(['name' => 'Joe', 'user_id' => $index + 1]);
     });

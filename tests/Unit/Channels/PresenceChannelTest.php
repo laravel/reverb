@@ -1,5 +1,6 @@
 <?php
 
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
@@ -43,7 +44,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(['foo' => 'bar']);
+    $channel->broadcast(Application::find('pusher-key'), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
 });
@@ -63,7 +64,7 @@ it('can return data stored on the connection', function () {
         ->once()
         ->andReturn(connections(2, ['user_info' => ['name' => 'Joe']]));
 
-    expect($channel->data())->toBe([
+    expect($channel->data($this->connection->application()))->toBe([
         'presence' => [
             'count' => 2,
             'ids' => [1, 2],

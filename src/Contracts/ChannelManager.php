@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Contracts;
 
 use Illuminate\Support\Collection;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 
 interface ChannelManager
@@ -31,7 +32,7 @@ interface ChannelManager
      *
      * @return \Illuminate\Support\Collection
      */
-    public function all(): Collection;
+    public function all(Application $app): Collection;
 
     /**
      * Unsubscribe from all channels.
@@ -47,5 +48,5 @@ interface ChannelManager
      * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\Support\Collection
      */
-    public function connections(Channel $channel): Collection;
+    public function connections(Application $app, Channel $channel): Collection;
 }

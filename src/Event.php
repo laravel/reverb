@@ -17,10 +17,10 @@ class Event
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
-    public static function dispatch(array $payload, Connection $connection = null): void
+    public static function dispatch(Application $app, array $payload, Connection $connection = null): void
     {
         if (! Config::get('reverb.pubsub.enabled')) {
-            static::dispatchSynchronously($payload, $connection);
+            static::dispatchSynchronously($app, $payload, $connection);
 
             return;
         }
@@ -40,14 +40,14 @@ class Event
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @return void
      */
-    public static function dispatchSynchronously(array $payload, Connection $connection = null): void
+    public static function dispatchSynchronously(Application $app, array $payload, Connection $connection = null): void
     {
         $channels = isset($payload['channel']) ? [$payload['channel']] : $payload['channels'];
 
         foreach ($channels as $channel) {
             $channel = ChannelBroker::create($channel);
 
-            $channel->broadcast($payload, $connection);
+            $channel->broadcast($app, $payload, $connection);
         }
     }
 }

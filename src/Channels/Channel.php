@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Channels;
 
 use Exception;
 use Illuminate\Support\Facades\App;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
@@ -55,10 +56,10 @@ class Channel
      * @param  array  $payload
      * @return void
      */
-    public function broadcast(array $payload, Connection $except = null)
+    public function broadcast(Application $app, array $payload, Connection $except = null)
     {
         App::make(ChannelManager::class)
-            ->connections($this)->each(function ($data) use ($payload, $except) {
+            ->connections($app, $this)->each(function ($data) use ($payload, $except) {
                 $connection = is_object($data['connection']) ? $data['connection'] : unserialize($data['connection']);
 
                 if ($except && $except->identifier() === $connection->identifier()) {
@@ -82,7 +83,7 @@ class Channel
      *
      * @return array
      */
-    public function data()
+    public function data(Application $app)
     {
         return [];
     }

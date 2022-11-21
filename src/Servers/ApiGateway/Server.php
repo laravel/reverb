@@ -2,8 +2,10 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Server as ReverbServer;
 
@@ -31,16 +33,23 @@ class Server
      */
     public function handle(Request $request)
     {
-        match ($request->event()) {
-            'CONNECT' => $this->server->open(
-                $this->connection($request->connectionId())
-            ),
-            'DISCONNECT' => $this->disconnect($request->connectionId()),
-            'MESSAGE' => $this->server->message(
-                $this->connection($request->connectionId()),
-                $request->message()
-            )
-        };
+        try {
+            match ($request->event()) {
+                'CONNECT' => $this->server->open(
+                    $this->connection($request)
+                ),
+                'DISCONNECT' => $this->disconnect($request),
+                'MESSAGE' => $this->server->message(
+                    $this->connection($request),
+                    $request->message()
+                )
+            };
+        } catch (Exception $e) {
+            $this->server->error(
+                $this->connection($request),
+                $e
+            );
+        }
     }
 
     /**
@@ -49,12 +58,17 @@ class Server
      * @param  string  $connectionId
      * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
-    protected function connection(string $connectionId): Connection
+    protected function connection(Request $request): Connection
     {
-        return $this->mutex(function () use ($connectionId) {
+        return $this->mutex(function () use ($request) {
+            $app = $this->application($request);
+
             return $this->repository->rememberForever(
-                "{$this->key()}:{$connectionId}",
-                fn () => new Connection($connectionId)
+                "{$this->key($app->id())}:{$request->connectionId()}",
+                fn () => new Connection(
+                    $request->connectionId(),
+                    $app
+                )
             );
         });
     }
@@ -65,14 +79,14 @@ class Server
      * @param  string  $connectionId
      * @return void
      */
-    protected function disconnect(string $connectionId)
+    protected function disconnect(Request $request)
     {
-        $this->server->close(
-            $this->connection($connectionId)
-        );
+        $connection = $this->connection($request);
+
+        $this->server->close($connection);
 
         $this->repository->forget(
-            "{$this->key()}:{$connectionId}"
+            "{$this->key($connection->application()->id())}:{$request->connectionId()}"
         );
     }
 
@@ -81,8 +95,15 @@ class Server
      *
      * @return string
      */
-    protected function key(): string
+    protected function key($appId): string
     {
-        return "{$this->prefix}:connections";
+        return "{$this->prefix}:{$appId}:connections";
+    }
+
+    protected function application(Request $request): Application
+    {
+        parse_str($request->serverVariables['QUERY_STRING'], $queryString);
+
+        return Application::find($queryString['appId']);
     }
 }
