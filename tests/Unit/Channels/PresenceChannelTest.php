@@ -46,7 +46,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(Application::find('pusher-key'), ['foo' => 'bar']);
+    $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
 });

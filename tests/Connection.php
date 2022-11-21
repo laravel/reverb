@@ -48,6 +48,6 @@ class Connection implements ConnectionInterface
 
     public function app(): Application
     {
-        return Application::find('pusher-key');
+        return Application::findByKey('pusher-key');
     }
 }

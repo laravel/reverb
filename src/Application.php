@@ -56,18 +56,45 @@ class Application
     }
 
     /**
-     * Get an application instance by key.
+     * Find an application instance by ID.
      *
      * @param  string  $key
      * @return \Laravel\Reverb\Application
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
-    public static function find(string $key): Application
+    public static function findByKey(string $key): Application
+    {
+        return static::find('key', $key);
+    }
+
+    /**
+     * Find an application instance by key.
+     *
+     * @param  string  $id
+     * @return \Laravel\Reverb\Application
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
+    public static function findById(string $id): Application
+    {
+        return static::find('id', $id);
+    }
+
+    /**
+     * Find an application instance.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return \Laravel\Reverb\Application
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
+    public static function find(string $key, $value): Application
     {
         $application = new static;
 
-        $app = $application->applications->firstWhere('key', $key);
+        $app = $application->applications->firstWhere($key, $value);
 
         if (! $app) {
             throw new InvalidApplication;

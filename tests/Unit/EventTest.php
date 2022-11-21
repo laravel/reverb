@@ -7,7 +7,7 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Event;
 
 it('can broadcast a pubsub event when enabled', function () {
-    $app = Application::find('pusher-key');
+    $app = Application::findByKey('pusher-key');
     Config::set('reverb.pubsub.enabled', true);
     $redis = Mockery::mock(Client::class);
     $redis->shouldReceive('publish')->once()
@@ -28,5 +28,5 @@ it('can broadcast an event directly when pubsub disabled', function () {
 
     $this->app->bind(ChannelManager::class, fn () => $channelManager);
 
-    Event::dispatch(Application::find('pusher-key'), ['channel' => 'test-channel']);
+    Event::dispatch(Application::findByKey('pusher-key'), ['channel' => 'test-channel']);
 });

@@ -110,6 +110,6 @@ class Server
     {
         parse_str($request->serverVariables['QUERY_STRING'], $queryString);
 
-        return Application::find($queryString['appId']);
+        return Application::findByKey($queryString['appId']);
     }
 }

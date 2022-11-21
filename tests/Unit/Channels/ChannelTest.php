@@ -42,7 +42,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(Application::find('pusher-key'), ['foo' => 'bar']);
+    $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
 });
@@ -56,7 +56,7 @@ it('does not broadcast to the connection sending the message', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(Application::find('pusher-key'), ['foo' => 'bar'], $connections->first()['connection']);
+    $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar'], $connections->first()['connection']);
 
     $connections->first()['connection']->assertNothingSent();
     $connections->take(-2)->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));

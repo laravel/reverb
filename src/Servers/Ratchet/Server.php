@@ -94,6 +94,6 @@ class Server implements MessageComponentInterface
         $request = $connection->httpRequest;
         parse_str($request->getUri()->getQuery(), $queryString);
 
-        return Application::find($queryString['appId']);
+        return Application::findByKey($queryString['appId']);
     }
 }
