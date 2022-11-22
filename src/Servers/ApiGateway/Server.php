@@ -61,14 +61,14 @@ class Server
     protected function connection(Request $request): Connection
     {
         return $this->mutex(function () use ($request) {
-            $app = $this->application($request);
-
             return $this->repository->rememberForever(
-                "{$this->key($app->id())}:{$request->connectionId()}",
-                fn () => new Connection(
-                    $request->connectionId(),
-                    $app
-                )
+                "{$this->key()}:{$request->connectionId()}",
+                function () use ($request) {
+                    return new Connection(
+                        $request->connectionId(),
+                        $this->application($request)
+                    );
+                }
             );
         });
     }
@@ -86,7 +86,7 @@ class Server
         $this->server->close($connection);
 
         $this->repository->forget(
-            "{$this->key($connection->app()->id())}:{$request->connectionId()}"
+            "{$this->key()}:{$request->connectionId()}"
         );
     }
 
@@ -95,9 +95,9 @@ class Server
      *
      * @return string
      */
-    protected function key($appId): string
+    protected function key(): string
     {
-        return "{$this->prefix}:{$appId}:connections";
+        return "{$this->prefix}:connections";
     }
 
     /**

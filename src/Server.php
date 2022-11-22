@@ -78,7 +78,9 @@ class Server
      */
     public function close(Connection $connection)
     {
-        $this->channels->unsubscribeFromAll($connection);
+        $this->channels
+            ->for($connection->app())
+            ->unsubscribeFromAll($connection);
 
         echo "Disconnected: ({$connection->id()})".PHP_EOL;
     }
