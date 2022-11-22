@@ -11,7 +11,7 @@ it('can broadcast a pubsub event when enabled', function () {
     Config::set('reverb.pubsub.enabled', true);
     $redis = Mockery::mock(Client::class);
     $redis->shouldReceive('publish')->once()
-        ->with('reverb', json_encode(['application' => $app, 'payload' => ['channel' => 'test-channel']]));
+        ->with('reverb', json_encode(['application' => serialize($app), 'payload' => ['channel' => 'test-channel']]));
 
     $this->app->bind(Client::class, fn () => $redis);
 
