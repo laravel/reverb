@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Aws\ApiGatewayManagementApi\ApiGatewayManagementApiClient;
 use Illuminate\Support\Facades\Config;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
@@ -21,8 +22,10 @@ class Connection implements ConnectionInterface, SerializableConnection
      */
     protected $id;
 
-    public function __construct(protected string $identifier)
-    {
+    public function __construct(
+        protected string $identifier,
+        protected Application $application
+    ) {
     }
 
     /**
@@ -73,5 +76,15 @@ class Connection implements ConnectionInterface, SerializableConnection
                 echo 'Unable to send message to connection: '.$e->getMessage();
             }
         });
+    }
+
+    /**
+     * Get the application the connection belongs to.
+     *
+     * @return \Laravel\Reverb\Application
+     */
+    public function app(): Application
+    {
+        return $this->application;
     }
 }

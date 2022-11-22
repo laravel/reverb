@@ -8,6 +8,8 @@ use Laravel\Reverb\Tests\Connection;
 beforeEach(function () {
     $this->connection = new Connection();
     $this->channelManager = Mockery::spy(ChannelManager::class);
+    $this->channelManager->shouldReceive('for')
+        ->andReturn($this->channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 });
 
@@ -43,7 +45,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(['foo' => 'bar']);
+    $channel->broadcast($connections->first()['connection']->app(), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
 });

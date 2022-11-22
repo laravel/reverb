@@ -33,7 +33,6 @@ class ServiceProvider extends BaseServiceProvider
 
         $config = $this->app['config']['reverb'];
 
-
         $this->app->singleton(ChannelManagerInterface::class, function ($app) use ($config) {
             return new ChannelManager(
                 $app['cache']->store(

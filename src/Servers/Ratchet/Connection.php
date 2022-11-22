@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
@@ -18,8 +19,10 @@ class Connection implements ConnectionInterface
      */
     protected $id;
 
-    public function __construct(protected RatchetConnectionInterface $connection)
-    {
+    public function __construct(
+        protected RatchetConnectionInterface $connection,
+        protected Application $application
+    ) {
     }
 
     /**
@@ -59,5 +62,15 @@ class Connection implements ConnectionInterface
         } catch (Throwable $e) {
             echo 'Unable to send message to connection: '.$e->getMessage();
         }
+    }
+
+    /**
+     * Get the application the connection belongs to.
+     *
+     * @return \Laravel\Reverb\Application
+     */
+    public function app(): Application
+    {
+        return $this->application;
     }
 }

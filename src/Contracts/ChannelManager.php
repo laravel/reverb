@@ -3,10 +3,19 @@
 namespace Laravel\Reverb\Contracts;
 
 use Illuminate\Support\Collection;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 
 interface ChannelManager
 {
+    /**
+     * The application the channel manager should be scoped to.
+     *
+     * @param  \Laravel\Reverb\Application  $application
+     * @return \Laravel\Reverb\Contracts\ChannelManager
+     */
+    public function for(Application $application): ChannelManager;
+
     /**
      * Subscribe to a channel.
      *

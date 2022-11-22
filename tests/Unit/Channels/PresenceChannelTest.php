@@ -1,5 +1,6 @@
 <?php
 
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
@@ -8,6 +9,8 @@ use Laravel\Reverb\Tests\Connection;
 beforeEach(function () {
     $this->connection = new Connection();
     $this->channelManager = Mockery::spy(ChannelManager::class);
+    $this->channelManager->shouldReceive('for')
+        ->andReturn($this->channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 });
 
@@ -43,7 +46,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(['foo' => 'bar']);
+    $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
 });
@@ -63,7 +66,7 @@ it('can return data stored on the connection', function () {
         ->once()
         ->andReturn(connections(2, ['user_info' => ['name' => 'Joe']]));
 
-    expect($channel->data())->toBe([
+    expect($channel->data($this->connection->app()))->toBe([
         'presence' => [
             'count' => 2,
             'ids' => [1, 2],

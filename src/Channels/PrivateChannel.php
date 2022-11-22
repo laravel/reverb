@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Channels;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
@@ -14,7 +13,7 @@ class PrivateChannel extends Channel
      *
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $auth
-     * @param  string  $data
+     * @param  string|null  $data
      * @return bool
      */
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
@@ -29,9 +28,10 @@ class PrivateChannel extends Channel
      *
      * @param  \Laravel\Reverb\Contracts\Connection  $connection
      * @param  string  $auth
+     * @param  string|null  $data
      * @return bool
      */
-    protected function verify(Connection $connection, string $auth, string $data = null): bool
+    protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
 
@@ -43,7 +43,7 @@ class PrivateChannel extends Channel
             hash_hmac(
                 'sha256',
                 $signature,
-                App::make('config')->get('broadcasting.connections.pusher.secret')
+                $connection->app()->secret(),
             ),
             Str::after($auth, ':')
         )) {

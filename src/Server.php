@@ -78,7 +78,9 @@ class Server
      */
     public function close(Connection $connection)
     {
-        $this->channels->unsubscribeFromAll($connection);
+        $this->channels
+            ->for($connection->app())
+            ->unsubscribeFromAll($connection);
 
         echo "Disconnected: ({$connection->id()})".PHP_EOL;
     }
@@ -87,11 +89,17 @@ class Server
      * Handle an error.
      *
      * @param  \Laravel\Reverb\Contracts\ConnectionInterface  $connection
-     * @param  \Exception  $e
+     * @param  \Exception  $exception
      * @return void
      */
-    public function error(Connection $connection, Exception $e)
+    public function error(Connection $connection, Exception $exception)
     {
-        echo 'Error: '.$e->getMessage().PHP_EOL;
+        if ($exception instanceof PusherException) {
+            $connection->send(json_encode($exception->payload()));
+
+            echo 'Message from '.$connection->id().' resulted in a pusher error'.PHP_EOL;
+        }
+
+        echo 'Error: '.$exception->getMessage().PHP_EOL;
     }
 }

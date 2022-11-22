@@ -9,7 +9,8 @@ use Laravel\Reverb\Tests\Connection;
 beforeEach(function () {
     $this->connection = new Connection;
     $this->channel = ChannelBroker::create('test-channel');
-    $this->channelManager = $this->app->make(ChannelManager::class);
+    $this->channelManager = $this->app->make(ChannelManager::class)
+        ->for($this->connection->app());
 });
 
 it('can subscribe to a channel', function () {
@@ -19,7 +20,9 @@ it('can subscribe to a channel', function () {
         $connection['data'])
     );
 
-    expect($this->channelManager->connections($this->channel))->toHaveCount(5);
+    expect(
+        $this->channelManager->connections($this->channel)
+    )->toHaveCount(5);
 });
 
 it('can unsubscribe from a channel', function () {
@@ -79,22 +82,22 @@ it('can unsubscribe a connection for all channels', function () {
 });
 
 it('can use a custom cache prefix', function () {
-    $channelManager = new Manager(
+    $channelManager = (new Manager(
         Cache::store('array'),
         'reverb-test'
-    );
+    ))->for($this->connection->app());
 
     $channelManager->subscribe(
         $this->channel,
-        new Connection
+        $connection = new Connection
     );
 
-    expect(Cache::get('reverb-test:channels'))
+    expect(Cache::get("reverb-test:channels:{$connection->app()->id()}"))
         ->toHaveCount(1);
 });
 
 it('can get the data for a connection subscribed to a channel', function () {
-    $connections = connections(5, ['name' => 'Joe'])->each(fn ($connection) => $this->channelManager->subscribe(
+    connections(5, ['name' => 'Joe'])->each(fn ($connection) => $this->channelManager->subscribe(
         $this->channel,
         $connection['connection'],
         $connection['data'])

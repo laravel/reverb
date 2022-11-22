@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
@@ -15,10 +16,30 @@ class ChannelManager implements ChannelManagerInterface
 {
     use EnsuresIntegrity;
 
+    /**
+     * The appliation instance.
+     *
+     * @var \Laravel\Reverb\Application
+     */
+    protected $application;
+
     public function __construct(
         protected Repository $repository,
         protected $prefix = 'reverb'
     ) {
+    }
+
+    /**
+     * The application the channel manager should be scoped to.
+     *
+     * @param  \Laravel\Reverb\Application  $application
+     * @return \Laravel\Reverb\Contracts\ChannelManager
+     */
+    public function for(Application $application): ChannelManagerInterface
+    {
+        $this->application = $application;
+
+        return $this;
     }
 
     /**
@@ -114,7 +135,13 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function key(): string
     {
-        return "{$this->prefix}:channels";
+        $key = "{$this->prefix}:channels";
+
+        if ($this->application) {
+            $key .= ":{$this->application->id()}";
+        }
+
+        return $key;
     }
 
     /**

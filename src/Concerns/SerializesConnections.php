@@ -14,6 +14,7 @@ trait SerializesConnections
         return [
             'id' => $this->id(),
             'identifier' => $this->identifier(),
+            'application' => $this->app(),
         ];
     }
 
@@ -27,5 +28,6 @@ trait SerializesConnections
     {
         $this->id = $values['id'];
         $this->identifier = $values['identifier'];
+        $this->application = $values['application'];
     }
 }

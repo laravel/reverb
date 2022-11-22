@@ -40,6 +40,7 @@ class ClientEvent
     public static function whisper(Connection $connection, array $payload): void
     {
         Event::dispatch(
+            $connection->app(),
             $payload + ['except' => $connection->identifier()],
             $connection
         );

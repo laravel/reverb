@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Facades\App;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
@@ -20,7 +21,7 @@ class PresenceChannel extends PrivateChannel
     {
         parent::subscribe($connection, $auth, $data);
 
-        $this->broadcast([
+        $this->broadcast($connection->app(), [
             'event' => 'pusher_internal:member_added',
             'data' => $data ? json_decode($data, true) : [],
             'channel' => $this->name(),
@@ -36,10 +37,11 @@ class PresenceChannel extends PrivateChannel
     public function unsubscribe(Connection $connection): void
     {
         $data = App::make(ChannelManager::class)
+            ->for($connection->app())
             ->data($this, $connection);
 
         if (isset($data['user_id'])) {
-            $this->broadcast([
+            $this->broadcast($connection->app(), [
                 'event' => 'pusher_internal:member_removed',
                 'data' => ['user_id' => $data['user_id']],
                 'channel' => $this->name(),
@@ -52,11 +54,13 @@ class PresenceChannel extends PrivateChannel
     /**
      * Get the data associated with the channel.
      *
+     * @param  \Laravel\Reverb\Application  $app
      * @return array
      */
-    public function data()
+    public function data(Application $app)
     {
         $connections = App::make(ChannelManager::class)
+            ->for($app)
             ->connections($this)
             ->map(function ($connection) {
                 return $connection['data'];
