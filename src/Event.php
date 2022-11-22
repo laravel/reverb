@@ -31,7 +31,7 @@ class Event
         $redis->publish(
             Config::get('reverb.pubsub.channel'),
             json_encode([
-                'application' => $app,
+                'application' => serialize($app),
                 'payload' => $payload,
             ])
         );

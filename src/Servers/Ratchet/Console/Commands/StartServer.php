@@ -144,7 +144,7 @@ class StartServer extends Command
         $redis->on('message', function (string $channel, string $payload) {
             $event = json_decode($payload, true);
             Event::dispatchSynchronously(
-                $event['application'],
+                unserialize($event['application']),
                 $event['payload']
             );
         });
