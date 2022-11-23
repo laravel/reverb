@@ -6,7 +6,6 @@ use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Event;
@@ -52,7 +51,7 @@ class StartServer extends Command
      */
     public function handle()
     {
-        App::instance(Logger::class, new CliLogger($this->output));
+        $this->laravel->instance(Logger::class, new CliLogger($this->output));
 
         $config = $this->laravel['config']['reverb.servers.ratchet'];
         $host = $this->option('host') ?: $config['host'];

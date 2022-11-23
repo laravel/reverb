@@ -2,20 +2,10 @@
 
 namespace Laravel\Reverb\Loggers;
 
-use Illuminate\Console\OutputStyle;
-use Illuminate\Console\View\Components\Factory;
-use Laravel\Reverb\Console\Components\Message;
 use Laravel\Reverb\Contracts\Logger;
 
-class CliLogger implements Logger
+class StandardLogger implements Logger
 {
-    protected $components;
-
-    public function __construct(protected OutputStyle $output)
-    {
-        $this->components = new Factory($output);
-    }
-
     /**
      * Log an infomational message.
      *
@@ -25,7 +15,13 @@ class CliLogger implements Logger
      */
     public function info(string $title, ?string $message = null): void
     {
-        $this->components->twoColumnDetail($title, $message);
+        $output = $title;
+
+        if ($message) {
+            $output .= ': '.$message;
+        }
+
+        fwrite(STDOUT, $output.PHP_EOL);
     }
 
     /**
@@ -36,7 +32,7 @@ class CliLogger implements Logger
      */
     public function error(string $string): void
     {
-        $this->output->error($string);
+        fwrite(STDERR, $string.PHP_EOL);
     }
 
     /**
@@ -47,7 +43,7 @@ class CliLogger implements Logger
      */
     public function line(?int $lines = 1): void
     {
-        $this->output->newLine($lines);
+        //
     }
 
     /**
@@ -66,8 +62,6 @@ class CliLogger implements Logger
 
         $message = json_encode($message, JSON_PRETTY_PRINT);
 
-        with(new Message($this->output))->render(
-            $message
-        );
+        fwrite(STDOUT, $message.PHP_EOL);
     }
 }
