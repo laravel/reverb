@@ -9,6 +9,7 @@ use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
 use Laravel\Reverb\Contracts\SerializableConnection;
+use Laravel\Reverb\Output;
 use Throwable;
 
 class Connection implements ConnectionInterface, SerializableConnection
@@ -73,7 +74,8 @@ class Connection implements ConnectionInterface, SerializableConnection
                     'Data' => $message,
                 ]);
             } catch (Throwable $e) {
-                echo 'Unable to send message to connection: '.$e->getMessage();
+                Output::error('Unable to send message.');
+                Output::info($e->getMessage());
             }
         });
     }

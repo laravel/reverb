@@ -24,7 +24,7 @@ class Server
     {
         PusherEvent::handle($connection, 'pusher:connection_established');
 
-        echo "New connection: ({$connection->id()})".PHP_EOL;
+        Output::info('New Connection', $connection->id());
     }
 
     /**
@@ -36,7 +36,8 @@ class Server
      */
     public function message(Connection $from, string $message)
     {
-        echo 'Message from '.$from->id().': '.$message.PHP_EOL;
+        Output::info('Message Received', $from->id());
+        Output::message($message);
 
         $event = json_decode($message, true);
 
@@ -51,11 +52,13 @@ class Server
                 default => ClientEvent::handle($from, $event)
             };
 
-            echo 'Message from '.$from->id().' handled'.PHP_EOL;
+            Output::info('Message Handled', $from->id());
+            Output::line();
         } catch (PusherException $e) {
             $from->send(json_encode($e->payload()));
 
-            echo 'Message from '.$from->id().' resulted in a pusher error'.PHP_EOL;
+            Output::error('Message from '.$from->id().' resulted in a pusher error');
+            Output::info($e->getMessage());
         } catch (Exception $e) {
             $from->send(json_encode([
                 'event' => 'pusher:error',
@@ -65,8 +68,8 @@ class Server
                 ]),
             ]));
 
-            echo 'Message from '.$from->id().' resulted in an unknown error'.PHP_EOL;
-            echo $e->getMessage().PHP_EOL;
+            Output::error('Message from '.$from->id().' resulted in an unknown error');
+            Output::info($e->getMessage());
         }
     }
 
@@ -82,7 +85,7 @@ class Server
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
 
-        echo "Disconnected: ({$connection->id()})".PHP_EOL;
+        Output::info('Connection closed', $connection->id());
     }
 
     /**
@@ -97,9 +100,20 @@ class Server
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
 
-            echo 'Message from '.$connection->id().' resulted in a pusher error'.PHP_EOL;
+            Output::error('Message from '.$connection->id().' resulted in a pusher error');
+
+            return Output::info($exception->getMessage());
         }
 
-        echo 'Error: '.$exception->getMessage().PHP_EOL;
+        $connection->send(json_encode([
+            'event' => 'pusher:error',
+            'data' => json_encode([
+                'code' => 4200,
+                'message' => 'Invalid message format',
+            ]),
+        ]));
+
+        Output::error('Message from '.$connection->id().' resulted in an unknown error');
+        Output::info($exception->getMessage());
     }
 }

@@ -6,10 +6,13 @@ use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Channels\Channel;
+use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
+use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Server as ReverbServer;
 use Laravel\Reverb\Servers\Ratchet\Server;
 use Ratchet\Http\HttpServer;
@@ -49,6 +52,8 @@ class StartServer extends Command
      */
     public function handle()
     {
+        App::instance(Logger::class, new CliLogger($this->output));
+
         $config = $this->laravel['config']['reverb.servers.ratchet'];
         $host = $this->option('host') ?: $config['host'];
         $port = $this->option('port') ?: $config['port'];
@@ -138,7 +143,7 @@ class StartServer extends Command
         $redis->subscribe($config['channel']);
 
         $redis->on('error', function (Exception $e) {
-            echo 'Error: '.$e->getMessage().PHP_EOL;
+            $this->components->error($e->getMessage());
         });
 
         $redis->on('message', function (string $channel, string $payload) {

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Output;
 
 class Channel
 {
@@ -78,7 +79,8 @@ class Channel
                 try {
                     $connection->send(json_encode($payload));
                 } catch (Exception $e) {
-                    echo $e->getMessage().PHP_EOL;
+                    Output::error('Broadcasting to '.$connection->id().' resulted in an error');
+                    Output::info($e->getMessage());
                 }
             });
     }
