@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Servers\Ratchet;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Output;
 use Ratchet\ConnectionInterface as RatchetConnectionInterface;
 use Throwable;
 
@@ -60,7 +61,8 @@ class Connection implements ConnectionInterface
         try {
             $this->connection->send($message);
         } catch (Throwable $e) {
-            echo 'Unable to send message to connection: '.$e->getMessage();
+            Output::error('Unable to send message.');
+            Output::info($e->getMessage());
         }
     }
 

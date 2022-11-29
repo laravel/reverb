@@ -42,7 +42,10 @@
         "laravel": {
             "providers": [
                 "Laravel\\Reverb\\ServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Output": "Laravel\\Reverb\\Output"
+            }
         }
     },
     "config": {

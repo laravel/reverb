@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use InvalidArgumentException;
 use Laravel\Reverb\Console\Commands\StartServer;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Loggers\StandardLogger;
 use Laravel\Reverb\Managers\ChannelManager;
 use Laravel\Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
 use Laravel\Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
@@ -41,6 +43,8 @@ class ServiceProvider extends BaseServiceProvider
                 $config['channel_cache']['prefix']
             );
         });
+
+        $this->app->instance(Logger::class, new StandardLogger);
 
         $this->app->register(
             $this->getServerProvider($config['default'])
