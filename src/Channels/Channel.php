@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Output;
 
 class Channel
@@ -28,7 +28,7 @@ class Channel
     /**
      * Subscribe to the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string|null  $auth
      * @param  string|null  $data
      * @return bool
@@ -43,7 +43,7 @@ class Channel
     /**
      * Unsubscribe from the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return bool
      */
     public function unsubscribe(Connection $connection): void
@@ -58,7 +58,7 @@ class Channel
      *
      * @param  \Laravel\Reverb\Application  $app
      * @param  array  $payload
-     * @param  \Laravel\Reverb\Contracts\Connection|null  $except
+     * @param  \Laravel\Reverb\Connection|null  $except
      * @return void
      */
     public function broadcast(Application $app, array $payload, Connection $except = null)

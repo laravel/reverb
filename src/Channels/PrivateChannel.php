@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 
 class PrivateChannel extends Channel
@@ -11,7 +11,7 @@ class PrivateChannel extends Channel
     /**
      * Subscribe to the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $auth
      * @param  string|null  $data
      * @return bool
@@ -26,7 +26,7 @@ class PrivateChannel extends Channel
     /**
      * Deteremine whether the given auth token is valid.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $auth
      * @param  string|null  $data
      * @return bool

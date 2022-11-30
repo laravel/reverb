@@ -9,7 +9,7 @@ use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\SerializableConnection;
 
 class ChannelManager implements ChannelManagerInterface
@@ -46,7 +46,7 @@ class ChannelManager implements ChannelManagerInterface
      * Subscribe to a channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  array  $data
      * @return void
      */
@@ -65,7 +65,7 @@ class ChannelManager implements ChannelManagerInterface
      * Unsubscribe from a channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public function unsubscribe(Channel $channel, Connection $connection): void

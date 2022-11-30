@@ -5,7 +5,7 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Exceptions\PusherException;
 
 class Server
@@ -17,7 +17,7 @@ class Server
     /**
      * Handle the a client connection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public function open(Connection $connection)
@@ -30,7 +30,7 @@ class Server
     /**
      * Handle a new message received by the connected client.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $message
      * @return void
      */
@@ -76,7 +76,7 @@ class Server
     /**
      * Handle a client disconnection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public function close(Connection $connection)
@@ -91,7 +91,7 @@ class Server
     /**
      * Handle an error.
      *
-     * @param  \Laravel\Reverb\Contracts\ConnectionInterface  $connection
+     * @param  \Laravel\Reverb\ConnectionInterface  $connection
      * @param  \Exception  $exception
      * @return void
      */

@@ -56,6 +56,7 @@ return [
             'allowed_origins' => [
                 //
             ],
+            'ping_interval' => env('REVERB_APP_PING_INTERVAL', 5),
         ],
 
     ],

@@ -6,7 +6,6 @@ use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Contracts\Connection;
 
 class Event
 {
@@ -15,7 +14,7 @@ class Event
      *
      * @param  \Laravel\Reverb\Application  $app
      * @param  array  $payload
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public static function dispatch(Application $app, array $payload, Connection $connection = null): void
@@ -42,7 +41,7 @@ class Event
      *
      * @param  \Laravel\Reverb\Application  $app
      * @param  array  $payload
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public static function dispatchSynchronously(Application $app, array $payload, Connection $connection = null): void

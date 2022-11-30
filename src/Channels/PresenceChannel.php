@@ -5,14 +5,14 @@ namespace Laravel\Reverb\Channels;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Connection;
 
 class PresenceChannel extends PrivateChannel
 {
     /**
      * Subscribe to the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $auth
      * @param  string  $data
      * @return bool
@@ -31,7 +31,7 @@ class PresenceChannel extends PrivateChannel
     /**
      * Unsubscribe from the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return bool
      */
     public function unsubscribe(Connection $connection): void

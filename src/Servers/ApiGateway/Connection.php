@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
-use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Connection as BaseConnection;
 use Laravel\Reverb\Contracts\SerializableConnection;
 use Laravel\Reverb\Output;
 use Throwable;
 
-class Connection implements ConnectionInterface, SerializableConnection
+class Connection extends BaseConnection implements SerializableConnection
 {
     use GeneratesPusherIdentifiers, SerializesConnections;
 
@@ -27,6 +27,7 @@ class Connection implements ConnectionInterface, SerializableConnection
         protected string $identifier,
         protected Application $application
     ) {
+        parent::__construct($application);
     }
 
     /**

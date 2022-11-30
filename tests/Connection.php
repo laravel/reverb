@@ -4,9 +4,9 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Connection as BaseConnection;
 
-class Connection implements ConnectionInterface
+class Connection extends BaseConnection
 {
     public $messages = [];
 

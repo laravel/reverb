@@ -44,6 +44,13 @@ class Application
     protected ?int $capacity;
 
     /**
+     * The interval in minutes check connections for activity.
+     *
+     * @var int
+     */
+    protected int $pingInterval;
+
+    /**
      * The allowed origins from which the application can be connected.
      *
      * @var array
@@ -105,6 +112,7 @@ class Application
         $application->secret = $app['secret'];
         $application->capacity = $app['capacity'];
         $application->allowedOrigins = $app['allowed_origins'];
+        $application->pingInterval = $app['ping_interval'];
 
         return $application;
     }
@@ -157,5 +165,15 @@ class Application
     public function allowedOrigins(): array
     {
         return $this->allowedOrigins;
+    }
+
+    /**
+     * Get the interval in minutes to ping the client.
+     *
+     * @return int
+     */
+    public function pingInterval(): int
+    {
+        return $this->pingInterval;
     }
 }
