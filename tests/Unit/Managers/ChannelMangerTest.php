@@ -108,3 +108,60 @@ it('can get the data for a connection subscribed to a channel', function () {
             ->toBe(['name' => 'Joe', 'user_id' => $index + 1]);
     });
 });
+
+it('can get all connections for all channels', function () {
+    $connections = connections(12);
+
+    $channelOne = ChannelBroker::create('test-channel-1');
+    $channelTwo = ChannelBroker::create('test-channel-2');
+    $channelThree = ChannelBroker::create('test-channel-3');
+
+    $connections = $connections->split(3);
+
+    $connections->first()->each(function ($connection) use ($channelOne, $channelTwo, $channelThree) {
+        $this->channelManager->subscribe(
+            $channelOne,
+            $connection['connection'],
+            $connection['data']
+        );
+
+        $this->channelManager->subscribe(
+            $channelTwo,
+            $connection['connection'],
+            $connection['data']
+        );
+
+        $this->channelManager->subscribe(
+            $channelThree,
+            $connection['connection'],
+            $connection['data']
+        );
+    });
+
+    $connections->get(1)->each(function ($connection) use ($channelTwo, $channelThree) {
+        $this->channelManager->subscribe(
+            $channelTwo,
+            $connection['connection'],
+            $connection['data']
+        );
+
+        $this->channelManager->subscribe(
+            $channelThree,
+            $connection['connection'],
+            $connection['data']
+        );
+    });
+
+    $connections->last()->each(function ($connection) use ($channelThree) {
+        $this->channelManager->subscribe(
+            $channelThree,
+            $connection['connection'],
+            $connection['data']
+        );
+    });
+
+    $this->assertCount(4, $this->channelManager->connections($channelOne));
+    $this->assertCount(8, $this->channelManager->connections($channelTwo));
+    $this->assertCount(12, $this->channelManager->connections($channelThree));
+    $this->assertCount(12, $this->channelManager->allConnections());
+});

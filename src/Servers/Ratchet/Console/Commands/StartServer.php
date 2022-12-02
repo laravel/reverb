@@ -6,12 +6,14 @@ use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use Exception;
 use Illuminate\Console\Command;
-use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
+use Laravel\Reverb\Jobs\PingInactiveConnections;
+use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
+use Laravel\Reverb\Output;
 use Laravel\Reverb\Server as ReverbServer;
 use Laravel\Reverb\Servers\Ratchet\Server;
 use Ratchet\Http\HttpServer;
@@ -61,6 +63,7 @@ class StartServer extends Command
 
         $this->bindRedis($loop);
         $this->subscribe($loop);
+        $this->scheduleCleanup($loop);
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
@@ -118,6 +121,17 @@ class StartServer extends Command
             return (new Factory($loop))->createLazyClient(
                 $this->redisUrl()
             );
+        });
+    }
+
+    protected function scheduleCleanup(LoopInterface $loop): void
+    {
+        $loop->addPeriodicTimer(60, function () {
+            Output::info('Pruning Stale Connections');
+            PruneStaleConnections::dispatch();
+
+            Output::info('Pinging Inactive Connections');
+            PingInactiveConnections::dispatch();
         });
     }
 

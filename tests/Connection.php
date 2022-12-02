@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Tests;
 
+use Carbon\Carbon;
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Connection as BaseConnection;
@@ -19,6 +20,7 @@ class Connection extends BaseConnection
         if ($identifier) {
             $this->identifier = $identifier;
         }
+        $this->lastSeenAt = now();
     }
 
     public function identifier(): string
@@ -31,9 +33,29 @@ class Connection extends BaseConnection
         return $this->id;
     }
 
+    public function app(): Application
+    {
+        return Application::findByKey('pusher-key');
+    }
+
+    public function setLastSeenAt(Carbon $lastSeenAt): void
+    {
+        $this->lastSeenAt = $lastSeenAt;
+    }
+
+    public function setHasBeenPinged(): void
+    {
+        $this->hasBeenPinged = true;
+    }
+
     public function send(string $message): void
     {
         $this->messages[] = $message;
+    }
+
+    public function disconnect(): void
+    {
+        //
     }
 
     public function assertSent(array $message): void
@@ -46,8 +68,8 @@ class Connection extends BaseConnection
         Assert::assertEmpty($this->messages);
     }
 
-    public function app(): Application
+    public function assertHasBeenPinged(): void
     {
-        return Application::findByKey('pusher-key');
+        Assert::assertTrue($this->hasBeenPinged);
     }
 }

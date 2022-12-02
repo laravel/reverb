@@ -5,7 +5,6 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Connection;
 
 class PusherEvent
 {
@@ -28,6 +27,7 @@ class PusherEvent
             ),
             'unsubscribe' => self::unsubscribe($connection, $payload['channel']),
             'ping' => self::pong($connection),
+            'pong' => $connection->touch(),
             default => throw new Exception('Unknown Pusher event: '.$event),
         };
     }
@@ -85,6 +85,16 @@ class PusherEvent
     public static function pong(Connection $connection): void
     {
         static::send($connection, 'pong');
+    }
+
+    /**
+     * Send a ping.
+     *
+     * @param  \Laravel\Reverb\Connection  $connection
+     */
+    public static function ping(Connection $connection): void
+    {
+        static::send($connection, 'ping');
     }
 
     /**
