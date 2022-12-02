@@ -63,6 +63,18 @@ class Application
     }
 
     /**
+     * Return all of the configured applications as Application instances.
+     */
+    public static function all(): Collection
+    {
+        $application = new static;
+
+        return $application->applications()->map(function ($app) use ($application) {
+            return $application->findById($app['id']);
+        });
+    }
+
+    /**
      * Find an application instance by ID.
      *
      * @param  string  $key
@@ -115,6 +127,16 @@ class Application
         $application->pingInterval = $app['ping_interval'];
 
         return $application;
+    }
+
+    /**
+     * Get the configured applications.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function applications(): Collection
+    {
+        return $this->applications;
     }
 
     /**
