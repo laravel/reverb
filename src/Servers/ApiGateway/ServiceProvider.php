@@ -29,7 +29,7 @@ class ServiceProvider extends BaseServiceProvider
 
     public function register()
     {
-        $config = $this->app['config']['reverb']['api_gateway'];
+        $config = $this->app['config']['reverb']['servers']['api_gateway'];
 
         Route::post('/apps/{appId}/events', function (Request $request, $appId) {
             Event::dispatch(Application::findById($appId), [
