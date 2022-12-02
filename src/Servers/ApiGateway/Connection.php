@@ -21,7 +21,7 @@ class Connection extends BaseConnection implements SerializableConnection
      *
      * @var string
      */
-    protected string $id;
+    protected $id;
 
     public function __construct(
         protected string $identifier,

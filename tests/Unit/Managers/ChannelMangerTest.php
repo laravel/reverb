@@ -56,6 +56,12 @@ it('can get all connections subscribed to a channel', function () {
         ->toBeIn($this->channelManager->connections($this->channel)->keys()));
 });
 
+it('can get all hydrated connections subscribed to a channel', function () {
+});
+
+it('only valid hydrated connections are returned', function () {
+});
+
 it('can unsubscribe a connection for all channels', function () {
     $channels = collect(['test-channel-1', 'test-channel-2', 'test-channel-3'])
         ->map(fn ($name) => ChannelBroker::create($name));
