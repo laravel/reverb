@@ -3,23 +3,16 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
 
 class Server
 {
-    protected $repository;
-
-    protected $prefix;
-
-    public function __construct(protected ReverbServer $server)
-    {
-        $config = Config::get('reverb.servers.api_gateway.connection_cache');
-
-        $this->prefix = $config['prefix'];
-        $this->repository = Cache::store($config['store']);
+    public function __construct(
+        protected ReverbServer $server,
+        protected ConnectionManager $connections
+    ) {
     }
 
     /**
@@ -57,10 +50,19 @@ class Server
      */
     protected function connection(Request $request): Connection
     {
-        return Connection::make(
-            $request->connectionId(),
-            $this->application($request)
-        );
+        $application = $this->application($request);
+
+        return $this->connections
+            ->for($application)
+            ->resolve(
+                $request->connectionId(),
+                function () use ($request, $application) {
+                    return new Connection(
+                        $request->connectionId(),
+                        $application
+                    );
+                }
+            );
     }
 
     /**
@@ -74,16 +76,6 @@ class Server
         $this->server->close(
             $this->connection($request)
         );
-    }
-
-    /**
-     * Get the cache key for the connections.
-     *
-     * @return string
-     */
-    protected function key(): string
-    {
-        return "{$this->prefix}:connections";
     }
 
     /**

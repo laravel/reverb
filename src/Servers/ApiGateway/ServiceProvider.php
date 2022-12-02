@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
@@ -41,7 +42,7 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         $this->app->singleton(
-            ConnectionManager::class,
+            ConnectionManagerInterface::class,
             fn ($app) => new ConnectionManager(
                 $app['cache']->store(
                     $config['connection_manager']['store']
@@ -56,7 +57,7 @@ class ServiceProvider extends BaseServiceProvider
                 $app['cache']->store(
                     $config['connection_manager']['store']
                 ),
-                $app->make(ConnectionManager::class),
+                $app->make(ConnectionManagerInterface::class),
                 $config['connection_manager']['prefix']
             )
         );

@@ -82,7 +82,8 @@ class Server implements MessageComponentInterface
     {
         $application = $this->application($connection);
 
-        return $this->connections->for($application)
+        return $this->connections
+            ->for($application)
             ->resolve(
                 $connection->resourceId,
                 function () use ($connection, $application) {
