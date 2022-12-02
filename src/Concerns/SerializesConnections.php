@@ -18,7 +18,7 @@ trait SerializesConnections
             'id' => $this->id(),
             'identifier' => $this->identifier(),
             'application' => $this->app()->id(),
-            'lastSeenAt' => (string) $this->lastSeenAt(),
+            'lastSeenAt' => $this->lastSeenAt ? (string) $this->lastSeenAt : null,
         ];
     }
 
