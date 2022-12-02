@@ -34,6 +34,13 @@ interface ConnectionManager
     public function all(): Collection;
 
     /**
+     * Get all of the hydrated connections from the cache.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function hydrated(): Collection;
+
+    /**
      * Remove a connection from the cache.
      *
      * @param  string  $identifier

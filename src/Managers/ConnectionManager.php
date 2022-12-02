@@ -66,6 +66,16 @@ class ConnectionManager implements ConnectionManagerInterface
     }
 
     /**
+     * Get all of the hydrated connections from the cache.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function hydrated(): Collection
+    {
+        return $this->all()->map(fn ($connection) => $this->hydrate($connection));
+    }
+
+    /**
      * Remove a connection from the cache.
      *
      * @param  string  $identifier

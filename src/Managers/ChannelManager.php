@@ -180,7 +180,7 @@ class ChannelManager implements ChannelManagerInterface
     {
         return $this->connections
             ->for($this->application)
-            ->all()
+            ->hydrated()
             ->intersectByKeys(
                 $this->connections($channel)
             );
