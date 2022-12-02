@@ -3,32 +3,40 @@
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
+use Laravel\Reverb\Managers\ConnectionManager;
 
 beforeEach(function () {
+    $this->connectionManager = Mockery::spy(ConnectionManager::class);
+    $this->connectionManager->shouldReceive('for')
+        ->andReturn($this->connectionManager);
+    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
+
     $this->channelManager = Mockery::spy(ChannelManager::class);
     $this->channelManager->shouldReceive('for')
         ->andReturn($this->channelManager);
-    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
+    $this->app->singleton(ConnectionManager::class, fn () => $this->connectionManager);
 });
 
 it('cleans up stale connections', function () {
     $connections = connections(5);
     $channel = ChannelBroker::create('test-channel');
 
-    $this->channelManager->shouldReceive('allConnections')
+    $this->connectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections);
 
-    $connections->map(fn ($connection) => $connection['connection'])
-        ->each(function ($connection) use ($channel) {
-            $channel->subscribe($connection);
-            $connection->setLastSeenAt(now()->subMinutes(10));
-            $connection->setHasBeenPinged();
+    $connections->each(function ($connection) use ($channel) {
+        $channel->subscribe($connection);
+        $connection->setLastSeenAt(now()->subMinutes(10));
+        $connection->setHasBeenPinged();
 
-            $this->channelManager->shouldReceive('unsubscribeFromAll')
+        $this->channelManager->shouldReceive('unsubscribeFromAll')
                 ->once()
                 ->with($connection);
-        });
+    });
 
-    (new PruneStaleConnections)->handle($this->channelManager);
+    (new PruneStaleConnections)->handle(
+        $this->connectionManager,
+        $this->channelManager
+    );
 });

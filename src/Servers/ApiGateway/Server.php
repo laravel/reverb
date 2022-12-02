@@ -6,13 +6,10 @@ use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Server as ReverbServer;
 
 class Server
 {
-    use EnsuresIntegrity;
-
     protected $repository;
 
     protected $prefix;
@@ -60,17 +57,10 @@ class Server
      */
     protected function connection(Request $request): Connection
     {
-        return $this->mutex(function () use ($request) {
-            return $this->repository->rememberForever(
-                "{$this->key()}:{$request->connectionId()}",
-                function () use ($request) {
-                    return new Connection(
-                        $request->connectionId(),
-                        $this->application($request)
-                    );
-                }
-            );
-        });
+        return Connection::make(
+            $request->connectionId(),
+            $this->application($request)
+        );
     }
 
     /**
@@ -81,12 +71,8 @@ class Server
      */
     protected function disconnect(Request $request)
     {
-        $connection = $this->connection($request);
-
-        $this->server->close($connection);
-
-        $this->repository->forget(
-            "{$this->key()}:{$request->connectionId()}"
+        $this->server->close(
+            $this->connection($request)
         );
     }
 

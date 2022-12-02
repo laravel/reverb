@@ -6,12 +6,9 @@ use Ramsey\Uuid\Uuid;
 
 uses(TestCase::class)->in(__DIR__);
 
-function connections(int $count = 1, array $data = [])
+function connections(int $count = 1)
 {
-    return collect(range(1, $count))->map(fn ($item, $index) => [
-        'connection' => new Connection(Uuid::uuid4()),
-        'data' => empty($data) ? [] : $data + ['user_id' => $index + 1],
-    ]);
+    return collect(range(1, $count))->map(fn () => new Connection(Uuid::uuid4()));
 }
 
 function validAuth(Connection $connection, string $channel, ?string $data = null)

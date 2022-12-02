@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Managers\ChannelManager as Manager;
+use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
@@ -14,11 +16,8 @@ beforeEach(function () {
 });
 
 it('can subscribe to a channel', function () {
-    connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
-        $this->channel,
-        $connection['connection'],
-        $connection['data'])
-    );
+    connections(5)
+        ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
 
     expect(
         $this->channelManager->connections($this->channel)
@@ -26,13 +25,10 @@ it('can subscribe to a channel', function () {
 });
 
 it('can unsubscribe from a channel', function () {
-    $connections = connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
-        $this->channel,
-        $connection['connection'],
-        $connection['data'])
-    );
+    $connections = connections(5)
+        ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
 
-    $this->channelManager->unsubscribe($this->channel, $connections->first()['connection']);
+    $this->channelManager->unsubscribe($this->channel, $connections->first());
 
     expect($this->channelManager->connections($this->channel))->toHaveCount(4);
 });
@@ -53,16 +49,11 @@ it('can get all channels', function () {
 });
 
 it('can get all connections subscribed to a channel', function () {
-    $connections = connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
-        $this->channel,
-        $connection['connection'],
-        $connection['data'])
-    );
+    $connections = connections(5)
+        ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
 
-    $this->channelManager->connections($this->channel)->each(function ($connection, $index) {
-        expect($connection['connection']->identifier())
-            ->toBe($index);
-    });
+    $connections->each(fn ($connection) => expect($connection->identifier())
+        ->toBeIn($this->channelManager->connections($this->channel)->keys()));
 });
 
 it('can unsubscribe a connection for all channels', function () {
@@ -84,6 +75,7 @@ it('can unsubscribe a connection for all channels', function () {
 it('can use a custom cache prefix', function () {
     $channelManager = (new Manager(
         Cache::store('array'),
+        App::make(ConnectionManager::class),
         'reverb-test'
     ))->for($this->connection->app());
 
@@ -92,20 +84,20 @@ it('can use a custom cache prefix', function () {
         $connection = new Connection
     );
 
-    expect(Cache::get("reverb-test:channels:{$connection->app()->id()}"))
+    expect(Cache::get("reverb-test:{$connection->app()->id()}:channels"))
         ->toHaveCount(1);
 });
 
 it('can get the data for a connection subscribed to a channel', function () {
-    connections(5, ['name' => 'Joe'])->each(fn ($connection) => $this->channelManager->subscribe(
+    connections(5)->each(fn ($connection) => $this->channelManager->subscribe(
         $this->channel,
-        $connection['connection'],
-        $connection['data'])
-    );
+        $connection,
+        ['name' => 'Joe']
+    ));
 
-    $this->channelManager->connections($this->channel)->values()->each(function ($connection, $index) {
-        expect($connection['data'])
-            ->toBe(['name' => 'Joe', 'user_id' => $index + 1]);
+    $this->channelManager->connections($this->channel)->values()->each(function ($data) {
+        expect($data)
+            ->toBe(['name' => 'Joe']);
     });
 });
 
@@ -119,49 +111,22 @@ it('can get all connections for all channels', function () {
     $connections = $connections->split(3);
 
     $connections->first()->each(function ($connection) use ($channelOne, $channelTwo, $channelThree) {
-        $this->channelManager->subscribe(
-            $channelOne,
-            $connection['connection'],
-            $connection['data']
-        );
-
-        $this->channelManager->subscribe(
-            $channelTwo,
-            $connection['connection'],
-            $connection['data']
-        );
-
-        $this->channelManager->subscribe(
-            $channelThree,
-            $connection['connection'],
-            $connection['data']
-        );
+        $this->channelManager->subscribe($channelOne, $connection);
+        $this->channelManager->subscribe($channelTwo, $connection);
+        $this->channelManager->subscribe($channelThree, $connection);
     });
 
     $connections->get(1)->each(function ($connection) use ($channelTwo, $channelThree) {
-        $this->channelManager->subscribe(
-            $channelTwo,
-            $connection['connection'],
-            $connection['data']
-        );
+        $this->channelManager->subscribe($channelTwo, $connection);
 
-        $this->channelManager->subscribe(
-            $channelThree,
-            $connection['connection'],
-            $connection['data']
-        );
+        $this->channelManager->subscribe($channelThree, $connection);
     });
 
     $connections->last()->each(function ($connection) use ($channelThree) {
-        $this->channelManager->subscribe(
-            $channelThree,
-            $connection['connection'],
-            $connection['data']
-        );
+        $this->channelManager->subscribe($channelThree, $connection);
     });
 
     $this->assertCount(4, $this->channelManager->connections($channelOne));
     $this->assertCount(8, $this->channelManager->connections($channelTwo));
     $this->assertCount(12, $this->channelManager->connections($channelThree));
-    $this->assertCount(12, $this->channelManager->allConnections());
 });
