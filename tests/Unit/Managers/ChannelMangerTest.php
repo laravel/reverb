@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Managers\ChannelManager as Manager;
 use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Tests\Connection;
@@ -12,6 +13,8 @@ beforeEach(function () {
     $this->connection = new Connection;
     $this->channel = ChannelBroker::create('test-channel');
     $this->channelManager = $this->app->make(ChannelManager::class)
+        ->for($this->connection->app());
+    $this->connectionManager = $this->app->make(ConnectionManagerInterface::class)
         ->for($this->connection->app());
 });
 
@@ -57,9 +60,58 @@ it('can get all connections subscribed to a channel', function () {
 });
 
 it('can get all hydrated connections subscribed to a channel', function () {
+    $connections = connections(5)
+        ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
+
+    $this->connectionManager
+        ->sync($connections->mapWithKeys(
+            fn ($connection) => [$connection->identifier() => $connection]
+        ));
+
+    $hydratedConnections = $this->channelManager->hydratedConnections($this->channel);
+
+    $this->expect($hydratedConnections)->toHaveCount(5);
+    $hydratedConnections->each(function ($connection) {
+        expect($connection)->toBeInstanceOf(Connection::class);
+    });
+});
+
+it('can get all hydrated serialized connections subscribed to a channel', function () {
+    $connections = connections(5, true)
+        ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
+
+    $this->connectionManager
+        ->sync($connections->mapWithKeys(
+            fn ($connection) => [$connection->identifier() => serialize($connection)]
+        ));
+
+    $hydratedConnections = $this->channelManager->hydratedConnections($this->channel);
+
+    $this->expect($hydratedConnections)->toHaveCount(5);
+    $hydratedConnections->each(function ($connection) {
+        expect($connection)->toBeInstanceOf(Connection::class);
+    });
 });
 
 it('only valid hydrated connections are returned', function () {
+    $connections = connections(10);
+
+    $this->connectionManager
+        ->sync($connections->mapWithKeys(
+            fn ($connection) => [$connection->identifier() => $connection]
+        ));
+
+    $connections->take(5)->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
+
+    $hydratedConnections = $this->channelManager->hydratedConnections($this->channel);
+    $allConnections = $this->connectionManager->all();
+
+    $this->expect($hydratedConnections)->toHaveCount(5);
+    $this->expect($allConnections)->toHaveCount(10);
+    $hydratedConnections->each(function ($connection, $index) use ($allConnections) {
+        expect($connection->identifier())->toBe($index);
+        expect($index)->toBeIn($allConnections->take(5)->keys());
+    });
 });
 
 it('can unsubscribe a connection for all channels', function () {
