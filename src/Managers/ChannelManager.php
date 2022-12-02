@@ -10,6 +10,7 @@ use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Laravel\Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
-use Laravel\Reverb\Managers\ConnectionManager;
 
 beforeEach(function () {
     $this->connectionManager = Mockery::spy(ConnectionManager::class);

@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Servers\Ratchet;
 
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Managers\ConnectionManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;

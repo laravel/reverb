@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Http\Controllers;
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Managers\ConnectionManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Http\HttpServerInterface;

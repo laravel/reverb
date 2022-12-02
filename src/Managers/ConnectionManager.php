@@ -8,9 +8,10 @@ use Illuminate\Support\Collection;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Contracts\SerializableConnection;
 
-class ConnectionManager
+class ConnectionManager implements ConnectionManagerInterface
 {
     use EnsuresIntegrity, InteractsWithApplications;
 

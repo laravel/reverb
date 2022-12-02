@@ -5,8 +5,8 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\PusherException;
-use Laravel\Reverb\Managers\ConnectionManager;
 
 class Server
 {
