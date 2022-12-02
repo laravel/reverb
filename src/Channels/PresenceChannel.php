@@ -4,8 +4,8 @@ namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\ChannelManager;
 
 class PresenceChannel extends PrivateChannel
 {
@@ -61,10 +61,7 @@ class PresenceChannel extends PrivateChannel
     {
         $connections = App::make(ChannelManager::class)
             ->for($app)
-            ->connections($this)
-            ->map(function ($connection) {
-                return $connection['data'];
-            });
+            ->connections($this);
 
         return [
             'presence' => [

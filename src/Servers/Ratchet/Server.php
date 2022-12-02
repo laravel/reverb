@@ -3,14 +3,17 @@
 namespace Laravel\Reverb\Servers\Ratchet;
 
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
 
 class Server implements MessageComponentInterface
 {
-    public function __construct(protected ReverbServer $server)
-    {
+    public function __construct(
+        protected ReverbServer $server,
+        protected ConnectionManager $connections
+    ) {
     }
 
     /**
@@ -77,10 +80,18 @@ class Server implements MessageComponentInterface
      */
     protected function connection(ConnectionInterface $connection): Connection
     {
-        return new Connection(
-            $connection,
-            $this->application($connection)
-        );
+        $application = $this->application($connection);
+
+        return $this->connections->for($application)
+            ->resolve(
+                $connection->resourceId,
+                function () use ($connection, $application) {
+                    return new Connection(
+                        $connection,
+                        $application
+                    );
+                }
+            );
     }
 
     /**

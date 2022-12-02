@@ -44,11 +44,11 @@ class Connection extends BaseConnection
      */
     public function id(): string
     {
-        if (! isset($this->connection->id)) {
-            $this->connection->id = $this->generateId();
+        if (! $this->id) {
+            $this->id = $this->generateId();
         }
 
-        return $this->connection->id;
+        return $this->id;
     }
 
     /**
@@ -61,10 +61,23 @@ class Connection extends BaseConnection
     {
         try {
             $this->connection->send($message);
+
+            Output::info('Message Sent', $this->id());
+            Output::message($message);
         } catch (Throwable $e) {
             Output::error('Unable to send message.');
             Output::info($e->getMessage());
         }
+    }
+
+    /**
+     * Terminate a connection.
+     *
+     * @return void
+     */
+    public function disconnect(): void
+    {
+        $this->connection->close();
     }
 
     /**

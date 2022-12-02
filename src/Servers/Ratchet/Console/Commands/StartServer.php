@@ -13,6 +13,7 @@ use Laravel\Reverb\Http\Controllers\StatsController;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
+use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Output;
 use Laravel\Reverb\Server as ReverbServer;
 use Laravel\Reverb\Servers\Ratchet\Server;
@@ -192,7 +193,8 @@ class StartServer extends Command
     {
         return new WsServer(
             new Server(
-                $this->laravel->make(ReverbServer::class)
+                $this->laravel->make(ReverbServer::class),
+                $this->laravel->make(ConnectionManager::class)
             )
         );
     }

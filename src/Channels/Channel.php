@@ -5,8 +5,8 @@ namespace Laravel\Reverb\Channels;
 use Exception;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Output;
 
 class Channel
@@ -65,9 +65,7 @@ class Channel
     {
         App::make(ChannelManager::class)
             ->for($app)
-            ->connections($this)->each(function ($data) use ($payload, $except) {
-                $connection = is_object($data['connection']) ? $data['connection'] : unserialize($data['connection']);
-
+            ->hydratedConnections($this)->each(function ($connection) use ($payload, $except) {
                 if ($except && $except->identifier() === $connection->identifier()) {
                     return;
                 }

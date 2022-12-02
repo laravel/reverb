@@ -60,6 +60,10 @@ class CliLogger implements Logger
     {
         $message = json_decode($message, true);
 
+        if (isset($message['data']) && is_string($message['data'])) {
+            $message['data'] = json_decode($message['data'], true);
+        }
+
         if (isset($message['data']['channel_data'])) {
             $message['data']['channel_data'] = json_decode($message['data']['channel_data'], true);
         }

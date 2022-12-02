@@ -5,13 +5,15 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Connection;
 use Laravel\Reverb\Exceptions\PusherException;
+use Laravel\Reverb\Managers\ConnectionManager;
 
 class Server
 {
-    public function __construct(protected ChannelManager $channels)
-    {
+    public function __construct(
+        protected ConnectionManager $connections,
+        protected ChannelManager $channels
+    ) {
     }
 
     /**
@@ -24,7 +26,7 @@ class Server
     {
         PusherEvent::handle($connection, 'pusher:connection_established');
 
-        Output::info('New Connection', $connection->id());
+        Output::info('Connection Established', $connection->id());
     }
 
     /**
@@ -53,7 +55,6 @@ class Server
             };
 
             Output::info('Message Handled', $from->id());
-            Output::line();
         } catch (PusherException $e) {
             $from->send(json_encode($e->payload()));
 
@@ -84,8 +85,10 @@ class Server
         $this->channels
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
+        $this->connections->disconnect($connection->identifier());
+        $connection->disconnect();
 
-        Output::info('Connection closed', $connection->id());
+        Output::info('Connection Closed', $connection->id());
     }
 
     /**

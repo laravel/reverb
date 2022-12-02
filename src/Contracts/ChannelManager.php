@@ -58,4 +58,12 @@ interface ChannelManager
      * @return \Illuminate\Support\Collection
      */
     public function connections(Channel $channel): Collection;
+
+    /**
+     * Hydrate the connections for the given channel.
+     *
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
+     * @return \Illuminate\Support\Collection
+     */
+    public function hydratedConnections(Channel $channel): Collection;
 }
