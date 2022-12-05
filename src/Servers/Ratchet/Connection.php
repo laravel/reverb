@@ -4,12 +4,12 @@ namespace Laravel\Reverb\Servers\Ratchet;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
-use Laravel\Reverb\Contracts\Connection as ConnectionInterface;
+use Laravel\Reverb\Connection as BaseConnection;
 use Laravel\Reverb\Output;
-use Ratchet\ConnectionInterface as RatchetConnectionInterface;
+use Ratchet\ConnectionInterface;
 use Throwable;
 
-class Connection implements ConnectionInterface
+class Connection extends BaseConnection
 {
     use GeneratesPusherIdentifiers;
 
@@ -21,9 +21,10 @@ class Connection implements ConnectionInterface
     protected $id;
 
     public function __construct(
-        protected RatchetConnectionInterface $connection,
+        protected ConnectionInterface $connection,
         protected Application $application
     ) {
+        parent::__construct($application);
     }
 
     /**
@@ -43,11 +44,11 @@ class Connection implements ConnectionInterface
      */
     public function id(): string
     {
-        if (! isset($this->connection->id)) {
-            $this->connection->id = $this->generateId();
+        if (! $this->id) {
+            $this->id = $this->generateId();
         }
 
-        return $this->connection->id;
+        return $this->id;
     }
 
     /**
@@ -60,10 +61,23 @@ class Connection implements ConnectionInterface
     {
         try {
             $this->connection->send($message);
+
+            Output::info('Message Sent', $this->id());
+            Output::message($message);
         } catch (Throwable $e) {
             Output::error('Unable to send message.');
             Output::info($e->getMessage());
         }
+    }
+
+    /**
+     * Terminate a connection.
+     *
+     * @return void
+     */
+    public function disconnect(): void
+    {
+        $this->connection->close();
     }
 
     /**

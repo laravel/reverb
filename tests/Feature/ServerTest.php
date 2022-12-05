@@ -125,6 +125,7 @@ it('can subscribe a user to a private channel', function () {
 });
 
 it('can subscribe a user to a presence channel', function () {
+    $this->channelManager->shouldReceive('hydratedConnections')->andReturn(collect());
     $this->channelManager->shouldReceive('connections')->andReturn(collect());
     $this->server->message(
         $connection = new Connection,
@@ -186,7 +187,9 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
+    $this->channelManager->shouldReceive('hydratedConnections')->andReturn(collect());
     $this->channelManager->shouldReceive('connections')->andReturn(collect());
+
     $this->server->message(
         $connection = new Connection,
         json_encode([

@@ -41,13 +41,13 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelManager->shouldReceive('subscribe');
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast($connections->first()['connection']->app(), ['foo' => 'bar']);
+    $channel->broadcast($connections->first()->app(), ['foo' => 'bar']);
 
-    $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
+    $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {

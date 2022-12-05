@@ -3,26 +3,16 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\EnsuresIntegrity;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server as ReverbServer;
 
 class Server
 {
-    use EnsuresIntegrity;
-
-    protected $repository;
-
-    protected $prefix;
-
-    public function __construct(protected ReverbServer $server)
-    {
-        $config = Config::get('reverb.servers.api_gateway.connection_cache');
-
-        $this->prefix = $config['prefix'];
-        $this->repository = Cache::store($config['store']);
+    public function __construct(
+        protected ReverbServer $server,
+        protected ConnectionManager $connections
+    ) {
     }
 
     /**
@@ -55,22 +45,29 @@ class Server
     /**
      * Get a Reverb connection from the API Gateway request.
      *
-     * @param  string  $connectionId
+     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
      * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
     protected function connection(Request $request): Connection
     {
-        return $this->mutex(function () use ($request) {
-            return $this->repository->rememberForever(
-                "{$this->key()}:{$request->connectionId()}",
-                function () use ($request) {
-                    return new Connection(
+        if ($application = $this->application($request)) {
+            return $this->connections
+                ->for($application)
+                ->connect(
+                    new Connection(
                         $request->connectionId(),
-                        $this->application($request)
-                    );
-                }
-            );
-        });
+                        $application
+                    )
+                );
+        }
+
+        foreach (Application::all() as $application) {
+            if ($connection = $this->connections->for($application)->find($request->connectionId())) {
+                return $this->connections->connect($connection);
+            }
+        }
+
+        throw new Exception('Unable to find connection for request.');
     }
 
     /**
@@ -81,35 +78,25 @@ class Server
      */
     protected function disconnect(Request $request)
     {
-        $connection = $this->connection($request);
-
-        $this->server->close($connection);
-
-        $this->repository->forget(
-            "{$this->key()}:{$request->connectionId()}"
+        $this->server->close(
+            $this->connection($request)
         );
-    }
-
-    /**
-     * Get the cache key for the connections.
-     *
-     * @return string
-     */
-    protected function key(): string
-    {
-        return "{$this->prefix}:connections";
     }
 
     /**
      * Get the application instance for the request.
      *
      * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
-     * @return \Laravel\Reverb\Application
+     * @return \Laravel\Reverb\Application|null
      */
-    protected function application(Request $request): Application
+    protected function application(Request $request): ?Application
     {
-        parse_str($request->serverVariables['QUERY_STRING'], $queryString);
+        try {
+            parse_str($request->serverVariables['QUERY_STRING'], $queryString);
 
-        return Application::findByKey($queryString['appId']);
+            return Application::findByKey($queryString['appId']);
+        } catch (Exception $e) {
+            return null;
+        }
     }
 }

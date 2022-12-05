@@ -21,7 +21,7 @@ it('can subscribe a connection to a channel', function () {
         ->once()
         ->with($channel, $this->connection, []);
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->andReturn(collect());
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
@@ -42,13 +42,13 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelManager->shouldReceive('subscribe');
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->once()
         ->andReturn($connections = connections(3));
 
     $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar']);
 
-    $connections->each(fn ($connection) => $connection['connection']->assertSent(['foo' => 'bar']));
+    $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {
@@ -62,9 +62,17 @@ it('fails to subscribe if the signature is invalid', function () {
 it('can return data stored on the connection', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
+    $connections = connections(2, )
+        ->map(fn ($connection, $index) => [
+            'user_info' => [
+                'name' => 'Joe',
+            ],
+            'user_id' => $index + 1,
+        ]);
+
     $this->channelManager->shouldReceive('connections')
         ->once()
-        ->andReturn(connections(2, ['user_info' => ['name' => 'Joe']]));
+        ->andReturn($connections);
 
     expect($channel->data($this->connection->app()))->toBe([
         'presence' => [
@@ -85,12 +93,12 @@ it('sends notification of subscription', function () {
         ->once()
         ->with($channel, $this->connection, []);
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->andReturn($connections = connections(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
 
-    $connections->each(fn ($connection) => $connection['connection']->assertSent([
+    $connections->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_added',
         'data' => [],
         'channel' => 'presence-test-channel',
@@ -105,7 +113,7 @@ it('sends notification of subscription with data', function () {
         ->once()
         ->with($channel, $this->connection, ['name' => 'Joe']);
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->andReturn($connections = connections(3));
 
     $channel->subscribe(
@@ -118,7 +126,7 @@ it('sends notification of subscription with data', function () {
         $data
     );
 
-    $connections->each(fn ($connection) => $connection['connection']->assertSent([
+    $connections->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_added',
         'data' => ['name' => 'Joe'],
         'channel' => 'presence-test-channel',
@@ -127,19 +135,19 @@ it('sends notification of subscription with data', function () {
 
 it('sends notification of an unsubscribe', function () {
     $channel = new PresenceChannel('presence-test-channel');
-    $connection = $connection = connections(1, ['user_info' => ['name' => 'Joe']])->first();
+    $connection = $connection = connections(1)->first();
 
     $this->channelManager->shouldReceive('data')
-        ->andReturn($connection['data']);
+        ->andReturn(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->andReturn($connections = connections(3));
 
     $this->channelManager->shouldReceive('unsubscribe');
 
     $channel->unsubscribe($this->connection);
 
-    $connections->each(fn ($connection) => $connection['connection']->assertSent([
+    $connections->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_removed',
         'data' => ['user_id' => 1],
         'channel' => 'presence-test-channel',

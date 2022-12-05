@@ -3,14 +3,14 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Connection;
 
 class ClientEvent
 {
     /**
      * Handle a pusher event.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  array  $event
      */
     public static function handle(Connection $connection, array $event)

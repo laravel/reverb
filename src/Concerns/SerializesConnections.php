@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Concerns;
 
+use Laravel\Reverb\Application;
+
 trait SerializesConnections
 {
     /**
@@ -14,7 +16,9 @@ trait SerializesConnections
         return [
             'id' => $this->id(),
             'identifier' => $this->identifier(),
-            'application' => $this->app(),
+            'application' => $this->app()->id(),
+            'lastSeenAt' => $this->lastSeenAt,
+            'hasBeenPinged' => $this->hasBeenPinged,
         ];
     }
 
@@ -28,6 +32,8 @@ trait SerializesConnections
     {
         $this->id = $values['id'];
         $this->identifier = $values['identifier'];
-        $this->application = $values['application'];
+        $this->application = Application::findById($values['application']);
+        $this->lastSeenAt = $values['lastSeenAt'] ?? null;
+        $this->hasBeenPinged = $values['hasBeenPinged'] ?? null;
     }
 }

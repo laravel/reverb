@@ -4,17 +4,17 @@ namespace Laravel\Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
-use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
+use Laravel\Reverb\Concerns\InteractsWithApplications;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
-use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Contracts\SerializableConnection;
+use Laravel\Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
 {
-    use EnsuresIntegrity;
+    use EnsuresIntegrity, InteractsWithApplications;
 
     /**
      * The appliation instance.
@@ -25,38 +25,23 @@ class ChannelManager implements ChannelManagerInterface
 
     public function __construct(
         protected Repository $repository,
+        protected ConnectionManager $connections,
         protected $prefix = 'reverb'
     ) {
-    }
-
-    /**
-     * The application the channel manager should be scoped to.
-     *
-     * @param  \Laravel\Reverb\Application  $application
-     * @return \Laravel\Reverb\Contracts\ChannelManager
-     */
-    public function for(Application $application): ChannelManagerInterface
-    {
-        $this->application = $application;
-
-        return $this;
     }
 
     /**
      * Subscribe to a channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  array  $data
      * @return void
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
         $connections = $this->connections($channel)
-            ->put($connection->identifier(), [
-                'connection' => $this->shouldBeSerialized($connection) ? serialize($connection) : $connection,
-                'data' => $data,
-            ]);
+            ->put($connection->identifier(), $data);
 
         $this->syncConnections($channel, $connections);
     }
@@ -65,7 +50,7 @@ class ChannelManager implements ChannelManagerInterface
      * Unsubscribe from a channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
@@ -121,11 +106,9 @@ class ChannelManager implements ChannelManagerInterface
     {
         $channels = $this->channels();
 
-        $this->mutex(function () use ($channel, $connections, $channels) {
-            $channels[$channel->name()] = $connections;
+        $channels[$channel->name()] = $connections;
 
-            $this->repository->forever($this->key(), $channels);
-        });
+        $this->repository->forever($this->key(), $channels);
     }
 
     /**
@@ -135,13 +118,13 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function key(): string
     {
-        $key = "{$this->prefix}:channels";
+        $key = $this->prefix;
 
         if ($this->application) {
             $key .= ":{$this->application->id()}";
         }
 
-        return $key;
+        return $key.':channels';
     }
 
     /**
@@ -163,15 +146,13 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function channels(Channel $channel = null): Collection
     {
-        return $this->mutex(function () use ($channel) {
-            $channels = $this->repository->get($this->key(), []);
+        $channels = $this->repository->get($this->key(), []);
 
-            if ($channel) {
-                return collect($channels[$channel->name()] ?? []);
-            }
+        if ($channel) {
+            return collect($channels[$channel->name()] ?? []);
+        }
 
-            return collect($channels ?: []);
-        });
+        return collect($channels ?: []);
     }
 
     /**
@@ -182,21 +163,26 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function data(Channel $channel, Connection $connection): array
     {
-        if (! $connection = $this->connections($channel)->get($connection->identifier())) {
+        if (! $data = $this->connections($channel)->get($connection->identifier())) {
             return [];
         }
 
-        return (array) $connection['data'];
+        return (array) $data;
     }
 
     /**
-     * Determine whether the connection should be serialized.
+     * Hydrate the connections for the given channel.
      *
-     * @param  Connection  $connection
-     * @return bool
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
+     * @return \Illuminate\Support\Collection
      */
-    protected function shouldBeSerialized(Connection $connection): bool
+    public function hydratedConnections(Channel $channel): Collection
     {
-        return $connection instanceof SerializableConnection;
+        return $this->connections
+            ->for($this->application)
+            ->hydrated()
+            ->intersectByKeys(
+                $this->connections($channel)
+            );
     }
 }

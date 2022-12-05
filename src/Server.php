@@ -5,32 +5,34 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\PusherException;
 
 class Server
 {
-    public function __construct(protected ChannelManager $channels)
-    {
+    public function __construct(
+        protected ConnectionManager $connections,
+        protected ChannelManager $channels
+    ) {
     }
 
     /**
      * Handle the a client connection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public function open(Connection $connection)
     {
         PusherEvent::handle($connection, 'pusher:connection_established');
 
-        Output::info('New Connection', $connection->id());
+        Output::info('Connection Established', $connection->id());
     }
 
     /**
      * Handle a new message received by the connected client.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $message
      * @return void
      */
@@ -53,7 +55,6 @@ class Server
             };
 
             Output::info('Message Handled', $from->id());
-            Output::line();
         } catch (PusherException $e) {
             $from->send(json_encode($e->payload()));
 
@@ -76,7 +77,7 @@ class Server
     /**
      * Handle a client disconnection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public function close(Connection $connection)
@@ -84,14 +85,16 @@ class Server
         $this->channels
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
+        $this->connections->disconnect($connection->identifier());
+        $connection->disconnect();
 
-        Output::info('Connection closed', $connection->id());
+        Output::info('Connection Closed', $connection->id());
     }
 
     /**
      * Handle an error.
      *
-     * @param  \Laravel\Reverb\Contracts\ConnectionInterface  $connection
+     * @param  \Laravel\Reverb\ConnectionInterface  $connection
      * @param  \Exception  $exception
      * @return void
      */

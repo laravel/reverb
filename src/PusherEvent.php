@@ -5,14 +5,13 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Contracts\Connection;
 
 class PusherEvent
 {
     /**
      * Handle a pusher event.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $event
      * @param  array  $data
      */
@@ -28,6 +27,7 @@ class PusherEvent
             ),
             'unsubscribe' => self::unsubscribe($connection, $payload['channel']),
             'ping' => self::pong($connection),
+            'pong' => $connection->touch(),
             default => throw new Exception('Unknown Pusher event: '.$event),
         };
     }
@@ -35,7 +35,7 @@ class PusherEvent
     /**
      * Acknowledge the connection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @return void
      */
     public static function acknowledge(Connection $connection)
@@ -49,7 +49,7 @@ class PusherEvent
     /**
      * Subscribe to the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $channel
      * @param  string|null  $auth
      * @param  string|null  $data
@@ -67,7 +67,7 @@ class PusherEvent
     /**
      * Unsubscribe from the given channel.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $channel
      * @return void
      */
@@ -80,7 +80,7 @@ class PusherEvent
     /**
      * Respond to a ping.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      */
     public static function pong(Connection $connection): void
     {
@@ -88,9 +88,19 @@ class PusherEvent
     }
 
     /**
+     * Send a ping.
+     *
+     * @param  \Laravel\Reverb\Connection  $connection
+     */
+    public static function ping(Connection $connection): void
+    {
+        static::send($connection, 'ping');
+    }
+
+    /**
      * Send a response to the given connection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $event
      * @param  array  $data
      * @return void
@@ -105,7 +115,7 @@ class PusherEvent
     /**
      * Send an internal response to the given connection.
      *
-     * @param  \Laravel\Reverb\Contracts\Connection  $connection
+     * @param  \Laravel\Reverb\Connection  $connection
      * @param  string  $event
      * @param  string  $channel
      * @param  array  $data

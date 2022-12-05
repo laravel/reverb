@@ -30,7 +30,7 @@ return [
         'api_gateway' => [
             'region' => env('REVERB_API_GATEWAY_REGION', 'us-east-1'),
             'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
-            'connection_cache' => [
+            'connection_manager' => [
                 'store' => env('REVERB_CONNECTION_CACHE', 'array'),
                 'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
             ],
@@ -56,21 +56,9 @@ return [
             'allowed_origins' => [
                 //
             ],
+            'ping_interval' => env('REVERB_APP_PING_INTERVAL', 5),
         ],
 
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Channel Cache Store
-    |--------------------------------------------------------------------------
-    |
-    |
-    */
-
-    'channel_cache' => [
-        'store' => env('REVERB_CHANNEL_CACHE', 'array'),
-        'prefix' => env('REVERB_CHANNEL_CACHE_PREFIX', 'reverb'),
     ],
 
     /*

@@ -13,7 +13,7 @@ beforeEach(function () {
 });
 
 it('can forward a client message', function () {
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->once()
         ->andReturn($connections = connections());
 
@@ -25,7 +25,7 @@ it('can forward a client message', function () {
         ]
     );
 
-    $connections->first()['connection']->assertSent([
+    $connections->first()->assertSent([
         'event' => 'client-test-message',
         'channel' => 'test-channel',
         'data' => ['foo' => 'bar'],
@@ -34,7 +34,7 @@ it('can forward a client message', function () {
 });
 
 it('does not forward a message to itself', function () {
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('hydratedConnections')
         ->once()
         ->andReturn(collect());
 
@@ -50,7 +50,7 @@ it('does not forward a message to itself', function () {
 });
 
 it('fails on unsupported message', function () {
-    $this->channelManager->shouldNotReceive('connections');
+    $this->channelManager->shouldNotReceive('hydratedConnections');
 
     ClientEvent::handle(
         $this->connection, [
