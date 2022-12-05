@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Concerns;
 
-use Carbon\Carbon;
 use Laravel\Reverb\Application;
 
 trait SerializesConnections
@@ -18,7 +17,8 @@ trait SerializesConnections
             'id' => $this->id(),
             'identifier' => $this->identifier(),
             'application' => $this->app()->id(),
-            'lastSeenAt' => $this->lastSeenAt ? (string) $this->lastSeenAt : null,
+            'lastSeenAt' => $this->lastSeenAt,
+            'hasBeenPinged' => $this->hasBeenPinged,
         ];
     }
 
@@ -33,6 +33,7 @@ trait SerializesConnections
         $this->id = $values['id'];
         $this->identifier = $values['identifier'];
         $this->application = Application::findById($values['application']);
-        $this->lastSeenAt = Carbon::parse($values['lastSeenAt']);
+        $this->lastSeenAt = $values['lastSeenAt'] ?? null;
+        $this->hasBeenPinged = $values['hasBeenPinged'] ?? null;
     }
 }

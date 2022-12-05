@@ -9,9 +9,9 @@ abstract class Connection
     /**
      * The last time the connection was seen.
      *
-     * @var \Carbon\Carbon
+     * @var string
      */
-    protected Carbon $lastSeenAt;
+    protected string $lastSeenAt;
 
     /**
      * Stores the ping state of the connection.
@@ -75,11 +75,13 @@ abstract class Connection
     /**
      * Touch the connection last seen at timestamp.
      *
-     * @return void
+     * @return \Laravel\Reverb\Connection
      */
-    public function touch(): void
+    public function touch(): Connection
     {
-        $this->lastSeenAt = now();
+        $this->lastSeenAt = (string) now();
+
+        return $this;
     }
 
     /**
@@ -89,7 +91,7 @@ abstract class Connection
      */
     public function lastSeenAt(): Carbon
     {
-        return $this->lastSeenAt;
+        return Carbon::parse($this->lastSeenAt);
     }
 
     /**
@@ -99,8 +101,6 @@ abstract class Connection
      */
     public function isActive(): bool
     {
-        Output::info((string) $this->lastSeenAt());
-
         return $this->lastSeenAt() &&
             $this->lastSeenAt()->isAfter(
                 now()->subMinutes(
