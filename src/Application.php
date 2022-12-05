@@ -64,6 +64,8 @@ class Application
 
     /**
      * Return all of the configured applications as Application instances.
+     *
+     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Application[]
      */
     public static function all(): Collection
     {
