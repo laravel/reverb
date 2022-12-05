@@ -15,7 +15,7 @@ it('pings inactive connections', function () {
     $connections = connections(5);
     $channel = ChannelBroker::create('test-channel');
 
-    $this->connectionManager->shouldReceive('all')
+    $this->connectionManager->shouldReceive('hydrated')
         ->once()
         ->andReturn($connections);
 
