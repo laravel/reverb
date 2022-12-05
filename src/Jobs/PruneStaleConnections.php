@@ -24,12 +24,12 @@ class PruneStaleConnections
         Application::all()->each(function ($application) use ($connections, $channels) {
             $connections
                 ->for($application)
-                ->all()
+                ->hydrated()
                 ->filter
                 ->isStale()
-                ->each(function ($connection) use ($connections, $channels) {
+                ->each(function ($connection) use ($connections, $channels, $application) {
                     $connections->disconnect($connection->identifier());
-                    $channels->unsubscribeFromAll($connection);
+                    $channels->for($application)->unsubscribeFromAll($connection);
                     $connection->disconnect();
 
                     Output::info('Connection Pruned', $connection->id());

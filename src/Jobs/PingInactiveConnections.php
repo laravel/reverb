@@ -21,11 +21,13 @@ class PingInactiveConnections
         Application::all()->each(function ($application) use ($connections) {
             $connections
                 ->for($application)
-                ->all()
+                ->hydrated()
                 ->filter
                 ->isInactive()
-                ->each
-                ->ping();
+                ->each(function ($connection) use ($connections) {
+                    $connection->ping();
+                    $connections->syncConnection($connection);
+                });
         });
     }
 }
