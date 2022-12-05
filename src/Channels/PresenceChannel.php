@@ -21,11 +21,15 @@ class PresenceChannel extends PrivateChannel
     {
         parent::subscribe($connection, $auth, $data);
 
-        $this->broadcast($connection->app(), [
-            'event' => 'pusher_internal:member_added',
-            'data' => $data ? json_decode($data, true) : [],
-            'channel' => $this->name(),
-        ]);
+        $this->broadcast(
+            $connection->app(),
+            [
+                'event' => 'pusher_internal:member_added',
+                'data' => $data ? json_decode($data, true) : [],
+                'channel' => $this->name(),
+            ],
+            $connection
+        );
     }
 
     /**
@@ -41,11 +45,15 @@ class PresenceChannel extends PrivateChannel
             ->data($this, $connection);
 
         if (isset($data['user_id'])) {
-            $this->broadcast($connection->app(), [
-                'event' => 'pusher_internal:member_removed',
-                'data' => ['user_id' => $data['user_id']],
-                'channel' => $this->name(),
-            ]);
+            $this->broadcast(
+                $connection->app(),
+                [
+                    'event' => 'pusher_internal:member_removed',
+                    'data' => ['user_id' => $data['user_id']],
+                    'channel' => $this->name(),
+                ],
+                $connection
+            );
         }
 
         parent::unsubscribe($connection);
