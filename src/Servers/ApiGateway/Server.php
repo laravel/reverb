@@ -45,24 +45,29 @@ class Server
     /**
      * Get a Reverb connection from the API Gateway request.
      *
-     * @param  string  $connectionId
+     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
      * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
     protected function connection(Request $request): Connection
     {
-        $application = $this->application($request);
-
-        return $this->connections
-            ->for($application)
-            ->resolve(
-                $request->connectionId(),
-                function () use ($request, $application) {
-                    return new Connection(
+        if ($application = $this->application($request)) {
+            return $this->connections
+                ->for($application)
+                ->connect(
+                    new Connection(
                         $request->connectionId(),
                         $application
-                    );
-                }
-            );
+                    )
+                );
+        }
+
+        foreach (Application::all() as $application) {
+            if ($connection = $this->connections->for($application)->find($request->connectionId())) {
+                return $this->connections->connect($connection);
+            }
+        }
+
+        throw new Exception('Unable to find connection for request.');
     }
 
     /**
@@ -82,12 +87,16 @@ class Server
      * Get the application instance for the request.
      *
      * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
-     * @return \Laravel\Reverb\Application
+     * @return \Laravel\Reverb\Application|null
      */
-    protected function application(Request $request): Application
+    protected function application(Request $request): ?Application
     {
-        parse_str($request->serverVariables['QUERY_STRING'], $queryString);
+        try {
+            parse_str($request->serverVariables['QUERY_STRING'], $queryString);
 
-        return Application::findByKey($queryString['appId']);
+            return Application::findByKey($queryString['appId']);
+        } catch (Exception $e) {
+            return null;
+        }
     }
 }

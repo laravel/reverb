@@ -15,6 +15,8 @@ class ConnectionManager implements ConnectionManagerInterface
 {
     use EnsuresIntegrity, InteractsWithApplications;
 
+    protected $connections;
+
     /**
      * The appliation instance.
      *
@@ -29,54 +31,37 @@ class ConnectionManager implements ConnectionManagerInterface
     }
 
     /**
-     * Resolve a connection by its identifier.
+     * Add a new connection to the manager.
      *
-     * @param  string  $identifier
-     * @param  Closure  $connection
-     * @return \Laravel\Reverb\Connection
+     * @param  \Laravel\Reverb\Connection  $connection
+     * @return \Laravel\Reverb\Connection $connection
      */
-    public function resolve(string $identifier, Closure $newConnection): Connection
+    public function connect(Connection $connection): Connection
     {
-        $connections = $this->all();
-
-        if (! $connection = $connections->get($identifier)) {
-            $connection = $newConnection();
-        }
-
-        $connection = $this->hydrate($connection);
         $connection->touch();
 
-        $this->sync(
-            $connections->put($identifier, $this->dehydrate($connection))
-        );
+        $this->syncConnection($connection);
 
         return $connection;
     }
 
     /**
-     * Get all of the connections from the cache.
+     * Attempt to find a connection from the manager.
      *
-     * @return \Illuminate\Support\Collection
+     * @param  string  $identifier
+     * @return \Laravel\Reverb\Connection|null $connection
      */
-    public function all(): Collection
+    public function reconnect(string $identifier): ?Connection
     {
-        return $this->mutex(function () {
-            return $this->repository->get($this->key()) ?? collect();
-        });
+        if ($connection = $this->find($identifier)) {
+            return $connection->touch();
+        }
+
+        return null;
     }
 
     /**
-     * Get all of the hydrated connections from the cache.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function hydrated(): Collection
-    {
-        return $this->all()->map(fn ($connection) => $this->hydrate($connection));
-    }
-
-    /**
-     * Remove a connection from the cache.
+     * Remove a connection from the manager.
      *
      * @param  string  $identifier
      * @return void
@@ -91,13 +76,85 @@ class ConnectionManager implements ConnectionManagerInterface
     }
 
     /**
-     * Synchronise the connections to the cache.
+     * Resolve a connection by its identifier.
+     *
+     * @param  string  $identifier
+     * @param  Closure  $connection
+     * @return \Laravel\Reverb\Connection
+     */
+    public function resolve(string $identifier, Closure $newConnection): Connection
+    {
+        if (! $connection = $this->find($identifier)) {
+            $connection = $newConnection();
+        }
+
+        return $this->connect($connection);
+    }
+
+    /**
+     * Find a connection by its identifier.
+     *
+     * @param  string  $identifier
+     * @return \Laravel\Reverb\Connection
+     */
+    public function find(string $identifier): ?Connection
+    {
+        if ($connection = $this->all()->get($identifier)) {
+            return $this->hydrate($connection);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all of the connections from the cache.
+     *
+     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]
+     */
+    public function all(): Collection
+    {
+        return $this->mutex(function () {
+            return $this->repository->get($this->key()) ?? collect();
+        });
+    }
+
+    /**
+     * Get all of the hydrated connections from the cache.
+     *
+     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
+     */
+    public function hydrated(): Collection
+    {
+        return $this->all()->map(fn ($connection) => $this->hydrate($connection));
+    }
+
+    /**
+     * Synchronize the connections with the manager.
+     *
+     * @param  \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]  $connections
+     * @return void
      */
     public function sync(Collection $connections): void
     {
         $this->mutex(function () use ($connections) {
             $this->repository->forever($this->key(), $connections);
         });
+    }
+
+    /**
+     * Synchronize a connection with the manager.
+     *
+     * @param  \Laravel\Reverb\Connection  $connection
+     * @return void
+     */
+    public function syncConnection(Connection $connection): void
+    {
+        $this->sync(
+            $this->all()->put(
+                $connection->identifier(),
+                $this->dehydrate($connection)
+            )
+        );
     }
 
     /**

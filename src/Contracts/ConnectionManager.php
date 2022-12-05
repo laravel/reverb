@@ -18,6 +18,30 @@ interface ConnectionManager
     public function for(Application $application): ConnectionManager;
 
     /**
+     * Add a new connection to the manager.
+     *
+     * @param  \Laravel\Reverb\Connection  $connection
+     * @return \Laravel\Reverb\Connection $connection
+     */
+    public function connect(Connection $connection): Connection;
+
+    /**
+     * Attempt to find a connection from the manager.
+     *
+     * @param  string  $identifier
+     * @return \Laravel\Reverb\Connection|null $connection
+     */
+    public function reconnect(string $identifier): ?Connection;
+
+    /**
+     * Remove a connection from the manager.
+     *
+     * @param  string  $identifier
+     * @return void
+     */
+    public function disconnect(string $identifier): void;
+
+    /**
      * Resolve a connection by its identifier.
      *
      * @param  string  $identifier
@@ -27,29 +51,40 @@ interface ConnectionManager
     public function resolve(string $identifier, Closure $newConnection): Connection;
 
     /**
+     * Find a connection by its identifier.
+     *
+     * @param  string  $identifier
+     * @return \Laravel\Reverb\Connection
+     */
+    public function find(string $identifier): ?Connection;
+
+    /**
      * Get all of the connections from the cache.
      *
-     * @return \Illuminate\Support\Collection
+     * @return @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
      */
     public function all(): Collection;
 
     /**
      * Get all of the hydrated connections from the cache.
      *
-     * @return \Illuminate\Support\Collection
+     * @return @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
      */
     public function hydrated(): Collection;
 
     /**
-     * Remove a connection from the cache.
+     * Synchronize the connections with the manager.
      *
-     * @param  string  $identifier
+     * @param  \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]  $connections
      * @return void
      */
-    public function disconnect(string $identifier): void;
+    public function sync(Collection $connections): void;
 
     /**
-     * Synchronise the connections to the cache.
+     * Synchronize a connection with the manager.
+     *
+     * @param  \Laravel\Reverb\Connection  $connection
+     * @return void
      */
-    public function sync(Collection $connections): void;
+    public function syncConnection(Connection $connection): void;
 }
