@@ -22,7 +22,8 @@
         "illuminate/console": "^9.38",
         "illuminate/http": "^9.38",
         "illuminate/redis": "^9.38",
-        "illuminate/support": "^9.37"
+        "illuminate/support": "^9.37",
+        "nesbot/carbon": "^2.64"
     },
     "require-dev": {
         "orchestra/testbench": "^7.11",
