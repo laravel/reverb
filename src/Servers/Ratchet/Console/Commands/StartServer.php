@@ -6,28 +6,15 @@ use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use Exception;
 use Illuminate\Console\Command;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Event;
-use Laravel\Reverb\Http\Controllers\EventController;
-use Laravel\Reverb\Http\Controllers\StatsController;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Output;
-use Laravel\Reverb\Server as ReverbServer;
-use Laravel\Reverb\Servers\Ratchet\Server;
-use Ratchet\Http\HttpServer;
-use Ratchet\Http\Router;
-use Ratchet\Server\IoServer;
-use Ratchet\WebSocket\WsServer;
+use Laravel\Reverb\Servers\Ratchet\Factory as ServerFactory;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
-use React\Socket\SocketServer;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 class StartServer extends Command
 {
@@ -66,17 +53,7 @@ class StartServer extends Command
         $this->subscribe($loop);
         $this->scheduleCleanup($loop);
 
-        $socket = new SocketServer("{$host}:{$port}", [], $loop);
-
-        $app = new Router(
-            new UrlMatcher($this->generateRoutes(), new RequestContext())
-        );
-
-        $server = new IoServer(
-            new HttpServer($app),
-            $socket,
-            $loop
-        );
+        $server = ServerFactory::make($host, $port, $loop);
 
         $this->components->info("Starting server on {$host}:{$port}");
 
@@ -167,35 +144,5 @@ class StartServer extends Command
                 $event['payload']
             );
         });
-    }
-
-    /**
-     * Generate the routes required to handle Pusher requests.
-     *
-     * @return \Symfony\Component\Routing\RouteCollection
-     */
-    protected function generateRoutes(): RouteCollection
-    {
-        $routes = new RouteCollection();
-        $routes->add('sockets', new Route('/app/{appId}', ['_controller' => $this->buildWebSocketServer()], [], [], null, [], ['GET']));
-        $routes->add('events', new Route('/apps/{appId}/events', ['_controller' => EventController::class], [], [], null, [], ['POST']));
-        $routes->add('stats', new Route('/stats', ['_controller' => StatsController::class], [], [], null, [], ['GET']));
-
-        return $routes;
-    }
-
-    /**
-     * Build the WebSocket server.
-     *
-     * @return \Ratchet\WebSocket\WsServer
-     */
-    protected function buildWebSocketServer()
-    {
-        return new WsServer(
-            new Server(
-                $this->laravel->make(ReverbServer::class),
-                $this->laravel->make(ConnectionManager::class)
-            )
-        );
     }
 }
