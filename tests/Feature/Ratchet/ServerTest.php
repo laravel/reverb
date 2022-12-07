@@ -124,3 +124,17 @@ it('can receive a message broadcast from the server', function () {
         expect($response)->toBe('{"event":"App\\\\Events\\\\TestEvent","channel":"test-channel","data":{"foo":"bar"}}');
     }
 });
+
+it('can handle an event', function () {
+    $connection = $this->connect();
+    $this->subscribe('presence-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    $this->triggerEvent(
+        'presence-test-channel',
+        'App\\Events\\TestEvent',
+        ['foo' => 'bar']
+    );
+
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","channel":"presence-test-channel","data":{"foo":"bar"}}');
+});
