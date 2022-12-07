@@ -12,6 +12,7 @@ use Ratchet\Client\WebSocket;
 use function React\Async\await;
 use React\Async\SimpleFiber;
 use React\EventLoop\Factory as LoopFactory;
+use React\Http\Browser;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use ReflectionObject;
@@ -226,5 +227,50 @@ class RatchetTestCase extends TestCase
         });
 
         return $promise->promise();
+    }
+
+    /**
+     * Send an event to the server.
+     *
+     * @param  string  $channel
+     * @param  string  $event
+     * @param  array  $data
+     * @return void
+     */
+    public function triggerEvent(string $channel, string $event, array $data = []): void
+    {
+        $response = await($this->postToServer('events', [
+            'name' => $event,
+            'channel' => $channel,
+            'data' => $data,
+        ]));
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('{}', $response->getBody()->getContents());
+    }
+
+    /**
+     * Post a request to the server.
+     *
+     * @param  string  $path
+     * @param  array  $data
+     * @param  string  $host
+     * @param  string  $port
+     * @param  string  $appId
+     * @return \React\Promise\PromiseInterface
+     */
+    public function postToServer(
+        string $path,
+        array $data = [],
+        string $host = '0.0.0.0',
+        string $port = '8080',
+        string $appId = '123456'
+    ): PromiseInterface {
+        return (new Browser($this->loop))
+            ->post(
+                "http://{$host}:{$port}/apps/{$appId}/{$path}",
+                [],
+                json_encode($data)
+            );
     }
 }

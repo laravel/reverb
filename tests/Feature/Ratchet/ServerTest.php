@@ -3,7 +3,6 @@
 use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Event;
 use Laravel\Reverb\Tests\RatchetTestCase;
 use function React\Async\await;
 use function React\Promise\all;
@@ -115,13 +114,10 @@ it('can receive a message broadcast from the server', function () {
     $this->subscribe('test-channel', connection: $connectionThree);
     $promiseThree = $this->messagePromise($connectionThree);
 
-    Event::dispatchSynchronously(
-        Application::findById('123456'),
-        [
-            'event' => 'App\\Events\\TestEvent',
-            'channel' => 'test-channel',
-            'data' => ['foo' => 'bar'],
-        ]
+    $this->triggerEvent(
+        'test-channel',
+        'App\\Events\\TestEvent',
+        ['foo' => 'bar']
     );
 
     foreach (await(all([$promiseOne, $promiseTwo, $promiseThree])) as $response) {
