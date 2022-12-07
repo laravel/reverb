@@ -3,6 +3,8 @@
 namespace Laravel\Reverb\Servers\Ratchet;
 
 use Illuminate\Support\Facades\App;
+use Laravel\Reverb\Http\Controllers\EventController;
+use Laravel\Reverb\Http\Controllers\StatsController;
 use Ratchet\Http\HttpServer;
 use Ratchet\Http\Router;
 use Ratchet\Server\IoServer;

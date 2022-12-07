@@ -142,7 +142,7 @@ it('can use a custom cache prefix', function () {
         $connection = new Connection
     );
 
-    expect(Cache::get("reverb-test:{$connection->app()->id()}:channels"))
+    expect(Cache::store('array')->get("reverb-test:{$connection->app()->id()}:channels"))
         ->toHaveCount(1);
 });
 
