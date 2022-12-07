@@ -29,7 +29,6 @@ it('can forward a client message', function () {
         'event' => 'client-test-message',
         'channel' => 'test-channel',
         'data' => ['foo' => 'bar'],
-        'except' => $this->connection->identifier(),
     ]);
 });
 
