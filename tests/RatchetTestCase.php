@@ -215,7 +215,7 @@ class RatchetTestCase extends TestCase
     /**
      * Return a promise for the next message received to the given connection.
      *
-     * @param  WebSocket  $connection
+     * @param  \Ratchet\Client\WebSocketWebSocket  $connection
      * @return \React\Promise\PromiseInterface
      */
     public function messagePromise(WebSocket $connection): PromiseInterface
@@ -224,6 +224,23 @@ class RatchetTestCase extends TestCase
 
         $connection->on('message', function ($message) use ($promise) {
             $promise->resolve((string) $message);
+        });
+
+        return $promise->promise();
+    }
+
+    /**
+     * Return a promise when a given connection is disconnected.
+     *
+     * @param  \Ratchet\Client\WebSocketWebSocket  $connection
+     * @return \React\Promise\PromiseInterface
+     */
+    public function disconnectPromise(WebSocket $connection): PromiseInterface
+    {
+        $promise = new Deferred;
+
+        $connection->on('close', function ($message) use ($promise) {
+            $promise->resolve('Connection Closed.');
         });
 
         return $promise->promise();

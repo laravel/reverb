@@ -3,7 +3,6 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Connection;
 
 class ClientEvent
 {

@@ -1,8 +1,11 @@
 <?php
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Jobs\PingInactiveConnections;
+use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\RatchetTestCase;
 use function React\Async\await;
 use function React\Promise\all;
@@ -137,4 +140,110 @@ it('can handle an event', function () {
     );
 
     expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","channel":"presence-test-channel","data":{"foo":"bar"}}');
+});
+
+it('can respond to a ping', function () {
+    $connection = $this->connect();
+    $promise = $this->messagePromise($connection);
+
+    $this->send(['event' => 'pusher:ping'], $connection);
+
+    expect(await($promise))->toBe('{"event":"pusher:pong"}');
+});
+
+it('it can ping inactive subscribers', function () {
+    $connection = $this->connect();
+    $promise = $this->messagePromise($connection);
+
+    Carbon::setTestNow(now()->addMinutes(10));
+
+    (new PingInactiveConnections)->handle(
+        connectionManager()
+    );
+
+    expect(await($promise))->toBe('{"event":"pusher:ping"}');
+});
+
+it('it can disconnect inactive subscribers', function () {
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+    $promise = $this->disconnectPromise($connection);
+
+    expect(connectionManager()->all())->toHaveCount(1);
+    expect(channelManager()->connections(ChannelBroker::create('test-channel')))->toHaveCount(1);
+
+    Carbon::setTestNow(now()->addMinutes(10));
+
+    (new PingInactiveConnections)->handle(
+        connectionManager()
+    );
+    (new PruneStaleConnections)->handle(
+        connectionManager(),
+        channelManager()
+    );
+
+    expect(connectionManager()->all())->toHaveCount(0);
+    expect(channelManager()->connections(ChannelBroker::create('test-channel')))->toHaveCount(0);
+
+    expect(await($promise))->toBe('Connection Closed.');
+});
+
+it('can handle a client whisper', function () {
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+
+    $newConnection = $this->connect();
+    $this->subscribe('test-channel', connection: $newConnection);
+    $promise = $this->messagePromise($newConnection);
+
+    $connection->send(
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => 'test-channel',
+            'data' => [
+                'id' => 123,
+                'name' => 'Joe Dixon',
+            ],
+        ])
+    );
+
+    expect(await($promise))->toBe('{"event":"client-start-typing","channel":"test-channel","data":{"id":123,"name":"Joe Dixon"}}');
+});
+
+it('can subscribe a connection to multiple channels', function () {
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+    $this->subscribe('test-channel-2', connection: $connection);
+    $this->subscribe('private-test-channel-3', connection: $connection, data: ['foo' => 'bar']);
+    $this->subscribe('presence-test-channel-4', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+
+    expect(connectionManager()->all())->toHaveCount(1);
+    expect(channelManager()->all())->toHaveCount(4);
+
+    $connection = connectionManager()->all()->first();
+
+    channelManager()->all()->each(function ($channel) use ($connection) {
+        expect(channelManager()->connections($channel))->toHaveCount(1);
+        expect(channelManager()->connections($channel)->map(fn ($conn, $index) => (string) $index))->toContain($connection->identifier());
+    });
+});
+
+it('can subscribe multiple connections to multiple channels', function () {
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+    $this->subscribe('test-channel-2', connection: $connection);
+    $this->subscribe('private-test-channel-3', connection: $connection, data: ['foo' => 'bar']);
+    $this->subscribe('presence-test-channel-4', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+    $this->subscribe('private-test-channel-3', connection: $connection, data: ['foo' => 'bar']);
+
+    expect(connectionManager()->all())->toHaveCount(2);
+    expect(channelManager()->all())->toHaveCount(4);
+
+    expect(channelManager()->connections(ChannelBroker::create('test-channel')))->toHaveCount(2);
+    expect(channelManager()->connections(ChannelBroker::create('test-channel-2')))->toHaveCount(1);
+    expect(channelManager()->connections(ChannelBroker::create('private-test-channel-3')))->toHaveCount(2);
+    expect(channelManager()->connections(ChannelBroker::create('presence-test-channel-4')))->toHaveCount(1);
 });

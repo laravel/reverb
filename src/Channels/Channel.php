@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Channels;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Connection;
@@ -75,7 +76,11 @@ class Channel
                 }
 
                 try {
-                    $connection->send(json_encode($payload));
+                    $connection->send(
+                        json_encode(
+                            Arr::except($payload, 'except')
+                        )
+                    );
                 } catch (Exception $e) {
                     Output::error('Broadcasting to '.$connection->id().' resulted in an error');
                     Output::info($e->getMessage());
