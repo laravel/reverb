@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\Ratchet;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Exceptions\PusherException;
 use Laravel\Reverb\Server as ReverbServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
@@ -24,9 +25,11 @@ class Server implements MessageComponentInterface
      */
     public function onOpen(ConnectionInterface $connection)
     {
-        $this->server->open(
-            $this->connection($connection)
-        );
+        if (! $connection = $this->connection($connection)) {
+            return;
+        }
+
+        $this->server->open($connection);
     }
 
     /**
@@ -38,8 +41,12 @@ class Server implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $message)
     {
+        if (! $connection = $this->connection($from)) {
+            return;
+        }
+
         $this->server->message(
-            $this->connection($from),
+            $connection,
             $message
         );
     }
@@ -52,9 +59,11 @@ class Server implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $connection)
     {
-        $this->server->close(
-            $this->connection($connection),
-        );
+        if (! $connection = $this->connection($connection)) {
+            return;
+        }
+
+        $this->server->close($connection);
     }
 
     /**
@@ -66,8 +75,12 @@ class Server implements MessageComponentInterface
      */
     public function onError(ConnectionInterface $connection, \Exception $e)
     {
+        if (! $connection = $this->connection($connection)) {
+            return;
+        }
+
         $this->server->error(
-            $this->connection($connection),
+            $connection,
             $e
         );
     }
@@ -76,23 +89,39 @@ class Server implements MessageComponentInterface
      * Get a Reverb connection from a Ratchet connection.
      *
      * @param  \Ratchet\ConnectionInterface  $connection
-     * @return \Laravel\Reverb\Servers\Ratchet\Connection
+     * @return \Laravel\Reverb\Servers\Ratchet\Connection|null
      */
-    protected function connection(ConnectionInterface $connection): Connection
+    protected function connection(ConnectionInterface $connection): ?Connection
     {
-        $application = $this->application($connection);
+        try {
+            $application = $this->application($connection);
 
-        return $this->connections
-            ->for($application)
-            ->resolve(
-                $connection->resourceId,
-                function () use ($connection, $application) {
-                    return new Connection(
-                        $connection,
-                        $application
-                    );
-                }
-            );
+            return $this->connections
+                ->for($application)
+                ->resolve(
+                    $connection->resourceId,
+                    function () use ($connection, $application) {
+                        return new Connection(
+                            $connection,
+                            $application
+                        );
+                    }
+                );
+        } catch (PusherException $e) {
+            $connection->send(json_encode($e->payload()));
+            $connection->close();
+        } catch (\Exception $e) {
+            $connection->send(json_encode([
+                'event' => 'pusher:error',
+                'data' => json_encode([
+                    'code' => 4200,
+                    'message' => $e->getMessage(),
+                ]),
+            ]));
+            $connection->close();
+        }
+
+        return null;
     }
 
     /**

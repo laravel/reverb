@@ -7,8 +7,10 @@ use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\RatchetTestCase;
+use function Ratchet\Client\connect;
 use function React\Async\await;
 use function React\Promise\all;
+use React\Promise\Deferred;
 
 uses(RatchetTestCase::class);
 
@@ -130,7 +132,7 @@ it('can receive a message broadcast from the server', function () {
 
 it('can handle an event', function () {
     $connection = $this->connect();
-    $this->subscribe('presence-test-channel', connection: $connection);
+    $this->subscribe('presence-test-channel', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
     $promise = $this->messagePromise($connection);
 
     $this->triggerEvent(
@@ -174,9 +176,13 @@ it('it can disconnect inactive subscribers', function () {
 
     Carbon::setTestNow(now()->addMinutes(10));
 
+    $promiseTwo = $this->messagePromise($connection);
     (new PingInactiveConnections)->handle(
         connectionManager()
     );
+    expect(await($promiseTwo))->toBe('{"event":"pusher:ping"}');
+
+    $promiseThree = $this->messagePromise($connection);
     (new PruneStaleConnections)->handle(
         connectionManager(),
         channelManager()
@@ -185,6 +191,7 @@ it('it can disconnect inactive subscribers', function () {
     expect(connectionManager()->all())->toHaveCount(0);
     expect(channelManager()->connections(ChannelBroker::create('test-channel')))->toHaveCount(0);
 
+    expect(await($promiseThree))->toBe('{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}');
     expect(await($promise))->toBe('Connection Closed.');
 });
 
@@ -246,4 +253,30 @@ it('can subscribe multiple connections to multiple channels', function () {
     expect(channelManager()->connections(ChannelBroker::create('test-channel-2')))->toHaveCount(1);
     expect(channelManager()->connections(ChannelBroker::create('private-test-channel-3')))->toHaveCount(2);
     expect(channelManager()->connections(ChannelBroker::create('presence-test-channel-4')))->toHaveCount(1);
+});
+
+it('fails to subscribe to a private channel with invalid auth signature', function () {
+    $response = $this->subscribe('private-test-channel', auth: 'invalid-signature');
+
+    expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+});
+
+it('fails to subscribe to a presence channel with invalid auth signature', function () {
+    $response = $this->subscribe('presence-test-channel', auth: 'invalid-signature');
+
+    expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+});
+
+it('fails to connect when an invalid application is provided', function () {
+    $promise = new Deferred();
+
+    $connection = await(
+        connect('ws://0.0.0.0:8080/app/invalid-key')
+    );
+
+    $connection->on('message', function ($message) use ($promise) {
+        $promise->resolve((string) $message);
+    });
+
+    expect(await($promise->promise()))->toBe('{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
 });
