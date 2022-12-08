@@ -39,7 +39,7 @@ class SendToConnection implements ShouldQueue
             ]);
 
             $client->postToConnection([
-                'ConnectionId' => $this->identifier,
+                'ConnectionId' => $this->connectionId,
                 'Data' => $this->message,
             ]);
         } catch (Throwable $e) {
