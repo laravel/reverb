@@ -57,6 +57,7 @@ class Server
             Output::info('Message Handled', $from->id());
         } catch (PusherException $e) {
             $from->send(json_encode($e->payload()));
+            $from->disconnect();
 
             Output::error('Message from '.$from->id().' resulted in a pusher error');
             Output::info($e->getMessage());
@@ -68,6 +69,7 @@ class Server
                     'message' => 'Invalid message format',
                 ]),
             ]));
+            $from->disconnect();
 
             Output::error('Message from '.$from->id().' resulted in an unknown error');
             Output::info($e->getMessage());

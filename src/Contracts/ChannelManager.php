@@ -66,4 +66,11 @@ interface ChannelManager
      * @return \Illuminate\Support\Collection
      */
     public function hydratedConnections(Channel $channel): Collection;
+
+    /**
+     * Flush the channel manager repository.
+     *
+     * @return void
+     */
+    public function flush(): void;
 }

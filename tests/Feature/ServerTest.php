@@ -3,6 +3,9 @@
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\TestCase;
+
+uses(TestCase::class);
 
 beforeEach(function () {
     $this->channelManager = Mockery::spy(ChannelManager::class);

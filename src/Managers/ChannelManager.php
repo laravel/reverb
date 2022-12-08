@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
@@ -184,5 +185,18 @@ class ChannelManager implements ChannelManagerInterface
             ->intersectByKeys(
                 $this->connections($channel)
             );
+    }
+
+    /**
+     * Flush the channel manager repository.
+     *
+     * @return void
+     */
+    public function flush(): void
+    {
+        Application::all()->each(function ($application) {
+            $this->for($application);
+            $this->repository->forget($this->key());
+        });
     }
 }

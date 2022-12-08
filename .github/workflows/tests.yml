@@ -14,12 +14,21 @@ permissions:
 
 jobs:
   tests:
+    timeout-minutes: 3
+
     runs-on: ubuntu-20.04
+
+    services:
+      redis:
+        image: redis:5.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
 
     strategy:
       fail-fast: true
       matrix:
-        php: ['8.0', 8.1, 8.2]
+        php: [8.1, 8.2]
         laravel: [9]
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}

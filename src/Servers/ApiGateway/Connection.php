@@ -2,15 +2,12 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Aws\ApiGatewayManagementApi\ApiGatewayManagementApiClient;
-use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Connection as BaseConnection;
 use Laravel\Reverb\Contracts\SerializableConnection;
-use Laravel\Reverb\Output;
-use Throwable;
+use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Connection extends BaseConnection implements SerializableConnection
 {
@@ -62,23 +59,7 @@ class Connection extends BaseConnection implements SerializableConnection
      */
     public function send(string $message): void
     {
-        dispatch(function () use ($message) {
-            try {
-                $client = new ApiGatewayManagementApiClient([
-                    'region' => Config::get('reverb.servers.api_gateway.region'),
-                    'endpoint' => Config::get('reverb.servers.api_gateway.endpoint'),
-                    'version' => 'latest',
-                ]);
-
-                $client->postToConnection([
-                    'ConnectionId' => $this->identifier,
-                    'Data' => $message,
-                ]);
-            } catch (Throwable $e) {
-                Output::error('Unable to send message.');
-                Output::info($e->getMessage());
-            }
-        });
+        SendToConnection::dispatch($this->identifier, $message);
     }
 
     /**

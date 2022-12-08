@@ -28,6 +28,13 @@ class PruneStaleConnections
                 ->filter
                 ->isStale()
                 ->each(function ($connection) use ($connections, $channels, $application) {
+                    $connection->send(json_encode([
+                        'event' => 'pusher:error',
+                        'data' => json_encode([
+                            'code' => 4201,
+                            'message' => 'Pong reply not received in time',
+                        ]),
+                    ]));
                     $connections->disconnect($connection->identifier());
                     $channels->for($application)->unsubscribeFromAll($connection);
                     $connection->disconnect();
