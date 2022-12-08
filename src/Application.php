@@ -37,13 +37,6 @@ class Application
     protected string $secret;
 
     /**
-     * The capacity of connections the application can handle.
-     *
-     * @var string
-     */
-    protected ?int $capacity;
-
-    /**
      * The interval in minutes check connections for activity.
      *
      * @var int
@@ -124,7 +117,6 @@ class Application
         $application->id = $app['id'];
         $application->key = $app['key'];
         $application->secret = $app['secret'];
-        $application->capacity = $app['capacity'];
         $application->allowedOrigins = $app['allowed_origins'];
         $application->pingInterval = $app['ping_interval'];
 
@@ -169,16 +161,6 @@ class Application
     public function secret(): string
     {
         return $this->secret;
-    }
-
-    /**
-     * Get the application capacity.
-     *
-     * @return int
-     */
-    public function capacity(): string
-    {
-        return $this->capacity;
     }
 
     /**

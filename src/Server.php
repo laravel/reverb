@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Exceptions\PusherException;
 
 class Server
@@ -24,9 +25,15 @@ class Server
      */
     public function open(Connection $connection)
     {
-        PusherEvent::handle($connection, 'pusher:connection_established');
+        try {
+            $this->verifyOrigin($connection);
 
-        Output::info('Connection Established', $connection->id());
+            PusherEvent::handle($connection, 'pusher:connection_established');
+
+            Output::info('Connection Established', $connection->id());
+        } catch (Exception $e) {
+            $this->error($connection, $e);
+        }
     }
 
     /**
@@ -120,5 +127,28 @@ class Server
 
         Output::error('Message from '.$connection->id().' resulted in an unknown error');
         Output::info($exception->getMessage());
+    }
+
+    /**
+     * Verify the origin of the connection.
+     *
+     * @param  \Laravel\Reverb\ConnectionInterface  $connection
+     * @return void
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidOrigin
+     */
+    protected function verifyOrigin(Connection $connection)
+    {
+        $allowedOrigins = $connection->app()->allowedOrigins();
+
+        if (in_array('*', $allowedOrigins)) {
+            return;
+        }
+
+        $origin = parse_url($connection->origin(), PHP_URL_HOST);
+
+        if (! $origin || ! in_array($origin, $allowedOrigins)) {
+            throw new InvalidOrigin;
+        }
     }
 }

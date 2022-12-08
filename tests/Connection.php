@@ -38,6 +38,11 @@ class Connection extends BaseConnection
         return Application::findByKey('pusher-key');
     }
 
+    public function origin(): string
+    {
+        return 'http://localhost';
+    }
+
     public function setLastSeenAt(Carbon $lastSeenAt): void
     {
         $this->lastSeenAt = $lastSeenAt;

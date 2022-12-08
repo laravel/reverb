@@ -320,3 +320,20 @@ it('can publish and subscribe to a client whisper', function () {
 
     expect(await($promise))->toBe('{"event":"client-start-typing","channel":"test-channel","data":{"id":123,"name":"Joe Dixon"}}');
 });
+
+it('cannot connect from an invalid origin', function () {
+    $this->app['config']->set('reverb.apps.0.allowed_origins', ['https://laravel.com']);
+
+    $connection = await(
+        connect('ws://0.0.0.0:8080/app/pusher-key')
+    );
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Origin not allowed\"}"}');
+});
+
+it('can connect from a valid origin', function () {
+    $this->app['config']->set('reverb.apps.0.allowed_origins', ['0.0.0.0']);
+
+    $this->connect();
+});

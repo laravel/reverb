@@ -103,7 +103,8 @@ class Server implements MessageComponentInterface
                     function () use ($connection, $application) {
                         return new Connection(
                             $connection,
-                            $application
+                            $application,
+                            $connection->httpRequest->getHeader('Origin')[0] ?? null
                         );
                     }
                 );

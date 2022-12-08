@@ -20,7 +20,7 @@ abstract class Connection
      */
     protected $hasBeenPinged = false;
 
-    public function __construct(protected Application $application)
+    public function __construct(protected Application $application, protected ?string $origin)
     {
     }
 
@@ -58,7 +58,20 @@ abstract class Connection
      *
      * @return \Laravel\Reverb\Application
      */
-    abstract public function app(): Application;
+    public function app(): Application
+    {
+        return $this->application;
+    }
+
+    /**
+     * Get the origin of the connection.
+     *
+     * @return string|null
+     */
+    public function origin(): ?string
+    {
+        return $this->origin;
+    }
 
     /**
      * Ping the connection to ensure it is still active.

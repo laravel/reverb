@@ -252,3 +252,44 @@ it('fails to connect when an invalid application is provided', function () {
 
     $this->assertSent('abc-123', '{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
 });
+
+it('cannot connect from an invalid origin', function () {
+    $this->app['config']->set('reverb.apps.0.allowed_origins', ['https://laravel.com']);
+
+    App::make(Server::class)
+        ->handle(Request::fromLambdaEvent(
+            [
+                'requestContext' => [
+                    'eventType' => 'CONNECT',
+                    'connectionId' => 'abc-123',
+                ],
+                'queryStringParameters' => [
+                    'appId' => 'pusher-key',
+                ],
+            ]
+        ));
+
+    $this->assertSent('abc-123', '{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Origin not allowed\"}"}', 1);
+});
+
+it('can connect from a valid origin', function () {
+    $this->app['config']->set('reverb.apps.0.allowed_origins', ['laravel.com']);
+
+    App::make(Server::class)
+        ->handle(Request::fromLambdaEvent(
+            [
+                'requestContext' => [
+                    'eventType' => 'CONNECT',
+                    'connectionId' => 'abc-123',
+                ],
+                'queryStringParameters' => [
+                    'appId' => 'pusher-key',
+                ],
+                'headers' => [
+                    'origin' => 'https://laravel.com',
+                ],
+            ]
+        ));
+
+    $this->assertSent('abc-123', 'connection_established', 1);
+});

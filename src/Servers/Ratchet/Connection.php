@@ -22,9 +22,10 @@ class Connection extends BaseConnection
 
     public function __construct(
         protected ConnectionInterface $connection,
-        protected Application $application
+        protected Application $application,
+        protected ?string $origin
     ) {
-        parent::__construct($application);
+        parent::__construct($application, $origin);
     }
 
     /**
@@ -49,6 +50,16 @@ class Connection extends BaseConnection
         }
 
         return $this->id;
+    }
+
+    /**
+     * Get the origin of the connection.
+     *
+     * @return string
+     */
+    public function origin(): string
+    {
+        return $this->origin;
     }
 
     /**
@@ -78,15 +89,5 @@ class Connection extends BaseConnection
     public function disconnect(): void
     {
         $this->connection->close();
-    }
-
-    /**
-     * Get the application the connection belongs to.
-     *
-     * @return \Laravel\Reverb\Application
-     */
-    public function app(): Application
-    {
-        return $this->application;
     }
 }
