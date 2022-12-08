@@ -210,7 +210,6 @@ class ConnectionManager implements ConnectionManagerInterface
         Application::all()->each(function ($application) {
             $this->for($application);
             $this->repository->forget($this->key());
-            dump($this->for($application)->all()->count());
         });
     }
 }
