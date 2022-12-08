@@ -87,4 +87,11 @@ interface ConnectionManager
      * @return void
      */
     public function syncConnection(Connection $connection): void;
+
+    /**
+     * Flush the channel manager repository.
+     *
+     * @return void
+     */
+    public function flush(): void;
 }

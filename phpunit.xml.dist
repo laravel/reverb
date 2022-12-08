@@ -13,5 +13,6 @@
         <env name="PUSHER_APP_ID" value="123456"/>
         <env name="PUSHER_APP_KEY" value="pusher-key"/>
         <env name="PUSHER_APP_SECRET" value="pusher-secret"/>
+        <env name="REVERB_API_GATEWAY_CONNECTION_CACHE" value="redis"/>
     </php>
 </phpunit>

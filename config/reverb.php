@@ -31,8 +31,8 @@ return [
             'region' => env('REVERB_API_GATEWAY_REGION', 'us-east-1'),
             'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
             'connection_manager' => [
-                'store' => env('REVERB_CONNECTION_CACHE', 'array'),
-                'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
+                'store' => env('REVERB_API_GATEWAY_CONNECTION_CACHE', 'dynamodb'),
+                'prefix' => env('REVERB_API_GATEWAY_CONNECTION_CACHE_PREFIX', 'reverb'),
             ],
         ],
 

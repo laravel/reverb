@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Managers;
 use Closure;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
@@ -197,5 +198,19 @@ class ConnectionManager implements ConnectionManagerInterface
         return $connection instanceof SerializableConnection
             ? serialize($connection)
             : $connection;
+    }
+
+    /**
+     * Flush the channel manager repository.
+     *
+     * @return void
+     */
+    public function flush(): void
+    {
+        Application::all()->each(function ($application) {
+            $this->for($application);
+            $this->repository->forget($this->key());
+            dump($this->for($application)->all()->count());
+        });
     }
 }

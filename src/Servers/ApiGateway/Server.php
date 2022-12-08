@@ -5,7 +5,10 @@ namespace Laravel\Reverb\Servers\ApiGateway;
 use Exception;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Exceptions\InvalidApplication;
+use Laravel\Reverb\Exceptions\PusherException;
 use Laravel\Reverb\Server as ReverbServer;
+use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Server
 {
@@ -34,10 +37,18 @@ class Server
                     $request->message()
                 )
             };
-        } catch (Exception $e) {
-            $this->server->error(
-                $this->connection($request),
-                $e
+        } catch (PusherException $e) {
+            SendToConnection::dispatch($request->connectionId(), json_encode($e->payload()));
+        } catch (\Exception $e) {
+            SendToConnection::dispatch(
+                $request->connectionId(),
+                json_encode([
+                    'event' => 'pusher:error',
+                    'data' => json_encode([
+                        'code' => 4200,
+                        'message' => $e->getMessage(),
+                    ]),
+                ])
             );
         }
     }
@@ -51,6 +62,10 @@ class Server
     protected function connection(Request $request): Connection
     {
         if ($application = $this->application($request)) {
+            if ($connection = $this->connections->for($application)->find($request->connectionId())) {
+                return $connection;
+            }
+
             return $this->connections
                 ->for($application)
                 ->connect(
@@ -67,7 +82,7 @@ class Server
             }
         }
 
-        throw new Exception('Unable to find connection for request.');
+        throw new InvalidApplication;
     }
 
     /**
