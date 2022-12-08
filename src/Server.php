@@ -66,7 +66,7 @@ class Server
                 'event' => 'pusher:error',
                 'data' => json_encode([
                     'code' => 4200,
-                    'message' => $e->getMessage(),
+                    'message' => 'Invalid message format',
                 ]),
             ]));
             $from->disconnect();

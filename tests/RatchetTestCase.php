@@ -2,9 +2,12 @@
 
 namespace Laravel\Reverb\Tests;
 
+use Clue\React\Redis\Client;
 use Illuminate\Support\Str;
+use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Event;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\Servers\Ratchet\Factory;
 use function Ratchet\Client\connect;
@@ -19,6 +22,8 @@ use ReflectionObject;
 
 class RatchetTestCase extends TestCase
 {
+    use InteractsWithAsyncRedis;
+
     protected $server;
 
     protected $loop;
@@ -59,6 +64,14 @@ class RatchetTestCase extends TestCase
             ],
             'ping_interval' => 10,
         ]);
+    }
+
+    public function usingRedis()
+    {
+        $this->app['config']->set('reverb.pubsub.enabled', true);
+
+        $this->bindRedis($this->loop);
+        $this->subscribeToRedis($this->loop);
     }
 
     /**

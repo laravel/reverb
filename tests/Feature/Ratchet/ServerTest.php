@@ -280,3 +280,43 @@ it('fails to connect when an invalid application is provided', function () {
 
     expect(await($promise->promise()))->toBe('{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
 });
+
+it('can publish and subscribe to a triggered event', function () {
+    $this->usingRedis();
+
+    $connection = $this->connect();
+    $this->subscribe('presence-test-channel', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+    $promise = $this->messagePromise($connection);
+
+    $this->triggerEvent(
+        'presence-test-channel',
+        'App\\Events\\TestEvent',
+        ['foo' => 'bar']
+    );
+
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","channel":"presence-test-channel","data":{"foo":"bar"}}');
+});
+
+it('can publish and subscribe to a client whisper', function () {
+    $this->usingRedis();
+
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+
+    $newConnection = $this->connect();
+    $this->subscribe('test-channel', connection: $newConnection);
+    $promise = $this->messagePromise($newConnection);
+
+    $connection->send(
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => 'test-channel',
+            'data' => [
+                'id' => 123,
+                'name' => 'Joe Dixon',
+            ],
+        ])
+    );
+
+    expect(await($promise))->toBe('{"event":"client-start-typing","channel":"test-channel","data":{"id":123,"name":"Joe Dixon"}}');
+});
