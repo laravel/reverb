@@ -52,9 +52,7 @@ class ApiGatewayTestCase extends TestCase
             'key' => 'pusher-key-2',
             'secret' => 'pusher-secret-2',
             'capacity' => null,
-            'allowed_origins' => [
-                //
-            ],
+            'allowed_origins' => ['*'],
             'ping_interval' => 10,
         ]);
     }

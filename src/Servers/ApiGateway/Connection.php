@@ -22,9 +22,10 @@ class Connection extends BaseConnection implements SerializableConnection
 
     public function __construct(
         protected string $identifier,
-        protected Application $application
+        protected Application $application,
+        protected ?string $origin
     ) {
-        parent::__construct($application);
+        parent::__construct($application, $origin);
     }
 
     /**
@@ -70,15 +71,5 @@ class Connection extends BaseConnection implements SerializableConnection
     public function disconnect(): void
     {
         //
-    }
-
-    /**
-     * Get the application the connection belongs to.
-     *
-     * @return \Laravel\Reverb\Application
-     */
-    public function app(): Application
-    {
-        return $this->application;
     }
 }

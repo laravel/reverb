@@ -71,7 +71,8 @@ class Server
                 ->connect(
                     new Connection(
                         $request->connectionId(),
-                        $application
+                        $application,
+                        $request->headers['origin'] ?? null
                     )
                 );
         }
