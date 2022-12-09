@@ -17,6 +17,7 @@ trait SerializesConnections
             'id' => $this->id(),
             'identifier' => $this->identifier(),
             'application' => $this->app()->id(),
+            'origin' => $this->origin(),
             'lastSeenAt' => $this->lastSeenAt,
             'hasBeenPinged' => $this->hasBeenPinged,
         ];
@@ -33,6 +34,7 @@ trait SerializesConnections
         $this->id = $values['id'];
         $this->identifier = $values['identifier'];
         $this->application = Application::findById($values['application']);
+        $this->origin = $values['origin'];
         $this->lastSeenAt = $values['lastSeenAt'] ?? null;
         $this->hasBeenPinged = $values['hasBeenPinged'] ?? null;
     }
