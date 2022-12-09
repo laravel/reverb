@@ -67,6 +67,7 @@ class Channel
         App::make(ChannelManager::class)
             ->for($app)
             ->hydratedConnections($this)->each(function ($connection) use ($payload, $except) {
+                $connection = Connection::hydrate($connection);
                 if ($except && $except->identifier() === $connection->identifier()) {
                     return;
                 }

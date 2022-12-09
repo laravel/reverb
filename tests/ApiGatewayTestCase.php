@@ -184,6 +184,6 @@ class ApiGatewayTestCase extends TestCase
      */
     public function managedConnection(): ?Connection
     {
-        return connectionManager()->hydrated()->last();
+        return Connection::hydrate(connectionManager()->all()->last());
     }
 }

@@ -66,13 +66,6 @@ interface ConnectionManager
     public function all(): Collection;
 
     /**
-     * Get all of the hydrated connections from the cache.
-     *
-     * @return @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
-     */
-    public function hydrated(): Collection;
-
-    /**
      * Synchronize the connections with the manager.
      *
      * @param  \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]  $connections

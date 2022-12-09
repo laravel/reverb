@@ -28,7 +28,7 @@ it('can resolve an existing connection', function () {
         ->toBe('my-connection');
 })->not->throws(Exception::class);
 
-it('resolve and store a new connection', function () {
+it('can resolve and store a new connection', function () {
     $this->connectionManager->sync(
         collect()
             ->put($this->connection->identifier(), $this->connection)
@@ -45,7 +45,7 @@ it('resolve and store a new connection', function () {
         ->toBe('my-connection');
 })->throws(Exception::class, 'Creating new connection.');
 
-it('disconnect a connection', function () {
+it('can disconnect a connection', function () {
     $this->connectionManager->sync(
         collect()
             ->put($this->connection->identifier(), $this->connection)
@@ -60,7 +60,7 @@ it('disconnect a connection', function () {
         ->toHaveCount(0);
 });
 
-it('get all connections', function () {
+it('can get all connections', function () {
     $this->connectionManager->sync(
         connections(10)
             ->mapWithKeys(fn ($connection) => [$connection->identifier() => $connection])
@@ -70,7 +70,7 @@ it('get all connections', function () {
         ->toHaveCount(10);
 });
 
-it('hydrate a serialized connection', function () {
+it('can hydrate a serialized connection', function () {
     $connection = serialize(new SerializableConnection('my-connection'));
 
     $this->connectionManager->sync(
@@ -83,7 +83,7 @@ it('hydrate a serialized connection', function () {
     )->toBeInstanceOf(SerializableConnection::class);
 });
 
-it('hydrate an unserialized connection', function () {
+it('can hydrate an unserialized connection', function () {
     $connection = new Connection('my-connection');
 
     $this->connectionManager->sync(
@@ -96,7 +96,7 @@ it('hydrate an unserialized connection', function () {
     )->toBeInstanceOf(Connection::class);
 });
 
-it('dehydrate a serialized connection', function () {
+it('can dehydrate a serialized connection', function () {
     $this->connectionManager->resolve(
         'my-connection',
         fn () => new SerializableConnection('my-connection')
@@ -106,7 +106,7 @@ it('dehydrate a serialized connection', function () {
         ->toBeString();
 });
 
-it('dehydrate an unserialized connection', function () {
+it('can dehydrate an unserialized connection', function () {
     $this->connectionManager->resolve(
         'my-connection',
         fn () => new Connection('my-connection')

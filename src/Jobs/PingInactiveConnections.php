@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ConnectionManager;
 
 class PingInactiveConnections
@@ -21,10 +22,14 @@ class PingInactiveConnections
         Application::all()->each(function ($application) use ($connections) {
             $connections
                 ->for($application)
-                ->hydrated()
-                ->filter
-                ->isInactive()
+                ->all()
                 ->each(function ($connection) use ($connections) {
+                    $connection = Connection::hydrate($connection);
+
+                    if ($connection->isActive()) {
+                        return;
+                    }
+
                     $connection->ping();
                     $connections->syncConnection($connection);
                 });

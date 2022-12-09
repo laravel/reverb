@@ -89,7 +89,7 @@ it('can get all hydrated serialized connections subscribed to a channel', functi
 
     $this->expect($hydratedConnections)->toHaveCount(5);
     $hydratedConnections->each(function ($connection) {
-        expect($connection)->toBeInstanceOf(Connection::class);
+        expect(Connection::hydrate($connection))->toBeInstanceOf(Connection::class);
     });
 });
 

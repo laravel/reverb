@@ -197,7 +197,7 @@ it('can subscribe a connection to multiple channels', function () {
     expect(connectionManager()->all())->toHaveCount(1);
     expect(channelManager()->all())->toHaveCount(4);
 
-    $connection = connectionManager()->hydrated()->first();
+    $connection = $this->managedConnection();
 
     channelManager()->all()->each(function ($channel) use ($connection) {
         expect(channelManager()->connections($channel))->toHaveCount(1);
