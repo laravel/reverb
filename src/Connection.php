@@ -3,6 +3,7 @@
 namespace Laravel\Reverb;
 
 use Carbon\Carbon;
+use Laravel\Reverb\Contracts\SerializableConnection;
 
 abstract class Connection
 {
@@ -140,5 +141,31 @@ abstract class Connection
     public function isStale(): bool
     {
         return $this->isInactive() && $this->hasBeenPinged;
+    }
+
+    /**
+     * Hydrate a serialized connection.
+     *
+     * @param  \Laravel\Reverb\Connection|string  $connection
+     * @return \Laravel\Reverb\Connection
+     */
+    public static function hydrate($connection): Connection
+    {
+        return is_object($connection)
+            ? $connection
+            : unserialize($connection);
+    }
+
+    /**
+     * Hydrate a serialized connection.
+     *
+     * @param  \Laravel\Reverb\Connection  $connection
+     * @return \Laravel\Reverb\Connection|string
+     */
+    public static function dehydrate($connection): Connection|string
+    {
+        return $connection instanceof SerializableConnection
+            ? serialize($connection)
+            : $connection;
     }
 }

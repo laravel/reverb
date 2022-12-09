@@ -10,7 +10,6 @@ use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
-use Laravel\Reverb\Contracts\SerializableConnection;
 
 class ConnectionManager implements ConnectionManagerInterface
 {
@@ -101,7 +100,7 @@ class ConnectionManager implements ConnectionManagerInterface
     public function find(string $identifier): ?Connection
     {
         if ($connection = $this->all()->get($identifier)) {
-            return $this->hydrate($connection);
+            return Connection::hydrate($connection);
         }
 
         return null;
@@ -117,16 +116,6 @@ class ConnectionManager implements ConnectionManagerInterface
         return $this->mutex(function () {
             return $this->repository->get($this->key()) ?? collect();
         });
-    }
-
-    /**
-     * Get all of the hydrated connections from the cache.
-     *
-     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
-     */
-    public function hydrated(): Collection
-    {
-        return $this->all()->map(fn ($connection) => $this->hydrate($connection));
     }
 
     /**
@@ -153,7 +142,7 @@ class ConnectionManager implements ConnectionManagerInterface
         $this->sync(
             $this->all()->put(
                 $connection->identifier(),
-                $this->dehydrate($connection)
+                Connection::dehydrate($connection)
             )
         );
     }
@@ -172,32 +161,6 @@ class ConnectionManager implements ConnectionManagerInterface
         }
 
         return $key .= ':connections';
-    }
-
-    /**
-     * Hydrate a serialized connection.
-     *
-     * @param  \Laravel\Reverb\Connection|string  $connection
-     * @return \Laravel\Reverb\Connection
-     */
-    protected function hydrate($connection): Connection
-    {
-        return is_object($connection)
-            ? $connection
-            : unserialize($connection);
-    }
-
-    /**
-     * Hydrate a serialized connection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return \Laravel\Reverb\Connection|string
-     */
-    protected function dehydrate($connection): Connection|string
-    {
-        return $connection instanceof SerializableConnection
-            ? serialize($connection)
-            : $connection;
     }
 
     /**

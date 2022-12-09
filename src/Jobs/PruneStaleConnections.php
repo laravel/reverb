@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Output;
@@ -24,10 +25,14 @@ class PruneStaleConnections
         Application::all()->each(function ($application) use ($connections, $channels) {
             $connections
                 ->for($application)
-                ->hydrated()
-                ->filter
-                ->isStale()
+                ->all()
                 ->each(function ($connection) use ($connections, $channels, $application) {
+                    $connection = Connection::hydrate($connection);
+
+                    if (! $connection->isStale()) {
+                        return;
+                    }
+
                     $connection->send(json_encode([
                         'event' => 'pusher:error',
                         'data' => json_encode([
