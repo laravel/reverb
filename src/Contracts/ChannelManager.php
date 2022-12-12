@@ -10,6 +10,13 @@ use Laravel\Reverb\Connection;
 interface ChannelManager
 {
     /**
+     * Get the application instance.
+     *
+     * @return Application|null
+     */
+    public function app(): ?Application;
+    
+    /**
      * The application the channel manager should be scoped to.
      *
      * @param  \Laravel\Reverb\Application  $application

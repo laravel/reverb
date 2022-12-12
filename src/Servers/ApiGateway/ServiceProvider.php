@@ -41,7 +41,7 @@ class ServiceProvider extends BaseServiceProvider
             return new JsonResponse((object) []);
         });
 
-        $this->app->singleton(
+        $this->app->bind(
             ConnectionManagerInterface::class,
             fn ($app) => new ConnectionManager(
                 $app['cache']->store(
@@ -51,7 +51,7 @@ class ServiceProvider extends BaseServiceProvider
             )
         );
 
-        $this->app->singleton(
+        $this->app->bind(
             ChannelManagerInterface::class,
             fn ($app) => new ChannelManager(
                 $app['cache']->store(

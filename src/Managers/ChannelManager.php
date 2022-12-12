@@ -32,6 +32,16 @@ class ChannelManager implements ChannelManagerInterface
     }
 
     /**
+     * Get the application instance.
+     *
+     * @return Application|null
+     */
+    public function app(): ?Application
+    {
+        return $this->application;
+    }
+
+    /**
      * Subscribe to a channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
