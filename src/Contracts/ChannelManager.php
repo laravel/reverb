@@ -52,20 +52,20 @@ interface ChannelManager
     public function unsubscribeFromAll(Connection $connection): void;
 
     /**
-     * Get all connections subscribed to a channel.
+     * Get all connection keys for the given channel.
+     *
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
+     * @return \Illuminate\Support\Collection
+     */
+    public function connectionKeys(Channel $channel): Collection;
+
+    /**
+     * Get all connections for the given channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\Support\Collection
      */
     public function connections(Channel $channel): Collection;
-
-    /**
-     * Hydrate the connections for the given channel.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\Support\Collection
-     */
-    public function hydratedConnections(Channel $channel): Collection;
 
     /**
      * Flush the channel manager repository.

@@ -20,7 +20,7 @@ it('can subscribe a connection to a channel', function () {
         ->once()
         ->with($channel, $this->connection, []);
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('connectionKeys')
         ->andReturn(collect());
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'private-test-channel'));
@@ -41,7 +41,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelManager->shouldReceive('subscribe');
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->once()
         ->andReturn($connections = connections(3));
 

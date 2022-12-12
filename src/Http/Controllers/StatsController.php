@@ -20,7 +20,7 @@ class StatsController implements HttpServerInterface
                 return [
                     'name' => $channel->name(),
                     'connections' => App::make(ChannelManager::class)
-                        ->connections($channel)
+                        ->connectionKeys($channel)
                         ->count(),
                 ];
             }),

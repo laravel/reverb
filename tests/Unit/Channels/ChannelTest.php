@@ -38,7 +38,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelManager->shouldReceive('subscribe');
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->once()
         ->andReturn($connections = connections(3));
 
@@ -52,7 +52,7 @@ it('does not broadcast to the connection sending the message', function () {
 
     $this->channelManager->shouldReceive('subscribe');
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->once()
         ->andReturn($connections = connections(3));
 

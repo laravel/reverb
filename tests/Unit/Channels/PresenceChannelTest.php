@@ -21,7 +21,7 @@ it('can subscribe a connection to a channel', function () {
         ->once()
         ->with($channel, $this->connection, []);
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->andReturn(collect());
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
@@ -42,7 +42,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelManager->shouldReceive('subscribe');
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->once()
         ->andReturn($connections = connections(3));
 
@@ -70,7 +70,7 @@ it('can return data stored on the connection', function () {
             'user_id' => $index + 1,
         ]);
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelManager->shouldReceive('connectionKeys')
         ->once()
         ->andReturn($connections);
 
@@ -93,7 +93,7 @@ it('sends notification of subscription', function () {
         ->once()
         ->with($channel, $this->connection, []);
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->andReturn($connections = connections(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
@@ -113,7 +113,7 @@ it('sends notification of subscription with data', function () {
         ->once()
         ->with($channel, $this->connection, ['name' => 'Joe']);
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->andReturn($connections = connections(3));
 
     $channel->subscribe(
@@ -140,7 +140,7 @@ it('sends notification of an unsubscribe', function () {
     $this->channelManager->shouldReceive('data')
         ->andReturn(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
 
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->andReturn($connections = connections(3));
 
     $this->channelManager->shouldReceive('unsubscribe');

@@ -41,7 +41,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
-        $connections = $this->connections($channel)
+        $connections = $this->connectionKeys($channel)
             ->put($connection->identifier(), $data);
 
         $this->syncConnections($channel, $connections);
@@ -56,7 +56,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
-        $connections = $this->connections($channel)
+        $connections = $this->connectionKeys($channel)
             ->reject(fn ($data, $identifier) => (string) $identifier === $connection->identifier());
 
         $this->syncConnections($channel, $connections);
@@ -87,13 +87,30 @@ class ChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get all connections subscribed to a channel.
+     * Get all connection keys for the given channel.
      *
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
+     * @return \Illuminate\Support\Collection
+     */
+    public function connectionKeys(Channel $channel): Collection
+    {
+        return $this->channel($channel);
+    }
+
+    /**
+     * Get all connections for the given channel.
+     *
+     * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Illuminate\Support\Collection
      */
     public function connections(Channel $channel): Collection
     {
-        return $this->channel($channel);
+        return $this->connections
+            ->for($this->application)
+            ->all()
+            ->intersectByKeys(
+                $this->connectionKeys($channel)
+            );
     }
 
     /**
@@ -164,27 +181,11 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function data(Channel $channel, Connection $connection): array
     {
-        if (! $data = $this->connections($channel)->get($connection->identifier())) {
+        if (! $data = $this->connectionKeys($channel)->get($connection->identifier())) {
             return [];
         }
 
         return (array) $data;
-    }
-
-    /**
-     * Hydrate the connections for the given channel.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\Support\Collection
-     */
-    public function hydratedConnections(Channel $channel): Collection
-    {
-        return $this->connections
-            ->for($this->application)
-            ->all()
-            ->intersectByKeys(
-                $this->connections($channel)
-            );
     }
 
     /**

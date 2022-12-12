@@ -23,7 +23,7 @@ it('can broadcast an event directly when pubsub disabled', function () {
     $channelManager = Mockery::mock(ChannelManager::class);
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
-    $channelManager->shouldReceive('hydratedConnections')->once()
+    $channelManager->shouldReceive('connections')->once()
         ->andReturn(collect());
 
     $this->app->bind(ChannelManager::class, fn () => $channelManager);

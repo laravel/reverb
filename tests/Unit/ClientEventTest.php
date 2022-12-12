@@ -13,7 +13,7 @@ beforeEach(function () {
 });
 
 it('can forward a client message', function () {
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->once()
         ->andReturn($connections = connections());
 
@@ -33,7 +33,7 @@ it('can forward a client message', function () {
 });
 
 it('does not forward a message to itself', function () {
-    $this->channelManager->shouldReceive('hydratedConnections')
+    $this->channelManager->shouldReceive('connections')
         ->once()
         ->andReturn(collect());
 
