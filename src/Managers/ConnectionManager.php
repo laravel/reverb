@@ -31,6 +31,16 @@ class ConnectionManager implements ConnectionManagerInterface
     }
 
     /**
+     * Get the application instance.
+     *
+     * @return Application|null
+     */
+    public function app(): ?Application
+    {
+        return $this->application;
+    }
+
+    /**
      * Add a new connection to the manager.
      *
      * @param  \Laravel\Reverb\Connection  $connection

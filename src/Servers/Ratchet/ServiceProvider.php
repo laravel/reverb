@@ -22,14 +22,14 @@ class ServiceProvider extends BaseServiceProvider
 
     public function register()
     {
-        $this->app->singleton(
+        $this->app->bind(
             ConnectionManagerInterface::class,
             fn ($app) => new ConnectionManager(
                 $app['cache']->store('array')
             )
         );
 
-        $this->app->singleton(
+        $this->app->bind(
             ChannelManagerInterface::class,
             fn ($app) => new ChannelManager(
                 $app['cache']->store('array'),

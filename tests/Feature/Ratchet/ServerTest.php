@@ -1,9 +1,12 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\RatchetTestCase;
@@ -336,4 +339,11 @@ it('can connect from a valid origin', function () {
     $this->app['config']->set('reverb.apps.0.allowed_origins', ['0.0.0.0']);
 
     $this->connect();
+});
+
+it('clears application state between requests', function () {
+    $this->subscribe('test-channel');
+
+    expect($this->app->make(ConnectionManager::class)->app())->toBeNull();
+    expect($this->app->make(ChannelManager::class)->app())->toBeNull();
 });

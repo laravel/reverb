@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Servers\ApiGateway\Request;
@@ -292,4 +294,11 @@ it('can connect from a valid origin', function () {
         ));
 
     $this->assertSent('abc-123', 'connection_established', 1);
+});
+
+it('clears application state between requests', function () {
+    $this->subscribe('test-channel');
+
+    expect($this->app->make(ConnectionManager::class)->app())->toBeNull();
+    expect($this->app->make(ChannelManager::class)->app())->toBeNull();
 });
