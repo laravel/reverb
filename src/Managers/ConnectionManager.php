@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Managers;
 
 use Closure;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
@@ -99,8 +98,8 @@ class ConnectionManager implements ConnectionManagerInterface
      */
     public function find(string $identifier): ?Connection
     {
-        if ($connection = $this->all()->get($identifier)) {
-            return Connection::hydrate($connection);
+        if ($connection = $this->all()->find($identifier)) {
+            return $connection;
         }
 
         return null;
@@ -109,22 +108,22 @@ class ConnectionManager implements ConnectionManagerInterface
     /**
      * Get all of the connections from the cache.
      *
-     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]
+     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
-    public function all(): Collection
+    public function all(): Connections
     {
         return $this->mutex(function () {
-            return $this->repository->get($this->key()) ?? collect();
+            return $this->repository->get($this->key()) ?? new Connections;
         });
     }
 
     /**
      * Synchronize the connections with the manager.
      *
-     * @param  \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]  $connections
+     * @param  \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]  $connections
      * @return void
      */
-    public function sync(Collection $connections): void
+    public function sync(Connections $connections): void
     {
         $this->mutex(function () use ($connections) {
             $this->repository->forever($this->key(), $connections);

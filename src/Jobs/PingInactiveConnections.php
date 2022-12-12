@@ -24,8 +24,6 @@ class PingInactiveConnections
                 ->for($application)
                 ->all()
                 ->each(function ($connection) use ($connections) {
-                    $connection = Connection::hydrate($connection);
-
                     if ($connection->isActive()) {
                         return;
                     }

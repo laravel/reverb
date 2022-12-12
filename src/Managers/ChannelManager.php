@@ -101,9 +101,9 @@ class ChannelManager implements ChannelManagerInterface
      * Get all connections for the given channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\Support\Collection
+     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
-    public function connections(Channel $channel): Collection
+    public function connections(Channel $channel): Connections
     {
         return $this->connections
             ->for($this->application)

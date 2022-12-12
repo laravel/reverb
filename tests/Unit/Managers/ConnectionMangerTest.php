@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Tests\Connection;
 use Laravel\Reverb\Tests\SerializableConnection;
 
@@ -13,7 +14,7 @@ beforeEach(function () {
 it('can resolve an existing connection', function () {
     $connection = new Connection('my-connection');
     $this->connectionManager->sync(
-        collect()
+        Connections::make()
             ->put($connection->identifier(), $connection)
     );
 
@@ -30,7 +31,7 @@ it('can resolve an existing connection', function () {
 
 it('can resolve and store a new connection', function () {
     $this->connectionManager->sync(
-        collect()
+        Connections::make()
             ->put($this->connection->identifier(), $this->connection)
     );
 
@@ -47,7 +48,7 @@ it('can resolve and store a new connection', function () {
 
 it('can disconnect a connection', function () {
     $this->connectionManager->sync(
-        collect()
+        Connections::make()
             ->put($this->connection->identifier(), $this->connection)
     );
 
@@ -74,7 +75,7 @@ it('can hydrate a serialized connection', function () {
     $connection = serialize(new SerializableConnection('my-connection'));
 
     $this->connectionManager->sync(
-        collect()
+        Connections::make()
             ->put('my-connection', $connection)
     );
 
@@ -87,7 +88,7 @@ it('can hydrate an unserialized connection', function () {
     $connection = new Connection('my-connection');
 
     $this->connectionManager->sync(
-        collect()
+        Connections::make()
             ->put('my-connection', $connection)
     );
 
@@ -102,7 +103,7 @@ it('can dehydrate a serialized connection', function () {
         fn () => new SerializableConnection('my-connection')
     );
 
-    expect($this->connectionManager->all()->get('my-connection'))
+    expect($this->connectionManager->all()->first())
         ->toBeString();
 });
 
