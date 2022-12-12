@@ -27,8 +27,6 @@ class PruneStaleConnections
                 ->for($application)
                 ->all()
                 ->each(function ($connection) use ($connections, $channels, $application) {
-                    $connection = Connection::hydrate($connection);
-
                     if (! $connection->isStale()) {
                         return;
                     }

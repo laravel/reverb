@@ -3,9 +3,9 @@
 namespace Laravel\Reverb\Contracts;
 
 use Closure;
-use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Managers\Connections;
 
 interface ConnectionManager
 {
@@ -68,17 +68,17 @@ interface ConnectionManager
     /**
      * Get all of the connections from the cache.
      *
-     * @return @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
+     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
-    public function all(): Collection;
+    public function all(): Connections;
 
     /**
      * Synchronize the connections with the manager.
      *
-     * @param  \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]|string[]  $connections
+     * @param  \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]  $connections
      * @return void
      */
-    public function sync(Collection $connections): void;
+    public function sync(Connections $connections): void;
 
     /**
      * Synchronize a connection with the manager.

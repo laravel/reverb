@@ -23,7 +23,7 @@ it('can subscribe to a channel', function () {
         ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
 
     expect(
-        $this->channelManager->connections($this->channel)
+        $this->channelManager->connectionKeys($this->channel)
     )->toHaveCount(5);
 });
 
@@ -33,7 +33,7 @@ it('can unsubscribe from a channel', function () {
 
     $this->channelManager->unsubscribe($this->channel, $connections->first());
 
-    expect($this->channelManager->connections($this->channel))->toHaveCount(4);
+    expect($this->channelManager->connectionKeys($this->channel))->toHaveCount(4);
 });
 
 it('can get all channels', function () {
@@ -56,7 +56,7 @@ it('can get all connections subscribed to a channel', function () {
         ->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
 
     $connections->each(fn ($connection) => expect($connection->identifier())
-        ->toBeIn($this->channelManager->connections($this->channel)->keys()));
+        ->toBeIn($this->channelManager->connectionKeys($this->channel)->keys()));
 });
 
 it('can get all hydrated connections subscribed to a channel', function () {
@@ -68,7 +68,7 @@ it('can get all hydrated connections subscribed to a channel', function () {
             fn ($connection) => [$connection->identifier() => $connection]
         ));
 
-    $hydratedConnections = $this->channelManager->hydratedConnections($this->channel);
+    $hydratedConnections = $this->channelManager->connections($this->channel);
 
     $this->expect($hydratedConnections)->toHaveCount(5);
     $hydratedConnections->each(function ($connection) {
@@ -85,7 +85,7 @@ it('can get all hydrated serialized connections subscribed to a channel', functi
             fn ($connection) => [$connection->identifier() => serialize($connection)]
         ));
 
-    $hydratedConnections = $this->channelManager->hydratedConnections($this->channel);
+    $hydratedConnections = $this->channelManager->connections($this->channel);
 
     $this->expect($hydratedConnections)->toHaveCount(5);
     $hydratedConnections->each(function ($connection) {
@@ -103,7 +103,7 @@ it('only valid hydrated connections are returned', function () {
 
     $connections->take(5)->each(fn ($connection) => $this->channelManager->subscribe($this->channel, $connection));
 
-    $hydratedConnections = $this->channelManager->hydratedConnections($this->channel);
+    $hydratedConnections = $this->channelManager->connections($this->channel);
     $allConnections = $this->connectionManager->all();
 
     $this->expect($hydratedConnections)->toHaveCount(5);
@@ -123,11 +123,11 @@ it('can unsubscribe a connection for all channels', function () {
         $this->connection
     ));
 
-    $channels->each(fn ($channel) => expect($this->channelManager->connections($channel))->toHaveCount(1));
+    $channels->each(fn ($channel) => expect($this->channelManager->connectionKeys($channel))->toHaveCount(1));
 
     $this->channelManager->unsubscribeFromAll($this->connection);
 
-    $channels->each(fn ($channel) => expect($this->channelManager->connections($channel))->toHaveCount(0));
+    $channels->each(fn ($channel) => expect($this->channelManager->connectionKeys($channel))->toHaveCount(0));
 });
 
 it('can use a custom cache prefix', function () {
@@ -153,7 +153,7 @@ it('can get the data for a connection subscribed to a channel', function () {
         ['name' => 'Joe']
     ));
 
-    $this->channelManager->connections($this->channel)->values()->each(function ($data) {
+    $this->channelManager->connectionKeys($this->channel)->values()->each(function ($data) {
         expect($data)
             ->toBe(['name' => 'Joe']);
     });
@@ -184,7 +184,7 @@ it('can get all connections for all channels', function () {
         $this->channelManager->subscribe($channelThree, $connection);
     });
 
-    $this->assertCount(4, $this->channelManager->connections($channelOne));
-    $this->assertCount(8, $this->channelManager->connections($channelTwo));
-    $this->assertCount(12, $this->channelManager->connections($channelThree));
+    $this->assertCount(4, $this->channelManager->connectionKeys($channelOne));
+    $this->assertCount(8, $this->channelManager->connectionKeys($channelTwo));
+    $this->assertCount(12, $this->channelManager->connectionKeys($channelThree));
 });

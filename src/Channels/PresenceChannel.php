@@ -69,7 +69,7 @@ class PresenceChannel extends PrivateChannel
     {
         $connections = App::make(ChannelManager::class)
             ->for($app)
-            ->connections($this);
+            ->connectionKeys($this);
 
         return [
             'presence' => [
