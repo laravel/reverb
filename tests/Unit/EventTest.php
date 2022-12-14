@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Event;
+use Laravel\Reverb\Managers\Connections;
 
 it('can broadcast a pubsub event when enabled', function () {
     $app = Application::findByKey('pusher-key');
@@ -24,7 +25,7 @@ it('can broadcast an event directly when pubsub disabled', function () {
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $channelManager->shouldReceive('connections')->once()
-        ->andReturn(collect());
+        ->andReturn(Connections::make());
 
     $this->app->bind(ChannelManager::class, fn () => $channelManager);
 

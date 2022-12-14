@@ -2,11 +2,9 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Exception;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
-use Laravel\Reverb\Exceptions\PusherException;
 use Laravel\Reverb\Server as ReverbServer;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
@@ -29,28 +27,47 @@ class Server
         try {
             match ($request->event()) {
                 'CONNECT' => $this->server->open(
-                    $this->connection($request)
+                    $this->connect($request)
                 ),
-                'DISCONNECT' => $this->disconnect($request),
+                'DISCONNECT' => $this->server->close(
+                    $this->getConnection($request)
+                ),
                 'MESSAGE' => $this->server->message(
-                    $this->connection($request),
+                    $this->getConnection($request),
                     $request->message()
                 )
             };
-        } catch (PusherException $e) {
-            SendToConnection::dispatch($request->connectionId(), json_encode($e->payload()));
-        } catch (\Exception $e) {
+        } catch (InvalidApplication $e) {
             SendToConnection::dispatch(
                 $request->connectionId(),
-                json_encode([
-                    'event' => 'pusher:error',
-                    'data' => json_encode([
-                        'code' => 4200,
-                        'message' => $e->getMessage(),
-                    ]),
-                ])
+                $e->message()
+            );
+        } catch (\Exception $e) {
+            $this->server->error(
+                $this->getConnection($request),
+                $e
             );
         }
+    }
+
+    /**
+     * Create a Reverb connection from the API Gateway request.
+     *
+     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
+     * @return \Laravel\Reverb\Servers\ApiGateway\Connection
+     */
+    protected function connect(Request $request): Connection
+    {
+        return $this->connections
+                ->for($application = $this->application($request))
+                ->resolve(
+                    $request->connectionId(),
+                    fn () => new Connection(
+                        $request->connectionId(),
+                        $application,
+                        $request->headers['origin'] ?? null
+                    )
+                );
     }
 
     /**
@@ -59,24 +76,8 @@ class Server
      * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
      * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
-    protected function connection(Request $request): Connection
+    protected function getConnection(Request $request): Connection
     {
-        if ($application = $this->application($request)) {
-            if ($connection = $this->connections->for($application)->find($request->connectionId())) {
-                return $connection;
-            }
-
-            return $this->connections
-                ->for($application)
-                ->connect(
-                    new Connection(
-                        $request->connectionId(),
-                        $application,
-                        $request->headers['origin'] ?? null
-                    )
-                );
-        }
-
         foreach (Application::all() as $application) {
             if ($connection = $this->connections->for($application)->find($request->connectionId())) {
                 return $this->connections->connect($connection);
@@ -87,19 +88,6 @@ class Server
     }
 
     /**
-     * Disconnect a connection.
-     *
-     * @param  string  $connectionId
-     * @return void
-     */
-    protected function disconnect(Request $request)
-    {
-        $this->server->close(
-            $this->connection($request)
-        );
-    }
-
-    /**
      * Get the application instance for the request.
      *
      * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
@@ -107,12 +95,8 @@ class Server
      */
     protected function application(Request $request): ?Application
     {
-        try {
-            parse_str($request->serverVariables['QUERY_STRING'], $queryString);
+        parse_str($request->serverVariables['QUERY_STRING'], $queryString);
 
-            return Application::findByKey($queryString['appId']);
-        } catch (Exception $e) {
-            return null;
-        }
+        return Application::findByKey($queryString['appId']);
     }
 }

@@ -123,7 +123,7 @@ class ConnectionManager implements ConnectionManagerInterface
     public function all(): Connections
     {
         return $this->mutex(function () {
-            return $this->repository->get($this->key()) ?? new Connections;
+            return $this->repository->get($this->key()) ?: new Connections;
         });
     }
 

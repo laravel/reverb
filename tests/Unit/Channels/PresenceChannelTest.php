@@ -4,6 +4,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
@@ -22,7 +23,7 @@ it('can subscribe a connection to a channel', function () {
         ->with($channel, $this->connection, []);
 
     $this->channelManager->shouldReceive('connections')
-        ->andReturn(collect());
+        ->andReturn(Connections::make());
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
 });

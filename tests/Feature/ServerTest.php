@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\Tests\Connection;
 use Laravel\Reverb\Tests\TestCase;
@@ -128,7 +129,7 @@ it('can subscribe a user to a private channel', function () {
 });
 
 it('can subscribe a user to a presence channel', function () {
-    $this->channelManager->shouldReceive('connections')->andReturn(collect());
+    $this->channelManager->shouldReceive('connections')->andReturn(Connections::make());
     $this->channelManager->shouldReceive('connectionKeys')->andReturn(collect());
     $this->server->message(
         $connection = new Connection,
@@ -190,7 +191,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
-    $this->channelManager->shouldReceive('connections')->andReturn(collect());
+    $this->channelManager->shouldReceive('connections')->andReturn(Connections::make());
     $this->channelManager->shouldReceive('connectionKeys')->andReturn(collect());
 
     $this->server->message(

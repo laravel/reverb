@@ -2,6 +2,7 @@
 
 use Laravel\Reverb\ClientEvent;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
@@ -35,7 +36,7 @@ it('can forward a client message', function () {
 it('does not forward a message to itself', function () {
     $this->channelManager->shouldReceive('connections')
         ->once()
-        ->andReturn(collect());
+        ->andReturn(Connections::make());
 
     ClientEvent::handle(
         $this->connection, [

@@ -2,9 +2,10 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
+use Exception;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Exceptions\PusherException;
+use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server as ReverbServer;
 use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
@@ -25,11 +26,9 @@ class Server implements MessageComponentInterface
      */
     public function onOpen(ConnectionInterface $connection)
     {
-        if (! $connection = $this->connection($connection)) {
-            return;
-        }
-
-        $this->server->open($connection);
+        $this->server->open(
+            $this->connection($connection)
+        );
     }
 
     /**
@@ -41,12 +40,8 @@ class Server implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $message)
     {
-        if (! $connection = $this->connection($from)) {
-            return;
-        }
-
         $this->server->message(
-            $connection,
+            $this->connection($from),
             $message
         );
     }
@@ -59,11 +54,9 @@ class Server implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $connection)
     {
-        if (! $connection = $this->connection($connection)) {
-            return;
-        }
-
-        $this->server->close($connection);
+        $this->server->close(
+            $this->connection($connection)
+        );
     }
 
     /**
@@ -73,14 +66,18 @@ class Server implements MessageComponentInterface
      * @param  \Exception  $e
      * @return void
      */
-    public function onError(ConnectionInterface $connection, \Exception $e)
+    public function onError(ConnectionInterface $connection, Exception $e)
     {
-        if (! $connection = $this->connection($connection)) {
+        if ($e instanceof InvalidApplication) {
+            $connection->send(
+                $e->message()
+            );
+
             return;
         }
 
         $this->server->error(
-            $connection,
+            $this->connection($connection),
             $e
         );
     }
@@ -89,40 +86,22 @@ class Server implements MessageComponentInterface
      * Get a Reverb connection from a Ratchet connection.
      *
      * @param  \Ratchet\ConnectionInterface  $connection
-     * @return \Laravel\Reverb\Servers\Ratchet\Connection|null
+     * @return \Laravel\Reverb\Servers\Ratchet\Connection
      */
-    protected function connection(ConnectionInterface $connection): ?Connection
+    protected function connection(ConnectionInterface $connection): Connection
     {
-        try {
-            $application = $this->application($connection);
+        $application = $this->application($connection);
 
-            return $this->connections
+        return $this->connections
                 ->for($application)
                 ->resolve(
                     $connection->resourceId,
-                    function () use ($connection, $application) {
-                        return new Connection(
-                            $connection,
-                            $application,
-                            $connection->httpRequest->getHeader('Origin')[0] ?? null
-                        );
-                    }
+                    fn () => new Connection(
+                        $connection,
+                        $application,
+                        $connection->httpRequest->getHeader('Origin')[0] ?? null
+                    )
                 );
-        } catch (PusherException $e) {
-            $connection->send(json_encode($e->payload()));
-            $connection->close();
-        } catch (\Exception $e) {
-            $connection->send(json_encode([
-                'event' => 'pusher:error',
-                'data' => json_encode([
-                    'code' => 4200,
-                    'message' => $e->getMessage(),
-                ]),
-            ]));
-            $connection->close();
-        }
-
-        return null;
     }
 
     /**

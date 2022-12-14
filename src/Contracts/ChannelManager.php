@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Managers\Connections;
 
 interface ChannelManager
 {
@@ -15,7 +16,7 @@ interface ChannelManager
      * @return Application|null
      */
     public function app(): ?Application;
-    
+
     /**
      * The application the channel manager should be scoped to.
      *
@@ -70,9 +71,9 @@ interface ChannelManager
      * Get all connections for the given channel.
      *
      * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\Support\Collection
+     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
-    public function connections(Channel $channel): Collection;
+    public function connections(Channel $channel): Connections;
 
     /**
      * Flush the channel manager repository.

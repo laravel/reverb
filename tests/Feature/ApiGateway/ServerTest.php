@@ -86,6 +86,7 @@ it('can notify other subscribers of a presence channel when a new member joins',
 });
 
 it('can notify other subscribers of a presence channel when a member leaves', function () {
+    $this->withoutExceptionHandling();
     $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']];
     $this->subscribe('presence-test-channel', data: $data);
 

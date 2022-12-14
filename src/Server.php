@@ -62,24 +62,8 @@ class Server
             };
 
             Output::info('Message Handled', $from->id());
-        } catch (PusherException $e) {
-            $from->send(json_encode($e->payload()));
-            $from->disconnect();
-
-            Output::error('Message from '.$from->id().' resulted in a pusher error');
-            Output::info($e->getMessage());
         } catch (Exception $e) {
-            $from->send(json_encode([
-                'event' => 'pusher:error',
-                'data' => json_encode([
-                    'code' => 4200,
-                    'message' => 'Invalid message format',
-                ]),
-            ]));
-            $from->disconnect();
-
-            Output::error('Message from '.$from->id().' resulted in an unknown error');
-            Output::info($e->getMessage());
+            $this->error($from, $e);
         }
     }
 
@@ -94,7 +78,9 @@ class Server
         $this->channels
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
-        $this->connections->disconnect($connection->identifier());
+        $this->connections
+            ->for($connection->app())
+            ->disconnect($connection->identifier());
         $connection->disconnect();
 
         Output::info('Connection Closed', $connection->id());

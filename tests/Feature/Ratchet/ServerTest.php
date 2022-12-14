@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;

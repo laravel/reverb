@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Connection as ReverbConnection;
@@ -19,9 +18,9 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
  *
  * @param  int  $count
  * @param  bool  $serializable
- * @return \Illuminate\Support\Collection|\Laravel\Reverb\Connection[]
+ * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
  */
-function connections(int $count = 1, $serializable = false): Collection
+function connections(int $count = 1, $serializable = false): Connections
 {
     return Connections::make(range(1, $count))->map(function () use ($serializable) {
         return $serializable
