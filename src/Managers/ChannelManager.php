@@ -51,10 +51,12 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
-        $connections = $this->connectionKeys($channel)
+        $this->mutex(function () use ($channel, $connection, $data) {
+            $connections = $this->connectionKeys($channel)
             ->put($connection->identifier(), $data);
 
-        $this->syncConnections($channel, $connections);
+            $this->syncConnections($channel, $connections);
+        });
     }
 
     /**
@@ -66,10 +68,12 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
-        $connections = $this->connectionKeys($channel)
-            ->reject(fn ($data, $identifier) => (string) $identifier === $connection->identifier());
+        $this->mutex(function () use ($channel, $connection) {
+            $connections = $this->connectionKeys($channel)
+                ->reject(fn ($data, $identifier) => (string) $identifier === $connection->identifier());
 
-        $this->syncConnections($channel, $connections);
+            $this->syncConnections($channel, $connections);
+        });
     }
 
     /**

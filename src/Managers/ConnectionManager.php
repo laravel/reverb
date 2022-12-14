@@ -148,12 +148,12 @@ class ConnectionManager implements ConnectionManagerInterface
      */
     public function syncConnection(Connection $connection): void
     {
-        $this->sync(
-            $this->all()->put(
-                $connection->identifier(),
-                Connection::dehydrate($connection)
-            )
+        $connections = $this->all()->put(
+            $connection->identifier(),
+            Connection::dehydrate($connection)
         );
+
+        $this->sync($connections);
     }
 
     /**

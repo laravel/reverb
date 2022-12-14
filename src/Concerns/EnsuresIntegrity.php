@@ -19,11 +19,11 @@ trait EnsuresIntegrity
             return $callback();
         }
 
-        if (! method_exists($this->repository, 'lock')) {
+        if (! method_exists($this->repository->getStore(), 'lock')) {
             return $callback();
         }
 
-        return $this->repository->lock($this->key(), $timeout)
+        return $this->repository->lock($this->mutexKey(), $timeout)
             ->block($timeout, function () use ($callback) {
                 return $callback();
             });
