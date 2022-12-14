@@ -3,6 +3,9 @@
 namespace Laravel\Reverb;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\SerializableConnection;
 
 abstract class Connection
@@ -21,8 +24,10 @@ abstract class Connection
      */
     protected $hasBeenPinged = false;
 
-    public function __construct(protected Application $application, protected ?string $origin)
-    {
+    public function __construct(
+        protected Application $application,
+        protected ?string $origin
+    ) {
     }
 
     /**
@@ -52,7 +57,7 @@ abstract class Connection
      *
      * @return void
      */
-    abstract public function disconnect(): void;
+    abstract public function terminate(): void;
 
     /**
      * Get the application the connection belongs to.
@@ -96,6 +101,24 @@ abstract class Connection
         $this->lastSeenAt = (string) now();
 
         return $this;
+    }
+
+    /**
+     * Disconnect and unsubscribe from all channels.
+     *
+     * @return void
+     */
+    public function disconnect(): void
+    {
+        App::make(ChannelManager::class)
+            ->for($this->app())
+            ->unsubscribeFromAll($this);
+
+        App::make(ConnectionManager::class)
+            ->for($this->app())
+            ->disconnect($this->identifier());
+
+        $this->terminate();
     }
 
     /**

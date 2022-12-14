@@ -75,12 +75,6 @@ class Server
      */
     public function close(Connection $connection)
     {
-        $this->channels
-            ->for($connection->app())
-            ->unsubscribeFromAll($connection);
-        $this->connections
-            ->for($connection->app())
-            ->disconnect($connection->identifier());
         $connection->disconnect();
 
         Output::info('Connection Closed', $connection->id());

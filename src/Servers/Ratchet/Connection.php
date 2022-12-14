@@ -86,7 +86,7 @@ class Connection extends BaseConnection
      *
      * @return void
      */
-    public function disconnect(): void
+    public function terminate(): void
     {
         $this->connection->close();
     }

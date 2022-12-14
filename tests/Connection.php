@@ -58,7 +58,7 @@ class Connection extends BaseConnection
         $this->messages[] = $message;
     }
 
-    public function disconnect(): void
+    public function terminate(): void
     {
         //
     }

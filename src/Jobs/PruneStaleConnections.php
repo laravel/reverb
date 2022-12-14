@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Output;
@@ -22,11 +21,11 @@ class PruneStaleConnections
      */
     public function handle(ConnectionManager $connections, ChannelManager $channels)
     {
-        Application::all()->each(function ($application) use ($connections, $channels) {
+        Application::all()->each(function ($application) use ($connections) {
             $connections
                 ->for($application)
                 ->all()
-                ->each(function ($connection) use ($connections, $channels, $application) {
+                ->each(function ($connection) {
                     if (! $connection->isStale()) {
                         return;
                     }
@@ -38,8 +37,7 @@ class PruneStaleConnections
                             'message' => 'Pong reply not received in time',
                         ]),
                     ]));
-                    $connections->disconnect($connection->identifier());
-                    $channels->for($application)->unsubscribeFromAll($connection);
+
                     $connection->disconnect();
 
                     Output::info('Connection Pruned', $connection->id());

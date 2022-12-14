@@ -68,7 +68,7 @@ class Connection extends BaseConnection implements SerializableConnection
      *
      * @return void
      */
-    public function disconnect(): void
+    public function terminate(): void
     {
         //
     }
