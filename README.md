@@ -78,12 +78,13 @@ App\Providers\BroadcastServiceProvider::class,
 // Using Vite
 new Echo({
     broadcaster: 'pusher',
-    key: import.meta.env.MIX_PUSHER_APP_KEY,
-    wsHost: import.meta.env.MIX_PUSHER_HOST,
-    wsPort: import.meta.env.MIX_PUSHER_PORT,
-    wssPort: import.meta.env.MIX_PUSHER_PORT,
-    forceTLS: import.meta.env.MIX_PUSHER_SCHEME,
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    wsHost: import.meta.env.VITE_PUSHER_HOST,
+    wsPort: import.meta.env.VITE_PUSHER_PORT,
+    wssPort: import.meta.env.VITE_PUSHER_PORT,
+    forceTLS: import.meta.env.VITE_PUSHER_SCHEME,
     enabledTransports: ['ws', 'wss'],
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
 })
 
 // Using Mix
@@ -95,5 +96,6 @@ new Echo({
     wssPort: process.env.MIX_PUSHER_PORT,
     forceTLS: process.env.MIX_PUSHER_SCHEME,
     enabledTransports: ['ws', 'wss'],
+    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 })
 ```
