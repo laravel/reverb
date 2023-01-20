@@ -79,23 +79,23 @@ App\Providers\BroadcastServiceProvider::class,
 new Echo({
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     wsHost: import.meta.env.VITE_PUSHER_HOST,
     wsPort: import.meta.env.VITE_PUSHER_PORT,
     wssPort: import.meta.env.VITE_PUSHER_PORT,
-    forceTLS: import.meta.env.VITE_PUSHER_SCHEME,
+    forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
 })
 
 // Using Mix
 new Echo({
     broadcaster: 'pusher',
     key: process.env.MIX_PUSHER_APP_KEY,
+    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
     wsHost: process.env.MIX_PUSHER_HOST,
     wsPort: process.env.MIX_PUSHER_PORT,
     wssPort: process.env.MIX_PUSHER_PORT,
-    forceTLS: process.env.MIX_PUSHER_SCHEME,
+    forceTLS: (process.env.MIX_PUSHER_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 })
 ```
