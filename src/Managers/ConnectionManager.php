@@ -4,10 +4,12 @@ namespace Laravel\Reverb\Managers;
 
 use Closure;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 
 class ConnectionManager implements ConnectionManagerInterface
@@ -31,19 +33,14 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Get the application instance.
-     *
-     * @return Application|null
      */
-    public function app(): ?Application
+    public function app(): Application|null
     {
         return $this->application;
     }
 
     /**
      * Add a new connection to the manager.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return \Laravel\Reverb\Connection $connection
      */
     public function connect(Connection $connection): Connection
     {
@@ -56,11 +53,8 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Attempt to find a connection from the manager.
-     *
-     * @param  string  $identifier
-     * @return \Laravel\Reverb\Connection|null $connection
      */
-    public function reconnect(string $identifier): ?Connection
+    public function reconnect(string $identifier): Connection|null
     {
         if ($connection = $this->find($identifier)) {
             return $connection->touch();
@@ -71,9 +65,6 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Remove a connection from the manager.
-     *
-     * @param  string  $identifier
-     * @return void
      */
     public function disconnect(string $identifier): void
     {
@@ -86,10 +77,6 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Resolve a connection by its identifier.
-     *
-     * @param  string  $identifier
-     * @param  Closure  $connection
-     * @return \Laravel\Reverb\Connection
      */
     public function resolve(string $identifier, Closure $newConnection): Connection
     {
@@ -102,9 +89,6 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Find a connection by its identifier.
-     *
-     * @param  string  $identifier
-     * @return \Laravel\Reverb\Connection
      */
     public function find(string $identifier): ?Connection
     {
@@ -131,7 +115,6 @@ class ConnectionManager implements ConnectionManagerInterface
      * Synchronize the connections with the manager.
      *
      * @param  \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]  $connections
-     * @return void
      */
     public function sync(Connections $connections): void
     {
@@ -142,9 +125,6 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Synchronize a connection with the manager.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
     public function syncConnection(Connection $connection): void
     {
@@ -158,8 +138,6 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Get the key for the channels.
-     *
-     * @return string
      */
     protected function key(): string
     {
@@ -174,14 +152,14 @@ class ConnectionManager implements ConnectionManagerInterface
 
     /**
      * Flush the channel manager repository.
-     *
-     * @return void
      */
     public function flush(): void
     {
-        Application::all()->each(function ($application) {
-            $this->for($application);
-            $this->repository->forget($this->key());
-        });
+        App::make(ApplicationsProvider::class)
+            ->all()
+            ->each(function (Application $application) {
+                $this->for($application);
+                $this->repository->forget($this->key());
+            });
     }
 }

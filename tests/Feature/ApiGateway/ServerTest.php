@@ -3,8 +3,8 @@
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
-use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -41,7 +41,7 @@ it('can handle connections to different applications', function () {
     $this->connect();
     $this->connect(appKey: 'pusher-key-2');
 
-    foreach (Application::all() as $app) {
+    foreach (App::make(ApplicationsProvider::class)->all() as $app) {
         $this->assertCount(1, connectionManager()->for($app)->all());
     }
 });
@@ -257,7 +257,7 @@ it('fails to connect when an invalid application is provided', function () {
 });
 
 it('cannot connect from an invalid origin', function () {
-    $this->app['config']->set('reverb.apps.0.allowed_origins', ['https://laravel.com']);
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['https://laravel.com']);
 
     App::make(Server::class)
         ->handle(Request::fromLambdaEvent(

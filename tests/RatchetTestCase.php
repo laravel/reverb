@@ -54,12 +54,21 @@ class RatchetTestCase extends TestCase
     {
         parent::defineEnvironment($app);
 
-        $app['config']->set('reverb.apps.1', [
+        $app['config']->set('reverb.apps.apps.1', [
             'id' => '654321',
             'key' => 'pusher-key-2',
             'secret' => 'pusher-secret-2',
             'capacity' => null,
             'allowed_origins' => ['*'],
+            'ping_interval' => 10,
+        ]);
+
+        $app['config']->set('reverb.apps.apps.2', [
+            'id' => '987654',
+            'key' => 'pusher-key-3',
+            'secret' => 'pusher-secret-3',
+            'capacity' => null,
+            'allowed_origins' => ['laravel.com'],
             'ping_interval' => 10,
         ]);
     }
@@ -121,12 +130,12 @@ class RatchetTestCase extends TestCase
      * @param  string  $key
      * @return \Ratchet\Client\WebSocket
      */
-    public function connect($host = '0.0.0.0', $port = '8080', $key = 'pusher-key')
+    public function connect($host = '0.0.0.0', $port = '8080', $key = 'pusher-key', $headers = [])
     {
         $promise = new Deferred;
 
         $connection = await(
-            connect("ws://{$host}:{$port}/app/{$key}")
+            connect("ws://{$host}:{$port}/app/{$key}", headers: $headers)
         );
 
         $connection->on('message', function ($message) use ($promise) {

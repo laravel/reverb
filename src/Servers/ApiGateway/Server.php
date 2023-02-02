@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server as ReverbServer;
@@ -12,17 +13,15 @@ class Server
 {
     public function __construct(
         protected ReverbServer $server,
-        protected ConnectionManager $connections
+        protected ConnectionManager $connections,
+        protected ApplicationsProvider $applications,
     ) {
     }
 
     /**
      * Handle the incoming API Gateway request.
-     *
-     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
-     * @return void
      */
-    public function handle(Request $request)
+    public function handle(Request $request): void
     {
         try {
             match ($request->event()) {
@@ -52,9 +51,6 @@ class Server
 
     /**
      * Create a Reverb connection from the API Gateway request.
-     *
-     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
-     * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
     protected function connect(Request $request): Connection
     {
@@ -72,13 +68,10 @@ class Server
 
     /**
      * Get a Reverb connection from the API Gateway request.
-     *
-     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
-     * @return \Laravel\Reverb\Servers\ApiGateway\Connection
      */
     protected function getConnection(Request $request): Connection
     {
-        foreach (Application::all() as $application) {
+        foreach ($this->applications->all() as $application) {
             if ($connection = $this->connections->for($application)->find($request->connectionId())) {
                 return $this->connections->connect($connection);
             }
@@ -89,14 +82,11 @@ class Server
 
     /**
      * Get the application instance for the request.
-     *
-     * @param  \Laravel\Reverb\Servers\ApiGateway\Request  $request
-     * @return \Laravel\Reverb\Application|null
      */
-    protected function application(Request $request): ?Application
+    protected function application(Request $request): Application|null
     {
         parse_str($request->serverVariables['QUERY_STRING'], $queryString);
 
-        return Application::findByKey($queryString['appId']);
+        return $this->applications->findByKey($queryString['appId']);
     }
 }

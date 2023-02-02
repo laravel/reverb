@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -32,8 +33,9 @@ it('can handle multiple new connections', function () {
 it('can handle connections to different applications', function () {
     $this->connect();
     $this->connect(key: 'pusher-key-2');
+    $this->connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
 
-    foreach (Application::all() as $app) {
+    foreach (App::make(ApplicationsProvider::class)->all() as $app) {
         $this->assertCount(1, connectionManager()->for($app)->all());
     }
 });
@@ -324,10 +326,8 @@ it('can publish and subscribe to a client whisper', function () {
 });
 
 it('cannot connect from an invalid origin', function () {
-    $this->app['config']->set('reverb.apps.0.allowed_origins', ['https://laravel.com']);
-
     $connection = await(
-        connect('ws://0.0.0.0:8080/app/pusher-key')
+        connect('ws://0.0.0.0:8080/app/pusher-key-3')
     );
     $promise = $this->messagePromise($connection);
 

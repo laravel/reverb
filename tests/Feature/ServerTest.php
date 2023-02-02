@@ -212,7 +212,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
 });
 
 it('it rejects a connection from an invalid origin', function () {
-    $this->app['config']->set('reverb.apps.0.allowed_origins', ['laravel.com']);
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
     $this->server->open($connection = new Connection);
 
     $connection->assertSent([

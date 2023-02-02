@@ -46,6 +46,7 @@
     "extra": {
         "laravel": {
             "providers": [
+                "Laravel\\Reverb\\ManagerProvider",
                 "Laravel\\Reverb\\ServiceProvider"
             ],
             "aliases": {

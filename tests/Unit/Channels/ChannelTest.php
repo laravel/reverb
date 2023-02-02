@@ -2,6 +2,7 @@
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Tests\Connection;
 
@@ -42,7 +43,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar']);
+    $channel->broadcast(app(ApplicationsProvider::class)->findByKey('pusher-key'), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });
@@ -56,7 +57,7 @@ it('does not broadcast to the connection sending the message', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(Application::findByKey('pusher-key'), ['foo' => 'bar'], $connections->first());
+    $channel->broadcast(app(ApplicationsProvider::class)->findByKey('pusher-key'), ['foo' => 'bar'], $connections->first());
 
     $connections->first()->assertNothingSent();
     $connections->take(-2)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
