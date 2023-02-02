@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Servers\Ratchet;
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Http\Controllers\EventController;
-use Laravel\Reverb\Http\Controllers\StatsController;
 use Ratchet\Http\HttpServer;
 use Ratchet\Http\Router;
 use Ratchet\Server\IoServer;
@@ -46,7 +45,6 @@ class Factory
         $routes = new RouteCollection();
         $routes->add('sockets', new Route('/app/{appId}', ['_controller' => static::handler()], [], [], null, [], ['GET']));
         $routes->add('events', new Route('/apps/{appId}/events', ['_controller' => EventController::class], [], [], null, [], ['POST']));
-        $routes->add('stats', new Route('/stats', ['_controller' => StatsController::class], [], [], null, [], ['GET']));
 
         return $routes;
     }
