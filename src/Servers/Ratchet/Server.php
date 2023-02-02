@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\Ratchet;
 
 use Exception;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server as ReverbServer;
@@ -14,7 +15,8 @@ class Server implements MessageComponentInterface
 {
     public function __construct(
         protected ReverbServer $server,
-        protected ConnectionManager $connections
+        protected ConnectionManager $connections,
+        protected ApplicationsProvider $applications,
     ) {
     }
 
@@ -115,6 +117,6 @@ class Server implements MessageComponentInterface
         $request = $connection->httpRequest;
         parse_str($request->getUri()->getQuery(), $queryString);
 
-        return Application::findByKey($queryString['appId']);
+        return $this->applications->findByKey($queryString['appId']);
     }
 }

@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Output;
@@ -21,27 +22,29 @@ class PruneStaleConnections
      */
     public function handle(ConnectionManager $connections, ChannelManager $channels)
     {
-        Application::all()->each(function ($application) use ($connections) {
-            $connections
-                ->for($application)
-                ->all()
-                ->each(function ($connection) {
-                    if (! $connection->isStale()) {
-                        return;
-                    }
+        app(ApplicationsProvider::class)
+            ->all()
+            ->each(function ($application) use ($connections) {
+                $connections
+                    ->for($application)
+                    ->all()
+                    ->each(function ($connection) {
+                        if (! $connection->isStale()) {
+                            return;
+                        }
 
-                    $connection->send(json_encode([
-                        'event' => 'pusher:error',
-                        'data' => json_encode([
-                            'code' => 4201,
-                            'message' => 'Pong reply not received in time',
-                        ]),
-                    ]));
+                        $connection->send(json_encode([
+                            'event' => 'pusher:error',
+                            'data' => json_encode([
+                                'code' => 4201,
+                                'message' => 'Pong reply not received in time',
+                            ]),
+                        ]));
 
-                    $connection->disconnect();
+                        $connection->disconnect();
 
-                    Output::info('Connection Pruned', $connection->id());
-                });
-        });
+                        Output::info('Connection Pruned', $connection->id());
+                    });
+            });
     }
 }

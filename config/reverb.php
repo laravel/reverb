@@ -48,12 +48,16 @@ return [
 
     'apps' => [
 
-        [
-            'id' => env('PUSHER_APP_ID'),
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'allowed_origins' => ['*'],
-            'ping_interval' => env('REVERB_APP_PING_INTERVAL', 5),
+        'provider' => 'config',
+
+        'apps' => [
+            [
+                'id' => env('PUSHER_APP_ID'),
+                'key' => env('PUSHER_APP_KEY'),
+                'secret' => env('PUSHER_APP_SECRET'),
+                'allowed_origins' => ['*'],
+                'ping_interval' => env('REVERB_APP_PING_INTERVAL', 5),
+            ],
         ],
 
     ],

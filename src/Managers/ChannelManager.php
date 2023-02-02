@@ -4,12 +4,14 @@ namespace Laravel\Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\ConnectionManager;
 
@@ -33,21 +35,14 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get the application instance.
-     *
-     * @return Application|null
      */
-    public function app(): ?Application
+    public function app(): Application|null
     {
         return $this->application;
     }
 
     /**
      * Subscribe to a channel.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  array  $data
-     * @return void
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
@@ -61,10 +56,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Unsubscribe from a channel.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
@@ -78,8 +69,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get all the channels.
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function all(): Collection
     {
@@ -90,8 +79,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Unsubscribe from all channels.
-     *
-     * @return void
      */
     public function unsubscribeFromAll(Connection $connection): void
     {
@@ -102,9 +89,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get all connection keys for the given channel.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\Support\Collection
      */
     public function connectionKeys(Channel $channel): Collection
     {
@@ -114,7 +98,6 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get all connections for the given channel.
      *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
      * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
     public function connections(Channel $channel): Connections
@@ -129,10 +112,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Sync the connections for a channel.
-     *
-     * @param  Channel  $channel
-     * @param  Collection  $connections
-     * @return void
      */
     protected function syncConnections(Channel $channel, Collection $connections): void
     {
@@ -145,8 +124,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get the key for the channels.
-     *
-     * @return string
      */
     protected function key(): string
     {
@@ -161,9 +138,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get the given channel from the cache.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\SUpport\Collection
      */
     protected function channel(Channel $channel): Collection
     {
@@ -172,9 +146,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get the channels from the cache.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return \Illuminate\SUpport\Collection
      */
     protected function channels(Channel $channel = null): Collection
     {
@@ -189,9 +160,6 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Get the data stored for a connection.
-     *
-     * @param  \Laravel\Reverb\Channels\Channel  $channel
-     * @return array
      */
     public function data(Channel $channel, Connection $connection): array
     {
@@ -204,14 +172,14 @@ class ChannelManager implements ChannelManagerInterface
 
     /**
      * Flush the channel manager repository.
-     *
-     * @return void
      */
     public function flush(): void
     {
-        Application::all()->each(function ($application) {
-            $this->for($application);
-            $this->repository->forget($this->key());
-        });
+        App::make(ApplicationsProvider::class)
+            ->all()
+            ->each(function (Application $application) {
+                $this->for($application);
+                $this->repository->forget($this->key());
+            });
     }
 }

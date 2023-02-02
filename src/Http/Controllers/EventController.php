@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Http\Controllers;
 
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Event;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
@@ -49,6 +50,6 @@ class EventController implements HttpServerInterface
     {
         parse_str($request->getUri()->getQuery(), $queryString);
 
-        return Application::findById($queryString['appId']);
+        return app(ApplicationsProvider::class)->findById($queryString['appId']);
     }
 }
