@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Connection as BaseConnection;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 
 class Connection extends BaseConnection
 {
@@ -35,7 +36,7 @@ class Connection extends BaseConnection
 
     public function app(): Application
     {
-        return Application::findByKey('pusher-key');
+        return app()->make(ApplicationsProvider::class)->findByKey('pusher-key');
     }
 
     public function origin(): string

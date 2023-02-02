@@ -3,12 +3,13 @@
 use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Managers\Connections;
 
 it('can broadcast a pubsub event when enabled', function () {
-    $app = Application::findByKey('pusher-key');
+    $app = app(ApplicationsProvider::class)->findByKey('pusher-key');
     Config::set('reverb.pubsub.enabled', true);
     $redis = Mockery::mock(Client::class);
     $redis->shouldReceive('publish')->once()
@@ -29,5 +30,5 @@ it('can broadcast an event directly when pubsub disabled', function () {
 
     $this->app->bind(ChannelManager::class, fn () => $channelManager);
 
-    Event::dispatch(Application::findByKey('pusher-key'), ['channel' => 'test-channel']);
+    Event::dispatch(app(ApplicationsProvider::class)->findByKey('pusher-key'), ['channel' => 'test-channel']);
 });

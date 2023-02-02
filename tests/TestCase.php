@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Tests;
 
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
+use Laravel\Reverb\ManagerProvider;
 use Laravel\Reverb\ServiceProvider;
 use Orchestra\Testbench\TestCase as TestbenchTestCase;
 
@@ -29,6 +30,7 @@ class TestCase extends TestbenchTestCase
     {
         return [
             ServiceProvider::class,
+            ManagerProvider::class,
         ];
     }
 }

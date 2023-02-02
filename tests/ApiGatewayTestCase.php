@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
+use Laravel\Reverb\ManagerProvider;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 use Laravel\Reverb\Servers\ApiGateway\Request;
 use Laravel\Reverb\Servers\ApiGateway\Server;
@@ -33,6 +34,7 @@ class ApiGatewayTestCase extends TestCase
     {
         return [
             ServiceProvider::class,
+            ManagerProvider::class,
             ApiGatewayServiceProvider::class,
         ];
     }
@@ -47,7 +49,7 @@ class ApiGatewayTestCase extends TestCase
     {
         $app['config']->set('reverb.default', 'api_gatway');
 
-        $app['config']->set('reverb.apps.1', [
+        $app['config']->set('reverb.apps.apps.1', [
             'id' => '654321',
             'key' => 'pusher-key-2',
             'secret' => 'pusher-secret-2',
