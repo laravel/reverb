@@ -32,37 +32,26 @@ abstract class Connection
 
     /**
      * Get the raw socket connection identifier.
-     *
-     * @return string
      */
     abstract public function identifier(): string;
 
     /**
      * Get the normalized socket ID.
-     *
-     * @return string
      */
     abstract public function id(): string;
 
     /**
      * Send a message to the connection.
-     *
-     * @param  string  $message
-     * @return void
      */
     abstract public function send(string $message): void;
 
     /**
      * Terminate a connection.
-     *
-     * @return void
      */
     abstract public function terminate(): void;
 
     /**
      * Get the application the connection belongs to.
-     *
-     * @return \Laravel\Reverb\Application
      */
     public function app(): Application
     {
@@ -71,10 +60,8 @@ abstract class Connection
 
     /**
      * Get the origin of the connection.
-     *
-     * @return string|null
      */
-    public function origin(): ?string
+    public function origin(): string|null
     {
         return $this->origin;
     }
@@ -93,8 +80,6 @@ abstract class Connection
 
     /**
      * Touch the connection last seen at timestamp.
-     *
-     * @return \Laravel\Reverb\Connection
      */
     public function touch(): Connection
     {
@@ -105,8 +90,6 @@ abstract class Connection
 
     /**
      * Disconnect and unsubscribe from all channels.
-     *
-     * @return void
      */
     public function disconnect(): void
     {
@@ -123,8 +106,6 @@ abstract class Connection
 
     /**
      * Get the last time the connection was seen.
-     *
-     * @return \Carbon\Carbon
      */
     public function lastSeenAt(): Carbon
     {
@@ -133,8 +114,6 @@ abstract class Connection
 
     /**
      * Determine whether the connection is still active.
-     *
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -148,8 +127,6 @@ abstract class Connection
 
     /**
      * Determine whether the connection is inactive.
-     *
-     * @return bool
      */
     public function isInactive(): bool
     {
@@ -158,8 +135,6 @@ abstract class Connection
 
     /**
      * Determine whether the connection is stale.
-     *
-     * @return bool
      */
     public function isStale(): bool
     {
@@ -168,11 +143,8 @@ abstract class Connection
 
     /**
      * Hydrate a serialized connection.
-     *
-     * @param  \Laravel\Reverb\Connection|string  $connection
-     * @return \Laravel\Reverb\Connection
      */
-    public static function hydrate($connection): Connection
+    public static function hydrate(Connection|string $connection): Connection
     {
         return is_object($connection)
             ? $connection
@@ -181,11 +153,8 @@ abstract class Connection
 
     /**
      * Hydrate a serialized connection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return \Laravel\Reverb\Connection|string
      */
-    public static function dehydrate($connection): Connection|string
+    public static function dehydrate(Connection $connection): Connection|string
     {
         return $connection instanceof SerializableConnection
             ? serialize($connection)

@@ -25,10 +25,8 @@ class StartServer extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): mixed
     {
         $server = $this->option('server') ?: config('reverb.default');
 
@@ -43,11 +41,8 @@ class StartServer extends Command
 
     /**
      * Inform the user that the server type is invalid.
-     *
-     * @param  string  $server
-     * @return int
      */
-    protected function invalidServer(string $server)
+    protected function invalidServer(string $server): int
     {
         $this->error("Invalid server: {$server}.");
 

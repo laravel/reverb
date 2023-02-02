@@ -3,8 +3,6 @@
 namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
-use Laravel\Reverb\Application;
-use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ApplicationsProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 
@@ -14,11 +12,8 @@ class PingInactiveConnections
 
     /**
      * Execute the job.
-     *
-     * @param  \Laravel\Reverb\Contracts\ConnectionManager  $connections
-     * @return void
      */
-    public function handle(ConnectionManager $connections)
+    public function handle(ConnectionManager $connections): void
     {
         app(ApplicationsProvider::class)
             ->all()

@@ -13,8 +13,6 @@ trait InteractsWithAsyncRedis
 {
     /**
      * Get the connection URL for Redis.
-     *
-     * @return string
      */
     protected function redisUrl(): string
     {
@@ -40,9 +38,6 @@ trait InteractsWithAsyncRedis
 
     /**
      * Bind the Redis client to the container.
-     *
-     * @param  \React\EventLoop\LoopInterface  $loop
-     * @return void
      */
     protected function bindRedis(LoopInterface $loop): void
     {
@@ -55,9 +50,6 @@ trait InteractsWithAsyncRedis
 
     /**
      * Subscribe to the Redis pub / sub channel.
-     *
-     * @param  \React\EventLoop\LoopInterface  $loop
-     * @return void
      */
     protected function subscribeToRedis(LoopInterface $loop): void
     {

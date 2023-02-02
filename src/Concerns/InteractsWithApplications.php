@@ -8,9 +8,6 @@ trait InteractsWithApplications
 {
     /**
      * The application the channel manager should be scoped to.
-     *
-     * @param  \Laravel\Reverb\Application  $application
-     * @return self
      */
     public function for(Application $application): self
     {

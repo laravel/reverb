@@ -8,9 +8,6 @@ class ChannelBroker
 {
     /**
      * Return the relevant channel instance.
-     *
-     * @param  string  $name
-     * @return \Laravel\Reverb\Channels\Channel
      */
     public static function create(string $name): Channel
     {

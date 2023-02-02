@@ -11,6 +11,9 @@ use Laravel\Reverb\Servers\Ratchet\Console\Commands\StartServer;
 
 class ServiceProvider extends BaseServiceProvider
 {
+    /**
+     * Bootstrap any application services.
+     */
     public function boot()
     {
         if ($this->app->runningInConsole()) {
@@ -20,6 +23,9 @@ class ServiceProvider extends BaseServiceProvider
         }
     }
 
+    /**
+     * Register any application services.
+     */
     public function register()
     {
         $this->app->bind(

@@ -9,6 +9,11 @@ use Laravel\Reverb\Contracts\Logger;
 
 class CliLogger implements Logger
 {
+    /**
+     * The components factory instance.
+     *
+     * @var \Illuminate\Console\View\Components\Factory
+     */
     protected $components;
 
     public function __construct(protected OutputStyle $output)
@@ -18,21 +23,14 @@ class CliLogger implements Logger
 
     /**
      * Log an infomational message.
-     *
-     * @param  string  $title
-     * @param  string|null  $message
-     * @return void
      */
-    public function info(string $title, ?string $message = null): void
+    public function info(string $title, string $message = null): void
     {
         $this->components->twoColumnDetail($title, $message);
     }
 
     /**
      * Log an error message.
-     *
-     * @param  string  $message
-     * @return void
      */
     public function error(string $string): void
     {
@@ -41,20 +39,14 @@ class CliLogger implements Logger
 
     /**
      * Append a new line to the log.
-     *
-     * @param  int  $lines
-     * @return void
      */
-    public function line(?int $lines = 1): void
+    public function line(int $lines = 1): void
     {
         $this->output->newLine($lines);
     }
 
     /**
      * Log a message sent to the server.
-     *
-     * @param  string  $message
-     * @return void
      */
     public function message(string $message): void
     {

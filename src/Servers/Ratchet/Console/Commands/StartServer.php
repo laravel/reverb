@@ -35,10 +35,8 @@ class StartServer extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): mixed
     {
         $this->laravel->instance(Logger::class, new CliLogger($this->output));
 
@@ -59,6 +57,9 @@ class StartServer extends Command
         $server->run();
     }
 
+    /**
+     * Use the event loop to schedule periodic cleanup of connections.
+     */
     protected function scheduleCleanup(LoopInterface $loop): void
     {
         $loop->addPeriodicTimer(60, function () {

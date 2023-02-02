@@ -6,8 +6,6 @@ trait GeneratesPusherIdentifiers
 {
     /**
      * Generate a Pusher-compatible socket ID.
-     *
-     * @return string
      */
     protected function generateId(): string
     {

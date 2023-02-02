@@ -8,12 +8,8 @@ trait EnsuresIntegrity
 {
     /**
      * Ensure this is the only running instance.
-     *
-     * @param  Closure  $callback
-     * @param  int  $timeout
-     * @return mixed
      */
-    protected function mutex(Closure $callback, $timeout = 10)
+    protected function mutex(Closure $callback, $timeout = 10): mixed
     {
         if (! property_exists($this, 'repository')) {
             return $callback();
@@ -31,8 +27,6 @@ trait EnsuresIntegrity
 
     /**
      * Get the mutex category key.
-     *
-     * @return string
      */
     protected function key(): string
     {
@@ -41,8 +35,6 @@ trait EnsuresIntegrity
 
     /**
      * Get the mutex key.
-     *
-     * @return string
      */
     protected function mutexKey(): string
     {

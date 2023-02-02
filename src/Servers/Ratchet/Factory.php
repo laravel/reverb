@@ -18,6 +18,9 @@ use Symfony\Component\Routing\RouteCollection;
 
 class Factory
 {
+    /**
+     * Create a new WebSocket server instance.
+     */
     public static function make(string $host = '0.0.0.0', string $port = '8080', ?LoopInterface $loop = null): IoServer
     {
         $loop = $loop ?: Loop::get();
@@ -37,8 +40,6 @@ class Factory
 
     /**
      * Generate the routes required to handle Pusher requests.
-     *
-     * @return \Symfony\Component\Routing\RouteCollection
      */
     protected static function routes(): RouteCollection
     {
@@ -51,10 +52,8 @@ class Factory
 
     /**
      * Build the WebSocket server.
-     *
-     * @return \Ratchet\WebSocket\WsServer
      */
-    protected static function handler()
+    protected static function handler(): WsServer
     {
         return new WsServer(
             App::make(Server::class)

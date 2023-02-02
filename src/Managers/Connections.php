@@ -9,13 +9,10 @@ class Connections extends Collection
 {
     /**
      * Find a connection in the collection.
-     *
-     * @param  string $identifier
-     * @return \Laravel\Reverb\Connection|null
      */
-    public function find($identifier)
+    public function find(string $identifier): Connection|null
     {
-        if(! $connection = parent::get($identifier)) {
+        if (! $connection = parent::get($identifier)) {
             return null;
         }
 
@@ -26,9 +23,8 @@ class Connections extends Collection
      * Execute a callback over each hydrated connection.
      *
      * @param  callable(TValue, TKey): mixed  $callback
-     * @return $this
      */
-    public function each(callable $callback)
+    public function each(callable $callback): Connections
     {
         foreach ($this as $key => $item) {
             if ($callback(Connection::hydrate($item), $key) === false) {

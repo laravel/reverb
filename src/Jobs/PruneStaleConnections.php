@@ -3,9 +3,7 @@
 namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
-use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationsProvider;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Output;
 
@@ -15,12 +13,8 @@ class PruneStaleConnections
 
     /**
      * Execute the job.
-     *
-     * @param  \Laravel\Reverb\Contracts\ConnectionManager  $connections
-     * @param  \Laravel\Reverb\Contracts\ChannelManager  $channels
-     * @return void
      */
-    public function handle(ConnectionManager $connections, ChannelManager $channels)
+    public function handle(ConnectionManager $connections): void
     {
         app(ApplicationsProvider::class)
             ->all()

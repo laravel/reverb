@@ -30,8 +30,6 @@ class Connection extends BaseConnection implements SerializableConnection
 
     /**
      * Get the raw socket connection identifier.
-     *
-     * @return string
      */
     public function identifier(): string
     {
@@ -40,8 +38,6 @@ class Connection extends BaseConnection implements SerializableConnection
 
     /**
      * Get the normalized socket ID.
-     *
-     * @return string
      */
     public function id(): string
     {
@@ -54,9 +50,6 @@ class Connection extends BaseConnection implements SerializableConnection
 
     /**
      * Send a message to the connection.
-     *
-     * @param  string  $message
-     * @return void
      */
     public function send(string $message): void
     {
@@ -65,8 +58,6 @@ class Connection extends BaseConnection implements SerializableConnection
 
     /**
      * Terminate a connection.
-     *
-     * @return void
      */
     public function terminate(): void
     {

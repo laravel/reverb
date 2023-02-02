@@ -11,59 +11,38 @@ interface ConnectionManager
 {
     /**
      * Get the application instance.
-     *
-     * @return Application|null
      */
-    public function app(): ?Application;
+    public function app(): Application|null;
 
     /**
      * The application the channel manager should be scoped to.
-     *
-     * @param  \Laravel\Reverb\Application  $application
-     * @return \Laravel\Reverb\Contracts\ConnectionManager
      */
     public function for(Application $application): ConnectionManager;
 
     /**
      * Add a new connection to the manager.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return \Laravel\Reverb\Connection $connection
      */
     public function connect(Connection $connection): Connection;
 
     /**
      * Attempt to find a connection from the manager.
-     *
-     * @param  string  $identifier
-     * @return \Laravel\Reverb\Connection|null $connection
      */
-    public function reconnect(string $identifier): ?Connection;
+    public function reconnect(string $identifier): Connection|null;
 
     /**
      * Remove a connection from the manager.
-     *
-     * @param  string  $identifier
-     * @return void
      */
     public function disconnect(string $identifier): void;
 
     /**
      * Resolve a connection by its identifier.
-     *
-     * @param  string  $identifier
-     * @param  Closure  $connection
-     * @return \Laravel\Reverb\Connection
      */
     public function resolve(string $identifier, Closure $newConnection): Connection;
 
     /**
      * Find a connection by its identifier.
-     *
-     * @param  string  $identifier
-     * @return \Laravel\Reverb\Connection
      */
-    public function find(string $identifier): ?Connection;
+    public function find(string $identifier): Connection|null;
 
     /**
      * Get all of the connections from the cache.
@@ -76,22 +55,16 @@ interface ConnectionManager
      * Synchronize the connections with the manager.
      *
      * @param  \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]  $connections
-     * @return void
      */
     public function sync(Connections $connections): void;
 
     /**
      * Synchronize a connection with the manager.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
     public function syncConnection(Connection $connection): void;
 
     /**
      * Flush the channel manager repository.
-     *
-     * @return void
      */
     public function flush(): void;
 }

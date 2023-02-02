@@ -7,13 +7,9 @@ use Laravel\Reverb\Contracts\Logger;
 class StandardLogger implements Logger
 {
     /**
-     * Log an infomational message.
-     *
-     * @param  string  $title
-     * @param  string|null  $message
-     * @return void
+     * Log an infomational message
      */
-    public function info(string $title, ?string $message = null): void
+    public function info(string $title, string $message = null): void
     {
         $output = $title;
 
@@ -26,9 +22,6 @@ class StandardLogger implements Logger
 
     /**
      * Log an error message.
-     *
-     * @param  string  $message
-     * @return void
      */
     public function error(string $string): void
     {
@@ -37,20 +30,14 @@ class StandardLogger implements Logger
 
     /**
      * Append a new line to the log.
-     *
-     * @param  int  $lines
-     * @return void
      */
-    public function line(?int $lines = 1): void
+    public function line(int $lines = 1): void
     {
         //
     }
 
     /**
      * Log a message sent to the server.
-     *
-     * @param  string  $message
-     * @return void
      */
     public function message(string $message): void
     {

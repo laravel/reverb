@@ -11,11 +11,6 @@ class Event
 {
     /**
      * Dispatch a message to a channel.
-     *
-     * @param  \Laravel\Reverb\Application  $app
-     * @param  array  $payload
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
     public static function dispatch(Application $app, array $payload, Connection $connection = null): void
     {
@@ -38,11 +33,6 @@ class Event
 
     /**
      * Notify all connections subscribed to the given channel.
-     *
-     * @param  \Laravel\Reverb\Application  $app
-     * @param  array  $payload
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
     public static function dispatchSynchronously(Application $app, array $payload, Connection $connection = null): void
     {

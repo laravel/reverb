@@ -12,6 +12,9 @@ use Laravel\Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
+    /**
+     * Bootstrap any application services.
+     */
     public function boot()
     {
         if ($this->app->runningInConsole()) {
@@ -25,6 +28,9 @@ class ServiceProvider extends BaseServiceProvider
         ]);
     }
 
+    /**
+     * Register any application services.
+     */
     public function register()
     {
         $this->mergeConfigFrom(

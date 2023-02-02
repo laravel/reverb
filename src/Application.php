@@ -10,13 +10,11 @@ class Application
         protected string $secret,
         protected int $pingInterval,
         protected array $allowedOrigins
-    )
-    {}
-    
+    ) {
+    }
+
     /**
      * Get the application ID.
-     *
-     * @return string
      */
     public function id(): string
     {
@@ -25,8 +23,6 @@ class Application
 
     /**
      * Get the application key.
-     *
-     * @return string
      */
     public function key(): string
     {
@@ -35,8 +31,6 @@ class Application
 
     /**
      * Get the application secret.
-     *
-     * @return string
      */
     public function secret(): string
     {
@@ -45,8 +39,6 @@ class Application
 
     /**
      * Get the allowed origins.
-     *
-     * @return array
      */
     public function allowedOrigins(): array
     {
@@ -55,8 +47,6 @@ class Application
 
     /**
      * Get the interval in minutes to ping the client.
-     *
-     * @return int
      */
     public function pingInterval(): int
     {

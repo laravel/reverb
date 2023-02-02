@@ -19,11 +19,8 @@ class Server
 
     /**
      * Handle the a client connection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
-    public function open(Connection $connection)
+    public function open(Connection $connection): void
     {
         try {
             $this->verifyOrigin($connection);
@@ -38,12 +35,8 @@ class Server
 
     /**
      * Handle a new message received by the connected client.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $message
-     * @return void
      */
-    public function message(Connection $from, string $message)
+    public function message(Connection $from, string $message): void
     {
         Output::info('Message Received', $from->id());
         Output::message($message);
@@ -69,11 +62,8 @@ class Server
 
     /**
      * Handle a client disconnection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
-    public function close(Connection $connection)
+    public function close(Connection $connection): void
     {
         $connection->disconnect();
 
@@ -82,19 +72,16 @@ class Server
 
     /**
      * Handle an error.
-     *
-     * @param  \Laravel\Reverb\ConnectionInterface  $connection
-     * @param  \Exception  $exception
-     * @return void
      */
-    public function error(Connection $connection, Exception $exception)
+    public function error(Connection $connection, Exception $exception): void
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
 
             Output::error('Message from '.$connection->id().' resulted in a pusher error');
+            Output::info($exception->getMessage());
 
-            return Output::info($exception->getMessage());
+            return;
         }
 
         $connection->send(json_encode([
@@ -112,12 +99,9 @@ class Server
     /**
      * Verify the origin of the connection.
      *
-     * @param  \Laravel\Reverb\ConnectionInterface  $connection
-     * @return void
-     *
      * @throws \Laravel\Reverb\Exceptions\InvalidOrigin
      */
-    protected function verifyOrigin(Connection $connection)
+    protected function verifyOrigin(Connection $connection): void
     {
         $allowedOrigins = $connection->app()->allowedOrigins();
 

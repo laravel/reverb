@@ -12,7 +12,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventController implements HttpServerInterface
 {
-    public function onOpen(ConnectionInterface $conn, RequestInterface $request = null)
+    /**
+     * Handle the a client connection.
+     */
+    public function onOpen(ConnectionInterface $conn, RequestInterface $request = null): void
     {
         $payload = json_decode($request->getBody()->getContents(), true);
 
@@ -25,26 +28,34 @@ class EventController implements HttpServerInterface
         tap($conn)->send(new JsonResponse((object) []))->close();
     }
 
-    public function onMessage(ConnectionInterface $from, $message)
+    /**
+     * Handle a new message received by the connected client.
+     *
+     * @param  string  $message
+     */
+    public function onMessage(ConnectionInterface $from, $message): void
     {
         //
     }
 
-    public function onClose(ConnectionInterface $connection)
+    /**
+     * Handle a client disconnection.
+     */
+    public function onClose(ConnectionInterface $connection): void
     {
         //
     }
 
-    public function onError(ConnectionInterface $connection, \Exception $e)
+    /**
+     * Handle an error.
+     */
+    public function onError(ConnectionInterface $connection, \Exception $e): void
     {
         //
     }
 
     /**
      * Get the application instance for the request.
-     *
-     * @param  \Psr\Http\Message\RequestInterface  $request
-     * @return \Laravel\Reverb\Application
      */
     protected function application(RequestInterface $request): Application
     {

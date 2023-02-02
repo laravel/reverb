@@ -10,12 +10,8 @@ class PusherEvent
 {
     /**
      * Handle a pusher event.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $event
-     * @param  array  $data
      */
-    public static function handle(Connection $connection, string $event, array $payload = [], string $channel = null)
+    public static function handle(Connection $connection, string $event, array $payload = []): void
     {
         match (Str::after($event, 'pusher:')) {
             'connection_established' => self::acknowledge($connection),
@@ -34,11 +30,8 @@ class PusherEvent
 
     /**
      * Acknowledge the connection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return void
      */
-    public static function acknowledge(Connection $connection)
+    public static function acknowledge(Connection $connection): void
     {
         self::send($connection, 'connection_established', [
             'socket_id' => $connection->id(),
@@ -48,12 +41,6 @@ class PusherEvent
 
     /**
      * Subscribe to the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $channel
-     * @param  string|null  $auth
-     * @param  string|null  $data
-     * @return void
      */
     public static function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
     {
@@ -66,10 +53,6 @@ class PusherEvent
 
     /**
      * Unsubscribe from the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $channel
-     * @return void
      */
     public static function unsubscribe(Connection $connection, string $channel): void
     {
@@ -79,8 +62,6 @@ class PusherEvent
 
     /**
      * Respond to a ping.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
      */
     public static function pong(Connection $connection): void
     {
@@ -89,8 +70,6 @@ class PusherEvent
 
     /**
      * Send a ping.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
      */
     public static function ping(Connection $connection): void
     {
@@ -99,11 +78,6 @@ class PusherEvent
 
     /**
      * Send a response to the given connection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $event
-     * @param  array  $data
-     * @return void
      */
     public static function send(Connection $connection, string $event, array $data = []): void
     {
@@ -114,12 +88,6 @@ class PusherEvent
 
     /**
      * Send an internal response to the given connection.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $event
-     * @param  string  $channel
-     * @param  array  $data
-     * @return void
      */
     public static function sendInternally(Connection $connection, string $event, string $channel, array $data = []): void
     {
@@ -130,14 +98,8 @@ class PusherEvent
 
     /**
      * Format the payload for the given event.
-     *
-     * @param  string  $event
-     * @param  array  $data
-     * @param  string  $channel
-     * @param  string  $prefix
-     * @return string|false
      */
-    public static function formatPayload(string $event, array $data = [], ?string $channel = null, string $prefix = 'pusher:')
+    public static function formatPayload(string $event, array $data = [], ?string $channel = null, string $prefix = 'pusher:'): string|false
     {
         return json_encode(
             array_filter([
@@ -150,13 +112,8 @@ class PusherEvent
 
     /**
      * Format the internal payload for the given event.
-     *
-     * @param  string  $event
-     * @param  array  $data
-     * @param  string  $channel
-     * @return string|false
      */
-    public static function formatInternalPayload(string $event, array $data = [], $channel = null)
+    public static function formatInternalPayload(string $event, array $data = [], $channel = null): string|false
     {
         return static::formatPayload($event, $data, $channel, 'pusher_internal:');
     }

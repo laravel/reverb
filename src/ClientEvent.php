@@ -8,18 +8,15 @@ class ClientEvent
 {
     /**
      * Handle a pusher event.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  array  $event
      */
-    public static function handle(Connection $connection, array $event)
+    public static function handle(Connection $connection, array $event): ClientEvent|null
     {
         if (! Str::startsWith($event['event'], 'client-')) {
-            return;
+            return null;
         }
 
         if (! isset($event['channel'])) {
-            return;
+            return null;
         }
 
         return self::whisper(
@@ -30,11 +27,6 @@ class ClientEvent
 
     /**
      * Whisper a message to all connection of the channel.
-     *
-     * @param  Connection  $connection
-     * @param  string  $channel
-     * @param  array  $payload
-     * @return void
      */
     public static function whisper(Connection $connection, array $payload): void
     {

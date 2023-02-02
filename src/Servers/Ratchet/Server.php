@@ -22,11 +22,8 @@ class Server implements MessageComponentInterface
 
     /**
      * Handle the a client connection.
-     *
-     * @param  \Ratchet\ConnectionInterface  $connection
-     * @return void
      */
-    public function onOpen(ConnectionInterface $connection)
+    public function onOpen(ConnectionInterface $connection): void
     {
         $this->server->open(
             $this->connection($connection)
@@ -36,11 +33,9 @@ class Server implements MessageComponentInterface
     /**
      * Handle a new message received by the connected client.
      *
-     * @param  \Ratchet\ConnectionInterface  $connection
      * @param  string  $message
-     * @return void
      */
-    public function onMessage(ConnectionInterface $from, $message)
+    public function onMessage(ConnectionInterface $from, $message): void
     {
         $this->server->message(
             $this->connection($from),
@@ -50,11 +45,8 @@ class Server implements MessageComponentInterface
 
     /**
      * Handle a client disconnection.
-     *
-     * @param  \Ratchet\ConnectionInterface  $connection
-     * @return void
      */
-    public function onClose(ConnectionInterface $connection)
+    public function onClose(ConnectionInterface $connection): void
     {
         $this->server->close(
             $this->connection($connection)
@@ -63,12 +55,8 @@ class Server implements MessageComponentInterface
 
     /**
      * Handle an error.
-     *
-     * @param  \Ratchet\ConnectionInterface  $connection
-     * @param  \Exception  $e
-     * @return void
      */
-    public function onError(ConnectionInterface $connection, Exception $e)
+    public function onError(ConnectionInterface $connection, Exception $e): void
     {
         if ($e instanceof InvalidApplication) {
             $connection->send(

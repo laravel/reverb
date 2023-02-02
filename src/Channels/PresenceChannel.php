@@ -11,11 +11,6 @@ class PresenceChannel extends PrivateChannel
 {
     /**
      * Subscribe to the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $auth
-     * @param  string  $data
-     * @return bool
      */
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
@@ -34,9 +29,6 @@ class PresenceChannel extends PrivateChannel
 
     /**
      * Unsubscribe from the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return bool
      */
     public function unsubscribe(Connection $connection): void
     {
@@ -61,11 +53,8 @@ class PresenceChannel extends PrivateChannel
 
     /**
      * Get the data associated with the channel.
-     *
-     * @param  \Laravel\Reverb\Application  $app
-     * @return array
      */
-    public function data(Application $app)
+    public function data(Application $app): array
     {
         $connections = App::make(ChannelManager::class)
             ->for($app)

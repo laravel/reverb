@@ -16,14 +16,12 @@ abstract class PusherException extends Exception
     /**
      * The error message associated with the exception.
      *
-     * @var int
+     * @var string
      */
     protected $message;
 
     /**
      * Get the Pusher formatted error payload.
-     *
-     * @return array
      */
     public function payload(): array
     {
@@ -38,8 +36,6 @@ abstract class PusherException extends Exception
 
     /**
      * Get the encoded Pusher formatted error payload.
-     *
-     * @return array
      */
     public function message()
     {

@@ -15,10 +15,6 @@ class SendToConnection implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param  string  $connectionId
-     * @param  string  $message
-     * @return void
      */
     public function __construct(public string $connectionId, public string $message)
     {
@@ -26,10 +22,8 @@ class SendToConnection implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         try {
             $client = new ApiGatewayManagementApiClient([

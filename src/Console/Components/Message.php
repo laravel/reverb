@@ -9,13 +9,8 @@ class Message extends Component
 {
     /**
      * Renders the component using the given arguments.
-     *
-     * @param  string  $first
-     * @param  string|null  $second
-     * @param  int  $verbosity
-     * @return void
      */
-    public function render($message, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public function render(string $message, int $verbosity = OutputInterface::VERBOSITY_NORMAL): void
     {
         $this->renderView('message', [
             'message' => $message,

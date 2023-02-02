@@ -8,12 +8,6 @@ class Request
 {
     /**
      * Create a new request instance.
-     *
-     * @param  array  $serverVariables
-     * @param  string  $body
-     * @parama array  $headers
-     *
-     * @return void
      */
     public function __construct(
         public array $serverVariables,
@@ -26,13 +20,8 @@ class Request
 
     /**
      * Create a new request from the given Lambda event.
-     *
-     * @param  array  $event
-     * @param  array  $serverVariables
-     * @param  string|null  $handler
-     * @return static
      */
-    public static function fromLambdaEvent(array $event, array $serverVariables = [], $handler = null)
+    public static function fromLambdaEvent(array $event, array $serverVariables = [], $handler = null): Request
     {
         if ($event['requestContext']['eventType'] === 'MESSAGE') {
             return new static(
@@ -85,11 +74,8 @@ class Request
 
     /**
      * Get the URI and query string for the given event.
-     *
-     * @param  array  $event
-     * @return array
      */
-    protected static function getUriAndQueryString(array $event)
+    protected static function getUriAndQueryString(array $event): array
     {
         $uri = $event['requestContext']['http']['path'] ?? $event['path'] ?? '/';
 
@@ -105,11 +91,8 @@ class Request
 
     /**
      * Get the query string from the event.
-     *
-     * @param  array  $event
-     * @return string
      */
-    protected static function getQueryString(array $event)
+    protected static function getQueryString(array $event): string
     {
         if (isset($event['version']) && $event['version'] === '2.0') {
             return http_build_query(
@@ -152,11 +135,8 @@ class Request
 
     /**
      * Get the request headers from the event.
-     *
-     * @param  array  $event
-     * @return array
      */
-    protected static function getHeaders(array $event)
+    protected static function getHeaders(array $event): array
     {
         if (! isset($event['multiValueHeaders'])) {
             return array_change_key_case(
@@ -174,11 +154,8 @@ class Request
 
     /**
      * Get the request body from the event.
-     *
-     * @param  array  $event
-     * @return string
      */
-    protected static function getRequestBody(array $event)
+    protected static function getRequestBody(array $event): string
     {
         $body = $event['body'] ?? '';
 
@@ -189,13 +166,8 @@ class Request
 
     /**
      * Ensure the request headers / server variables contain a content type.
-     *
-     * @param  array  $event
-     * @param  array  $headers
-     * @param  array  $serverVariables
-     * @return array
      */
-    protected static function ensureContentTypeIsSet(array $event, array $headers, array $serverVariables)
+    protected static function ensureContentTypeIsSet(array $event, array $headers, array $serverVariables): array
     {
         if ((! isset($headers['content-type']) && isset($event['httpMethod']) && (strtoupper($event['httpMethod']) === 'POST')) ||
             (! isset($headers['content-type']) && isset($event['requestContext']['http']['method']) && (strtoupper($event['requestContext']['http']['method']) === 'POST'))) {
@@ -211,14 +183,8 @@ class Request
 
     /**
      * Ensure the request headers / server variables contain a content length.
-     *
-     * @param  array  $event
-     * @param  array  $headers
-     * @param  array  $serverVariables
-     * @param  string  $requestBody
-     * @return array
      */
-    protected static function ensureContentLengthIsSet(array $event, array $headers, array $serverVariables, $requestBody)
+    protected static function ensureContentLengthIsSet(array $event, array $headers, array $serverVariables, $requestBody): array
     {
         if ((! isset($headers['content-length']) && isset($event['httpMethod']) && ! in_array(strtoupper($event['httpMethod']), ['TRACE'])) ||
             (! isset($headers['content-length']) && isset($event['requestContext']['http']['method']) && ! in_array(strtoupper($event['requestContext']['http']['method']), ['TRACE']))) {
@@ -234,10 +200,6 @@ class Request
 
     /**
      * Ensure the request headers contain a source IP address.
-     *
-     * @param  array  $event
-     * @param  array  $headers
-     * @return array
      */
     protected static function ensureSourceIpAddressIsSet(array $event, array $headers): array
     {
@@ -254,8 +216,6 @@ class Request
 
     /**
      * Get the event from the Lambda event.
-     *
-     * @return string
      */
     public function event(): string
     {
@@ -264,8 +224,6 @@ class Request
 
     /**
      * Get the message from the Lambda event.
-     *
-     * @return string
      */
     public function message(): string
     {
@@ -274,8 +232,6 @@ class Request
 
     /**
      * Determine whether the request is a connection.
-     *
-     * @return bool
      */
     public function isConnection(): bool
     {
@@ -284,8 +240,6 @@ class Request
 
     /**
      * Determine whether the request is a disconnection.
-     *
-     * @return bool
      */
     public function isDisconnection(): bool
     {
@@ -294,8 +248,6 @@ class Request
 
     /**
      * Determine whether the request is a message.
-     *
-     * @return bool
      */
     public function isMessage(): bool
     {
@@ -304,8 +256,6 @@ class Request
 
     /**
      * Get the connection ID for the request.
-     *
-     * @return string
      */
     public function connectionId(): string
     {

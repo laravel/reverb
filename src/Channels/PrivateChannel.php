@@ -10,11 +10,6 @@ class PrivateChannel extends Channel
 {
     /**
      * Subscribe to the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $auth
-     * @param  string|null  $data
-     * @return bool
      */
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
@@ -25,11 +20,6 @@ class PrivateChannel extends Channel
 
     /**
      * Deteremine whether the given auth token is valid.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string  $auth
-     * @param  string|null  $data
-     * @return bool
      */
     protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {

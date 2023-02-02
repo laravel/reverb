@@ -18,21 +18,14 @@ class Channel
 
     /**
      * Get the channel name.
-     *
-     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
 
     /**
      * Subscribe to the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @param  string|null  $auth
-     * @param  string|null  $data
-     * @return bool
      */
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
@@ -43,9 +36,6 @@ class Channel
 
     /**
      * Unsubscribe from the given channel.
-     *
-     * @param  \Laravel\Reverb\Connection  $connection
-     * @return bool
      */
     public function unsubscribe(Connection $connection): void
     {
@@ -56,13 +46,8 @@ class Channel
 
     /**
      * Send a message to all connections subscribed to the channel.
-     *
-     * @param  \Laravel\Reverb\Application  $app
-     * @param  array  $payload
-     * @param  \Laravel\Reverb\Connection|null  $except
-     * @return void
      */
-    public function broadcast(Application $app, array $payload, Connection $except = null)
+    public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
         App::make(ChannelManager::class)
             ->for($app)
@@ -91,11 +76,8 @@ class Channel
 
     /**
      * Get the data associated with the channel.
-     *
-     * @param  \Laravel\Reverb\Application  $app
-     * @return array
      */
-    public function data(Application $app)
+    public function data(Application $app): array
     {
         return [];
     }

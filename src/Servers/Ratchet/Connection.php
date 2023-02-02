@@ -30,8 +30,6 @@ class Connection extends BaseConnection
 
     /**
      * Get the raw socket connection identifier.
-     *
-     * @return string
      */
     public function identifier(): string
     {
@@ -40,8 +38,6 @@ class Connection extends BaseConnection
 
     /**
      * Get the normalized socket ID.
-     *
-     * @return string
      */
     public function id(): string
     {
@@ -54,8 +50,6 @@ class Connection extends BaseConnection
 
     /**
      * Get the origin of the connection.
-     *
-     * @return string
      */
     public function origin(): string
     {
@@ -64,9 +58,6 @@ class Connection extends BaseConnection
 
     /**
      * Send a message to the connection.
-     *
-     * @param  string  $message
-     * @return void
      */
     public function send(string $message): void
     {
@@ -83,8 +74,6 @@ class Connection extends BaseConnection
 
     /**
      * Terminate a connection.
-     *
-     * @return void
      */
     public function terminate(): void
     {
