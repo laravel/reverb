@@ -4,7 +4,7 @@ namespace Laravel\Reverb;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 
 class ManagerProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -13,11 +13,11 @@ class ManagerProvider extends ServiceProvider implements DeferrableProvider
      */
     public function register(): void
     {
-        $this->app->singleton(ApplicationsManager::class);
+        $this->app->singleton(ApplicationManager::class);
 
         $this->app->bind(
-            ApplicationsProvider::class,
-            fn () => $this->app->make(ApplicationsManager::class)->driver()
+            ApplicationProvider::class,
+            fn () => $this->app->make(ApplicationManager::class)->driver()
         );
     }
 
@@ -26,6 +26,6 @@ class ManagerProvider extends ServiceProvider implements DeferrableProvider
      */
     public function provides(): array
     {
-        return [ApplicationsManager::class, ApplicationsProvider::class];
+        return [ApplicationManager::class, ApplicationProvider::class];
     }
 }

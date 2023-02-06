@@ -4,7 +4,7 @@ namespace Laravel\Reverb;
 
 use Illuminate\Support\Manager;
 
-class ApplicationsManager extends Manager
+class ApplicationManager extends Manager
 {
     /**
      * Get the default driver name.

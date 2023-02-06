@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Contracts;
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 
-interface ApplicationsProvider
+interface ApplicationProvider
 {
     /**
      * Return all of the configured applications as Application instances.

@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Servers\Ratchet;
 
 use Exception;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server as ReverbServer;
@@ -16,7 +16,7 @@ class Server implements MessageComponentInterface
     public function __construct(
         protected ReverbServer $server,
         protected ConnectionManager $connections,
-        protected ApplicationsProvider $applications,
+        protected ApplicationProvider $applications,
     ) {
     }
 

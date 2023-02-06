@@ -4,7 +4,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -35,7 +35,7 @@ it('can handle connections to different applications', function () {
     $this->connect(key: 'pusher-key-2');
     $this->connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
 
-    foreach (App::make(ApplicationsProvider::class)->all() as $app) {
+    foreach (App::make(ApplicationProvider::class)->all() as $app) {
         $this->assertCount(1, connectionManager()->for($app)->all());
     }
 });

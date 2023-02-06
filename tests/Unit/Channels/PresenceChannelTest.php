@@ -1,8 +1,7 @@
 <?php
 
-use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\PresenceChannel;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Managers\Connections;
@@ -48,7 +47,7 @@ it('can broadcast to all connections of a channel', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(app(ApplicationsProvider::class)->findByKey('pusher-key'), ['foo' => 'bar']);
+    $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar']);
 
     $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });

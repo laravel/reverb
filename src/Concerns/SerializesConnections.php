@@ -2,7 +2,7 @@
 
 namespace Laravel\Reverb\Concerns;
 
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 
 trait SerializesConnections
 {
@@ -28,7 +28,7 @@ trait SerializesConnections
     {
         $this->id = $values['id'];
         $this->identifier = $values['identifier'];
-        $this->application = app(ApplicationsProvider::class)->findById($values['application']);
+        $this->application = app(ApplicationProvider::class)->findById($values['application']);
         $this->origin = $values['origin'];
         $this->lastSeenAt = $values['lastSeenAt'] ?? null;
         $this->hasBeenPinged = $values['hasBeenPinged'] ?? null;

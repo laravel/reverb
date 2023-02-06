@@ -9,7 +9,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 
 class ConnectionManager implements ConnectionManagerInterface
@@ -155,7 +155,7 @@ class ConnectionManager implements ConnectionManagerInterface
      */
     public function flush(): void
     {
-        App::make(ApplicationsProvider::class)
+        App::make(ApplicationProvider::class)
             ->all()
             ->each(function (Application $application) {
                 $this->for($application);

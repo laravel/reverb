@@ -3,10 +3,10 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\Collection;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 
-class ConfigProvider implements ApplicationsProvider
+class ConfigProvider implements ApplicationProvider
 {
     public function __construct(protected Collection $applications)
     {

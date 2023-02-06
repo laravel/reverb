@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Laravel\Reverb\Contracts\ApplicationsProvider;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Event;
@@ -38,7 +38,7 @@ class ServiceProvider extends BaseServiceProvider
         $config = $this->app['config']['reverb']['servers']['api_gateway'];
 
         Route::post('/apps/{appId}/events', function (Request $request, $appId) {
-            Event::dispatch($this->app->make(ApplicationsProvider::class)
+            Event::dispatch($this->app->make(ApplicationProvider::class)
                 ->findById($appId), [
                     'event' => $request->name,
                     'channel' => $request->channel,
