@@ -3,12 +3,12 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use InvalidArgumentException;
 use Laravel\Reverb\Console\Commands\StartServer;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Loggers\StandardLogger;
-use Laravel\Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
-use Laravel\Reverb\Servers\Ratchet\ServiceProvider as RatchetServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -26,6 +26,8 @@ class ServiceProvider extends BaseServiceProvider
         $this->publishes([
             __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
         ]);
+
+        $this->app->make(ServerProvider::class)->boot();
     }
 
     /**
@@ -37,29 +39,31 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/reverb.php', 'reverb'
         );
 
-        $config = $this->app['config']['reverb'];
-
-        $this->app->instance(Logger::class, new StandardLogger);
-
-        $this->app->register(
-            $this->getServerProvider($config['default'])
-        );
+        $this->registerServer();
     }
 
-    /**
-     * Register the server provider.
-     *
-     * @param  string  $server
-     * @return void
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function getServerProvider($name)
+    public function registerServer()
     {
-        return match ($name) {
-            'ratchet' => RatchetServiceProvider::class,
-            'api_gateway' => ApiGatewayServiceProvider::class,
-            default => throw new InvalidArgumentException("Server provider [{$name}] is not supported."),
-        };
+        $this->app->singleton(ServerManager::class);
+        $this->app->bind(
+            ServerProvider::class,
+            fn () => $this->app->make(ServerManager::class)->driver()
+        );
+
+        $server = $this->app->make(ServerProvider::class);
+
+        $server->register();
+
+        $this->app->bind(
+            ConnectionManager::class,
+            fn () => $server->buildConnectionManager()
+        );
+
+        $this->app->bind(
+            ChannelManager::class,
+            fn () => $server->buildChannelManager()
+        );
+
+        $this->app->instance(Logger::class, new StandardLogger);
     }
 }

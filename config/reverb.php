@@ -25,6 +25,9 @@ return [
         'ratchet' => [
             'host' => env('REVERB_RATCHET_HOST', '127.0.0.1'),
             'port' => env('REVERB_RATCHET_PORT', 8080),
+            'connection_manager' => [
+                'prefix' => env('REVERB_RATCHET_CONNECTION_CACHE_PREFIX', 'reverb'),
+            ],
         ],
 
         'api_gateway' => [

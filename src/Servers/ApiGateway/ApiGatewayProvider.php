@@ -3,21 +3,25 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
+use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Managers\ChannelManager;
 use Laravel\Reverb\Managers\ConnectionManager;
 
-class ServiceProvider extends BaseServiceProvider
+class ApiGatewayProvider extends ServerProvider
 {
+    public function __construct(protected Application $app, protected array $config)
+    {
+    }
+
     /**
      * Bootstrap any application services.
      */
@@ -35,8 +39,6 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        $config = $this->app['config']['reverb']['servers']['api_gateway'];
-
         Route::post('/apps/{appId}/events', function (Request $request, $appId) {
             Event::dispatch($this->app->make(ApplicationProvider::class)
                 ->findById($appId), [
@@ -47,26 +49,32 @@ class ServiceProvider extends BaseServiceProvider
 
             return new JsonResponse((object) []);
         });
+    }
 
-        $this->app->bind(
-            ConnectionManagerInterface::class,
-            fn ($app) => new ConnectionManager(
-                $app['cache']->store(
-                    $config['connection_manager']['store']
-                ),
-                $config['connection_manager']['prefix']
-            )
+    /**
+     * Build the connection manager for the server.
+     */
+    public function buildConnectionManager(): ConnectionManager
+    {
+        return new ConnectionManager(
+            $this->app['cache']->store(
+                $this->config['connection_manager']['store']
+            ),
+            $this->config['connection_manager']['prefix']
         );
+    }
 
-        $this->app->bind(
-            ChannelManagerInterface::class,
-            fn ($app) => new ChannelManager(
-                $app['cache']->store(
-                    $config['connection_manager']['store']
-                ),
-                $app->make(ConnectionManagerInterface::class),
-                $config['connection_manager']['prefix']
-            )
+    /**
+     * Build the channel manager for the server.
+     */
+    public function buildChannelManager(): ChannelManager
+    {
+        return new ChannelManager(
+            $this->app['cache']->store(
+                $this->config['connection_manager']['store']
+            ),
+            $this->app->make(ConnectionManagerInterface::class),
+            $this->config['connection_manager']['prefix']
         );
     }
 }

@@ -12,7 +12,6 @@ use Laravel\Reverb\ManagerProvider;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 use Laravel\Reverb\Servers\ApiGateway\Request;
 use Laravel\Reverb\Servers\ApiGateway\Server;
-use Laravel\Reverb\Servers\ApiGateway\ServiceProvider as ApiGatewayServiceProvider;
 use Laravel\Reverb\ServiceProvider;
 
 class ApiGatewayTestCase extends TestCase
@@ -22,6 +21,18 @@ class ApiGatewayTestCase extends TestCase
         parent::setUp();
 
         $this->app->instance(Logger::class, new NullLogger);
+    }
+
+    /**
+     * Resolve application core configuration implementation.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+        $app['config']->set('reverb.default', 'api_gateway');
     }
 
     /**
@@ -35,7 +46,6 @@ class ApiGatewayTestCase extends TestCase
         return [
             ServiceProvider::class,
             ManagerProvider::class,
-            ApiGatewayServiceProvider::class,
         ];
     }
 
@@ -47,8 +57,6 @@ class ApiGatewayTestCase extends TestCase
      */
     protected function defineEnvironment($app)
     {
-        $app['config']->set('reverb.default', 'api_gatway');
-
         $app['config']->set('reverb.apps.apps.1', [
             'id' => '654321',
             'key' => 'pusher-key-2',
