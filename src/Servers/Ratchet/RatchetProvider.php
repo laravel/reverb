@@ -20,6 +20,11 @@ class RatchetProvider extends ServerProvider
 {
     use InteractsWithAsyncRedis;
 
+    /**
+     * Indicates whether the server should publish events.
+     *
+     * @var bool
+     */
     protected $publishesEvents;
 
     public function __construct(protected Application $app, protected array $config)
@@ -81,6 +86,9 @@ class RatchetProvider extends ServerProvider
         });
     }
 
+    /**
+     * Enable publishing of events.
+     */
     public function withPublishing(): void
     {
         $this->publishesEvents = true;
