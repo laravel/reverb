@@ -4,10 +4,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default Reverb Server Name
+    | Default Reverb Server
     |--------------------------------------------------------------------------
     |
+    | This option controls the default server used by Reverb to handle
+    | messages received from and when sending messages to connected
+    | clients. You must specify one of the servers listed below.
     |
+    | Supported: "ratchet", "api_gateway"
     */
 
     'default' => env('REVERB_SERVER', 'ratchet'),
@@ -17,7 +21,9 @@ return [
     | Reverb Servers
     |--------------------------------------------------------------------------
     |
-    |
+    | Here you may define details for each of the supported Reverb servers.
+    | Each server has its own configuration options which are defined in
+    | the array below. You should ensure all the options are present.
     */
 
     'servers' => [
@@ -49,7 +55,9 @@ return [
     |--------------------------------------------------------------------------
     | Reverb Applications
     |--------------------------------------------------------------------------
-    |
+    | Here you may define how Reverb applications are managed. Should you
+    | wish to use the "config" provider, you should define an array of
+    | apps which Reverb can handle including an id, key and secret.
     |
     */
 
