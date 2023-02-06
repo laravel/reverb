@@ -2,19 +2,29 @@
 
 namespace Laravel\Reverb\Servers\Ratchet;
 
+use Clue\React\Redis\Client;
+use Clue\React\Redis\Factory;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Contracts\ServerProvider;
+use Laravel\Reverb\Event;
 use Laravel\Reverb\Managers\ChannelManager;
 use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Servers\Ratchet\Console\Commands\StartServer;
+use React\EventLoop\LoopInterface;
 
 class RatchetProvider extends ServerProvider
 {
+    use InteractsWithAsyncRedis;
+
+    protected $publishesEvents;
+
     public function __construct(protected Application $app, protected array $config)
     {
+        $this->publishesEvents = (bool) $this->config['publish_events']['enabled'] ?? false;
     }
 
     /**
@@ -29,6 +39,51 @@ class RatchetProvider extends ServerProvider
                 ]);
             });
         }
+    }
+
+    /**
+     * Determine whether the server should publish events.
+     */
+    public function shouldPublishEvents(): bool
+    {
+        return $this->publishesEvents;
+    }
+
+    /**
+     * Publish the given payload on the configured channel.
+     */
+    public function publish(array $payload): void
+    {
+        $this->app->make(Client::class)
+            ->publish(
+                $this->config['publish_events']['channel'] ?? 'reverb',
+                json_encode($payload)
+            );
+    }
+
+    /**
+     * Subscribe to the configured channel.
+     */
+    public function subscribe(LoopInterface $loop)
+    {
+        $redis = (new Factory($loop))->createLazyClient(
+            $this->redisUrl()
+        );
+
+        $redis->subscribe($this->config['publish_events']['channel'] ?? 'reverb');
+
+        $redis->on('message', function (string $channel, string $payload) {
+            $event = json_decode($payload, true);
+            Event::dispatchSynchronously(
+                unserialize($event['application']),
+                $event['payload']
+            );
+        });
+    }
+
+    public function withPublishing(): void
+    {
+        $this->publishesEvents = true;
     }
 
     /**

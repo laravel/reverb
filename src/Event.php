@@ -2,10 +2,9 @@
 
 namespace Laravel\Reverb;
 
-use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ServerProvider;
 
 class Event
 {
@@ -14,21 +13,18 @@ class Event
      */
     public static function dispatch(Application $app, array $payload, Connection $connection = null): void
     {
-        if (! Config::get('reverb.pubsub.enabled')) {
+        $server = App::make(ServerProvider::class);
+
+        if ($server->shouldNotPublishEvents()) {
             static::dispatchSynchronously($app, $payload, $connection);
 
             return;
         }
 
-        $redis = App::make(Client::class);
-
-        $redis->publish(
-            Config::get('reverb.pubsub.channel'),
-            json_encode([
-                'application' => serialize($app),
-                'payload' => $payload,
-            ])
-        );
+        $server->publish([
+            'application' => serialize($app),
+            'payload' => $payload,
+        ]);
     }
 
     /**

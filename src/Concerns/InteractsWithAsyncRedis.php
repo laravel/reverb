@@ -6,7 +6,7 @@ use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Laravel\Reverb\Event;
+use Laravel\Reverb\ServerManager;
 use React\EventLoop\LoopInterface;
 
 trait InteractsWithAsyncRedis
@@ -53,24 +53,12 @@ trait InteractsWithAsyncRedis
      */
     protected function subscribeToRedis(LoopInterface $loop): void
     {
-        $config = Config::get('reverb.pubsub');
+        $server = App::make(ServerManager::class);
 
-        if (! $config['enabled']) {
+        if ($server->doesNotSubscribeToEvents()) {
             return;
         }
 
-        $redis = (new Factory($loop))->createLazyClient(
-            $this->redisUrl()
-        );
-
-        $redis->subscribe($config['channel']);
-
-        $redis->on('message', function (string $channel, string $payload) {
-            $event = json_decode($payload, true);
-            Event::dispatchSynchronously(
-                unserialize($event['application']),
-                $event['payload']
-            );
-        });
+        $server->subscribe($loop);
     }
 }

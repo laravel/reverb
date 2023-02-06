@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\Servers\Ratchet\Factory;
@@ -75,7 +76,9 @@ class RatchetTestCase extends TestCase
 
     public function usingRedis()
     {
-        $this->app['config']->set('reverb.pubsub.enabled', true);
+        app(ServerProvider::class)->withPublishing();
+
+        // $this->app['config']->set('reverb.servers.ratchet.publish_events.enabled', true);
 
         $this->bindRedis($this->loop);
         $this->subscribeToRedis($this->loop);

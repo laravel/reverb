@@ -28,6 +28,10 @@ return [
             'connection_manager' => [
                 'prefix' => env('REVERB_RATCHET_CONNECTION_CACHE_PREFIX', 'reverb'),
             ],
+            'publish_events' => [
+                'enabled' => env('REVERB_RATCHET_SCALING_ENABLED', false),
+                'channel' => env('REVERB_RATCHET_SCALING_CHANNEL', 'reverb'),
+            ],
         ],
 
         'api_gateway' => [
@@ -63,19 +67,6 @@ return [
             ],
         ],
 
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Publish / Subscribe Settings
-    |--------------------------------------------------------------------------
-    |
-    |
-    */
-
-    'pubsub' => [
-        'enabled' => env('REVERB_PUBSUB_ENABLED', false),
-        'channel' => env('REVERB_PUBSUB_CHANNEL', 'reverb'),
     ],
 
 ];
