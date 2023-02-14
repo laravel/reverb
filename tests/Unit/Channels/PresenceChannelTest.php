@@ -63,7 +63,7 @@ it('fails to subscribe if the signature is invalid', function () {
 it('can return data stored on the connection', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
-    $connections = connections(2, )
+    $connections = connections(2)
         ->map(fn ($connection, $index) => [
             'user_info' => [
                 'name' => 'Joe',
