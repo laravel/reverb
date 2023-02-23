@@ -12,8 +12,6 @@ abstract class Connection
 {
     /**
      * The last time the connection was seen.
-     *
-     * @var string
      */
     protected string $lastSeenAt;
 

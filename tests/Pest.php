@@ -17,7 +17,6 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
 /**
  * Create a defined number of connections.
  *
- * @param  int  $count
  * @param  bool  $serializable
  * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
  */
@@ -33,10 +32,7 @@ function connections(int $count = 1, $serializable = false): Connections
 /**
  * Generate a valid Pusher authentication signature.
  *
- * @param  \Laravel\Reverb\Connection  $connection
- * @param  string  $channel
  * @param  string  $data
- * @return string
  */
 function validAuth(ReverbConnection $connection, string $channel, ?string $data = null): string
 {
@@ -51,8 +47,6 @@ function validAuth(ReverbConnection $connection, string $channel, ?string $data 
 
 /**
  * Return the connection manager.
- *
- * @return \Laravel\Reverb\Contracts\ConnectionManager
  */
 function connectionManager(Application $app = null): ConnectionManager
 {
@@ -62,8 +56,6 @@ function connectionManager(Application $app = null): ConnectionManager
 
 /**
  * Return the connection manager.
- *
- * @return \Laravel\Reverb\Contracts\ChannelManager
  */
 function channelManager(Application $app = null): ChannelManager
 {
