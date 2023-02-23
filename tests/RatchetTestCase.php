@@ -157,10 +157,6 @@ class RatchetTestCase extends TestCase
 
     /**
      * Send a message to the connected client.
-     *
-     * @param  array  $message
-     * @param  \Ratchet\Client\WebSocket|null  $connection
-     * @return string
      */
     public function send(array $message, ?WebSocket $connection = null): string
     {
@@ -179,9 +175,6 @@ class RatchetTestCase extends TestCase
 
     /**
      * Disconnect the connected client.
-     *
-     * @param  \Ratchet\Client\WebSocket  $connection
-     * @return string
      */
     public function disconnect(WebSocket $connection): string
     {
@@ -199,11 +192,8 @@ class RatchetTestCase extends TestCase
     /**
      * Subscribe to a channel.
      *
-     * @param  string  $channel
      * @param  array  $data
      * @param  string  $auth
-     * @param  \Ratchet\Client\WebSocket|null  $connection
-     * @return string
      */
     public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?WebSocket $connection = null): string
     {
@@ -227,8 +217,6 @@ class RatchetTestCase extends TestCase
 
     /**
      * Return the latest connection set on the manager.
-     *
-     * @return \Laravel\Reverb\Connection|null
      */
     public function managedConnection(): ?Connection
     {
@@ -239,7 +227,6 @@ class RatchetTestCase extends TestCase
      * Return a promise for the next message received to the given connection.
      *
      * @param  \Ratchet\Client\WebSocketWebSocket  $connection
-     * @return \React\Promise\PromiseInterface
      */
     public function messagePromise(WebSocket $connection): PromiseInterface
     {
@@ -256,7 +243,6 @@ class RatchetTestCase extends TestCase
      * Return a promise when a given connection is disconnected.
      *
      * @param  \Ratchet\Client\WebSocketWebSocket  $connection
-     * @return \React\Promise\PromiseInterface
      */
     public function disconnectPromise(WebSocket $connection): PromiseInterface
     {
@@ -271,11 +257,6 @@ class RatchetTestCase extends TestCase
 
     /**
      * Send an event to the server.
-     *
-     * @param  string  $channel
-     * @param  string  $event
-     * @param  array  $data
-     * @return void
      */
     public function triggerEvent(string $channel, string $event, array $data = []): void
     {
@@ -291,13 +272,6 @@ class RatchetTestCase extends TestCase
 
     /**
      * Post a request to the server.
-     *
-     * @param  string  $path
-     * @param  array  $data
-     * @param  string  $host
-     * @param  string  $port
-     * @param  string  $appId
-     * @return \React\Promise\PromiseInterface
      */
     public function postToServer(
         string $path,

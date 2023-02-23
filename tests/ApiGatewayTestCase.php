@@ -72,7 +72,6 @@ class ApiGatewayTestCase extends TestCase
      *
      * @param  string  $connectionId $name
      * @param  string  $appKey
-     * @return void
      */
     public function connect($connectionId = 'abc-123', $appKey = 'pusher-key'): void
     {
@@ -95,10 +94,8 @@ class ApiGatewayTestCase extends TestCase
     /**
      * Send a message to the connected client.
      *
-     * @param  array  $message
      * @param  string  $connectionId
      * @param  string  $appKey
-     * @return void
      */
     public function send(array $message, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
     {
@@ -119,12 +116,9 @@ class ApiGatewayTestCase extends TestCase
     /**
      * Subscribe to a channel.
      *
-     * @param  string  $channel
      * @param  array  $data
-     * @param  string|null  $auth
      * @param  string  $connectionId
      * @param  string  $appKey
-     * @return void
      */
     public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
     {
@@ -150,7 +144,6 @@ class ApiGatewayTestCase extends TestCase
      * Disconnect a connected client.
      *
      * @param  string  $connectionId
-     * @return void
      */
     public function disconnect($connectionId = 'abc-123'): void
     {
@@ -168,9 +161,7 @@ class ApiGatewayTestCase extends TestCase
     /**
      * Assert a message was sent to the given connection.
      *
-     * @param  string|null  $connectionId
      * @param  mixed  $message
-     * @param  int|null  $times
      * @return void
      */
     public function assertSent(string $connectionId = null, mixed $message = null, ?int $times = null)
@@ -189,8 +180,6 @@ class ApiGatewayTestCase extends TestCase
 
     /**
      * Return the latest connection set on the manager.
-     *
-     * @return \Laravel\Reverb\Connection|null
      */
     public function managedConnection(): ?Connection
     {
