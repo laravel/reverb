@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Manager;
 use Laravel\Reverb\Servers\ApiGateway\ApiGatewayProvider;
 use Laravel\Reverb\Servers\Ratchet\RatchetProvider;
+use Laravel\Reverb\Servers\Swoole\SwooleProvider;
 
 class ServerManager extends Manager
 {
@@ -30,6 +31,17 @@ class ServerManager extends Manager
         return new RatchetProvider(
             $this->app,
             $this->config->get('reverb.servers.ratchet', [])
+        );
+    }
+
+    /**
+     * Creates the Ratchet driver.
+     */
+    public function createSwooleDriver(): SwooleProvider
+    {
+        return new SwooleProvider(
+            $this->app,
+            $this->config->get('reverb.servers.swoole', [])
         );
     }
 

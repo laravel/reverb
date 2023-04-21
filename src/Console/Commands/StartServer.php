@@ -12,7 +12,7 @@ class StartServer extends Command
      * @var string
      */
     protected $signature = 'reverb:start
-                {--server=ratchet}
+                {--server=}
                 {--host=}
                 {--port=}';
 
@@ -32,6 +32,10 @@ class StartServer extends Command
 
         return match ($server) {
             'ratchet' => $this->call('ratchet:start', [
+                '--host' => $this->option('host'),
+                '--port' => $this->option('port'),
+            ]),
+            'swoole' => $this->call('swoole:start', [
                 '--host' => $this->option('host'),
                 '--port' => $this->option('port'),
             ]),

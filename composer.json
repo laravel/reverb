@@ -24,7 +24,8 @@
         "illuminate/http": "^10.0",
         "illuminate/redis": "^10.0",
         "illuminate/support": "^10.0",
-        "nesbot/carbon": "^2.64"
+        "nesbot/carbon": "^2.64",
+        "swoole/ide-helper": "~5.0.0"
     },
     "require-dev": {
         "orchestra/testbench": "^8.0",

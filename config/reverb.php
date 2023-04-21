@@ -40,6 +40,18 @@ return [
             ],
         ],
 
+        'swoole' => [
+            'host' => env('REVERB_SWOOLE_HOST', '127.0.0.1'),
+            'port' => env('REVERB_SWOOLE_PORT', 8080),
+            'connection_manager' => [
+                'prefix' => env('REVERB_SWOOLE_CONNECTION_CACHE_PREFIX', 'reverb'),
+            ],
+            'publish_events' => [
+                'enabled' => env('REVERB_SWOOLE_SCALING_ENABLED', false),
+                'channel' => env('REVERB_SWOOLE_SCALING_CHANNEL', 'reverb'),
+            ],
+        ],
+
         'api_gateway' => [
             'region' => env('REVERB_API_GATEWAY_REGION', 'us-east-1'),
             'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
