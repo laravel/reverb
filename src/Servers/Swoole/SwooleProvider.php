@@ -53,7 +53,7 @@ class SwooleProvider extends ServerProvider
      */
     public function publish(array $payload): void
     {
-        // TODO: Implement publish() method.
+        // @TODO
     }
 
     /**
@@ -61,7 +61,7 @@ class SwooleProvider extends ServerProvider
      */
     public function subscribe(LoopInterface $loop)
     {
-        // Implement subscribe() method.
+        // @TODO
     }
 
     /**
