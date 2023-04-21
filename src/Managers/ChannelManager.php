@@ -48,7 +48,7 @@ class ChannelManager implements ChannelManagerInterface
     {
         $this->mutex(function () use ($channel, $connection, $data) {
             $connections = $this->connectionKeys($channel)
-            ->put($connection->identifier(), $data);
+                ->put($connection->identifier(), $data);
 
             $this->syncConnections($channel, $connections);
         });

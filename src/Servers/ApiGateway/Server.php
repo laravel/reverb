@@ -55,15 +55,15 @@ class Server
     protected function connect(Request $request): Connection
     {
         return $this->connections
-                ->for($application = $this->application($request))
-                ->resolve(
+            ->for($application = $this->application($request))
+            ->resolve(
+                $request->connectionId(),
+                fn () => new Connection(
                     $request->connectionId(),
-                    fn () => new Connection(
-                        $request->connectionId(),
-                        $application,
-                        $request->headers['origin'] ?? null
-                    )
-                );
+                    $application,
+                    $request->headers['origin'] ?? null
+                )
+            );
     }
 
     /**

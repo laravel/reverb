@@ -82,15 +82,15 @@ class Server implements MessageComponentInterface
         $application = $this->application($connection);
 
         return $this->connections
-                ->for($application)
-                ->resolve(
-                    $connection->resourceId,
-                    fn () => new Connection(
-                        $connection,
-                        $application,
-                        $connection->httpRequest->getHeader('Origin')[0] ?? null
-                    )
-                );
+            ->for($application)
+            ->resolve(
+                $connection->resourceId,
+                fn () => new Connection(
+                    $connection,
+                    $application,
+                    $connection->httpRequest->getHeader('Origin')[0] ?? null
+                )
+            );
     }
 
     /**

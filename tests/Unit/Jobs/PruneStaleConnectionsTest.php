@@ -31,8 +31,8 @@ it('cleans up stale connections', function () {
         $connection->setHasBeenPinged();
 
         $this->channelManager->shouldReceive('unsubscribeFromAll')
-                ->once()
-                ->with($connection);
+            ->once()
+            ->with($connection);
     });
 
     (new PruneStaleConnections)->handle(
