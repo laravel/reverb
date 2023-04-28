@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Loggers;
 
+use Illuminate\Support\Facades\Log;
 use Laravel\Reverb\Contracts\Logger;
 
 class StandardLogger implements Logger
@@ -17,7 +18,7 @@ class StandardLogger implements Logger
             $output .= ': '.$message;
         }
 
-        fwrite(STDOUT, $output.PHP_EOL);
+        Log::info($output);
     }
 
     /**
@@ -25,7 +26,7 @@ class StandardLogger implements Logger
      */
     public function error(string $string): void
     {
-        fwrite(STDERR, $string.PHP_EOL);
+        Log::error($string);
     }
 
     /**
@@ -49,6 +50,6 @@ class StandardLogger implements Logger
 
         $message = json_encode($message, JSON_PRETTY_PRINT);
 
-        fwrite(STDOUT, $message.PHP_EOL);
+        Log::info($message);
     }
 }
