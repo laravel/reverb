@@ -10,7 +10,7 @@ class Connections extends Collection
     /**
      * Find a connection in the collection.
      */
-    public function find(string $identifier): Connection|null
+    public function find(string $identifier): ?Connection
     {
         if (! $connection = parent::get($identifier)) {
             return null;

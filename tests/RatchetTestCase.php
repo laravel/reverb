@@ -11,15 +11,16 @@ use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\Servers\Ratchet\Factory;
-use function Ratchet\Client\connect;
 use Ratchet\Client\WebSocket;
-use function React\Async\await;
 use React\Async\SimpleFiber;
 use React\EventLoop\Factory as LoopFactory;
 use React\Http\Browser;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use ReflectionObject;
+
+use function Ratchet\Client\connect;
+use function React\Async\await;
 
 class RatchetTestCase extends TestCase
 {
@@ -158,7 +159,7 @@ class RatchetTestCase extends TestCase
     /**
      * Send a message to the connected client.
      */
-    public function send(array $message, ?WebSocket $connection = null): string
+    public function send(array $message, WebSocket $connection = null): string
     {
         $promise = new Deferred;
 
@@ -191,11 +192,8 @@ class RatchetTestCase extends TestCase
 
     /**
      * Subscribe to a channel.
-     *
-     * @param  array  $data
-     * @param  string  $auth
      */
-    public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?WebSocket $connection = null): string
+    public function subscribe(string $channel, ?array $data = [], string $auth = null, WebSocket $connection = null): string
     {
         $data = ! empty($data) ? json_encode($data) : null;
 

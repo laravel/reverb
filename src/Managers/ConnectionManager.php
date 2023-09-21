@@ -34,7 +34,7 @@ class ConnectionManager implements ConnectionManagerInterface
     /**
      * Get the application instance.
      */
-    public function app(): Application|null
+    public function app(): ?Application
     {
         return $this->application;
     }
@@ -54,7 +54,7 @@ class ConnectionManager implements ConnectionManagerInterface
     /**
      * Attempt to find a connection from the manager.
      */
-    public function reconnect(string $identifier): Connection|null
+    public function reconnect(string $identifier): ?Connection
     {
         if ($connection = $this->find($identifier)) {
             return $connection->touch();

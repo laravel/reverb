@@ -94,7 +94,6 @@ class ApiGatewayTestCase extends TestCase
     /**
      * Send a message to the connected client.
      *
-     * @param  string  $connectionId
      * @param  string  $appKey
      */
     public function send(array $message, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
@@ -116,11 +115,9 @@ class ApiGatewayTestCase extends TestCase
     /**
      * Subscribe to a channel.
      *
-     * @param  array  $data
-     * @param  string  $connectionId
      * @param  string  $appKey
      */
-    public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
+    public function subscribe(string $channel, ?array $data = [], string $auth = null, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
     {
         $data = ! empty($data) ? json_encode($data) : null;
 
@@ -161,10 +158,9 @@ class ApiGatewayTestCase extends TestCase
     /**
      * Assert a message was sent to the given connection.
      *
-     * @param  mixed  $message
      * @return void
      */
-    public function assertSent(string $connectionId = null, mixed $message = null, ?int $times = null)
+    public function assertSent(string $connectionId = null, mixed $message = null, int $times = null)
     {
         Bus::assertDispatched(SendToConnection::class, function ($job) use ($connectionId, $message) {
             return ($connectionId ? $job->connectionId === $connectionId : true)

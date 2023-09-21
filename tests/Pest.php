@@ -31,10 +31,8 @@ function connections(int $count = 1, $serializable = false): Connections
 
 /**
  * Generate a valid Pusher authentication signature.
- *
- * @param  string  $data
  */
-function validAuth(ReverbConnection $connection, string $channel, ?string $data = null): string
+function validAuth(ReverbConnection $connection, string $channel, string $data = null): string
 {
     $signature = "{$connection->id()}:{$channel}";
 

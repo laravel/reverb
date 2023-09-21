@@ -83,7 +83,7 @@ class Server
     /**
      * Get the application instance for the request.
      */
-    protected function application(Request $request): Application|null
+    protected function application(Request $request): ?Application
     {
         parse_str($request->serverVariables['QUERY_STRING'], $queryString);
 

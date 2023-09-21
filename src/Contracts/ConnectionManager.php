@@ -12,7 +12,7 @@ interface ConnectionManager
     /**
      * Get the application instance.
      */
-    public function app(): Application|null;
+    public function app(): ?Application;
 
     /**
      * The application the channel manager should be scoped to.
@@ -27,7 +27,7 @@ interface ConnectionManager
     /**
      * Attempt to find a connection from the manager.
      */
-    public function reconnect(string $identifier): Connection|null;
+    public function reconnect(string $identifier): ?Connection;
 
     /**
      * Remove a connection from the manager.
@@ -42,7 +42,7 @@ interface ConnectionManager
     /**
      * Find a connection by its identifier.
      */
-    public function find(string $identifier): Connection|null;
+    public function find(string $identifier): ?Connection;
 
     /**
      * Get all of the connections from the cache.
