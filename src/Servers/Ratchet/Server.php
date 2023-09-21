@@ -74,8 +74,6 @@ class Server implements MessageComponentInterface
 
     /**
      * Get a Reverb connection from a Ratchet connection.
-     *
-     * @return \Laravel\Reverb\Servers\Ratchet\Connection
      */
     protected function connection(ConnectionInterface $connection): Connection
     {

@@ -27,7 +27,7 @@ class Channel
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
+    public function subscribe(Connection $connection, string $auth = null, string $data = null): void
     {
         App::make(ChannelManager::class)
             ->for($connection->app())

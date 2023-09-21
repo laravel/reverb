@@ -12,7 +12,7 @@ class PresenceChannel extends PrivateChannel
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
+    public function subscribe(Connection $connection, string $auth = null, string $data = null): void
     {
         parent::subscribe($connection, $auth, $data);
 

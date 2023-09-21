@@ -42,7 +42,7 @@ class PusherEvent
     /**
      * Subscribe to the given channel.
      */
-    public static function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
+    public static function subscribe(Connection $connection, string $channel, string $auth = null, string $data = null): void
     {
         $channel = ChannelBroker::create($channel);
 
@@ -99,7 +99,7 @@ class PusherEvent
     /**
      * Format the payload for the given event.
      */
-    public static function formatPayload(string $event, array $data = [], ?string $channel = null, string $prefix = 'pusher:'): string|false
+    public static function formatPayload(string $event, array $data = [], string $channel = null, string $prefix = 'pusher:'): string|false
     {
         return json_encode(
             array_filter([

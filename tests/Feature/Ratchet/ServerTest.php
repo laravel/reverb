@@ -10,10 +10,11 @@ use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\RatchetTestCase;
+use React\Promise\Deferred;
+
 use function Ratchet\Client\connect;
 use function React\Async\await;
 use function React\Promise\all;
-use React\Promise\Deferred;
 
 uses(RatchetTestCase::class);
 

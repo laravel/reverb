@@ -59,7 +59,7 @@ abstract class Connection
     /**
      * Get the origin of the connection.
      */
-    public function origin(): string|null
+    public function origin(): ?string
     {
         return $this->origin;
     }

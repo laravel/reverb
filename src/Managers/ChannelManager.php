@@ -36,7 +36,7 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the application instance.
      */
-    public function app(): Application|null
+    public function app(): ?Application
     {
         return $this->application;
     }

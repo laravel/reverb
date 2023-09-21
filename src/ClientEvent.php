@@ -9,7 +9,7 @@ class ClientEvent
     /**
      * Handle a pusher event.
      */
-    public static function handle(Connection $connection, array $event): ClientEvent|null
+    public static function handle(Connection $connection, array $event): ?ClientEvent
     {
         if (! Str::startsWith($event['event'], 'client-')) {
             return null;

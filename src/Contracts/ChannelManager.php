@@ -13,7 +13,7 @@ interface ChannelManager
     /**
      * Get the application instance.
      */
-    public function app(): Application|null;
+    public function app(): ?Application;
 
     /**
      * The application the channel manager should be scoped to.
