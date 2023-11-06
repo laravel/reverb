@@ -20,10 +20,11 @@ class StatsController implements HttpServerInterface
 
         tap($conn)->send(new JsonResponse((object) [
             'connections' => App::make(ConnectionManager::class)->for($app)->all()->count(),
-            'channels' => App::make(ChannelManager::class)->for($app)->all()->map(function ($channel) {
+            'channels' => App::make(ChannelManager::class)->for($app)->all()->map(function ($channel) use ($app) {
                 return [
                     'name' => $channel->name(),
                     'connections' => App::make(ChannelManager::class)
+                        ->for($app)
                         ->connectionKeys($channel)
                         ->count(),
                 ];
