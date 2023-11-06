@@ -11,6 +11,8 @@ trait EnsuresIntegrity
      */
     protected function mutex(Closure $callback, $timeout = 10): mixed
     {
+        return $callback();
+        
         if (! property_exists($this, 'repository')) {
             return $callback();
         }
