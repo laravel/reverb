@@ -15,14 +15,14 @@ interface ApplicationProvider
     public function all(): Collection;
 
     /**
-     * Find an application instance by ID.
+     * Find an application instance by key.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
     public function findByKey(string $key): Application;
 
     /**
-     * Find an application instance by key.
+     * Find an application instance by ID.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */

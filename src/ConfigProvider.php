@@ -25,7 +25,7 @@ class ConfigProvider implements ApplicationProvider
     }
 
     /**
-     * Find an application instance by ID.
+     * Find an application instance by key.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
@@ -35,7 +35,7 @@ class ConfigProvider implements ApplicationProvider
     }
 
     /**
-     * Find an application instance by key.
+     * Find an application instance by ID.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
