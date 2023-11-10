@@ -22,21 +22,23 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', LoopInterface $loop = null): IoServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', LoopInterface $loop = null)
     {
         $loop = $loop ?: Loop::get();
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
-        $app = new Router(
-            new UrlMatcher(static::routes(), new RequestContext)
-        );
 
-        return new IoServer(
-            new HttpServer($app),
-            $socket,
-            $loop
-        );
+
+        // $app = new Router(
+        //     new UrlMatcher(static::routes(), new RequestContext)
+        // );
+
+        // return new IoServer(
+        //     new HttpServer($app),
+        //     $socket,
+        //     $loop
+        // );
     }
 
     /**
