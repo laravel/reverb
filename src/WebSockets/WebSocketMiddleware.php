@@ -67,9 +67,8 @@ class WebSocketMiddleware
     {
         return app(ConnectionManager::class)
             ->for($app = $this->application($request))
-            ->resolve(
-                $connection->resourceId,
-                fn () => new Connection(
+            ->connect(
+                new Connection(
                     $connection,
                     $app,
                     $this->origin($request)
