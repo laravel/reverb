@@ -7,7 +7,7 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Loggers\StandardLogger;
+use Laravel\Reverb\Loggers\NullLogger;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -57,6 +57,6 @@ class ServiceProvider extends BaseServiceProvider
             fn () => $server->buildChannelManager()
         );
 
-        $this->app->instance(Logger::class, new StandardLogger);
+        $this->app->instance(Logger::class, new NullLogger);
     }
 }
