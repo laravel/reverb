@@ -3,7 +3,6 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Laravel\Reverb\Console\Commands\StartServer;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\Logger;
@@ -17,12 +16,6 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                StartServer::class,
-            ]);
-        }
-
         $this->publishes([
             __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
         ]);

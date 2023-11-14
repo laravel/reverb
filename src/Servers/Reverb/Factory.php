@@ -1,16 +1,15 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Ratchet;
+namespace Laravel\Reverb\Servers\Reverb;
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
-use Laravel\Reverb\Http\Middleware\WebSocketMiddleware;
 use Laravel\Reverb\Server;
+use Laravel\Reverb\WebSockets\WebSocketMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
-use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Http\HttpServer;
@@ -56,23 +55,13 @@ class Factory
     /**
      * Generate the routes required to handle Pusher requests.
      */
-    protected static function routes(): RouteCollection
-    {
-        $routes = new RouteCollection();
-        $routes->add('sockets', new Route('/app/{appId}', ['_controller' => static::handler()], [], [], null, [], ['GET']));
-        $routes->add('events', new Route('/apps/{appId}/events', ['_controller' => EventController::class], [], [], null, [], ['POST']));
-        $routes->add('stats', new Route('/stats', ['_controller' => StatsController::class], [], [], null, [], ['GET']));
+    // protected static function routes(): RouteCollection
+    // {
+    //     $routes = new RouteCollection();
+    //     $routes->add('sockets', new Route('/app/{appId}', ['_controller' => static::handler()], [], [], null, [], ['GET']));
+    //     $routes->add('events', new Route('/apps/{appId}/events', ['_controller' => EventController::class], [], [], null, [], ['POST']));
+    //     $routes->add('stats', new Route('/stats', ['_controller' => StatsController::class], [], [], null, [], ['GET']));
 
-        return $routes;
-    }
-
-    /**
-     * Build the WebSocket server.
-     */
-    protected static function handler(): WsServer
-    {
-        return new WsServer(
-            App::make(Server::class)
-        );
-    }
+    //     return $routes;
+    // }
 }

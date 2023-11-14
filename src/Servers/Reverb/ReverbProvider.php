@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Ratchet;
+namespace Laravel\Reverb\Servers\Reverb;
 
 use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
@@ -13,10 +13,10 @@ use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Managers\ChannelManager;
 use Laravel\Reverb\Managers\ConnectionManager;
-use Laravel\Reverb\Servers\Ratchet\Console\Commands\StartServer;
+use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 
-class RatchetProvider extends ServerProvider
+class ReverbProvider extends ServerProvider
 {
     use InteractsWithAsyncRedis;
 

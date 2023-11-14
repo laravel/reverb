@@ -5,7 +5,7 @@ namespace Laravel\Reverb;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Manager;
 use Laravel\Reverb\Servers\ApiGateway\ApiGatewayProvider;
-use Laravel\Reverb\Servers\Ratchet\RatchetProvider;
+use Laravel\Reverb\Servers\Reverb\ReverbProvider;
 
 class ServerManager extends Manager
 {
@@ -19,17 +19,17 @@ class ServerManager extends Manager
      */
     public function getDefaultDriver(): string
     {
-        return $this->config->get('reverb.default', 'ratchet');
+        return $this->config->get('reverb.default', 'reverb');
     }
 
     /**
-     * Creates the Ratchet driver.
+     * Creates the Reverb driver.
      */
-    public function createRatchetDriver(): RatchetProvider
+    public function createReverbDriver(): ReverbProvider
     {
-        return new RatchetProvider(
+        return new ReverbProvider(
             $this->app,
-            $this->config->get('reverb.servers.ratchet', [])
+            $this->config->get('reverb.servers.reverb', [])
         );
     }
 

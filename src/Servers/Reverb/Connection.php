@@ -1,15 +1,13 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Ratchet;
+namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
-use Laravel\Reverb\Connection as BaseConnection;
-use Laravel\Reverb\Output;
-use Ratchet\ConnectionInterface;
-use Throwable;
+use Laravel\Reverb\Connection as ReverbConnection;
+use Laravel\Reverb\WebSockets\WsConnection;
 
-class Connection extends BaseConnection
+class Connection extends ReverbConnection
 {
     use GeneratesPusherIdentifiers;
 
@@ -20,11 +18,10 @@ class Connection extends BaseConnection
      */
     protected $id;
 
-    public function __construct(
-        protected ConnectionInterface $connection,
-        protected Application $application,
-        protected ?string $origin
-    ) {
+    protected $buffer;
+
+    public function __construct(protected WsConnection $connection, Application $application, string $origin = null)
+    {
         parent::__construct($application, $origin);
     }
 
@@ -49,11 +46,11 @@ class Connection extends BaseConnection
     }
 
     /**
-     * Get the origin of the connection.
+     * Create a new connection instance.
      */
-    public function origin(): string
+    public static function make(WsConnection $connection, Application $application, string $origin): Connection
     {
-        return $this->origin;
+        return new static($connection, $application, $origin);
     }
 
     /**
@@ -61,15 +58,7 @@ class Connection extends BaseConnection
      */
     public function send(string $message): void
     {
-        try {
-            $this->connection->send($message);
-
-            Output::info('Message Sent', $this->id());
-            Output::message($message);
-        } catch (Throwable $e) {
-            Output::error('Unable to send message.');
-            Output::info($e->getMessage());
-        }
+        $this->connection->send($message);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Ratchet\Console\Commands;
+namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 
 use Illuminate\Console\Command;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
@@ -9,7 +9,7 @@ use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Output;
-use Laravel\Reverb\Servers\Ratchet\Factory as ServerFactory;
+use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 
@@ -22,7 +22,7 @@ class StartServer extends Command
      *
      * @var string
      */
-    protected $signature = 'ratchet:start
+    protected $signature = 'reverb:start
                 {--host=}
                 {--port=}';
 
@@ -31,16 +31,14 @@ class StartServer extends Command
      *
      * @var string
      */
-    protected $description = 'Start the Ratchet Reverb server';
+    protected $description = 'Start the Reverb server';
 
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        $this->laravel->instance(Logger::class, new CliLogger($this->output));
-
-        $config = $this->laravel['config']['reverb.servers.ratchet'];
+        $config = $this->laravel['config']['reverb.servers.reverb'];
         $host = $this->option('host') ?: $config['host'];
         $port = $this->option('port') ?: $config['port'];
 

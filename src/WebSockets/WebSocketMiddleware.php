@@ -1,13 +1,13 @@
 <?php
 
-namespace Laravel\Reverb\Http\Middleware;
+namespace Laravel\Reverb\WebSockets;
 
 use Closure;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server;
-use Laravel\Reverb\WebSockets\Connection;
+use Laravel\Reverb\Servers\Reverb\Connection;
 use Laravel\Reverb\WebSockets\Request as WebSocketRequest;
 use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\ServerRequestInterface;
@@ -60,7 +60,7 @@ class WebSocketMiddleware
     }
 
     /**
-     * Get a Reverb connection from a Ratchet connection.
+     * Get a Reverb connection from a WebSocket connection.
      */
     protected function connection(ServerRequestInterface $request, WsConnection $connection): Connection
     {
