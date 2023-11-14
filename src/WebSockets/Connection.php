@@ -2,15 +2,9 @@
 
 namespace Laravel\Reverb\WebSockets;
 
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Connection as ReverbConnection;
-use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Server;
-use Ratchet\RFC6455\Messaging\CloseFrameChecker;
-use Ratchet\RFC6455\Messaging\Message;
-use Ratchet\RFC6455\Messaging\MessageBuffer;
 
 class Connection extends ReverbConnection
 {
@@ -28,25 +22,6 @@ class Connection extends ReverbConnection
     public function __construct(protected WsConnection $connection, Application $application, string $origin = null)
     {
         parent::__construct($application, $origin);
-
-        $this->buffer = new MessageBuffer(
-            new CloseFrameChecker,
-            onMessage: function (Message $message) {
-                App::make(Server::class)->message($this, $message->getPayload());
-            },
-            sender: [$connection->stream, 'write']
-        );
-
-        App::make(ConnectionManager::class)->for($application)->resolve(
-            $connection->resourceId,
-            fn () => $this
-        );
-        
-        App::make(Server::class)->open($this);
-        $connection->stream->on('data', [$this->buffer, 'onData']);
-        $connection->stream->on('close', function () {
-            App::make(Server::class)->close($this);
-        });
     }
 
     /**
@@ -69,18 +44,27 @@ class Connection extends ReverbConnection
         return $this->id;
     }
 
-    public static function make(WsConnection $connection, $application, $origin)
+    /**
+     * Create a new connection instance.
+     */
+    public static function make(WsConnection $connection, Application $application, string $origin): Connection
     {
         return new static($connection, $application, $origin);
     }
 
+    /**
+     * Send a message to the connection.
+     */
     public function send(string $message): void
     {
-        $this->buffer->sendMessage($message);
+        $this->connection->send($message);
     }
 
+    /**
+     * Terminate a connection.
+     */
     public function terminate(): void
     {
-        $this->connection->stream->close();
+        $this->connection->close();
     }
 }

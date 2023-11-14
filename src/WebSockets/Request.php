@@ -2,8 +2,6 @@
 
 namespace Laravel\Reverb\WebSockets;
 
-use Illuminate\Support\Facades\App;
-use Laravel\Reverb\Contracts\ApplicationProvider;
 use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
@@ -15,62 +13,48 @@ class Request
 {
     protected $connection;
 
+    protected $input;
+
+    protected $output;
+
+    protected $stream;
+
+    protected $response;
+
     public function __construct(protected ServerRequestInterface $request)
     {
-
-    }
-
-    public function isWebSocketRequest()
-    {
-        $upgrade = $this->request->getHeader('Upgrade')[0] ?? null;
-
-        return $upgrade === 'websocket';
-    }
-
-    public function negotiate()
-    {
         $negotiator = new ServerNegotiator(new RequestVerifier);
-        $response = $negotiator->handshake($this->request);
+        $this->response = $negotiator->handshake($this->request);
+        $this->input = new ThroughStream;
+        $this->output = new ThroughStream;
+        $this->stream = new CompositeStream($this->input, $this->output);
+    }
 
-        if ($response->getStatusCode() != '101') {
-            return false;
-        }
+    /**
+     * Determine whether thee request is a WebSocket request.
+     */
+    public function isWebSocketRequest(): bool
+    {
+        return $this->response->getStatusCode() === 101;
+    }
 
-        $inStream = new ThroughStream();
-        $outStream = new ThroughStream();
-
-        $this->connect($inStream, $outStream);
-
+    /**
+     * Generate the response to the WebSocket request.
+     */
+    public function respond(): Response
+    {
         return new Response(
-            $response->getStatusCode(),
-            $response->getHeaders(),
-            new CompositeStream($outStream, $inStream)
+            $this->response->getStatusCode(),
+            $this->response->getHeaders(),
+            new CompositeStream($this->output, $this->input)
         );
     }
 
-    public function connect($inStream, $outStream)
+    /**
+     * Generate a WebSocket connection from the request.
+     */
+    public function connect(): WsConnection
     {
-        return $this->connection = Connection::make(
-            new WsConnection(new CompositeStream($inStream, $outStream)),
-            $this->application(),
-            $this->origin(),
-        );
-    }
-
-    public function connection()
-    {
-        return $this->connection;
-    }
-
-    protected function application()
-    {
-        parse_str($this->request->getUri()->getQuery(), $queryString);
-
-        return App::make(ApplicationProvider::class)->findByKey($queryString['appId']);
-    }
-
-    protected function origin()
-    {
-        return $this->request->getHeader('Origin')[0] ?? null;
+        return new WsConnection($this->stream);
     }
 }
