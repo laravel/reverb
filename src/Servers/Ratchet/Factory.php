@@ -3,17 +3,19 @@
 namespace Laravel\Reverb\Servers\Ratchet;
 
 use Illuminate\Support\Facades\App;
+use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
-use Ratchet\Http\HttpServer;
-use Ratchet\Http\Router;
-use Ratchet\Server\IoServer;
+use Laravel\Reverb\Http\Middleware\WebSocketMiddleware;
+use Laravel\Reverb\Server;
+use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
+use React\Http\HttpServer;
+use React\Http\Message\Response;
 use React\Socket\SocketServer;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -28,17 +30,27 @@ class Factory
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
+        $server = new HttpServer(
+            $loop,
+            new WebSocketMiddleware(App::make(Server::class)),
+            function (ServerRequestInterface $request) {
+                $payload = json_decode($request->getBody()->getContents(), true);
+                parse_str($request->getUri()->getQuery(), $queryString);
 
+                $app = app(ApplicationProvider::class)->findById($queryString['appId']);
 
-        // $app = new Router(
-        //     new UrlMatcher(static::routes(), new RequestContext)
-        // );
+                Event::dispatch($app, [
+                    'event' => $payload['name'],
+                    'channel' => $payload['channel'],
+                    'data' => $payload['data'],
+                ]);
 
-        // return new IoServer(
-        //     new HttpServer($app),
-        //     $socket,
-        //     $loop
-        // );
+                return Response::json([]);
+            }
+        );
+
+        $server->listen($socket);
+        $loop->run();
     }
 
     /**

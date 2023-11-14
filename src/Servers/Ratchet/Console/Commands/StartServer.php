@@ -50,11 +50,9 @@ class StartServer extends Command
         $this->subscribeToRedis($loop);
         $this->scheduleCleanup($loop);
 
-        $server = ServerFactory::make($host, $port, $loop);
-
         $this->components->info("Starting server on {$host}:{$port}");
 
-        $server->run();
+        ServerFactory::make($host, $port, $loop);
     }
 
     /**
