@@ -17,7 +17,7 @@ class WsConnection extends EventEmitter
 
     public function __construct(public DuplexStreamInterface $stream)
     {
-        $this->resourceId = (string) Str::uuid();
+        $this->resourceId = Str::random();
 
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,
