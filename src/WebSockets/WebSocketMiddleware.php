@@ -12,6 +12,7 @@ use Laravel\Reverb\WebSockets\Request as WebSocketRequest;
 use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
+use Illuminate\Support\Str;
 
 class WebSocketMiddleware
 {
@@ -46,9 +47,9 @@ class WebSocketMiddleware
      */
     protected function application(ServerRequestInterface $request): Application
     {
-        parse_str($request->getUri()->getQuery(), $queryString);
+        $appId = Str::afterLast($request->getUri()->getPath(), '/');
 
-        return app(ApplicationProvider::class)->findByKey($queryString['appId']);
+        return app(ApplicationProvider::class)->findByKey($appId);
     }
 
     /**

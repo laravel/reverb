@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
@@ -34,9 +35,10 @@ class Factory
             new WebSocketMiddleware(App::make(Server::class)),
             function (ServerRequestInterface $request) {
                 $payload = json_decode($request->getBody()->getContents(), true);
-                parse_str($request->getUri()->getQuery(), $queryString);
+                $appId = Str::beforeLast($request->getUri()->getPath(), '/');
+                $appId = Str::afterLast($appId, '/');
 
-                $app = app(ApplicationProvider::class)->findById($queryString['appId']);
+                $app = app(ApplicationProvider::class)->findById($appId);
 
                 Event::dispatch($app, [
                     'event' => $payload['name'],
@@ -44,7 +46,7 @@ class Factory
                     'data' => $payload['data'],
                 ]);
 
-                return Response::json([]);
+                return Response::json(['status' => 'success']);
             }
         );
 
