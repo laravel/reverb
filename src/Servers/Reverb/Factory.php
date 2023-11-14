@@ -15,6 +15,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Http\HttpServer;
 use React\Http\Message\Response;
+use React\Http\Middleware\LimitConcurrentRequestsMiddleware;
 use React\Socket\SocketServer;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -32,6 +33,7 @@ class Factory
 
         $server = new HttpServer(
             $loop,
+            new LimitConcurrentRequestsMiddleware(10000),
             new WebSocketMiddleware(App::make(Server::class)),
             function (ServerRequestInterface $request) {
                 $payload = json_decode($request->getBody()->getContents(), true);
