@@ -27,6 +27,9 @@ class Factory
      */
     public static function make(string $host = '0.0.0.0', string $port = '8080', LoopInterface $loop = null)
     {
+        set_time_limit(0);
+        ob_implicit_flush();
+        
         $loop = $loop ?: Loop::get();
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);
