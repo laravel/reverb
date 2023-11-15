@@ -3,16 +3,15 @@
 namespace Laravel\Reverb\WebSockets;
 
 use Closure;
+use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\Servers\Reverb\Connection;
 use Laravel\Reverb\WebSockets\Request as WebSocketRequest;
-use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
-use Illuminate\Support\Str;
 
 class WebSocketMiddleware
 {

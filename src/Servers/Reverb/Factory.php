@@ -17,7 +17,6 @@ use React\EventLoop\LoopInterface;
 use React\Http\HttpServer;
 use React\Http\Message\Response;
 use React\Http\Middleware\LimitConcurrentRequestsMiddleware;
-use React\Http\Middleware\RequestBodyBufferMiddleware;
 use React\Http\Middleware\StreamingRequestMiddleware;
 use React\Socket\SocketServer;
 use Symfony\Component\Routing\Route;
@@ -29,7 +28,7 @@ class Factory
      * Create a new WebSocket server instance.
      */
     public static function make(string $host = '0.0.0.0', string $port = '8080', LoopInterface $loop = null)
-    {        
+    {
         $loop = $loop ?: Loop::get();
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);

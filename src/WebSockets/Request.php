@@ -3,12 +3,10 @@
 namespace Laravel\Reverb\WebSockets;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
 use React\Http\Message\Response;
 use React\Stream\CompositeStream;
-use React\Stream\ThroughStream;
 
 class Request
 {

@@ -4,10 +4,8 @@ namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 
 use Illuminate\Console\Command;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Output;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use React\EventLoop\Loop;
