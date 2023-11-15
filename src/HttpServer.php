@@ -57,9 +57,9 @@ class HttpServer
                 $negotiator = new ServerNegotiator(new RequestVerifier);
                 $response = $negotiator->handshake($request);
 
-                $connection = new WsConnection($connection);
+                $connection->write(Message::toString($response));
 
-                $connection->send(Message::toString($response));
+                $connection = new WsConnection($connection);
 
                 $server = app(Server::class);
                 $reverbConnection = $this->connection($request, $connection);

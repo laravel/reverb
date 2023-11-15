@@ -40,7 +40,7 @@ class Conn
 
     public function send($data)
     {
-        dump($this->connection->write($data));
+        $this->connection->write($data);
 
         return $this;
     }
