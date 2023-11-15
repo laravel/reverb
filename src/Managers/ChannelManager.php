@@ -102,9 +102,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function connections(Channel $channel): Connections
     {
-        return $this->connections
-            ->for($this->application)
-            ->all()
+        return collect($this->connections->for($this->application)->all())
             ->intersectByKeys(
                 $this->connectionKeys($channel)
             );
