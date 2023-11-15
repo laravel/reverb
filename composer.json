@@ -18,6 +18,7 @@
         "php": "^8.2",
         "aws/aws-sdk-php": "^3.241",
         "clue/redis-react": "^2.6",
+        "guzzlehttp/psr7": "^2.6",
         "illuminate/cache": "^10.0",
         "illuminate/console": "^10.0",
         "illuminate/http": "^10.0",
@@ -25,7 +26,8 @@
         "illuminate/support": "^10.0",
         "nesbot/carbon": "^2.64",
         "ratchet/rfc6455": "^0.3.1",
-        "react/http": "^1.9"
+        "react/socket": "^1.14",
+        "symfony/http-foundation": "^6.3"
     },
     "require-dev": {
         "orchestra/testbench": "^8.0",
