@@ -50,7 +50,7 @@ interface ChannelManager
      *
      * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
-    public function connections(Channel $channel): Connections;
+    public function connections(Channel $channel): Collection;
 
     /**
      * Flush the channel manager repository.

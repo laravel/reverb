@@ -100,7 +100,7 @@ class ChannelManager implements ChannelManagerInterface
      *
      * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
      */
-    public function connections(Channel $channel): Connections
+    public function connections(Channel $channel): Collection
     {
         return collect($this->connections->for($this->application)->all())
             ->intersectByKeys(
