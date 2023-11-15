@@ -34,7 +34,7 @@ class HttpServer
         $connection->on('data', function ($data) use ($connection) {
             $this->handleRequest($data, $connection);
         });
-        // $conn->on('close', function () use ($conn) {
+        // $connection->on('close', function () use ($connection) {
         //     $this->handleEnd($conn);
         // });
         // $conn->on('error', function (\Exception $e) use ($conn) {
@@ -66,6 +66,7 @@ class HttpServer
                 $server->open($reverbConnection);
 
                 $connection->on('message', fn (string $message) => $server->message($reverbConnection, $message));
+                $connection->on('close', fn () => $server->close($reverbConnection));
 
                 return;
             }
