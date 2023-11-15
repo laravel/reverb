@@ -30,7 +30,7 @@ class Connection extends ReverbConnection
      */
     public function identifier(): string
     {
-        return (string) $this->connection->resourceId;
+        return (string) $this->connection->id();
     }
 
     /**

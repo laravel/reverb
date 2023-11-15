@@ -8,6 +8,7 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
+use Laravel\Reverb\HttpServer as ReverbHttpServer;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\WebSockets\WebSocketMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +18,7 @@ use React\Http\HttpServer;
 use React\Http\Message\Response;
 use React\Http\Middleware\LimitConcurrentRequestsMiddleware;
 use React\Http\Middleware\RequestBodyBufferMiddleware;
+use React\Http\Middleware\StreamingRequestMiddleware;
 use React\Socket\SocketServer;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -27,39 +29,35 @@ class Factory
      * Create a new WebSocket server instance.
      */
     public static function make(string $host = '0.0.0.0', string $port = '8080', LoopInterface $loop = null)
-    {
-        gc_enable();
-        set_time_limit(0);
-        ob_implicit_flush();
-        
+    {        
         $loop = $loop ?: Loop::get();
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
-        $server = new HttpServer(
-            $loop,
-            new LimitConcurrentRequestsMiddleware(10000),
-            new RequestBodyBufferMiddleware(2 * 1024 * 1024),
-            new WebSocketMiddleware(App::make(Server::class)),
-            function (ServerRequestInterface $request) {
-                $payload = json_decode($request->getBody()->getContents(), true);
-                $appId = Str::beforeLast($request->getUri()->getPath(), '/');
-                $appId = Str::afterLast($appId, '/');
+        return new ReverbHttpServer($socket, $loop);
 
-                $app = app(ApplicationProvider::class)->findById($appId);
+        // dump('Starting server...');
+        // $server = new HttpServer(
+        //     $loop,
+        //     new LimitConcurrentRequestsMiddleware(10000),
+        //     new StreamingRequestMiddleware(),
+        //     new WebSocketMiddleware(App::make(Server::class)),
+        //     function (ServerRequestInterface $request) {
+        //         $payload = json_decode($request->getBody()->getContents(), true);
+        //         $appId = Str::beforeLast($request->getUri()->getPath(), '/');
+        //         $appId = Str::afterLast($appId, '/');
 
-                Event::dispatch($app, [
-                    'event' => $payload['name'],
-                    'channel' => $payload['channel'],
-                    'data' => $payload['data'],
-                ]);
+        //         $app = app(ApplicationProvider::class)->findById($appId);
 
-                return Response::json(['status' => 'success']);
-            }
-        );
+        //         Event::dispatch($app, [
+        //             'event' => $payload['name'],
+        //             'channel' => $payload['channel'],
+        //             'data' => $payload['data'],
+        //         ]);
 
-        $server->listen($socket);
-        $loop->run();
+        //         return Response::json(['status' => 'success']);
+        //     }
+        // );
     }
 
     /**

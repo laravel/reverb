@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\WebSockets;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
@@ -21,13 +22,15 @@ class Request
 
     protected $response;
 
-    public function __construct(protected ServerRequestInterface $request)
+    protected $startMemory;
+
+    public function __construct(protected RequestInterface $request)
     {
+        $this->startMemory = memory_get_usage();
         $negotiator = new ServerNegotiator(new RequestVerifier);
+        dump(memory_get_usage() - $this->startMemory);
         $this->response = $negotiator->handshake($this->request);
-        $this->input = new ThroughStream;
-        $this->output = new ThroughStream;
-        $this->stream = new CompositeStream($this->input, $this->output);
+        dump(memory_get_usage() - $this->startMemory);
     }
 
     /**
@@ -55,6 +58,9 @@ class Request
      */
     public function connect(): WsConnection
     {
-        return new WsConnection($this->stream);
+        $connection = new WsConnection($this->stream);
+        dump(memory_get_usage() - $this->startMemory);
+
+        return $connection;
     }
 }

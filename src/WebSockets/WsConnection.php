@@ -3,31 +3,26 @@
 namespace Laravel\Reverb\WebSockets;
 
 use Evenement\EventEmitter;
-use Illuminate\Support\Str;
+use Laravel\Reverb\Conn;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\Message;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
-use React\Stream\DuplexStreamInterface;
 
 class WsConnection extends EventEmitter
 {
-    public string $resourceId;
-
     protected $buffer;
 
-    public function __construct(public DuplexStreamInterface $stream)
+    public function __construct(public Conn $connection)
     {
-        $this->resourceId = Str::random();
-
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,
             onMessage: fn (Message $message) => $this->emit('message', [$message->getPayload()]),
             onControl: fn () => $this->close(),
-            sender: [$stream, 'write']
+            sender: [$connection, 'write']
         );
 
-        $stream->on('data', [$this->buffer, 'onData']);
-        $stream->on('close', fn () => $this->emit('close'));
+        $connection->on('data', [$this->buffer, 'onData']);
+        $connection->on('close', fn () => $this->emit('close'));
     }
 
     /**
@@ -43,6 +38,11 @@ class WsConnection extends EventEmitter
      */
     public function close(): void
     {
-        $this->stream->close();
+        $this->connection->close();
+    }
+
+    public function id()
+    {
+        return $this->connection->id();
     }
 }
