@@ -47,21 +47,14 @@ interface ConnectionManager
     /**
      * Get all of the connections from the cache.
      *
-     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
+     * @return <int, \Laravel\Reverb\Connection>
      */
-    public function all(): Connections;
-
-    /**
-     * Synchronize the connections with the manager.
-     *
-     * @param  \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]  $connections
-     */
-    public function sync(Connections $connections): void;
+    public function all(): array;
 
     /**
      * Synchronize a connection with the manager.
      */
-    public function syncConnection(Connection $connection): void;
+    public function save(Connection $connection): void;
 
     /**
      * Flush the channel manager repository.

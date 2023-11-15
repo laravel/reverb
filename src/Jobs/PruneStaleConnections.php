@@ -19,9 +19,7 @@ class PruneStaleConnections
         app(ApplicationProvider::class)
             ->all()
             ->each(function ($application) use ($connections) {
-                $connections
-                    ->for($application)
-                    ->all()
+                collect($connections->for($application)->all())
                     ->each(function ($connection) {
                         if (! $connection->isStale()) {
                             return;

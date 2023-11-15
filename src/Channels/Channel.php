@@ -49,8 +49,6 @@ class Channel
      */
     public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
-        return;
-
         App::make(ChannelManager::class)
             ->for($app)
             ->connections($this)

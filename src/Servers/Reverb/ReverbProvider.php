@@ -99,10 +99,7 @@ class ReverbProvider extends ServerProvider
      */
     public function buildConnectionManager(): ConnectionManagerInterface
     {
-        return new ConnectionManager(
-            $this->app['cache']->store('array'),
-            $this->config['connection_manager']['prefix'] ?? 'reverb'
-        );
+        return new ConnectionManager;
     }
 
     /**
