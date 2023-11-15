@@ -22,7 +22,6 @@ class Server
      */
     public function open(Connection $connection): void
     {
-        dump('Opening connection...');
         try {
             $this->verifyOrigin($connection);
 

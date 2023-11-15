@@ -18,7 +18,7 @@ class WsConnection extends EventEmitter
             new CloseFrameChecker,
             onMessage: fn (Message $message) => $this->emit('message', [$message->getPayload()]),
             onControl: fn () => $this->close(),
-            sender: [$connection, 'write']
+            sender: [$connection, 'send']
         );
 
         $connection->on('data', [$this->buffer, 'onData']);
