@@ -73,9 +73,9 @@ class HttpServer
             $payload = json_decode($request->getBody()->getContents(), true);
 
             Event::dispatch($this->application($request), [
-                'event' => $payload['name'],
-                'channel' => $payload['channel'],
-                'data' => $payload['data'],
+                'event' => $payload['name'] ?? 'subscribe',
+                'channel' => $payload['channel'] ?? 'channel',
+                'data' => $payload['data'] ?? [],
             ]);
 
             return tap($connection)->send(new JsonResponse((object) []))->close();
