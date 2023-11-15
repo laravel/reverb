@@ -41,16 +41,11 @@ interface ChannelManager
     public function unsubscribeFromAll(Connection $connection): void;
 
     /**
-     * Get all connection keys for the given channel.
-     */
-    public function connectionKeys(Channel $channel): Collection;
-
-    /**
      * Get all connections for the given channel.
      *
-     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
+     * @return <array string, \Laravel\Reverb\Connection>
      */
-    public function connections(Channel $channel): Collection;
+    public function connections(Channel $channel): array;
 
     /**
      * Flush the channel manager repository.

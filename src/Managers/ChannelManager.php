@@ -13,11 +13,17 @@ use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
-use Laravel\Reverb\Contracts\ConnectionManager;
 
 class ChannelManager implements ChannelManagerInterface
 {
     use EnsuresIntegrity, InteractsWithApplications;
+
+    /**
+     * Connection store.
+     *
+     * @var array<string, array<string, array<string, \Laravel\Reverb\Connection>>>
+     */
+    protected $connections = [];
 
     /**
      * The appliation instance.
@@ -25,13 +31,6 @@ class ChannelManager implements ChannelManagerInterface
      * @var \Laravel\Reverb\Application
      */
     protected $application;
-
-    public function __construct(
-        protected Repository $repository,
-        protected ConnectionManager $connections,
-        protected $prefix = 'reverb'
-    ) {
-    }
 
     /**
      * Get the application instance.
@@ -46,12 +45,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
-        $this->mutex(function () use ($channel, $connection, $data) {
-            $connections = $this->connectionKeys($channel)
-                ->put($connection->identifier(), $data);
-
-            $this->syncConnections($channel, $connections);
-        });
+        $this->connections[$this->application->id()][$channel->name()][$connection->identifier()] = $connection;
     }
 
     /**
@@ -59,12 +53,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
-        $this->mutex(function () use ($channel, $connection) {
-            $connections = $this->connectionKeys($channel)
-                ->reject(fn ($data, $identifier) => (string) $identifier === $connection->identifier());
-
-            $this->syncConnections($channel, $connections);
-        });
+        unset($this->connections[$this->application->id()][$channel->name()][$connection->identifier()]);
     }
 
     /**
@@ -88,50 +77,13 @@ class ChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get all connection keys for the given channel.
-     */
-    public function connectionKeys(Channel $channel): Collection
-    {
-        return $this->channel($channel);
-    }
-
-    /**
      * Get all connections for the given channel.
      *
-     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
+     * @return <array string, \Laravel\Reverb\Connection>
      */
-    public function connections(Channel $channel): Collection
+    public function connections(Channel $channel): array
     {
-        return collect($this->connections->for($this->application)->all())
-            ->intersectByKeys(
-                $this->connectionKeys($channel)
-            );
-    }
-
-    /**
-     * Sync the connections for a channel.
-     */
-    protected function syncConnections(Channel $channel, Collection $connections): void
-    {
-        $channels = $this->channels();
-
-        $channels[$channel->name()] = $connections;
-
-        $this->repository->forever($this->key(), $channels);
-    }
-
-    /**
-     * Get the key for the channels.
-     */
-    protected function key(): string
-    {
-        $key = $this->prefix;
-
-        if ($this->application) {
-            $key .= ":{$this->application->id()}";
-        }
-
-        return $key.':channels';
+        return $this->connections[$this->application->id()][$channel->name()] ?? [];
     }
 
     /**
@@ -147,25 +99,13 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function channels(Channel $channel = null): Collection
     {
-        $channels = $this->repository->get($this->key(), []);
+        $channels = $this->connections[$this->application->id()];
 
         if ($channel) {
             return collect($channels[$channel->name()] ?? []);
         }
 
         return collect($channels ?: []);
-    }
-
-    /**
-     * Get the data stored for a connection.
-     */
-    public function data(Channel $channel, Connection $connection): array
-    {
-        if (! $data = $this->connectionKeys($channel)->get($connection->identifier())) {
-            return [];
-        }
-
-        return (array) $data;
     }
 
     /**
@@ -176,8 +116,7 @@ class ChannelManager implements ChannelManagerInterface
         App::make(ApplicationProvider::class)
             ->all()
             ->each(function (Application $application) {
-                $this->for($application);
-                $this->repository->forget($this->key());
+                $this->connections[$application->id()] = [];
             });
     }
 }

@@ -107,10 +107,6 @@ class ReverbProvider extends ServerProvider
      */
     public function buildChannelManager(): ChannelManagerInterface
     {
-        return new ChannelManager(
-            $this->app['cache']->store('array'),
-            $this->app->make(ConnectionManagerInterface::class),
-            $this->config['connection_manager']['prefix'] ?? 'reverb'
-        );
+        return new ChannelManager;
     }
 }

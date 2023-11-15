@@ -49,9 +49,7 @@ class Channel
      */
     public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
-        App::make(ChannelManager::class)
-            ->for($app)
-            ->connections($this)
+        collect(App::make(ChannelManager::class)->for($app)->connections($this))
             ->each(function ($connection) use ($payload, $except) {
                 if ($except && $except->identifier() === $connection->identifier()) {
                     return;
