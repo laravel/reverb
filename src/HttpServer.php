@@ -87,9 +87,8 @@ class HttpServer
     {
         return app(ConnectionManager::class)
             ->for($application = $this->application($request))
-            ->resolve(
-                $connection->id(),
-                fn () => new Connection(
+            ->connect(
+                new Connection(
                     $connection,
                     $application,
                     $request->getHeader('Origin')[0] ?? null
