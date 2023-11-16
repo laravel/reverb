@@ -71,7 +71,7 @@ class Server
         try {
             return Request::from($message, $connection);
         } catch (OverflowException $e) {
-            $this->close($connection, 413);
+            $this->close($connection, 413, 'Payload too large.');
         }
     }
 }
