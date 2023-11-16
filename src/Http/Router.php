@@ -43,7 +43,13 @@ class Router
             return $this->close($connection, 404, 'Not found.');
         }
 
-        return $route['_controller']($request, $connection, ...Arr::except($route, ['_controller', '_route']));
+        $response = $route['_controller']($request, $connection, ...Arr::except($route, ['_controller', '_route']));
+
+        if (! $this->isWebSocketRequest($request)) {
+            return $connection->send($response)->close();
+        }
+
+        return null;
     }
 
     /**

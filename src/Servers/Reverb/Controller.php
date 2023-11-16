@@ -14,9 +14,9 @@ class Controller
     /**
      * Invoke the Reverb WebSocket server.
      */
-    public function __invoke(RequestInterface $request, WsConnection $connection, string $key): void
+    public function __invoke(RequestInterface $request, WsConnection $connection, string $appKey): void
     {
-        $reverbConnection = $this->connection($request, $connection, $key);
+        $reverbConnection = $this->connection($request, $connection, $appKey);
 
         $server = app(Server::class);
         $server->open($reverbConnection);

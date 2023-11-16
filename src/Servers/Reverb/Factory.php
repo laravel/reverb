@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Servers\Reverb;
 use Laravel\Reverb\Http\Route;
 use Laravel\Reverb\Http\Router;
 use Laravel\Reverb\Http\Server as HttpServer;
+use Laravel\Reverb\Pusher\Http\Controllers\EventsController;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
@@ -33,7 +34,8 @@ class Factory
     {
         $routes = new RouteCollection;
 
-        $routes->add('sockets', Route::get('/app/{key}', new Controller));
+        $routes->add('sockets', Route::get('/app/{appKey}', new Controller));
+        $routes->add('events', Route::post('/apps/{appId}/events', new EventsController));
 
         return $routes;
     }
