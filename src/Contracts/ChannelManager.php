@@ -5,7 +5,6 @@ namespace Laravel\Reverb\Contracts;
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Connection;
 use Laravel\Reverb\Managers\Connections;
 
 interface ChannelManager
@@ -41,16 +40,11 @@ interface ChannelManager
     public function unsubscribeFromAll(Connection $connection): void;
 
     /**
-     * Get all connection keys for the given channel.
-     */
-    public function connectionKeys(Channel $channel): Collection;
-
-    /**
      * Get all connections for the given channel.
      *
-     * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
+     * @return <array string, \Laravel\Reverb\Connection>
      */
-    public function connections(Channel $channel): Connections;
+    public function connections(Channel $channel): array;
 
     /**
      * Flush the channel manager repository.

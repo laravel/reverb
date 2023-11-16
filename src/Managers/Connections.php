@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Managers;
 
 use Illuminate\Support\Collection;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 
 class Connections extends Collection
 {

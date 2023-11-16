@@ -18,16 +18,13 @@ class PingInactiveConnections
         app(ApplicationProvider::class)
             ->all()
             ->each(function ($application) use ($connections) {
-                $connections
-                    ->for($application)
-                    ->all()
-                    ->each(function ($connection) use ($connections) {
+                collect($connections->for($application)->all())
+                    ->each(function ($connection) {
                         if ($connection->isActive()) {
                             return;
                         }
 
                         $connection->ping();
-                        $connections->syncConnection($connection);
                     });
             });
     }

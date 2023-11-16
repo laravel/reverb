@@ -3,12 +3,11 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Laravel\Reverb\Console\Commands\StartServer;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Loggers\StandardLogger;
+use Laravel\Reverb\Loggers\NullLogger;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -17,12 +16,6 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                StartServer::class,
-            ]);
-        }
-
         $this->publishes([
             __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
         ]);
@@ -54,16 +47,16 @@ class ServiceProvider extends BaseServiceProvider
 
         $server->register();
 
-        $this->app->bind(
+        $this->app->singleton(
             ConnectionManager::class,
             fn () => $server->buildConnectionManager()
         );
 
-        $this->app->bind(
+        $this->app->singleton(
             ChannelManager::class,
             fn () => $server->buildChannelManager()
         );
 
-        $this->app->instance(Logger::class, new StandardLogger);
+        $this->app->instance(Logger::class, new NullLogger);
     }
 }

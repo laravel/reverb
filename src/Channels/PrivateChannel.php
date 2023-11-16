@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 
 class PrivateChannel extends Channel

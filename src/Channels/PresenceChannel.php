@@ -4,8 +4,8 @@ namespace Laravel\Reverb\Channels;
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\Connection;
 
 class PresenceChannel extends PrivateChannel
 {

@@ -11,10 +11,10 @@ return [
     | messages received from and when sending messages to connected
     | clients. You must specify one of the servers listed below.
     |
-    | Supported: "ratchet", "api_gateway"
+    | Supported: "reverb", "api_gateway"
     */
 
-    'default' => env('REVERB_SERVER', 'ratchet'),
+    'default' => env('REVERB_SERVER', 'reverb'),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,15 +28,15 @@ return [
 
     'servers' => [
 
-        'ratchet' => [
-            'host' => env('REVERB_RATCHET_HOST', '127.0.0.1'),
-            'port' => env('REVERB_RATCHET_PORT', 8080),
+        'reverb' => [
+            'host' => env('REVERB_HOST', '127.0.0.1'),
+            'port' => env('REVERB_PORT', 8080),
             'connection_manager' => [
-                'prefix' => env('REVERB_RATCHET_CONNECTION_CACHE_PREFIX', 'reverb'),
+                'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
             ],
             'publish_events' => [
-                'enabled' => env('REVERB_RATCHET_SCALING_ENABLED', false),
-                'channel' => env('REVERB_RATCHET_SCALING_CHANNEL', 'reverb'),
+                'enabled' => env('REVERB_SCALING_ENABLED', false),
+                'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),
             ],
         ],
 

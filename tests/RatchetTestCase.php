@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Tests;
 use Clue\React\Redis\Client;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
