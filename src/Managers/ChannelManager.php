@@ -99,6 +99,10 @@ class ChannelManager implements ChannelManagerInterface
      */
     protected function channels(Channel $channel = null): Collection
     {
+        if (! isset($this->connections[$this->application->id()])) {
+            $this->connections[$this->application->id()] = [];
+        }
+
         $channels = $this->connections[$this->application->id()];
 
         if ($channel) {
