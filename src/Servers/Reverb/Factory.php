@@ -8,7 +8,7 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Controllers\EventController;
 use Laravel\Reverb\Http\Controllers\StatsController;
-use Laravel\Reverb\HttpServer as ReverbHttpServer;
+use Laravel\Reverb\Http\Server as ReverbHttpServer;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\WebSockets\WebSocketMiddleware;
 use Psr\Http\Message\ServerRequestInterface;

@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\WebSockets;
 
 use Evenement\EventEmitter;
-use Laravel\Reverb\Conn;
+use Laravel\Reverb\Http\Connection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\Message;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
@@ -12,7 +12,7 @@ class WsConnection extends EventEmitter
 {
     protected $buffer;
 
-    public function __construct(public Conn $connection)
+    public function __construct(public Connection $connection)
     {
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,

@@ -1,11 +1,11 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Http;
 
 use BadMethodCallException;
 use React\Socket\ConnectionInterface;
 
-class Conn
+class Connection
 {
     protected $id;
 

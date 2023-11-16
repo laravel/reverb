@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Http;
 
 use GuzzleHttp\Psr7\Message;
 use Psr\Http\Message\RequestInterface;

@@ -1,11 +1,13 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Http;
 
 use GuzzleHttp\Psr7\Message;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Servers\Reverb\Connection;
+use Laravel\Reverb\Event;
+use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
@@ -16,20 +18,18 @@ use React\Socket\ConnectionInterface;
 use React\Socket\ServerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class HttpServer
+class Server
 {
-    protected $loop;
-
-    public function __construct(protected ServerInterface $socket, LoopInterface $loop = null)
+    public function __construct(protected ServerInterface $socket, protected ?LoopInterface $loop = null)
     {
-        $this->loop = $this->loop ?: Loop::get();
+        $this->loop = $loop ?: Loop::get();
 
         $socket->on('connection', $this);
     }
 
     public function __invoke(ConnectionInterface $connection)
     {
-        $connection = new Conn($connection);
+        $connection = new Connection($connection);
 
         $connection->on('data', function ($data) use ($connection) {
             $this->handleRequest($data, $connection);
@@ -42,12 +42,18 @@ class HttpServer
         // });
     }
 
-    public function start()
+    /**
+     * Start the Http server
+     */
+    public function start(): void
     {
         $this->loop->run();
     }
 
-    protected function handleRequest(string $data, Conn $connection)
+    /**
+     * Handle an incoming request.
+     */
+    protected function handleRequest(string $data, Connection $connection): mixed
     {
         if (! $connection->isInitialized()) {
             $request = Request::from($data);
@@ -68,7 +74,7 @@ class HttpServer
                 $connection->on('message', fn (string $message) => $server->message($reverbConnection, $message));
                 $connection->on('close', fn () => $server->close($reverbConnection));
 
-                return;
+                return null;
             }
 
             $payload = json_decode($request->getBody()->getContents(), true);
@@ -88,7 +94,7 @@ class HttpServer
         return app(ConnectionManager::class)
             ->for($application = $this->application($request))
             ->connect(
-                new Connection(
+                new ReverbConnection(
                     $connection,
                     $application,
                     $request->getHeader('Origin')[0] ?? null
