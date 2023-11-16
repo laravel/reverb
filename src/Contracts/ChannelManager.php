@@ -5,7 +5,6 @@ namespace Laravel\Reverb\Contracts;
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Managers\Connections;
 
 interface ChannelManager

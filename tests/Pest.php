@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\Connection as ReverbConnection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\Connection as ReverbConnection;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Tests\Connection;

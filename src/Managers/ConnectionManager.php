@@ -7,8 +7,8 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
-use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 
 class ConnectionManager implements ConnectionManagerInterface

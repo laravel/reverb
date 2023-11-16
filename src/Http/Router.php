@@ -38,7 +38,7 @@ class Router
         try {
             $route = $this->matcher->match($uri->getPath());
         } catch (MethodNotAllowedException $e) {
-            return $this->close($connection, 405, array('Allow' => $e->getAllowedMethods()));
+            return $this->close($connection, 405, ['Allow' => $e->getAllowedMethods()]);
         } catch (ResourceNotFoundException $e) {
             return $this->close($connection, 404);
         }
