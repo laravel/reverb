@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Http;
 
 use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Arr;
+use Laravel\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
@@ -14,6 +15,8 @@ use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 class Router
 {
+    use ClosesConnections;
+
     public function __construct(protected UrlMatcherInterface $matcher)
     {
     }
@@ -35,9 +38,9 @@ class Router
         try {
             $route = $this->matcher->match($uri->getPath());
         } catch (MethodNotAllowedException $e) {
-            // return $this->close($conn, 405, array('Allow' => $nae->getAllowedMethods()));
+            return $this->close($connection, 405, array('Allow' => $e->getAllowedMethods()));
         } catch (ResourceNotFoundException $e) {
-            // return $this->close($conn, 404);
+            return $this->close($connection, 404);
         }
 
         return $route['_controller']($request, $connection, ...Arr::except($route, ['_controller', '_route']));

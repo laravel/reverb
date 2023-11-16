@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Http;
 
+use GuzzleHttp\Psr7\Message;
+use Laravel\Reverb\Concerns\ClosesConnections;
 use OverflowException;
 use Psr\Http\Message\RequestInterface;
 use React\EventLoop\Loop;
@@ -11,6 +13,8 @@ use React\Socket\ServerInterface;
 
 class Server
 {
+    use ClosesConnections;
+
     public function __construct(protected ServerInterface $socket, protected Router $router, protected ?LoopInterface $loop = null)
     {
         $this->loop = $loop ?: Loop::get();
@@ -59,12 +63,15 @@ class Server
         $this->router->dispatch($request, $connection);
     }
 
+    /**
+     * Create a Psr7 request from the incoming message.
+     */
     protected function createRequest(string $message, Connection $connection): RequestInterface
     {
         try {
             return Request::from($message, $connection);
         } catch (OverflowException $e) {
-            // $connection->close(413);
+            $this->close($connection, 413);
         }
     }
 }
