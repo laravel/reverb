@@ -14,7 +14,7 @@ class Connection extends ConnectionContract
     /**
      * The normalized socket ID.
      */
-    protected string $id;
+    protected ?string $id = null;
 
     /**
      * The last time the connection was seen.
