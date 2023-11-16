@@ -5,6 +5,7 @@ namespace Laravel\Reverb;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\Connection;
 
 class PusherEvent
 {

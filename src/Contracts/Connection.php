@@ -1,12 +1,15 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Contracts;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\SerializableConnection;
+use Laravel\Reverb\Output;
+use Laravel\Reverb\PusherEvent;
 
 abstract class Connection
 {

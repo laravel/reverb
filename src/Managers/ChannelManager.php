@@ -10,7 +10,7 @@ use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\EnsuresIntegrity;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 

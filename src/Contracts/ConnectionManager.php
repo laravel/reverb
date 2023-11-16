@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Contracts;
 
 use Closure;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Managers\Connections;
 
 interface ConnectionManager

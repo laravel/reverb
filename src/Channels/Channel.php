@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Output;
 

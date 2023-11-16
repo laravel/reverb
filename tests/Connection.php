@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Tests;
 use Carbon\Carbon;
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Connection as BaseConnection;
+use Laravel\Reverb\Contracts\Connection as BaseConnection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 
 class Connection extends BaseConnection

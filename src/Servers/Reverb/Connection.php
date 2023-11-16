@@ -4,21 +4,29 @@ namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
-use Laravel\Reverb\Connection as ReverbConnection;
+use Laravel\Reverb\Contracts\Connection as ConnectionContract;
 use Laravel\Reverb\WebSockets\WsConnection;
 
-class Connection extends ReverbConnection
+class Connection extends ConnectionContract
 {
     use GeneratesPusherIdentifiers;
 
     /**
      * The normalized socket ID.
-     *
-     * @var string
      */
-    protected $id;
+    protected string $id;
 
-    protected $buffer;
+    /**
+     * The last time the connection was seen.
+     */
+    protected string $lastSeenAt;
+
+    /**
+     * Stores the ping state of the connection.
+     *
+     * @var \Carbon\Carbon
+     */
+    protected $hasBeenPinged = false;
 
     public function __construct(protected WsConnection $connection, Application $application, string $origin = null)
     {

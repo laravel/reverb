@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Tests;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\ManagerProvider;

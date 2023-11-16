@@ -4,6 +4,7 @@ namespace Laravel\Reverb;
 
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ServerProvider;
 
 class Event
