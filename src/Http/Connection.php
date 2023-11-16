@@ -7,37 +7,93 @@ use React\Socket\ConnectionInterface;
 
 class Connection
 {
-    protected $id;
+    /**
+     * Connection ID.
+     */
+    protected int $id;
 
-    protected $initilized = false;
+    /**
+     * Connection status.
+     */
+    protected bool $connected = false;
 
-    protected $buffer = '';
+    /**
+     * Connection buffer.
+     */
+    protected string $buffer = '';
 
     public function __construct(protected ConnectionInterface $connection)
     {
         $this->id = (int) $connection->stream;
     }
 
-    public function id()
+    /**
+     * Return the connection ID.
+     */
+    public function id(): int
     {
         return $this->id;
     }
 
-    public function initialize()
+    /**
+     * Mark the connection as connected.
+     */
+    public function connect(): void
     {
-        $this->initilized = true;
+        $this->connected = true;
     }
 
-    public function isInitialized()
+    /**
+     * Determine whether the connection is connected.
+     */
+    public function isConnected(): bool
     {
-        return $this->initilized;
+        return $this->connected;
     }
 
+    /**
+     * Get the HTTP message buffer.
+     */
+    public function buffer(): string
+    {
+        return $this->buffer;
+    }
+
+    /**
+     * Determine whether the connection has an HTTP message buffer set.
+     */
     public function hasBuffer()
     {
         return $this->buffer !== '';
     }
 
+    /**
+     * Return the HTTP message buffer length.
+     */
+    public function bufferLength()
+    {
+        return strlen($this->buffer);
+    }
+
+    /**
+     * Append to the HTTP message buffer.
+     */
+    public function appendToBuffer($message)
+    {
+        $this->buffer .= $message;
+    }
+
+    /**
+     * Clear the HTTP message buffer.
+     */
+    public function clearBuffer()
+    {
+        $this->buffer = '';
+    }
+
+    /**
+     * Send a message to the connection.
+     */
     public function send($data)
     {
         $this->connection->write($data);
@@ -45,6 +101,9 @@ class Connection
         return $this;
     }
 
+    /**
+     * Close the connection.
+     */
     public function close()
     {
         $this->connection->end();
@@ -52,6 +111,9 @@ class Connection
         return $this;
     }
 
+    /**
+     * Dynamically proxy method calls to the underlying connection.
+     */
     public function __call($method, $parameters)
     {
         if (! method_exists($this->connection, $method)) {

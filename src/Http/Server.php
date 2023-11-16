@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Http;
 
+use OverflowException;
+use Psr\Http\Message\RequestInterface;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
@@ -42,13 +44,27 @@ class Server
     /**
      * Handle an incoming request.
      */
-    protected function handleRequest(string $data, Connection $connection): void
+    protected function handleRequest(string $message, Connection $connection): void
     {
-        if (! $connection->isInitialized()) {
-            $request = Request::from($data);
-            $connection->initialize();
+        if ($connection->isConnected()) {
+            return;
+        }
 
-            $this->router->dispatch($request, $connection);
+        if (($request = $this->createRequest($message, $connection)) === null) {
+            return;
+        }
+
+        $connection->connect();
+
+        $this->router->dispatch($request, $connection);
+    }
+
+    protected function createRequest(string $message, Connection $connection): RequestInterface
+    {
+        try {
+            return Request::from($message, $connection);
+        } catch (OverflowException $e) {
+            // $connection->close(413);
         }
     }
 }
