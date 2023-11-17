@@ -274,6 +274,17 @@ class RatchetTestCase extends TestCase
         $this->assertSame('{}', $response->getBody()->getContents());
     }
 
+    public function request(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
+        return (new Browser($this->loop))
+            ->request(
+                $method,
+                "http://{$host}:{$port}/apps/{$appId}/{$path}",
+                [],
+                ($data) ? json_encode($data) : ''
+            );
+    }
+
     /**
      * Post a request to the server.
      */
@@ -284,12 +295,7 @@ class RatchetTestCase extends TestCase
         string $port = '8080',
         string $appId = '123456'
     ): PromiseInterface {
-        return (new Browser($this->loop))
-            ->post(
-                "http://{$host}:{$port}/apps/{$appId}/{$path}",
-                [],
-                json_encode($data)
-            );
+        return $this->request($path, 'POST', $data, $host, $port, $appId);
     }
 
     /**
@@ -309,5 +315,23 @@ class RatchetTestCase extends TestCase
         $signature = hash_hmac('sha256', $string, 'pusher-secret');
 
         return $this->postToServer("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
+    }
+
+    public function getWithSignature(
+        string $path,
+        array $data = [],
+        string $host = '0.0.0.0',
+        string $port = '8080',
+        string $appId = '123456'
+    ): PromiseInterface {
+        $hash = md5(json_encode($data));
+        $timestamp = time();
+        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $string = "POST\n/apps/{$appId}/{$path}\n$query";
+        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+
+        $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
+        
+        return $this->request("{$path}&auth_signature={$signature}", 'GET', '', $host, $port, $appId);
     }
 }

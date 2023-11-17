@@ -26,9 +26,13 @@ abstract class Controller
 
     protected $body;
 
+    protected $query;
+
     public function __invoke(RequestInterface $request, Connection $connection, ...$args)
     {
+        parse_str($request->getUri()->getQuery(), $query);
         $this->body = $request->getBody()->getContents();
+        $this->query = $query;
 
         try {
             $this->setApplication($args['appId'] ?? null);
@@ -91,9 +95,7 @@ abstract class Controller
      */
     protected function verifySignature(RequestInterface $request): void
     {
-        parse_str($request->getUri()->getQuery(), $queryParams);
-
-        $params = Arr::except($queryParams, [
+        $params = Arr::except($this->query, [
             'auth_signature', 'body_md5', 'appId', 'appKey', 'channelName',
         ]);
 
@@ -111,8 +113,8 @@ abstract class Controller
 
         $signature = hash_hmac('sha256', $signature, $this->application->secret());
 
-        if ($signature !== $queryParams['auth_signature']) {
-            // throw new HttpException(401, 'Authentication signature invalid.');
+        if ($signature !== $this->query['auth_signature']) {
+            throw new HttpException(401, 'Authentication signature invalid.');
         }
     }
 
