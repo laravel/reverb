@@ -89,7 +89,7 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel from the cache.
      */
-    protected function channel(Channel $channel): Collection
+    public function channel(Channel $channel): Collection
     {
         return $this->channels($channel);
     }
@@ -97,7 +97,7 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the channels from the cache.
      */
-    protected function channels(Channel $channel = null): Collection
+    public function channels(Channel $channel = null): Collection
     {
         if (! isset($this->connections[$this->application->id()])) {
             $this->connections[$this->application->id()] = [];
