@@ -17,6 +17,8 @@ class EventsController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
+        // @TODO Validate the request body as a JSON object in the correct format.
+        
         $payload = json_decode($this->body, true);
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
