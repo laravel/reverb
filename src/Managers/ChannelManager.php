@@ -45,7 +45,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
-        $this->connections[$this->application->id()][$channel->name()][$connection->identifier()] = $connection;
+        $this->connections[$this->application->id()][$channel->name()][$connection->id()] = $connection;
     }
 
     /**
@@ -53,7 +53,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
-        unset($this->connections[$this->application->id()][$channel->name()][$connection->identifier()]);
+        unset($this->connections[$this->application->id()][$channel->name()][$connection->id()]);
     }
 
     /**

@@ -97,7 +97,7 @@ abstract class Connection
 
         App::make(ConnectionManager::class)
             ->for($this->app())
-            ->disconnect($this->identifier());
+            ->disconnect($this->id());
 
         $this->terminate();
     }
