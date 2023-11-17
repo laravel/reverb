@@ -46,6 +46,15 @@ class Server
     }
 
     /**
+     * Stop the Http server
+     */
+    public function stop(): void
+    {
+        $this->loop->stop();
+        $this->socket->close();
+    }
+
+    /**
      * Handle an incoming request.
      */
     protected function handleRequest(string $message, Connection $connection): void

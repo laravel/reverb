@@ -34,7 +34,8 @@
         "pestphp/pest": "^2.0",
         "phpstan/phpstan": "^1.10",
         "ratchet/pawl": "^0.4.1",
-        "react/async": "^4.0"
+        "react/async": "^4.0",
+        "react/http": "^1.9"
     },
     "autoload": {
         "psr-4": {

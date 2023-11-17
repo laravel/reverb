@@ -6,9 +6,12 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 abstract class Controller
@@ -16,6 +19,10 @@ abstract class Controller
     use ClosesConnections;
 
     protected ?Application $application = null;
+
+    protected $connections;
+
+    protected $channels;
 
     protected $body;
 
@@ -25,6 +32,8 @@ abstract class Controller
 
         try {
             $this->setApplication($args['appId'] ?? null);
+            $this->setConnections();
+            $this->setChannels();
             $this->verifySignature($request);
         } catch (HttpException $e) {
             return $this->close($connection, $e->getStatusCode(), $e->getMessage());
@@ -33,14 +42,17 @@ abstract class Controller
         return $this->handle($request, $connection, ...$args);
     }
 
-    abstract public function handle(RequestInterface $request, Connection $connection, ...$args);
+    /**
+     * Handle the incoming request.
+     */
+    abstract public function handle(RequestInterface $request, Connection $connection, ...$args): Response;
 
     /**
      * Set the Reverb application instance.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function setApplication(?string $appId): Application
+    protected function setApplication(?string $appId): Application
     {
         if ($this->application) {
             return $this->application;
@@ -58,11 +70,27 @@ abstract class Controller
     }
 
     /**
+     * Set the Reverb connection manager instance.
+     */
+    protected function setConnections()
+    {
+        $this->connections = app(ConnectionManager::class)->for($this->application);
+    }
+
+    /**
+     * Set the Reverb channel manager instance.
+     */
+    protected function setChannels()
+    {
+        $this->channels = app(ChannelManager::class)->for($this->application);
+    }
+
+    /**
      * Verify the Pusher signature.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function verifySignature(RequestInterface $request): void
+    protected function verifySignature(RequestInterface $request): void
     {
         parse_str($request->getUri()->getQuery(), $queryParams);
 
@@ -92,7 +120,7 @@ abstract class Controller
     /**
      * Format the given parameters into the correct format for signature verification.
      */
-    public static function formatParams(array $params): string
+    protected static function formatParams(array $params): string
     {
         if (! is_array($params)) {
             return $params;

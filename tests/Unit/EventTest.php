@@ -25,9 +25,21 @@ it('can broadcast an event directly when publishing disabled', function () {
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $channelManager->shouldReceive('connections')->once()
-        ->andReturn(Connections::make());
+        ->andReturn([]);
 
     $this->app->bind(ChannelManager::class, fn () => $channelManager);
 
     Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channel' => 'test-channel']);
+});
+
+it('can broadcast an event for multiple channels', function () {
+    $channelManager = Mockery::mock(ChannelManager::class);
+    $channelManager->shouldReceive('for')
+        ->andReturn($channelManager);
+    $channelManager->shouldReceive('connections')->twice()
+        ->andReturn([]);
+
+    $this->app->bind(ChannelManager::class, fn () => $channelManager);
+
+    Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channels' => ['test-channel-one', 'test-channel-two']]);
 });
