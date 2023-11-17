@@ -7,7 +7,7 @@ use function React\Async\await;
 uses(RatchetTestCase::class);
 
 it('can receive and event trigger', function () {
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channel' => 'test-channel',
         'data' => ['some' => 'data'],
@@ -18,7 +18,7 @@ it('can receive and event trigger', function () {
 });
 
 it('can receive and event trigger for multiple channels', function () {
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
@@ -31,7 +31,7 @@ it('can receive and event trigger for multiple channels', function () {
 it('can return user counts when requested', function () {
     $this->subscribe('test-channel-one');
 
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
@@ -45,7 +45,7 @@ it('can return user counts when requested', function () {
 it('can return subscription counts when requested', function () {
     $this->subscribe('test-channel-two');
 
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
@@ -59,7 +59,7 @@ it('can return subscription counts when requested', function () {
 it('can return user and subscription counts when requested', function () {
     $this->subscribe('test-channel-two');
 
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
@@ -75,14 +75,14 @@ it('can ignore a subscriber', function () {
     $this->subscribe('test-channel-two', connection: $connection);
 
     $promiseOne = $this->messagePromise($connection);
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
     ]));
 
     $promiseTwo = $this->messagePromise($connection);
-    $response = await($this->postToServerWithSignature('events', [
+    $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],

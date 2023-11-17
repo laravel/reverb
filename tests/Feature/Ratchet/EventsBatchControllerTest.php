@@ -7,7 +7,7 @@ use function React\Async\await;
 uses(RatchetTestCase::class);
 
 it('can receive an event batch trigger', function () {
-    $response = await($this->postToServerWithSignature('batch_events', [[
+    $response = await($this->signedPostRequest('batch_events', [[
         'name' => 'NewEvent',
         'channel' => 'test-channel',
         'data' => ['some' => 'data'],
@@ -18,7 +18,7 @@ it('can receive an event batch trigger', function () {
 });
 
 it('can receive an event batch trigger with multiple events', function () {
-    $response = await($this->postToServerWithSignature('batch_events', [
+    $response = await($this->signedPostRequest('batch_events', [
         [
             'name' => 'NewEvent',
             'channel' => 'test-channel',
@@ -36,7 +36,7 @@ it('can receive an event batch trigger with multiple events', function () {
 });
 
 it('can receive an event batch trigger with multiple events and return info for each', function () {
-    $response = await($this->postToServerWithSignature('batch_events', [
+    $response = await($this->signedPostRequest('batch_events', [
         [
             'name' => 'NewEvent',
             'channel' => 'test-channel',
@@ -62,7 +62,7 @@ it('can receive an event batch trigger with multiple events and return info for 
 });
 
 it('can receive an event batch trigger with multiple events and return info for some', function () {
-    $response = await($this->postToServerWithSignature('batch_events', [
+    $response = await($this->signedPostRequest('batch_events', [
         [
             'name' => 'NewEvent',
             'channel' => 'test-channel',
