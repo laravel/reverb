@@ -43,7 +43,7 @@ class Factory
         $routes->add('events', Route::post('/apps/{appId}/events', new EventsController));
         $routes->add('events_batch', Route::post('/apps/{appId}/batch_events', new EventsBatchController));
         $routes->add('channels', Route::get('/apps/{appId}/channels', new ChannelsController));
-        // $routes->add('channel', Route::get('/apps/{appId}/channels/{channel}', new ChannelController));
+        $routes->add('channel', Route::get('/apps/{appId}/channels/{channel}', new ChannelController));
         // $routes->add('channel_users', Route::post('/apps/{appId}/channels/{channel}/users', new ChannelUsersController));
         // $routes->add('users_terminate', Route::post('/apps/{appId}/users/{user}/terminate_connections', new UsersTerminateController));
 
