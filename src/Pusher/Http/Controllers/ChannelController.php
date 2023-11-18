@@ -15,7 +15,7 @@ class ChannelController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        if(! $channel = $args['channel'] ?? null) {
+        if (! $channel = $args['channel'] ?? null) {
             return new JsonResponse((object) []);
         }
 

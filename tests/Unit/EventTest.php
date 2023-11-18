@@ -6,7 +6,6 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
-use Laravel\Reverb\Managers\Connections;
 
 it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('pusher-key');

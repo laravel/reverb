@@ -17,7 +17,7 @@ class EventsBatchController extends Controller
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
         // @TODO Validate the request body as a JSON array of events in the correct format and a max of 10 items.
-        
+
         $items = collect(json_decode($this->body, true));
 
         $info = $items->map(function ($item) {

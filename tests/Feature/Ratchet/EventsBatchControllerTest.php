@@ -28,7 +28,7 @@ it('can receive an event batch trigger with multiple events', function () {
             'name' => 'AnotherNewEvent',
             'channel' => 'test-channel-two',
             'data' => ['some' => ['more' => 'data']],
-        ]
+        ],
     ]));
 
     $this->assertSame(200, $response->getStatusCode());
@@ -54,7 +54,7 @@ it('can receive an event batch trigger with multiple events and return info for 
             'channel' => 'test-channel-three',
             'data' => ['some' => ['more' => 'data']],
             'info' => 'subscription_count,user_count',
-        ]
+        ],
     ]));
 
     $this->assertSame(200, $response->getStatusCode());
@@ -73,7 +73,7 @@ it('can receive an event batch trigger with multiple events and return info for 
             'name' => 'AnotherNewEvent',
             'channel' => 'test-channel-two',
             'data' => ['some' => ['more' => 'data']],
-        ]
+        ],
     ]));
 
     $this->assertSame(200, $response->getStatusCode());
