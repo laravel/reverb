@@ -15,12 +15,8 @@ class ChannelController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        if (! $channel = $args['channel'] ?? null) {
-            return new JsonResponse((object) []);
-        }
-
         $info = explode(',', $this->query['info'] ?? '');
-        $connections = $this->channels->channel(ChannelBroker::create($channel));
+        $connections = $this->channels->channel(ChannelBroker::create($args['channel']));
         $totalConnections = count($connections);
 
         return new JsonResponse((object) array_filter([
