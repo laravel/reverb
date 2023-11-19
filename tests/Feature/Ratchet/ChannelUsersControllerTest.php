@@ -12,5 +12,5 @@ it('returns an error when presence channel not provided', function () {
 })->throws(ResponseException::class);
 
 it('returns the user data', function () {
-    // 
+    //
 })->todo();

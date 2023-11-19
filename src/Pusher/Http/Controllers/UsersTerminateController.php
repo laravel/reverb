@@ -14,7 +14,7 @@ class UsersTerminateController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        if(! $connection = $this->connections->find($args['user'])) {
+        if (! $connection = $this->connections->find($args['user'])) {
             return new JsonResponse((object) [], 400);
         }
 

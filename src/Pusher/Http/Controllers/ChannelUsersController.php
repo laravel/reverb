@@ -18,7 +18,7 @@ class ChannelUsersController extends Controller
     {
         $channel = ChannelBroker::create($args['channel']);
 
-        if(! $channel instanceof PresenceChannel) {
+        if (! $channel instanceof PresenceChannel) {
             return new JsonResponse((object) [], 400);
         }
 
