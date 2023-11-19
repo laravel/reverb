@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\Connection;
@@ -33,10 +34,12 @@ class Event
      */
     public static function dispatchSynchronously(Application $app, array $payload, Connection $connection = null): void
     {
-        $channels = isset($payload['channel']) ? [$payload['channel']] : $payload['channels'];
+        $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
         foreach ($channels as $channel) {
+            unset($payload['channels']);
             $channel = ChannelBroker::create($channel);
+            $payload['channel'] = $channel->name();
 
             $channel->broadcast($app, $payload, $connection);
         }

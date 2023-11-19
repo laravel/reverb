@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Tests;
 
 use Clue\React\Redis\Client;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\Connection;
@@ -10,17 +11,19 @@ use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Loggers\NullLogger;
-use Laravel\Reverb\Servers\Ratchet\Factory;
+use Laravel\Reverb\Servers\Reverb\Factory;
 use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
-use React\EventLoop\Factory as LoopFactory;
+use React\EventLoop\Loop;
 use React\Http\Browser;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
+use React\Promise\Timer\TimeoutException;
 use ReflectionObject;
 
 use function Ratchet\Client\connect;
 use function React\Async\await;
+use function React\Promise\Timer\timeout;
 
 class RatchetTestCase extends TestCase
 {
@@ -35,7 +38,7 @@ class RatchetTestCase extends TestCase
         parent::setUp();
 
         $this->app->instance(Logger::class, new NullLogger);
-        $this->loop = LoopFactory::create();
+        $this->loop = Loop::get();
         $this->startServer();
     }
 
@@ -121,8 +124,7 @@ class RatchetTestCase extends TestCase
     public function stopServer()
     {
         if ($this->server) {
-            $this->loop->stop();
-            $this->server->socket->close();
+            $this->server->stop();
         }
     }
 
@@ -218,7 +220,7 @@ class RatchetTestCase extends TestCase
      */
     public function managedConnection(): ?Connection
     {
-        return connectionManager()->all()->last();
+        return Arr::last(connectionManager()->all());
     }
 
     /**
@@ -226,7 +228,7 @@ class RatchetTestCase extends TestCase
      *
      * @param  \Ratchet\Client\WebSocketWebSocket  $connection
      */
-    public function messagePromise(WebSocket $connection): PromiseInterface
+    public function messagePromise(WebSocket $connection)
     {
         $promise = new Deferred;
 
@@ -234,7 +236,11 @@ class RatchetTestCase extends TestCase
             $promise->resolve((string) $message);
         });
 
-        return $promise->promise();
+        return timeout($promise->promise(), 0.1, $this->loop)
+            ->then(
+                fn ($message) => $message,
+                fn (TimeoutException $error) => false
+            );
     }
 
     /**
@@ -268,21 +274,66 @@ class RatchetTestCase extends TestCase
         $this->assertSame('{}', $response->getBody()->getContents());
     }
 
+    public function request(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
+        return (new Browser($this->loop))
+            ->request(
+                $method,
+                "http://{$host}:{$port}/apps/{$appId}/{$path}",
+                [],
+                ($data) ? json_encode($data) : ''
+            );
+    }
+
+    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
+        $hash = md5(json_encode($data));
+        $timestamp = time();
+        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $string = "POST\n/apps/{$appId}/{$path}\n$query";
+        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+        $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
+
+        return $this->request("{$path}&auth_signature={$signature}", $method, $data, $host, $port, $appId);
+    }
+
     /**
      * Post a request to the server.
      */
-    public function postToServer(
+    public function postReqeust(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
+        return $this->request($path, 'POST', $data, $host, $port, $appId);
+    }
+
+    /**
+     * Post a signed request to the server.
+     */
+    public function signedPostRequest(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
+        $hash = md5(json_encode($data));
+        $timestamp = time();
+        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $string = "POST\n/apps/{$appId}/{$path}\n$query";
+        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+
+        return $this->postReqeust("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
+    }
+
+    public function getWithSignature(
         string $path,
         array $data = [],
         string $host = '0.0.0.0',
         string $port = '8080',
         string $appId = '123456'
     ): PromiseInterface {
-        return (new Browser($this->loop))
-            ->post(
-                "http://{$host}:{$port}/apps/{$appId}/{$path}",
-                [],
-                json_encode($data)
-            );
+        $hash = md5(json_encode($data));
+        $timestamp = time();
+        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $string = "POST\n/apps/{$appId}/{$path}\n$query";
+        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+
+        $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
+
+        return $this->request("{$path}&auth_signature={$signature}", 'GET', '', $host, $port, $appId);
     }
 }

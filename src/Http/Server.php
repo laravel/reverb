@@ -46,6 +46,15 @@ class Server
     }
 
     /**
+     * Stop the Http server
+     */
+    public function stop(): void
+    {
+        $this->loop->stop();
+        $this->socket->close();
+    }
+
+    /**
      * Handle an incoming request.
      */
     protected function handleRequest(string $message, Connection $connection): void
@@ -71,7 +80,7 @@ class Server
         try {
             return Request::from($message, $connection);
         } catch (OverflowException $e) {
-            $this->close($connection, 413);
+            $this->close($connection, 413, 'Payload too large.');
         }
     }
 }

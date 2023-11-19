@@ -51,11 +51,11 @@ class Channel
     {
         collect(App::make(ChannelManager::class)->for($app)->connections($this))
             ->each(function ($connection) use ($payload, $except) {
-                if ($except && $except->identifier() === $connection->identifier()) {
+                if ($except && $except->id() === $connection->id()) {
                     return;
                 }
 
-                if (isset($payload['except']) && $payload['except'] === $connection->identifier()) {
+                if (isset($payload['except']) && $payload['except'] === $connection->id()) {
                     return;
                 }
 

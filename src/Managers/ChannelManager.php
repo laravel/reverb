@@ -45,7 +45,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function subscribe(Channel $channel, Connection $connection, $data = []): void
     {
-        $this->connections[$this->application->id()][$channel->name()][$connection->identifier()] = $connection;
+        $this->connections[$this->application->id()][$channel->name()][$connection->id()] = $connection;
     }
 
     /**
@@ -53,7 +53,7 @@ class ChannelManager implements ChannelManagerInterface
      */
     public function unsubscribe(Channel $channel, Connection $connection): void
     {
-        unset($this->connections[$this->application->id()][$channel->name()][$connection->identifier()]);
+        unset($this->connections[$this->application->id()][$channel->name()][$connection->id()]);
     }
 
     /**
@@ -89,7 +89,7 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel from the cache.
      */
-    protected function channel(Channel $channel): Collection
+    public function channel(Channel $channel): Collection
     {
         return $this->channels($channel);
     }
@@ -97,8 +97,12 @@ class ChannelManager implements ChannelManagerInterface
     /**
      * Get the channels from the cache.
      */
-    protected function channels(Channel $channel = null): Collection
+    public function channels(Channel $channel = null): Collection
     {
+        if (! isset($this->connections[$this->application->id()])) {
+            $this->connections[$this->application->id()] = [];
+        }
+
         $channels = $this->connections[$this->application->id()];
 
         if ($channel) {

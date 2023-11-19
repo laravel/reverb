@@ -11,9 +11,9 @@ trait ClosesConnections
     /**
      * Close the connection.
      */
-    protected function close(Connection $connection, int $statusCode = 400, array $headers = []): void
+    protected function close(Connection $connection, int $statusCode = 400, string $message = '', array $headers = []): void
     {
-        $response = new Response($statusCode, $headers);
+        $response = new Response($statusCode, $headers, $message);
 
         $connection->send(Message::toString($response));
         $connection->close();
