@@ -73,13 +73,14 @@ it('can return user and subscription counts when requested', function () {
 it('can ignore a subscriber', function () {
     $connection = $this->connect();
     $this->subscribe('test-channel-two', connection: $connection);
-
     $promiseOne = $this->messagePromise($connection);
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
     ]));
+    expect(await($promiseOne))->toBe('{"event":"NewEvent","data":{"some":"data"},"channel":"test-channel-two"}');
+
 
     $promiseTwo = $this->messagePromise($connection);
     $response = await($this->signedPostRequest('events', [
@@ -91,6 +92,5 @@ it('can ignore a subscriber', function () {
 
     $this->assertSame(200, $response->getStatusCode());
     $this->assertSame('{}', $response->getBody()->getContents());
-    expect(await($promiseOne))->toBe('{"event":"NewEvent","data":{"some":"data"},"channel":"test-channel-two"}');
     expect(await($promiseTwo))->toBeFalse();
 });
