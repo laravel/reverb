@@ -82,8 +82,6 @@ class RatchetTestCase extends TestCase
     {
         app(ServerProvider::class)->withPublishing();
 
-        // $this->app['config']->set('reverb.servers.ratchet.publish_events.enabled', true);
-
         $this->bindRedis($this->loop);
         $this->subscribeToRedis($this->loop);
     }
@@ -264,7 +262,7 @@ class RatchetTestCase extends TestCase
      */
     public function triggerEvent(string $channel, string $event, array $data = []): void
     {
-        $response = await($this->postToServer('events', [
+        $response = await($this->signedPostRequest('events', [
             'name' => $event,
             'channel' => $channel,
             'data' => $data,

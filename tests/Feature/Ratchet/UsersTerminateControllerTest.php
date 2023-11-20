@@ -26,7 +26,7 @@ it('unsubscribes from all channels and terminates a user', function () {
 
     $connection = Arr::first($connections);
 
-    $response = await($this->signedPostRequest("users/{$connection->id()}/terminate_connections"));
+    $response = await($this->signedPostRequest("users/{$connection->identifier()}/terminate_connections"));
 
     $this->assertSame(200, $response->getStatusCode());
     $this->assertSame('{}', $response->getBody()->getContents());

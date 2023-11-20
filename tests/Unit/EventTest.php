@@ -3,7 +3,7 @@
 use Clue\React\Redis\Client;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 
@@ -20,25 +20,21 @@ it('can publish an event when enabled', function () {
 });
 
 it('can broadcast an event directly when publishing disabled', function () {
-    $channelManager = Mockery::mock(ChannelManager::class);
-    $channelManager->shouldReceive('for')
-        ->andReturn($channelManager);
-    $channelManager->shouldReceive('connections')->once()
+    $channelConnectionManager = Mockery::mock(ChannelConnectionManager::class);
+    $channelConnectionManager->shouldReceive('all')->once()
         ->andReturn([]);
 
-    $this->app->bind(ChannelManager::class, fn () => $channelManager);
+    $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 
     Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channel' => 'test-channel']);
 });
 
 it('can broadcast an event for multiple channels', function () {
-    $channelManager = Mockery::mock(ChannelManager::class);
-    $channelManager->shouldReceive('for')
-        ->andReturn($channelManager);
-    $channelManager->shouldReceive('connections')->twice()
+    $channelConnectionManager = Mockery::mock(ChannelConnectionManager::class);
+    $channelConnectionManager->shouldReceive('all')->twice()
         ->andReturn([]);
 
-    $this->app->bind(ChannelManager::class, fn () => $channelManager);
+    $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 
     Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channels' => ['test-channel-one', 'test-channel-two']]);
 });

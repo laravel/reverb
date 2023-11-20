@@ -22,6 +22,7 @@ class PruneStaleConnections
                 collect($connections->for($application)->all())
                     ->each(function ($connection) {
                         if (! $connection->isStale()) {
+                            dump('Connection is not stale', $connection->id());
                             return;
                         }
 

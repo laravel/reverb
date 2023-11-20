@@ -25,7 +25,7 @@ it('cleans up stale connections', function () {
         ->once()
         ->andReturn($connections);
 
-    $connections->each(function ($connection) use ($channel) {
+    collect($connections)->each(function ($connection) use ($channel) {
         $channel->subscribe($connection);
         $connection->setLastSeenAt(now()->subMinutes(10));
         $connection->setHasBeenPinged();

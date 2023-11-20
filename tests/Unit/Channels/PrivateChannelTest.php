@@ -1,27 +1,23 @@
 <?php
 
 use Laravel\Reverb\Channels\PrivateChannel;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
     $this->connection = new Connection();
-    $this->channelManager = Mockery::spy(ChannelManager::class);
-    $this->channelManager->shouldReceive('for')
-        ->andReturn($this->channelManager);
-    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
+    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
+    $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('can subscribe a connection to a channel', function () {
     $channel = new PrivateChannel('private-test-channel');
 
-    $this->channelManager->shouldReceive('subscribe')
+    $this->channelConnectionManager->shouldReceive('add')
         ->once()
-        ->with($channel, $this->connection, []);
-
-    $this->channelManager->shouldReceive('connectionKeys')
-        ->andReturn(collect());
+        ->with($this->connection, []);
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'private-test-channel'));
 });
@@ -29,9 +25,9 @@ it('can subscribe a connection to a channel', function () {
 it('can unsubscribe a connection from a channel', function () {
     $channel = new PrivateChannel('private-test-channel');
 
-    $this->channelManager->shouldReceive('unsubscribe')
+    $this->channelConnectionManager->shouldReceive('remove')
         ->once()
-        ->with($channel, $this->connection);
+        ->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 });
@@ -39,21 +35,21 @@ it('can unsubscribe a connection from a channel', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new PrivateChannel('test-channel');
 
-    $this->channelManager->shouldReceive('subscribe');
+    $this->channelConnectionManager->shouldReceive('add');
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast($connections->first()->app(), ['foo' => 'bar']);
+    $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar']);
 
-    $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {
     $channel = new PrivateChannel('presence-test-channel');
 
-    $this->channelManager->shouldNotReceive('subscribe');
+    $this->channelConnectionManager->shouldNotReceive('subscribe');
 
     $channel->subscribe($this->connection, 'invalid-signature');
 })->throws(ConnectionUnauthorized::class);

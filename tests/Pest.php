@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
@@ -18,15 +19,15 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
  * Create a defined number of connections.
  *
  * @param  bool  $serializable
- * @return \Laravel\Reverb\Managers\Connections|\Laravel\Reverb\Connection[]|string[]
+ * @return array<int, \Laravel\Reverb\Connection|string>
  */
-function connections(int $count = 1, $serializable = false): Connections
+function connections(int $count = 1, $serializable = false): array
 {
-    return Connections::make(range(1, $count))->map(function () use ($serializable) {
+    return Collection::make(range(1, $count))->map(function () use ($serializable) {
         return $serializable
                     ? new SerializableConnection(Uuid::uuid4())
                     : new Connection(Uuid::uuid4());
-    });
+    })->all();
 }
 
 /**

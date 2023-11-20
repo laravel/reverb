@@ -6,10 +6,6 @@ use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
     $this->connection = new Connection;
-    $this->channelManager = Mockery::spy(ChannelManager::class);
-    $this->channelManager->shouldReceive('for')
-        ->andReturn($this->channelManager);
-    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 });
 
 it('can send an acknowledgement', function () {
@@ -21,7 +17,7 @@ it('can send an acknowledgement', function () {
     $this->connection->assertSent([
         'event' => 'pusher:connection_established',
         'data' => json_encode([
-            'socket_id' => '10000.00001',
+            'socket_id' => $this->connection->id(),
             'activity_timeout' => 30,
         ]),
     ]);
