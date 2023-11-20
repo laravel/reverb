@@ -4,10 +4,8 @@ namespace Laravel\Reverb\Channels;
 
 use Exception;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Output;
 
@@ -19,7 +17,7 @@ class Channel
      * @var \Laravel\Reverb\Contracts\ChannelConnectionManager
      */
     protected $connections;
-    
+
     public function __construct(protected string $name)
     {
         $this->connections = app(ChannelConnectionManager::class);

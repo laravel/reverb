@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Arr;
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Tests\RatchetTestCase;
 use React\Http\Message\ResponseException;
 
