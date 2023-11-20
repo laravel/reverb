@@ -4,7 +4,7 @@ namespace Laravel\Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class PusherEvent
@@ -45,7 +45,9 @@ class PusherEvent
      */
     public static function subscribe(Connection $connection, string $channel, string $auth = null, string $data = null): void
     {
-        $channel = ChannelBroker::create($channel);
+        $channel = app(ChannelManager::class)
+            ->for($connection->app())
+            ->find($channel);
 
         $channel->subscribe($connection, $auth, $data);
 
@@ -57,7 +59,9 @@ class PusherEvent
      */
     public static function unsubscribe(Connection $connection, string $channel): void
     {
-        ChannelBroker::create($channel)
+        $channel = app(ChannelManager::class)
+            ->for($connection->app())
+            ->find($channel)
             ->unsubscribe($connection);
     }
 

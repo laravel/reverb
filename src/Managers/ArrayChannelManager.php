@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Managers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Contracts\ApplicationProvider;
@@ -46,6 +47,14 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
+     * Find the given channel
+     */
+    public function find(string $channel): Channel
+    {
+        return $this->channels($channel);
+    }
+
+    /**
      * Unsubscribe from all channels.
      */
     public function unsubscribeFromAll(Connection $connection): void
@@ -66,7 +75,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the channels.
      */
-    public function channels(string $channel = null): array
+    public function channels(string $channel = null): array|Channel
     {
         if (! isset($this->applications[$this->application->id()])) {
             $this->applications[$this->application->id()] = [];
@@ -75,7 +84,11 @@ class ArrayChannelManager implements ChannelManagerInterface
         $channels = $this->applications[$this->application->id()];
 
         if ($channel) {
-            return $channels[$channel] ?? ChannelBroker::create($channel);
+            if(! isset($channels[$channel])) {
+                $this->applications[$this->application->id()][$channel] = ChannelBroker::create($channel);
+            }
+
+            return $this->applications[$this->application->id()][$channel];
         }
 
         return $channels ?: [];

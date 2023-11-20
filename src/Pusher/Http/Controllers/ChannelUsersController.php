@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
@@ -16,7 +15,7 @@ class ChannelUsersController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        $channel = ChannelBroker::create($args['channel']);
+        $channel = $this->channels->find($args['channel']);
 
         if (! $channel instanceof PresenceChannel) {
             return new JsonResponse((object) [], 400);

@@ -4,7 +4,7 @@ namespace Laravel\Reverb;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
-use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ServerProvider;
 
@@ -38,7 +38,7 @@ class Event
 
         foreach ($channels as $channel) {
             unset($payload['channels']);
-            $channel = ChannelBroker::create($channel);
+            $channel = app(ChannelManager::class)->find($channel);
             $payload['channel'] = $channel->name();
 
             $channel->broadcast($app, $payload, $connection);

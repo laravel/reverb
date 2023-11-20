@@ -15,15 +15,15 @@ class ChannelsController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        $channels = $this->channels->channels();
+        $channels = $this->channels->all();
         $info = explode(',', $this->query['info'] ?? '');
 
         if (isset($this->query['filter_by_prefix'])) {
-            $channels = $channels->filter(fn ($connections, $name) => Str::startsWith($name, $this->query['filter_by_prefix']));
+            $channels = $channels->filter(fn ($channel) => Str::startsWith($channel->name(), $this->query['filter_by_prefix']));
         }
 
-        $channels = $channels->mapWithKeys(function ($connections, $name) use ($info) {
-            return [$name => array_filter(['user_count' => in_array('user_count', $info) ? count($connections) : null])];
+        $channels = $channels->mapWithKeys(function ($channel) use ($info) {
+            return [$channel->name() => array_filter(['user_count' => in_array('user_count', $info) ? count($channel->connections()) : null])];
         });
 
         return new JsonResponse((object) ['channels' => $channels]);

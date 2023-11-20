@@ -4,20 +4,12 @@ namespace Laravel\Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Exceptions\PusherException;
 
 class Server
 {
-    public function __construct(
-        protected ConnectionManager $connections,
-        protected ChannelManager $channels
-    ) {
-    }
-
     /**
      * Handle the a client connection.
      */

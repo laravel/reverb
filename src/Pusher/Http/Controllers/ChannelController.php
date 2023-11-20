@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +15,7 @@ class ChannelController extends Controller
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
         $info = explode(',', $this->query['info'] ?? '');
-        $connections = $this->channels->channel(ChannelBroker::create($args['channel']));
+        $connections = $this->channels->find($args['channel'])->connections();
         $totalConnections = count($connections);
 
         return new JsonResponse((object) array_filter([

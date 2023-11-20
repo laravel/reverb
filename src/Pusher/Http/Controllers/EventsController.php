@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
 use Illuminate\Support\Arr;
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
@@ -50,7 +49,7 @@ class EventsController extends Controller
         $info = explode(',', $info);
 
         $channels = collect($channels)->mapWithKeys(function ($channel) use ($info) {
-            $count = count($this->channels->connections(ChannelBroker::create($channel)));
+            $count = count($this->channels->find($channel)->connections());
             $info = [
                 'user_count' => in_array('user_count', $info) ? $count : null,
                 'subscription_count' => in_array('subscription_count', $info) ? $count : null,

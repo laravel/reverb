@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Output;
@@ -33,6 +34,14 @@ class Channel
     }
 
     /**
+     * Get all connections for the channel.
+     */
+    public function connections(): array
+    {
+        return $this->connections->all();
+    }
+
+    /**
      * Subscribe to the given channel.
      */
     public function subscribe(Connection $connection, string $auth = null, string $data = null): void
@@ -53,7 +62,7 @@ class Channel
      */
     public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
-        collect($this->connections->all())
+        collect($this->connections())
             ->each(function ($connection) use ($payload, $except) {
                 if ($except && $except->id() === $connection->id()) {
                     return;
