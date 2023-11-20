@@ -9,14 +9,14 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Tests\RatchetTestCase;
+use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect;
 use function React\Async\await;
 use function React\Promise\all;
 
-uses(RatchetTestCase::class);
+uses(ReverbTestCase::class);
 
 it('can handle a new connection', function () {
     $this->connect();

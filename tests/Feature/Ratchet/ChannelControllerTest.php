@@ -1,10 +1,10 @@
 <?php
 
-use Laravel\Reverb\Tests\RatchetTestCase;
+use Laravel\Reverb\Tests\ReverbTestCase;
 
 use function React\Async\await;
 
-uses(RatchetTestCase::class);
+uses(ReverbTestCase::class);
 
 it('can return data for a single channel', function () {
     $this->subscribe('test-channel-one');

@@ -1,11 +1,11 @@
 <?php
 
-use Laravel\Reverb\Tests\RatchetTestCase;
+use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Message\ResponseException;
 
 use function React\Async\await;
 
-uses(RatchetTestCase::class);
+uses(ReverbTestCase::class);
 
 it('returns an error when presence channel not provided', function () {
     await($this->signedRequest('channels/test-channel/users'));

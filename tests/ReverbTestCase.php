@@ -25,7 +25,7 @@ use function Ratchet\Client\connect;
 use function React\Async\await;
 use function React\Promise\Timer\timeout;
 
-class RatchetTestCase extends TestCase
+class ReverbTestCase extends TestCase
 {
     use InteractsWithAsyncRedis;
 

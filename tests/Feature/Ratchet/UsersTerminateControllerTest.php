@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Arr;
-use Laravel\Reverb\Tests\RatchetTestCase;
+use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Message\ResponseException;
 
 use function React\Async\await;
 
-uses(RatchetTestCase::class);
+uses(ReverbTestCase::class);
 
 it('returns an error when connection cannot be found', function () {
     await($this->signedPostRequest('channels/users/not-a-user/terminate_connections'));
