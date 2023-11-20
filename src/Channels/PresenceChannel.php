@@ -2,9 +2,6 @@
 
 namespace Laravel\Reverb\Channels;
 
-use Illuminate\Support\Facades\App;
-use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class PresenceChannel extends PrivateChannel
@@ -32,16 +29,18 @@ class PresenceChannel extends PrivateChannel
      */
     public function unsubscribe(Connection $connection): void
     {
-        $data = App::make(ChannelManager::class)
-            ->for($connection->app())
-            ->data($this, $connection);
+        if (! $subscription = $this->connections->find($connection)) {
+            parent::unsubscribe($connection);
 
-        if (isset($data['user_id'])) {
+            return;
+        }
+
+        if ($userId = $subscription->data('user_id')) {
             $this->broadcast(
                 $connection->app(),
                 [
                     'event' => 'pusher_internal:member_removed',
-                    'data' => ['user_id' => $data['user_id']],
+                    'data' => ['user_id' => $userId],
                     'channel' => $this->name(),
                 ],
                 $connection
@@ -54,16 +53,25 @@ class PresenceChannel extends PrivateChannel
     /**
      * Get the data associated with the channel.
      */
-    public function data(Application $app): array
+    public function data(): array
     {
-        $connections = App::make(ChannelManager::class)
-            ->for($app)
-            ->connectionKeys($this);
+        $connections = collect($this->connections->all())
+            ->map(fn ($connection) => $connection->data());
+
+        if ($connections->contains(fn ($connection) => ! isset($connection['user_id']))) {
+            return [
+                'presence' => [
+                    'count' => 0,
+                    'ids' => [],
+                    'hash' => [],
+                ],
+            ];
+        }
 
         return [
             'presence' => [
-                'count' => $connections->count(),
-                'ids' => $connections->map(fn ($connection) => $connection['user_id'])->toArray(),
+                'count' => $connections->count() ?? 0,
+                'ids' => $connections->map(fn ($connection) => $connection['user_id'])->all(),
                 'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
             ],
         ];

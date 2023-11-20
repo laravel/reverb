@@ -8,6 +8,7 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection as ReverbConnection;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Managers\Connections;
+use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 use Laravel\Reverb\Tests\Connection;
 use Laravel\Reverb\Tests\SerializableConnection;
 use Laravel\Reverb\Tests\TestCase;
@@ -21,12 +22,15 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
  * @param  bool  $serializable
  * @return array<int, \Laravel\Reverb\Connection|string>
  */
-function connections(int $count = 1, $serializable = false): array
+function connections(int $count = 1, array $data = [], $serializable = false): array
 {
-    return Collection::make(range(1, $count))->map(function () use ($serializable) {
-        return $serializable
-                    ? new SerializableConnection(Uuid::uuid4())
-                    : new Connection(Uuid::uuid4());
+    return Collection::make(range(1, $count))->map(function () use ($data, $serializable) {
+        return new ChannelConnection(
+            $serializable
+                ? new SerializableConnection(Uuid::uuid4())
+                : new Connection(Uuid::uuid4()),
+            $data
+        );
     })->all();
 }
 

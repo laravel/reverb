@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
@@ -63,7 +63,7 @@ it('can subscribe to a presence channel', function () {
 
     expect(Str::contains($response, 'pusher_internal:subscription_succeeded'))->toBeTrue();
     expect(Str::contains($response, '"hash\":{\"1\":{\"name\":\"Test User\"}}'))->toBeTrue();
-})->todo();
+});
 
 it('can notify other subscribers of a presence channel when a new member joins', function () {
     $connectionOne = $this->connect();
@@ -82,7 +82,7 @@ it('can notify other subscribers of a presence channel when a new member joins',
 
     expect(await($promiseOne))->toBe('{"event":"pusher_internal:member_added","data":{"user_id":2,"user_info":{"name":"Test User 2"}},"channel":"presence-test-channel"}');
     expect(await($promiseTwo))->toBe('{"event":"pusher_internal:member_added","data":{"user_id":3,"user_info":{"name":"Test User 3"}},"channel":"presence-test-channel"}');
-})->todo();
+});
 
 it('can notify other subscribers of a presence channel when a member leaves', function () {
     $connectionOne = $this->connect();
@@ -109,7 +109,7 @@ it('can notify other subscribers of a presence channel when a member leaves', fu
 
     expect(await($promiseThree))->toBe('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
     expect(await($promiseFour))->toBe('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
-})->todo();
+});
 
 it('can receive a message broadcast from the server', function () {
     $connectionOne = $this->connect();
@@ -147,7 +147,7 @@ it('can handle an event', function () {
     );
 
     expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
-})->todo();
+});
 
 it('can respond to a ping', function () {
     $connection = $this->connect();
@@ -231,13 +231,13 @@ it('can subscribe a connection to multiple channels', function () {
     expect(connectionManager()->all())->toHaveCount(1);
     expect(channelManager()->all())->toHaveCount(4);
 
-    $connection = connectionManager()->all()[0];
+    $connection = Arr::first(connectionManager()->all());
 
     channelManager()->all()->each(function ($channel) use ($connection) {
         expect($channel->connections())->toHaveCount(1);
-        expect(channelManager()->connectionKeys($channel)->map(fn ($conn, $index) => (string) $index))->toContain($connection->identifier());
+        expect(collect($channel->connections())->map(fn ($conn, $index) => (string) $index))->toContain($connection->identifier());
     });
-})->todo();
+});
 
 it('can subscribe multiple connections to multiple channels', function () {
     $connection = $this->connect();
@@ -253,11 +253,11 @@ it('can subscribe multiple connections to multiple channels', function () {
     expect(connectionManager()->all())->toHaveCount(2);
     expect(channelManager()->all())->toHaveCount(4);
 
-    expect(channelManager()->connectionKeys(ChannelBroker::create('test-channel')))->toHaveCount(2);
-    expect(channelManager()->connectionKeys(ChannelBroker::create('test-channel-2')))->toHaveCount(1);
-    expect(channelManager()->connectionKeys(ChannelBroker::create('private-test-channel-3')))->toHaveCount(2);
-    expect(channelManager()->connectionKeys(ChannelBroker::create('presence-test-channel-4')))->toHaveCount(1);
-})->todo();
+    expect(channelManager()->find('test-channel')->connections())->toHaveCount(2);
+    expect(channelManager()->find('test-channel-2')->connections())->toHaveCount(1);
+    expect(channelManager()->find('private-test-channel-3')->connections())->toHaveCount(2);
+    expect(channelManager()->find('presence-test-channel-4')->connections())->toHaveCount(1);
+});
 
 it('fails to subscribe to a private channel with invalid auth signature', function () {
     $response = $this->subscribe('private-test-channel', auth: 'invalid-signature');
@@ -303,8 +303,8 @@ it('can publish and subscribe to a triggered event', function () {
         ['foo' => 'bar']
     );
 
-    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","channel":"presence-test-channel","data":{"foo":"bar"}}');
-})->todo();
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
+});
 
 it('can publish and subscribe to a client whisper', function () {
     $this->usingRedis();

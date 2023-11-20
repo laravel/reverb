@@ -4,6 +4,7 @@ use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
@@ -22,7 +23,7 @@ it('can subscribe a connection to a channel', function () {
         ->andReturn([]);
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
-})->todo();
+});
 
 it('can unsubscribe a connection from a channel', function () {
     $channel = new PresenceChannel('presence-test-channel');
@@ -32,21 +33,21 @@ it('can unsubscribe a connection from a channel', function () {
         ->with($this->connection);
 
     $channel->unsubscribe($this->connection);
-})->todo();
+});
 
 it('can broadcast to all connections of a channel', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
     $this->channelConnectionManager->shouldReceive('subscribe');
 
-    $this->channelConnectionManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections = connections(3));
 
     $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar']);
 
-    $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
-})->todo();
+    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+});
 
 it('fails to subscribe if the signature is invalid', function () {
     $channel = new PresenceChannel('presence-test-channel');
@@ -59,15 +60,12 @@ it('fails to subscribe if the signature is invalid', function () {
 it('can return data stored on the connection', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
-    $connections = connections(2)
-        ->map(fn ($connection, $index) => [
-            'user_info' => [
-                'name' => 'Joe',
-            ],
-            'user_id' => $index + 1,
-        ]);
+    $connections = [
+        connections(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1])[0],
+        connections(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 2])[0],
+    ];
 
-    $this->channelConnectionManager->shouldReceive('connectionKeys')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections);
 
@@ -81,36 +79,36 @@ it('can return data stored on the connection', function () {
             ],
         ],
     ]);
-})->todo();
+});
 
 it('sends notification of subscription', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('subscribe')
+    $this->channelConnectionManager->shouldReceive('add')
         ->once()
-        ->with($channel, $this->connection, []);
+        ->with($this->connection, []);
 
-    $this->channelConnectionManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->andReturn($connections = connections(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
 
-    $connections->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_added',
         'data' => [],
         'channel' => 'presence-test-channel',
     ]));
-})->todo();
+});
 
 it('sends notification of subscription with data', function () {
     $channel = new PresenceChannel('presence-test-channel');
     $data = json_encode(['name' => 'Joe']);
 
-    $this->channelConnectionManager->shouldReceive('subscribe')
+    $this->channelConnectionManager->shouldReceive('add')
         ->once()
-        ->with($channel, $this->connection, ['name' => 'Joe']);
+        ->with($this->connection, ['name' => 'Joe']);
 
-    $this->channelConnectionManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->andReturn($connections = connections(3));
 
     $channel->subscribe(
@@ -123,30 +121,42 @@ it('sends notification of subscription with data', function () {
         $data
     );
 
-    $connections->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_added',
         'data' => ['name' => 'Joe'],
         'channel' => 'presence-test-channel',
     ]));
-})->todo();
+});
 
 it('sends notification of an unsubscribe', function () {
     $channel = new PresenceChannel('presence-test-channel');
-    $connection = $connection = connections(1)->first();
+    $data = json_encode(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
 
-    $this->channelConnectionManager->shouldReceive('data')
-        ->andReturn(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
+    $channel->subscribe(
+        $this->connection,
+        validAuth(
+            $this->connection,
+            'presence-test-channel',
+            $data
+        ),
+        $data
+    );
 
-    $this->channelConnectionManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('find')
+        ->andReturn(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
+
+    $this->channelConnectionManager->shouldReceive('all')
         ->andReturn($connections = connections(3));
 
-    $this->channelConnectionManager->shouldReceive('unsubscribe');
+    $this->channelConnectionManager->shouldReceive('remove')
+        ->once()
+        ->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 
-    $connections->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_removed',
         'data' => ['user_id' => 1],
         'channel' => 'presence-test-channel',
     ]));
-})->todo();
+});

@@ -56,17 +56,25 @@ class Channel
     }
 
     /**
+     * Determine if the connection is subscribed to the channel.
+     */
+    public function subscribed(Connection $connection): bool
+    {
+        return $this->connections->find($connection) !== null;
+    }
+
+    /**
      * Send a message to all connections subscribed to the channel.
      */
     public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
         collect($this->connections())
             ->each(function ($connection) use ($payload, $except) {
-                if ($except && $except->identifier() === $connection->identifier()) {
+                if ($except && $except->identifier() === $connection->connection()->identifier()) {
                     return;
                 }
 
-                if (isset($payload['except']) && $payload['except'] === $connection->identifier()) {
+                if (isset($payload['except']) && $payload['except'] === $connection->connection()->identifier()) {
                     return;
                 }
 
@@ -86,7 +94,7 @@ class Channel
     /**
      * Get the data associated with the channel.
      */
-    public function data(Application $app): array
+    public function data(): array
     {
         return [];
     }

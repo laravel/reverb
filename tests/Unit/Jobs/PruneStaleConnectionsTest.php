@@ -26,13 +26,13 @@ it('cleans up stale connections', function () {
         ->andReturn($connections);
 
     collect($connections)->each(function ($connection) use ($channel) {
-        $channel->subscribe($connection);
+        $channel->subscribe($connection->connection());
         $connection->setLastSeenAt(now()->subMinutes(10));
         $connection->setHasBeenPinged();
 
         $this->channelManager->shouldReceive('unsubscribeFromAll')
             ->once()
-            ->with($connection);
+            ->with($connection->connection());
     });
 
     (new PruneStaleConnections)->handle(

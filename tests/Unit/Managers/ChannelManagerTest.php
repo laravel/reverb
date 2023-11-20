@@ -15,16 +15,16 @@ beforeEach(function () {
 
 it('can subscribe to a channel', function () {
     collect(connections(5))
-        ->each(fn ($connection) => $this->channel->subscribe($connection));
+        ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
     expect($this->channel->connections())->toHaveCount(5);
 });
 
 it('can unsubscribe from a channel', function () {
     $connections = collect(connections(5))
-        ->each(fn ($connection) => $this->channel->subscribe($connection));
+        ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
-    $this->channel->unsubscribe($connections->first());
+    $this->channel->unsubscribe($connections->first()->connection());
 
     expect($this->channel->connections())->toHaveCount(4);
 });
@@ -42,10 +42,10 @@ it('can get all channels', function () {
 
 it('can get all connections subscribed to a channel', function () {
     $connections = collect(connections(5))
-        ->each(fn ($connection) => $this->channel->subscribe($connection));
+        ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
     $connections->each(fn ($connection) => expect($connection->identifier())
-        ->toBeIn(collect($this->channel->connections())->pluck('identifier')->all()));
+        ->toBeIn(array_keys($this->channel->connections())));
 });
 
 it('can unsubscribe a connection for all channels', function () {
@@ -61,17 +61,15 @@ it('can unsubscribe a connection for all channels', function () {
 });
 
 it('can get the data for a connection subscribed to a channel', function () {
-    collect(connections(5))->each(fn ($connection) => $this->channelManager->subscribe(
-        $this->channel,
-        $connection,
-        ['name' => 'Joe']
+    collect(connections(5))->each(fn ($connection) => $this->channel->subscribe(
+        $connection->connection(),
+        data: json_encode(['name' => 'Joe'])
     ));
 
-    $this->channelManager->connectionKeys($this->channel)->values()->each(function ($data) {
-        expect($data)
-            ->toBe(['name' => 'Joe']);
+    collect($this->channel->connections())->each(function ($connection) {
+        expect($connection->data())->toBe(['name' => 'Joe']);
     });
-})->todo();
+});
 
 it('can get all connections for all channels', function () {
     $connections = connections(12);
@@ -83,19 +81,19 @@ it('can get all connections for all channels', function () {
     $connections = collect($connections)->split(3);
 
     $connections->first()->each(function ($connection) use ($channelOne, $channelTwo, $channelThree) {
-        $channelOne->subscribe($connection);
-        $channelTwo->subscribe($connection);
-        $channelThree->subscribe($connection);
+        $channelOne->subscribe($connection->connection());
+        $channelTwo->subscribe($connection->connection());
+        $channelThree->subscribe($connection->connection());
     });
 
     $connections->get(1)->each(function ($connection) use ($channelTwo, $channelThree) {
-        $channelTwo->subscribe($connection);
+        $channelTwo->subscribe($connection->connection());
 
-        $channelThree->subscribe($connection);
+        $channelThree->subscribe($connection->connection());
     });
 
     $connections->last()->each(function ($connection) use ($channelThree) {
-        $channelThree->subscribe($connection);
+        $channelThree->subscribe($connection->connection());
     });
 
     expect($channelOne->connections())->toHaveCount(4);

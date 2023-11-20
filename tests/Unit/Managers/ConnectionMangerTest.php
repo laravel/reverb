@@ -52,7 +52,7 @@ it('can disconnect a connection', function () {
 
 it('can get all connections', function () {
     $connections = collect(connections(10));
-    $connections->each(fn ($connection) => $this->connectionManager->save($connection));
+    $connections->each(fn ($connection) => $this->connectionManager->save($connection->connection()));
 
     expect($this->connectionManager->all())
         ->toHaveCount(10);

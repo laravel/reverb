@@ -51,7 +51,7 @@ class Event
 
         $channel->subscribe($connection, $auth, $data);
 
-        self::sendInternally($connection, 'subscription_succeeded', $channel->name(), $channel->data($connection->app()));
+        self::sendInternally($connection, 'subscription_succeeded', $channel->name(), $channel->data());
     }
 
     /**

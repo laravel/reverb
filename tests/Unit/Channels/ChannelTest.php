@@ -54,7 +54,7 @@ it('does not broadcast to the connection sending the message', function () {
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar'], $connections[0]);
+    $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar'], $connections[0]->connection());
 
     $connections[0]->assertNothingSent();
     collect(array_slice($connections, -2))->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));

@@ -21,6 +21,11 @@ class ChannelUsersController extends Controller
             return new JsonResponse((object) [], 400);
         }
 
-        return new JsonResponse((object) []);
+        $connections = collect($channel->connections())
+            ->map(fn ($connection) => $connection->data())
+            ->map(fn ($data) => ['id' => $data['user_id']])
+            ->values();
+
+        return new JsonResponse((object) ['users' => $connections]);
     }
 }
