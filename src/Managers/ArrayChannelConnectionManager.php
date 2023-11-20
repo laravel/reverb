@@ -4,22 +4,23 @@ namespace Laravel\Reverb\Managers;
 
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 
 class ArrayChannelConnectionManager implements ChannelConnectionManager
 {
     /**
      * Connection store.
      *
-     * @var array<string, array<string, \Laravel\Reverb\Connection>>
+     * @var array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
     protected $connections = [];
 
     /**
      * Add a connection.
      */
-    public function add(Connection $connection): void
+    public function add(Connection $connection, array $data): void
     {
-        $this->connections[$connection->identifier()] = $connection;
+        $this->connections[$connection->identifier()] = new ChannelConnection($connection, $data);
     }
 
     /**

@@ -7,7 +7,7 @@ interface ChannelConnectionManager
     /**
      * Add a connection.
      */
-    public function add(Connection $connection): void;
+    public function add(Connection $connection, array $data): void;
 
     /**
      * Remove a connection.
@@ -16,6 +16,7 @@ interface ChannelConnectionManager
 
     /**
      * Get all the connections.
+     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
     public function all(): array;
 
