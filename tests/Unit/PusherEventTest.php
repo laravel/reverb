@@ -1,6 +1,5 @@
 <?php
 
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\PusherEvent;
 use Laravel\Reverb\Tests\Connection;
 

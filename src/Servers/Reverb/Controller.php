@@ -17,7 +17,7 @@ class Controller
      */
     public function __invoke(RequestInterface $request, WsConnection $connection, string $appKey): void
     {
-        if(!$reverbConnection = $this->connection($request, $connection, $appKey)) {
+        if (! $reverbConnection = $this->connection($request, $connection, $appKey)) {
             return;
         }
 
@@ -37,6 +37,7 @@ class Controller
             $application = app(ApplicationProvider::class)->findByKey($key);
         } catch (InvalidApplication $e) {
             $connection->send('{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
+
             return $connection->close();
         }
 

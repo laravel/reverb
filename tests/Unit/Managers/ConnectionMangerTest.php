@@ -1,9 +1,7 @@
 <?php
 
 use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Tests\Connection;
-use Laravel\Reverb\Tests\SerializableConnection;
 
 beforeEach(function () {
     $this->connection = new Connection;
