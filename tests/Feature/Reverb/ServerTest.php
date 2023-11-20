@@ -126,12 +126,12 @@ it('can receive a message broadcast from the server', function () {
 
     $this->triggerEvent(
         'test-channel',
-        'TestEvent',
+        'App\\Events\\TestEvent',
         ['foo' => 'bar']
     );
 
     foreach (await(all([$promiseOne, $promiseTwo, $promiseThree])) as $response) {
-        expect($response)->toBe('{"event":"TestEvent","data":{"foo":"bar"},"channel":"test-channel"}');
+        expect($response)->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"test-channel"}');
     }
 });
 
@@ -142,11 +142,11 @@ it('can handle an event', function () {
 
     $this->triggerEvent(
         'presence-test-channel',
-        'TestEvent',
+        'App\\Events\\TestEvent',
         ['foo' => 'bar']
     );
 
-    expect(await($promise))->toBe('{"event":"TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
 });
 
 it('can respond to a ping', function () {
@@ -299,11 +299,11 @@ it('can publish and subscribe to a triggered event', function () {
 
     $this->triggerEvent(
         'presence-test-channel',
-        'TestEvent',
+        'App\\Events\\TestEvent',
         ['foo' => 'bar']
     );
 
-    expect(await($promise))->toBe('{"event":"TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
 });
 
 it('can publish and subscribe to a client whisper', function () {
