@@ -1,7 +1,6 @@
 <?php
 
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\Tests\Connection;
 use Laravel\Reverb\Tests\TestCase;
@@ -199,8 +198,10 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
-    $this->channelManager->shouldReceive('connections')->andReturn(Connections::make());
-    $this->channelManager->shouldReceive('connectionKeys')->andReturn(collect());
+    $channelManager = Mockery::spy(ChannelManager::class);
+    $channelManager->shouldReceive('for')
+        ->andReturn($channelManager);
+    $this->app->singleton(ChannelManager::class, fn () => $channelManager);
 
     $this->server->message(
         $connection = new Connection,
@@ -214,10 +215,10 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
 
     $this->server->close($connection);
 
-    $this->channelManager->shouldHaveReceived('unsubscribeFromAll')
+    $channelManager->shouldHaveReceived('unsubscribeFromAll')
         ->once()
         ->with($connection);
-})->todo();
+});
 
 it('it rejects a connection from an invalid origin', function () {
     $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
