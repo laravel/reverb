@@ -13,7 +13,7 @@ use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Managers\ArrayChannelManager;
 use Laravel\Reverb\Managers\ChannelManager;
-use Laravel\Reverb\Managers\ConnectionManager;
+use Laravel\Reverb\Managers\ArrayConnectionManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 
@@ -100,7 +100,7 @@ class ReverbProvider extends ServerProvider
      */
     public function buildConnectionManager(): ConnectionManagerInterface
     {
-        return new ConnectionManager;
+        return new ArrayConnectionManager;
     }
 
     /**
