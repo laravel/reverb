@@ -55,6 +55,11 @@ class Channel
         $this->connections->remove($connection);
     }
 
+    public function subscribed(Connection $connection): bool
+    {
+        return $this->connections->find($connection);
+    }
+
     /**
      * Send a message to all connections subscribed to the channel.
      */

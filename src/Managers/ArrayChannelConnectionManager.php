@@ -32,6 +32,14 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
+     * Find a connection by its identifier.
+     */
+    public function find(Connection $connection): ?ChannelConnection
+    {
+        return $this->connections[$connection->identifier()] ?? null;
+    }
+
+    /**
      * Get all the connections.
      */
     public function all(): array

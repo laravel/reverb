@@ -22,13 +22,14 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
  * @param  bool  $serializable
  * @return array<int, \Laravel\Reverb\Connection|string>
  */
-function connections(int $count = 1, $serializable = false): array
+function connections(int $count = 1, array $data = [], $serializable = false): array
 {
-    return Collection::make(range(1, $count))->map(function () use ($serializable) {
+    return Collection::make(range(1, $count))->map(function () use ($data, $serializable) {
         return new ChannelConnection(
-                $serializable
-                    ? new SerializableConnection(Uuid::uuid4())
-                    : new Connection(Uuid::uuid4())
+            $serializable
+                ? new SerializableConnection(Uuid::uuid4())
+                : new Connection(Uuid::uuid4()),
+            $data
         );
     })->all();
 }

@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb;
 
+use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\Connection;
 
 class ChannelConnection
@@ -22,8 +23,12 @@ class ChannelConnection
     /**
      * Get the connection data.
      */
-    public function data(): array
+    public function data(string $key = null): mixed
     {
+        if ($key) {
+            return Arr::get($this->data, $key);
+        }
+
         return $this->data;
     }
 
