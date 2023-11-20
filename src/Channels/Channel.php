@@ -65,6 +65,7 @@ class Channel
      */
     public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
+        dump($except ? $except->identifier() : 'No ID');
         collect($this->connections())
             ->each(function ($connection) use ($payload, $except) {
                 if ($except && $except->identifier() === $connection->connection()->identifier()) {
