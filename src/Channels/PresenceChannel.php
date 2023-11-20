@@ -54,14 +54,24 @@ class PresenceChannel extends PrivateChannel
     /**
      * Get the data associated with the channel.
      */
-    public function data(Application $app): array
+    public function data(): array
     {
         $connections = collect($this->connections->all())
             ->map(fn ($connection) => $connection->data());
 
+        if ($connections->contains(fn ($connection) => ! isset($connection['user_id']))) {
+            return [
+                'presence' => [
+                    'count' => 0,
+                    'ids' => [],
+                    'hash' => [],
+                ],
+            ];
+        }
+
         return [
             'presence' => [
-                'count' => $connections->count(),
+                'count' => $connections->count() ?? 0,
                 'ids' => $connections->map(fn ($connection) => $connection['user_id'])->all(),
                 'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
             ],

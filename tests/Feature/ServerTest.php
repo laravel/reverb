@@ -118,7 +118,7 @@ it('can subscribe a user to a private channel', function () {
             'event' => 'pusher:subscribe',
             'data' => [
                 'channel' => 'private-test-channel',
-                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:private-test-channel', 'pusher-secret'),
+                'auth' => 'app-key:'.hash_hmac('sha256', $connection->id().':private-test-channel', 'pusher-secret'),
             ],
         ]));
 
@@ -126,18 +126,16 @@ it('can subscribe a user to a private channel', function () {
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'private-test-channel',
     ]);
-})->todo();
+});
 
 it('can subscribe a user to a presence channel', function () {
-    $this->channelManager->shouldReceive('connections')->andReturn(Connections::make());
-    $this->channelManager->shouldReceive('connectionKeys')->andReturn(collect());
     $this->server->message(
         $connection = new Connection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
                 'channel' => 'presence-test-channel',
-                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:presence-test-channel', 'pusher-secret'),
+                'auth' => 'app-key:'.hash_hmac('sha256', $connection->id().':presence-test-channel', 'pusher-secret'),
             ],
         ]));
 
@@ -152,7 +150,7 @@ it('can subscribe a user to a presence channel', function () {
         ]),
         'channel' => 'presence-test-channel',
     ]);
-})->todo();
+});
 
 it('unsubscribes a user from a channel on disconnection', function () {
     $channelManager = Mockery::spy(ChannelManager::class);

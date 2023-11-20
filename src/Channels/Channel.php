@@ -91,7 +91,7 @@ class Channel
     /**
      * Get the data associated with the channel.
      */
-    public function data(Application $app): array
+    public function data(): array
     {
         return [];
     }
