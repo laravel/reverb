@@ -61,17 +61,15 @@ it('can unsubscribe a connection for all channels', function () {
 });
 
 it('can get the data for a connection subscribed to a channel', function () {
-    collect(connections(5))->each(fn ($connection) => $this->channelManager->subscribe(
-        $this->channel,
-        $connection,
-        ['name' => 'Joe']
+    collect(connections(5))->each(fn ($connection) => $this->channel->subscribe(
+        $connection->connection(),
+        data: json_encode(['name' => 'Joe'])
     ));
 
-    $this->channelManager->connectionKeys($this->channel)->values()->each(function ($data) {
-        expect($data)
-            ->toBe(['name' => 'Joe']);
+    collect($this->channel->connections())->each(function ($connection) {
+        expect($connection->data())->toBe(['name' => 'Joe']);
     });
-})->todo();
+});
 
 it('can get all connections for all channels', function () {
     $connections = connections(12);
