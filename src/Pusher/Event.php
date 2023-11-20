@@ -1,13 +1,13 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Pusher;
 
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
-class PusherEvent
+class Event
 {
     /**
      * Handle a pusher event.

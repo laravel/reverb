@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Exceptions\PusherException;
+use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class Server
 {

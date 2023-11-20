@@ -1,6 +1,6 @@
 <?php
 
-use Laravel\Reverb\PusherEvent;
+use Laravel\Reverb\Pusher\Event as PusherEvent;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {

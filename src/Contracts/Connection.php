@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Output;
-use Laravel\Reverb\PusherEvent;
+use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 abstract class Connection
 {
