@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Channels;
 
-use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 
 class PresenceChannel extends PrivateChannel
