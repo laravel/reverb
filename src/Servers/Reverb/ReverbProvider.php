@@ -7,12 +7,14 @@ use Clue\React\Redis\Factory;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
-use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
+use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
-use Laravel\Reverb\Managers\ChannelManager;
-use Laravel\Reverb\Managers\ConnectionManager;
+use Laravel\Reverb\Managers\ArrayChannelConnectionManager;
+use Laravel\Reverb\Managers\ArrayChannelManager;
+use Laravel\Reverb\Managers\ArrayConnectionManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 
@@ -97,16 +99,24 @@ class ReverbProvider extends ServerProvider
     /**
      * Build the connection manager for the server.
      */
-    public function buildConnectionManager(): ConnectionManagerInterface
+    public function buildConnectionManager(): ConnectionManager
     {
-        return new ConnectionManager;
+        return new ArrayConnectionManager;
     }
 
     /**
      * Build the channel manager for the server.
      */
-    public function buildChannelManager(): ChannelManagerInterface
+    public function buildChannelManager(): ChannelManager
     {
-        return new ChannelManager;
+        return new ArrayChannelManager;
+    }
+
+    /**
+     * Build the channel manager for the server.
+     */
+    public function buildChannelConnectionManager(): ChannelConnectionManager
+    {
+        return new ArrayChannelConnectionManager;
     }
 }

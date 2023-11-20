@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Arr;
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Tests\RatchetTestCase;
 use React\Http\Message\ResponseException;
 
@@ -22,8 +21,8 @@ it('unsubscribes from all channels and terminates a user', function () {
     $this->subscribe('test-channel-two');
 
     expect($connections = connectionManager()->all())->toHaveCount(3);
-    expect(channelManager()->connections(ChannelBroker::create('test-channel-one')))->toHaveCount(2);
-    expect(channelManager()->connections(ChannelBroker::create('test-channel-two')))->toHaveCount(2);
+    expect(channelManager()->all()->get('test-channel-one')->connections())->toHaveCount(2);
+    expect(channelManager()->all()->get('test-channel-two')->connections())->toHaveCount(2);
 
     $connection = Arr::first($connections);
 
@@ -32,6 +31,6 @@ it('unsubscribes from all channels and terminates a user', function () {
     $this->assertSame(200, $response->getStatusCode());
     $this->assertSame('{}', $response->getBody()->getContents());
     expect($connections = connectionManager()->all())->toHaveCount(2);
-    expect(channelManager()->connections(ChannelBroker::create('test-channel-one')))->toHaveCount(1);
-    expect(channelManager()->connections(ChannelBroker::create('test-channel-two')))->toHaveCount(1);
+    expect(channelManager()->all()->get('test-channel-one')->connections())->toHaveCount(1);
+    expect(channelManager()->all()->get('test-channel-two')->connections())->toHaveCount(1);
 });

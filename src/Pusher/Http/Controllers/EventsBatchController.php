@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
-use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
@@ -46,7 +45,7 @@ class EventsBatchController extends Controller
     protected function getInfo(string $channel, string $info): array
     {
         $info = explode(',', $info);
-        $count = count($this->channels->connections(ChannelBroker::create($channel)));
+        $count = count($this->channels->find($channel)->connections());
         $info = [
             'user_count' => in_array('user_count', $info) ? $count : null,
             'subscription_count' => in_array('subscription_count', $info) ? $count : null,
