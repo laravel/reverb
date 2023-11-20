@@ -5,16 +5,19 @@ namespace Laravel\Reverb\Tests;
 use Carbon\Carbon;
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
 
 class Connection extends BaseConnection
 {
+    use GeneratesPusherIdentifiers;
+
     public $messages = [];
 
     public $identifier = '19c1c8e8-351b-4eb5-b6d9-6cbfc54a3446';
 
-    public $id = '10000.00001';
+    public $id;
 
     public function __construct(string $identifier = null)
     {
@@ -31,6 +34,10 @@ class Connection extends BaseConnection
 
     public function id(): string
     {
+        if (! $this->id) {
+            $this->id = $this->generateId();
+        }
+
         return $this->id;
     }
 

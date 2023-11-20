@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\WebSockets\WsConnection;
@@ -16,7 +17,9 @@ class Controller
      */
     public function __invoke(RequestInterface $request, WsConnection $connection, string $appKey): void
     {
-        $reverbConnection = $this->connection($request, $connection, $appKey);
+        if (! $reverbConnection = $this->connection($request, $connection, $appKey)) {
+            return;
+        }
 
         $server = app(Server::class);
         $server->open($reverbConnection);
@@ -28,10 +31,18 @@ class Controller
     /**
      * Get the Reverb connection instance for the request.
      */
-    protected function connection(RequestInterface $request, WsConnection $connection, string $key): ReverbConnection
+    protected function connection(RequestInterface $request, WsConnection $connection, string $key): ?ReverbConnection
     {
+        try {
+            $application = app(ApplicationProvider::class)->findByKey($key);
+        } catch (InvalidApplication $e) {
+            $connection->send('{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
+
+            return $connection->close();
+        }
+
         return app(ConnectionManager::class)
-            ->for($application = app(ApplicationProvider::class)->findByKey($key))
+            ->for($application)
             ->connect(
                 new ReverbConnection(
                     $connection,

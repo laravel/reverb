@@ -2,23 +2,21 @@
 
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
     $this->connection = new Connection();
-    $this->channelManager = Mockery::spy(ChannelManager::class);
-    $this->channelManager->shouldReceive('for')
-        ->andReturn($this->channelManager);
-    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
+    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
+    $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('can subscribe a connection to a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelManager->shouldReceive('subscribe')
+    $this->channelConnectionManager->shouldReceive('add')
         ->once()
-        ->with($channel, $this->connection, []);
+        ->with($this->connection, []);
 
     $channel->subscribe($this->connection);
 });
@@ -26,9 +24,9 @@ it('can subscribe a connection to a channel', function () {
 it('can unsubscribe a connection from a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelManager->shouldReceive('unsubscribe')
+    $this->channelConnectionManager->shouldReceive('remove')
         ->once()
-        ->with($channel, $this->connection);
+        ->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 });
@@ -36,28 +34,28 @@ it('can unsubscribe a connection from a channel', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelManager->shouldReceive('subscribe');
+    $this->channelConnectionManager->shouldReceive('add');
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections = connections(3));
 
     $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar']);
 
-    $connections->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });
 
 it('does not broadcast to the connection sending the message', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelManager->shouldReceive('subscribe');
+    $this->channelConnectionManager->shouldReceive('add');
 
-    $this->channelManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections = connections(3));
 
-    $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar'], $connections->first());
+    $channel->broadcast(app(ApplicationProvider::class)->findByKey('pusher-key'), ['foo' => 'bar'], $connections[0]);
 
-    $connections->first()->assertNothingSent();
-    $connections->take(-2)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    $connections[0]->assertNothingSent();
+    collect(array_slice($connections, -2))->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
 });

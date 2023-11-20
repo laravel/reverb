@@ -1,9 +1,7 @@
 <?php
 
 use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Tests\Connection;
-use Laravel\Reverb\Tests\SerializableConnection;
 
 beforeEach(function () {
     $this->connection = new Connection;
@@ -13,10 +11,7 @@ beforeEach(function () {
 
 it('can resolve an existing connection', function () {
     $connection = new Connection('my-connection');
-    $this->connectionManager->sync(
-        Connections::make()
-            ->put($connection->identifier(), $connection)
-    );
+    $this->connectionManager->save($connection);
 
     $connection = $this->connectionManager->resolve(
         'my-connection',
@@ -27,13 +22,10 @@ it('can resolve an existing connection', function () {
 
     expect($connection->identifier())
         ->toBe('my-connection');
-})->not->throws(Exception::class);
+});
 
 it('can resolve and store a new connection', function () {
-    $this->connectionManager->sync(
-        Connections::make()
-            ->put($this->connection->identifier(), $this->connection)
-    );
+    $this->connectionManager->save($this->connection);
 
     $connection = $this->connectionManager->resolve(
         'my-connection',
@@ -47,10 +39,7 @@ it('can resolve and store a new connection', function () {
 })->throws(Exception::class, 'Creating new connection.');
 
 it('can disconnect a connection', function () {
-    $this->connectionManager->sync(
-        Connections::make()
-            ->put($this->connection->identifier(), $this->connection)
-    );
+    $this->connectionManager->save($this->connection);
 
     expect($this->connectionManager->all())
         ->toHaveCount(1);
@@ -62,57 +51,9 @@ it('can disconnect a connection', function () {
 });
 
 it('can get all connections', function () {
-    $this->connectionManager->sync(
-        connections(10)
-            ->mapWithKeys(fn ($connection) => [$connection->identifier() => $connection])
-    );
+    $connections = collect(connections(10));
+    $connections->each(fn ($connection) => $this->connectionManager->save($connection));
 
     expect($this->connectionManager->all())
         ->toHaveCount(10);
-});
-
-it('can hydrate a serialized connection', function () {
-    $connection = serialize(new SerializableConnection('my-connection'));
-
-    $this->connectionManager->sync(
-        Connections::make()
-            ->put('my-connection', $connection)
-    );
-
-    $this->expect(
-        $this->connectionManager->resolve('my-connection', fn () => null)
-    )->toBeInstanceOf(SerializableConnection::class);
-});
-
-it('can hydrate an unserialized connection', function () {
-    $connection = new Connection('my-connection');
-
-    $this->connectionManager->sync(
-        Connections::make()
-            ->put('my-connection', $connection)
-    );
-
-    $this->expect(
-        $this->connectionManager->resolve('my-connection', fn () => null)
-    )->toBeInstanceOf(Connection::class);
-});
-
-it('can dehydrate a serialized connection', function () {
-    $this->connectionManager->resolve(
-        'my-connection',
-        fn () => new SerializableConnection('my-connection')
-    );
-
-    expect($this->connectionManager->all()->first())
-        ->toBeString();
-});
-
-it('can dehydrate an unserialized connection', function () {
-    $this->connectionManager->resolve(
-        'my-connection',
-        fn () => new Connection('my-connection')
-    );
-
-    expect($this->connectionManager->all()->get('my-connection'))
-        ->toBeInstanceOf(Connection::class);
 });

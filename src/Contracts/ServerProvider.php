@@ -61,4 +61,9 @@ abstract class ServerProvider
      * Build the channel manager for the server.
      */
     abstract public function buildChannelManager(): ChannelManager;
+
+    /**
+     * Build the channel manager for the server.
+     */
+    abstract public function buildChannelConnectionManager(): ChannelConnectionManager;
 }

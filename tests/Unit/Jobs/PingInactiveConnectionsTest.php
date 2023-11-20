@@ -19,7 +19,7 @@ it('pings inactive connections', function () {
         ->once()
         ->andReturn($connections);
 
-    $connections = $connections->each(function ($connection) use ($channel) {
+    $connections = collect($connections)->each(function ($connection) use ($channel) {
         $channel->subscribe($connection);
         $connection->setLastSeenAt(now()->subMinutes(10));
     });

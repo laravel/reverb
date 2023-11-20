@@ -103,7 +103,7 @@ class ArrayConnectionManager implements ConnectionManagerInterface
      */
     public function save(Connection $connection): void
     {
-        $this->connections[$this->application->id()][$connection->id()] = $connection;
+        $this->connections[$this->application->id()][$connection->identifier()] = $connection;
     }
 
     /**

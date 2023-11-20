@@ -33,7 +33,7 @@ class ClientEvent
     {
         Event::dispatch(
             $connection->app(),
-            $payload + ['except' => $connection->id()],
+            $payload + ['except' => $connection->identifier()],
             $connection
         );
     }

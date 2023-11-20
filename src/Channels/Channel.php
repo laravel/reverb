@@ -62,11 +62,11 @@ class Channel
     {
         collect($this->connections())
             ->each(function ($connection) use ($payload, $except) {
-                if ($except && $except->id() === $connection->id()) {
+                if ($except && $except->identifier() === $connection->identifier()) {
                     return;
                 }
 
-                if (isset($payload['except']) && $payload['except'] === $connection->id()) {
+                if (isset($payload['except']) && $payload['except'] === $connection->identifier()) {
                     return;
                 }
 

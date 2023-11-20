@@ -38,7 +38,7 @@ class Event
 
         foreach ($channels as $channel) {
             unset($payload['channels']);
-            $channel = app(ChannelManager::class)->find($channel);
+            $channel = app(ChannelManager::class)->for($app)->find($channel);
             $payload['channel'] = $channel->name();
 
             $channel->broadcast($app, $payload, $connection);

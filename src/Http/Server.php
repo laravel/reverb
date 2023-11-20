@@ -75,12 +75,14 @@ class Server
     /**
      * Create a Psr7 request from the incoming message.
      */
-    protected function createRequest(string $message, Connection $connection): RequestInterface
+    protected function createRequest(string $message, Connection $connection): ?RequestInterface
     {
         try {
-            return Request::from($message, $connection);
+            $request = Request::from($message, $connection);
         } catch (OverflowException $e) {
             $this->close($connection, 413, 'Payload too large.');
         }
+
+        return $request;
     }
 }

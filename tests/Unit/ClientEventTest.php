@@ -1,20 +1,17 @@
 <?php
 
 use Laravel\Reverb\ClientEvent;
-use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Managers\Connections;
+use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
     $this->connection = new Connection;
-    $this->channelManager = Mockery::spy(ChannelManager::class);
-    $this->channelManager->shouldReceive('for')
-        ->andReturn($this->channelManager);
-    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
+    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
+    $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('can forward a client message', function () {
-    $this->channelManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
         ->andReturn($connections = connections());
 
@@ -26,7 +23,7 @@ it('can forward a client message', function () {
         ]
     );
 
-    $connections->first()->assertSent([
+    $connections[0]->assertSent([
         'event' => 'client-test-message',
         'channel' => 'test-channel',
         'data' => ['foo' => 'bar'],
@@ -34,9 +31,9 @@ it('can forward a client message', function () {
 });
 
 it('does not forward a message to itself', function () {
-    $this->channelManager->shouldReceive('connections')
+    $this->channelConnectionManager->shouldReceive('all')
         ->once()
-        ->andReturn(Connections::make());
+        ->andReturn([$this->connection]);
 
     ClientEvent::handle(
         $this->connection, [
@@ -50,7 +47,7 @@ it('does not forward a message to itself', function () {
 });
 
 it('fails on unsupported message', function () {
-    $this->channelManager->shouldNotReceive('hydratedConnections');
+    $this->channelConnectionManager->shouldNotReceive('hydratedConnections');
 
     ClientEvent::handle(
         $this->connection, [
