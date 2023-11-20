@@ -81,7 +81,6 @@ it('can ignore a subscriber', function () {
     ]));
     expect(await($promiseOne))->toBe('{"event":"NewEvent","data":{"some":"data"},"channel":"test-channel-two"}');
 
-
     $promiseTwo = $this->messagePromise($connection);
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
