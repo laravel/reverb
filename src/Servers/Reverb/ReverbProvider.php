@@ -11,6 +11,7 @@ use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
+use Laravel\Reverb\Managers\ArrayChannelManager;
 use Laravel\Reverb\Managers\ChannelManager;
 use Laravel\Reverb\Managers\ConnectionManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
@@ -107,6 +108,6 @@ class ReverbProvider extends ServerProvider
      */
     public function buildChannelManager(): ChannelManagerInterface
     {
-        return new ChannelManager;
+        return new ArrayChannelManager;
     }
 }
