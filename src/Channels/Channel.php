@@ -12,8 +12,16 @@ use Laravel\Reverb\Output;
 
 class Channel
 {
+    /**
+     * The channel connections.
+     *
+     * @var \Laravel\Reverb\Contracts\ChannelConnectionManager
+     */
+    protected $connections;
+    
     public function __construct(protected string $name)
     {
+        $this->connections = app(ChannelConnectionManager::class);
     }
 
     /**
@@ -29,9 +37,7 @@ class Channel
      */
     public function subscribe(Connection $connection, string $auth = null, string $data = null): void
     {
-        App::make(ChannelManager::class)
-            ->for($connection->app())
-            ->subscribe($this, $connection, $data ? json_decode($data, true) : []);
+        $this->connections->add($connection, $data ? json_decode($data, true) : []);
     }
 
     /**
@@ -39,9 +45,7 @@ class Channel
      */
     public function unsubscribe(Connection $connection): void
     {
-        App::make(ChannelManager::class)
-            ->for($connection->app())
-            ->unsubscribe($this, $connection);
+        $this->connections->remove($connection);
     }
 
     /**
@@ -49,7 +53,7 @@ class Channel
      */
     public function broadcast(Application $app, array $payload, Connection $except = null): void
     {
-        collect(App::make(ChannelManager::class)->for($app)->connections($this))
+        collect($this->connections->all())
             ->each(function ($connection) use ($payload, $except) {
                 if ($except && $except->id() === $connection->id()) {
                     return;
