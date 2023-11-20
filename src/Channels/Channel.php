@@ -55,9 +55,12 @@ class Channel
         $this->connections->remove($connection);
     }
 
+    /**
+     * Determine if the connection is subscribed to the channel.
+     */
     public function subscribed(Connection $connection): bool
     {
-        return $this->connections->find($connection);
+        return $this->connections->find($connection) !== null;
     }
 
     /**
