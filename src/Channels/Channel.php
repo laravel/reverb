@@ -67,12 +67,13 @@ class Channel
     {
         dump($except ? $except->identifier() : 'No ID');
         dump($this->name());
-    dump(count($this->connections()));
+        dump(count($this->connections()));
         collect($this->connections())
             ->each(function ($connection) use ($payload, $except) {
                 dump($connection->connection()->identifier());
                 if ($except && $except->identifier() === $connection->connection()->identifier()) {
                     dump('Returning early');
+
                     return;
                 }
 
