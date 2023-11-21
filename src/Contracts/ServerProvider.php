@@ -53,11 +53,6 @@ abstract class ServerProvider
     }
 
     /**
-     * Build the connection manager for the server.
-     */
-    abstract public function buildConnectionManager(): ConnectionManager;
-
-    /**
      * Build the channel manager for the server.
      */
     abstract public function buildChannelManager(): ChannelManager;

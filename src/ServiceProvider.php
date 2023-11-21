@@ -49,11 +49,6 @@ class ServiceProvider extends BaseServiceProvider
         $server->register();
 
         $this->app->singleton(
-            ConnectionManager::class,
-            fn () => $server->buildConnectionManager()
-        );
-
-        $this->app->singleton(
             ChannelManager::class,
             fn () => $server->buildChannelManager()
         );

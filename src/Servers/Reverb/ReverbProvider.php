@@ -97,14 +97,6 @@ class ReverbProvider extends ServerProvider
     }
 
     /**
-     * Build the connection manager for the server.
-     */
-    public function buildConnectionManager(): ConnectionManager
-    {
-        return new ArrayConnectionManager;
-    }
-
-    /**
      * Build the channel manager for the server.
      */
     public function buildChannelManager(): ChannelManager
