@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Tests;
 
 use Clue\React\Redis\Client;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\Connection;

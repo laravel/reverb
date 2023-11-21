@@ -21,7 +21,7 @@ class EventsController extends Controller
         $payload = json_decode($this->body, true);
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
-        if(isset($payload['socket_id'])) {
+        if (isset($payload['socket_id'])) {
             dump($this->channels->find($channels[0])->findById($payload['socket_id']));
         }
 

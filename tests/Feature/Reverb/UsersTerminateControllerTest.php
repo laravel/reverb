@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Arr;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Message\ResponseException;
 
