@@ -19,7 +19,7 @@ class Connection extends ConnectionContract
     /**
      * The last time the connection was seen.
      */
-    protected string $lastSeenAt;
+    protected ?string $lastSeenAt = null;
 
     /**
      * Stores the ping state of the connection.

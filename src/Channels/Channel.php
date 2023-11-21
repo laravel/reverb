@@ -48,11 +48,11 @@ class Channel
     }
 
     /**
-     * Find a connection by its identifier.
+     * Find a connection by its ID.
      */
-    public function findById(string $identifier): ?Connection
+    public function findById(string $id): ?Connection
     {
-        return $this->connections->findById($identifier);
+        return $this->connections->findById($id);
     }
 
     /**
@@ -86,11 +86,11 @@ class Channel
     {
         collect($this->connections())
             ->each(function ($connection) use ($payload, $except) {
-                if ($except && $except->identifier() === $connection->connection()->identifier()) {
+                if ($except && $except->id() === $connection->connection()->id()) {
                     return;
                 }
 
-                if (isset($payload['except']) && $payload['except'] === $connection->connection()->identifier()) {
+                if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
                     return;
                 }
 

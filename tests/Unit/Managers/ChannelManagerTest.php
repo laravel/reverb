@@ -41,7 +41,7 @@ it('can get all connections subscribed to a channel', function () {
     $connections = collect(connections(5))
         ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
-    $connections->each(fn ($connection) => expect($connection->identifier())
+    $connections->each(fn ($connection) => expect($connection->id())
         ->toBeIn(array_keys($this->channel->connections())));
 });
 

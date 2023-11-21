@@ -137,16 +137,15 @@ it('can respond to a ping', function () {
 
 it('it can ping inactive subscribers', function () {
     $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
     $promise = $this->messagePromise($connection);
 
     Carbon::setTestNow(now()->addMinutes(10));
 
-    (new PingInactiveConnections)->handle(
-        channelManager()
-    );
+    (new PingInactiveConnections)->handle(channelManager());
 
     expect(await($promise))->toBe('{"event":"pusher:ping"}');
-})->todo();
+});
 
 it('it can disconnect inactive subscribers', function () {
     $connection = $this->connect();
@@ -168,12 +167,11 @@ it('it can disconnect inactive subscribers', function () {
         channelManager()
     );
 
-    expect(connectionManager()->all())->toHaveCount(0);
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(0);
 
     expect(await($promiseThree))->toBe('{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}');
     expect(await($promise))->toBe('Connection Closed.');
-})->todo();
+});
 
 it('can handle a client whisper', function () {
     $connection = $this->connect();

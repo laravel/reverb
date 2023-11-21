@@ -22,7 +22,7 @@ it('can subscribe a connection to a channel', function () {
     $this->channelConnectionManager->shouldReceive('connections')
         ->andReturn([]);
 
-    $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
+    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-test-channel'));
 });
 
 it('can unsubscribe a connection from a channel', function () {
@@ -91,7 +91,7 @@ it('sends notification of subscription', function () {
     $this->channelConnectionManager->shouldReceive('all')
         ->andReturn($connections = connections(3));
 
-    $channel->subscribe($this->connection, validAuth($this->connection, 'presence-test-channel'));
+    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-test-channel'));
 
     collect($connections)->each(fn ($connection) => $connection->assertSent([
         'event' => 'pusher_internal:member_added',
@@ -114,7 +114,7 @@ it('sends notification of subscription with data', function () {
     $channel->subscribe(
         $this->connection,
         validAuth(
-            $this->connection,
+            $this->connection->id(),
             'presence-test-channel',
             $data
         ),
@@ -135,7 +135,7 @@ it('sends notification of an unsubscribe', function () {
     $channel->subscribe(
         $this->connection,
         validAuth(
-            $this->connection,
+            $this->connection->id(),
             'presence-test-channel',
             $data
         ),

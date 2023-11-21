@@ -20,7 +20,7 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
      */
     public function add(Connection $connection, array $data): void
     {
-        $this->connections[$connection->identifier()] = new ChannelConnection($connection, $data);
+        $this->connections[$connection->id()] = new ChannelConnection($connection, $data);
     }
 
     /**
@@ -28,7 +28,7 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
      */
     public function remove(Connection $connection): void
     {
-        unset($this->connections[$connection->identifier()]);
+        unset($this->connections[$connection->id()]);
     }
 
     /**
@@ -36,15 +36,15 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
      */
     public function find(Connection $connection): ?ChannelConnection
     {
-        return $this->findById($connection->identifier());
+        return $this->findById($connection->id());
     }
 
     /**
-     * Find a connection in the set by its identifier.
+     * Find a connection in the set by its ID.
      */
-    public function findById(string $identifier): ?ChannelConnection
+    public function findById(string $id): ?ChannelConnection
     {
-        return $this->connections[$identifier] ?? null;
+        return $this->connections[$id] ?? null;
     }
 
     /**
