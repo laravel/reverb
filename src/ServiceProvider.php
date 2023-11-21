@@ -5,7 +5,6 @@ namespace Laravel\Reverb;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Loggers\NullLogger;

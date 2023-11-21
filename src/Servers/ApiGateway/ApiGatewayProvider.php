@@ -10,14 +10,12 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Managers\ArrayChannelConnectionManager;
 use Laravel\Reverb\Managers\ArrayChannelManager;
-use Laravel\Reverb\Managers\ArrayConnectionManager;
 
 class ApiGatewayProvider extends ServerProvider
 {
