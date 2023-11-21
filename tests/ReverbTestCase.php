@@ -183,6 +183,24 @@ class ReverbTestCase extends TestCase
     }
 
     /**
+     * Send a message to the connected client.
+     */
+    public function sendRaw(mixed $message, WebSocket $connection = null): string
+    {
+        $promise = new Deferred;
+
+        $connection = $connection ?: $this->connect();
+
+        $connection->on('message', function ($message) use ($promise) {
+            $promise->resolve((string) $message);
+        });
+
+        $connection->send($message);
+
+        return await($promise->promise());
+    }
+
+    /**
      * Disconnect the connected client.
      */
     public function disconnect(WebSocket $connection): string
