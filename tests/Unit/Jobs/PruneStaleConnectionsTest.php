@@ -2,28 +2,22 @@
 
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 
 beforeEach(function () {
-    $this->connectionManager = Mockery::spy(ConnectionManager::class);
-    $this->connectionManager->shouldReceive('for')
-        ->andReturn($this->connectionManager);
-    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
-
     $this->channelManager = Mockery::spy(ChannelManager::class);
     $this->channelManager->shouldReceive('for')
         ->andReturn($this->channelManager);
-    $this->app->singleton(ConnectionManager::class, fn () => $this->connectionManager);
+    $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 });
 
 it('cleans up stale connections', function () {
     $connections = connections(5);
     $channel = ChannelBroker::create('test-channel');
 
-    $this->connectionManager->shouldReceive('all')
+    $this->channelManager->shouldReceive('connections')
         ->once()
-        ->andReturn($connections);
+        ->andReturn(collect($connections));
 
     collect($connections)->each(function ($connection) use ($channel) {
         $channel->subscribe($connection->connection());
@@ -35,8 +29,5 @@ it('cleans up stale connections', function () {
             ->with($connection->connection());
     });
 
-    (new PruneStaleConnections)->handle(
-        $this->connectionManager,
-        $this->channelManager
-    );
+    (new PruneStaleConnections)->handle($this->channelManager);
 });

@@ -24,9 +24,14 @@ interface ChannelManager
     public function all(): Collection;
 
     /**
-     * Find the given channel
+     * Find the given channel.
      */
     public function find(string $channel): Channel;
+
+    /**
+     * Get all the connections for the given channels.
+     */
+    public function connections(string $channel = null): Collection;
 
     /**
      * Unsubscribe from all channels.

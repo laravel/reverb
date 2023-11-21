@@ -14,11 +14,11 @@ class UsersTerminateController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        if (! $connection = $this->connections->find($args['user'])) {
+        if (! $connection = $this->channels->connections()[$args['user']]) {
             return new JsonResponse((object) [], 400);
         }
 
-        $connection->disconnect();
+        $connection->connection()->disconnect();
 
         return new JsonResponse((object) []);
     }

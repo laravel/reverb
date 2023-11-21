@@ -13,7 +13,7 @@ abstract class Connection
     /**
      * The last time the connection was seen.
      */
-    protected string $lastSeenAt;
+    protected ?string $lastSeenAt = null;
 
     /**
      * Stores the ping state of the connection.
@@ -95,19 +95,15 @@ abstract class Connection
             ->for($this->app())
             ->unsubscribeFromAll($this);
 
-        App::make(ConnectionManager::class)
-            ->for($this->app())
-            ->disconnect($this->identifier());
-
         $this->terminate();
     }
 
     /**
      * Get the last time the connection was seen.
      */
-    public function lastSeenAt(): Carbon
+    public function lastSeenAt(): ?Carbon
     {
-        return Carbon::parse($this->lastSeenAt);
+        return $this->lastSeenAt ? Carbon::parse($this->lastSeenAt) : null;
     }
 
     /**

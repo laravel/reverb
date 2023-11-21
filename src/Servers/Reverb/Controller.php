@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server;
 use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
@@ -41,14 +40,10 @@ class Controller
             return $connection->close();
         }
 
-        return app(ConnectionManager::class)
-            ->for($application)
-            ->connect(
-                new ReverbConnection(
-                    $connection,
-                    $application,
-                    $request->getHeader('Origin')[0] ?? null
-                )
-            );
+        return new ReverbConnection(
+            $connection,
+            $application,
+            $request->getHeader('Origin')[0] ?? null
+        );
     }
 }

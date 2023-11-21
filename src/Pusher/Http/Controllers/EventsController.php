@@ -28,7 +28,7 @@ class EventsController extends Controller
                 'channels' => $channels,
                 'data' => $payload['data'],
             ],
-            isset($payload['socket_id']) ? $this->connections->find($payload['socket_id']) : null
+            isset($payload['socket_id']) ? $this->channels->connections()[$payload['socket_id']]->connection() : null
         );
 
         if (isset($payload['info'])) {

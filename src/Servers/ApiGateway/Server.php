@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server as ReverbServer;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
@@ -13,7 +12,6 @@ class Server
 {
     public function __construct(
         protected ReverbServer $server,
-        protected ConnectionManager $connections,
         protected ApplicationProvider $applications,
     ) {
     }
@@ -29,10 +27,10 @@ class Server
                     $this->connect($request)
                 ),
                 'DISCONNECT' => $this->server->close(
-                    $this->getConnection($request)
+                    $this->connect($request)
                 ),
                 'MESSAGE' => $this->server->message(
-                    $this->getConnection($request),
+                    $this->connect($request),
                     $request->message()
                 )
             };
@@ -43,7 +41,7 @@ class Server
             );
         } catch (\Exception $e) {
             $this->server->error(
-                $this->getConnection($request),
+                $this->connect($request),
                 $e
             );
         }
@@ -54,30 +52,11 @@ class Server
      */
     protected function connect(Request $request): Connection
     {
-        return $this->connections
-            ->for($application = $this->application($request))
-            ->resolve(
-                $request->connectionId(),
-                fn () => new Connection(
-                    $request->connectionId(),
-                    $application,
-                    $request->headers['origin'] ?? null
-                )
-            );
-    }
-
-    /**
-     * Get a Reverb connection from the API Gateway request.
-     */
-    protected function getConnection(Request $request): Connection
-    {
-        foreach ($this->applications->all() as $application) {
-            if ($connection = $this->connections->for($application)->find($request->connectionId())) {
-                return $this->connections->connect($connection);
-            }
-        }
-
-        throw new InvalidApplication;
+        return new Connection(
+            $request->connectionId(),
+            $this->application($request),
+            $request->headers['origin'] ?? null
+        );
     }
 
     /**

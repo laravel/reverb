@@ -1,7 +1,6 @@
 <?php
 
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager as ConnectionManagerInterface;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
@@ -9,8 +8,6 @@ beforeEach(function () {
     $this->channelManager = $this->app->make(ChannelManager::class)
         ->for($this->connection->app());
     $this->channel = $this->channelManager->find('test-channel-0');
-    $this->connectionManager = $this->app->make(ConnectionManagerInterface::class)
-        ->for($this->connection->app());
 });
 
 it('can subscribe to a channel', function () {
@@ -44,7 +41,7 @@ it('can get all connections subscribed to a channel', function () {
     $connections = collect(connections(5))
         ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
-    $connections->each(fn ($connection) => expect($connection->identifier())
+    $connections->each(fn ($connection) => expect($connection->id())
         ->toBeIn(array_keys($this->channel->connections())));
 });
 

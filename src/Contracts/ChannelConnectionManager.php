@@ -17,9 +17,14 @@ interface ChannelConnectionManager
     public function remove(Connection $connection): void;
 
     /**
-     * Find a connection by its identifier.
+     * Find a connection in the set.
      */
     public function find(Connection $connection): ?ChannelConnection;
+
+    /**
+     * Find a connection in the set by its ID.
+     */
+    public function findById(string $id): ?ChannelConnection;
 
     /**
      * Get all the connections.

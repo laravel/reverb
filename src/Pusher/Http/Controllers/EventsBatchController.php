@@ -27,7 +27,7 @@ class EventsBatchController extends Controller
                     'channel' => $item['channel'],
                     'data' => $item['data'],
                 ],
-                isset($item['socket_id']) ? $this->connections->find($item['socket_id']) : null
+                isset($item['socket_id']) ? $this->channels->find($item['channel'])->connections()->findById($item['socket_id']) : null
             );
 
             return isset($item['info']) ? $this->getInfo($item['channel'], $item['info']) : [];

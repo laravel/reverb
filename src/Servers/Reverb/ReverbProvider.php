@@ -9,12 +9,10 @@ use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Managers\ArrayChannelConnectionManager;
 use Laravel\Reverb\Managers\ArrayChannelManager;
-use Laravel\Reverb\Managers\ArrayConnectionManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 
@@ -94,14 +92,6 @@ class ReverbProvider extends ServerProvider
     public function withPublishing(): void
     {
         $this->publishesEvents = true;
-    }
-
-    /**
-     * Build the connection manager for the server.
-     */
-    public function buildConnectionManager(): ConnectionManager
-    {
-        return new ArrayConnectionManager;
     }
 
     /**

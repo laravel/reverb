@@ -7,7 +7,6 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
@@ -36,7 +35,6 @@ abstract class Controller
 
         try {
             $this->setApplication($args['appId'] ?? null);
-            $this->setConnections();
             $this->setChannels();
         } catch (HttpException $e) {
             return $this->close($connection, $e->getStatusCode(), $e->getMessage());
@@ -70,14 +68,6 @@ abstract class Controller
         } catch (InvalidApplication $e) {
             throw new HttpException(404, 'No matching application for ID ['.$appId.'] found.');
         }
-    }
-
-    /**
-     * Set the Reverb connection manager instance.
-     */
-    protected function setConnections()
-    {
-        $this->connections = app(ConnectionManager::class)->for($this->application);
     }
 
     /**

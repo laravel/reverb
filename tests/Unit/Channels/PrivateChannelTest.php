@@ -19,7 +19,7 @@ it('can subscribe a connection to a channel', function () {
         ->once()
         ->with($this->connection, []);
 
-    $channel->subscribe($this->connection, validAuth($this->connection, 'private-test-channel'));
+    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-test-channel'));
 });
 
 it('can unsubscribe a connection from a channel', function () {
