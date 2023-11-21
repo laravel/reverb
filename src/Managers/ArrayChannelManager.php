@@ -93,17 +93,15 @@ class ArrayChannelManager implements ChannelManagerInterface
             $this->applications[$this->application->id()] = [];
         }
 
-        $channels = $this->applications[$this->application->id()];
-
         if ($channel) {
-            if (! isset($channels[$channel])) {
+            if (! isset($this->applications[$this->application->id()][$channel])) {
                 $this->applications[$this->application->id()][$channel] = ChannelBroker::create($channel);
             }
 
             return $this->applications[$this->application->id()][$channel];
         }
 
-        return $channels ?: [];
+        return $this->applications[$this->application->id()] ?? [];
     }
 
     /**
