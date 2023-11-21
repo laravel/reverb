@@ -14,6 +14,8 @@ beforeEach(function () {
 it('can handle a connection', function () {
     $this->server->open($connection = new Connection);
 
+    expect($connection->lastSeenAt())->not->toBeNull();
+
     $connection->assertSent([
         'event' => 'pusher:connection_established',
         'data' => json_encode([
@@ -103,6 +105,8 @@ it('can subscribe a user to a channel', function () {
                 'auth' => '',
             ],
         ]));
+
+    expect($connection->lastSeenAt())->not->toBeNull();
 
     $connection->assertSent([
         'event' => 'pusher_internal:subscription_succeeded',

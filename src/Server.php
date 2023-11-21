@@ -19,6 +19,8 @@ class Server
         try {
             $this->verifyOrigin($connection);
 
+            $connection->touch();
+
             PusherEvent::handle($connection, 'pusher:connection_established');
 
             Output::info('Connection Established', $connection->id());
@@ -34,6 +36,8 @@ class Server
     {
         Output::info('Message Received', $from->id());
         Output::message($message);
+
+        $from->touch();
 
         $event = json_decode($message, true);
 

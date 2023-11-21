@@ -24,7 +24,6 @@ class Connection extends BaseConnection
         if ($identifier) {
             $this->identifier = $identifier;
         }
-        $this->lastSeenAt = now();
     }
 
     public function identifier(): string
