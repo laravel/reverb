@@ -44,8 +44,6 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
      */
     public function findById(string $identifier): ?ChannelConnection
     {
-        dump($this->connections, $identifier);
-
         return $this->connections[$identifier] ?? null;
     }
 

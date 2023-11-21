@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Output;
 
 class PruneStaleConnections
@@ -14,16 +14,15 @@ class PruneStaleConnections
     /**
      * Execute the job.
      */
-    public function handle(ConnectionManager $connections): void
+    public function handle(ChannelManager $channels): void
     {
         app(ApplicationProvider::class)
             ->all()
-            ->each(function ($application) use ($connections) {
-                collect($connections->for($application)->all())
+            ->each(function ($application) use ($channels) {
+
+                $channels->for($application)->connections()
                     ->each(function ($connection) {
                         if (! $connection->isStale()) {
-                            dump('Connection is not stale', $connection->id());
-
                             return;
                         }
 

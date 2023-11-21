@@ -55,6 +55,18 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
+     * Get all the connections for the given channels.
+     */
+    public function connections(string $channel = null): Collection
+    {
+        $channels = Collection::wrap($this->channels($channel));
+
+        return $channels->reduce(function ($carry, $channel) {
+            return $carry = $carry->merge($channel->connections());
+        }, collect());
+    }
+
+    /**
      * Unsubscribe from all channels.
      */
     public function unsubscribeFromAll(Connection $connection): void
