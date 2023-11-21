@@ -95,10 +95,6 @@ abstract class Connection
             ->for($this->app())
             ->unsubscribeFromAll($this);
 
-        App::make(ConnectionManager::class)
-            ->for($this->app())
-            ->disconnect($this->identifier());
-
         $this->terminate();
     }
 

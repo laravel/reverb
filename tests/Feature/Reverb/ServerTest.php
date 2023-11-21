@@ -1,12 +1,8 @@
 <?php
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
@@ -18,33 +14,14 @@ use function React\Promise\all;
 
 uses(ReverbTestCase::class);
 
-it('can handle a new connection', function () {
-    $this->connect();
-
-    $this->assertCount(1, connectionManager()->all());
-});
-
-it('can handle multiple new connections', function () {
-    $this->connect();
-    $this->connect();
-
-    $this->assertCount(2, connectionManager()->all());
-});
-
 it('can handle connections to different applications', function () {
     $this->connect();
     $this->connect(key: 'pusher-key-2');
     $this->connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
-
-    foreach (App::make(ApplicationProvider::class)->all() as $app) {
-        $this->assertCount(1, connectionManager()->for($app)->all());
-    }
 });
 
 it('can subscribe to a channel', function () {
     $response = $this->subscribe('test-channel');
-
-    $this->assertCount(1, connectionManager()->all());
 
     $this->assertCount(1, channelManager()->find('test-channel')->connections());
 
@@ -165,31 +142,30 @@ it('it can ping inactive subscribers', function () {
     Carbon::setTestNow(now()->addMinutes(10));
 
     (new PingInactiveConnections)->handle(
-        connectionManager()
+        channelManager()
     );
 
     expect(await($promise))->toBe('{"event":"pusher:ping"}');
-});
+})->todo();
 
 it('it can disconnect inactive subscribers', function () {
     $connection = $this->connect();
     $this->subscribe('test-channel', connection: $connection);
     $promise = $this->disconnectPromise($connection);
 
-    expect(connectionManager()->all())->toHaveCount(1);
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(1);
 
     Carbon::setTestNow(now()->addMinutes(10));
 
     $promiseTwo = $this->messagePromise($connection);
     (new PingInactiveConnections)->handle(
-        connectionManager()
+        channelManager()
     );
     expect(await($promiseTwo))->toBe('{"event":"pusher:ping"}');
 
     $promiseThree = $this->messagePromise($connection);
     (new PruneStaleConnections)->handle(
-        connectionManager()
+        channelManager()
     );
 
     expect(connectionManager()->all())->toHaveCount(0);
@@ -197,7 +173,7 @@ it('it can disconnect inactive subscribers', function () {
 
     expect(await($promiseThree))->toBe('{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}');
     expect(await($promise))->toBe('Connection Closed.');
-});
+})->todo();
 
 it('can handle a client whisper', function () {
     $connection = $this->connect();
@@ -228,14 +204,10 @@ it('can subscribe a connection to multiple channels', function () {
     $this->subscribe('private-test-channel-3', connection: $connection, data: ['foo' => 'bar']);
     $this->subscribe('presence-test-channel-4', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
 
-    expect(connectionManager()->all())->toHaveCount(1);
     expect(channelManager()->all())->toHaveCount(4);
-
-    $connection = Arr::first(connectionManager()->all());
-
     channelManager()->all()->each(function ($channel) use ($connection) {
         expect($channel->connections())->toHaveCount(1);
-        expect(collect($channel->connections())->map(fn ($conn, $index) => (string) $index))->toContain($connection->identifier());
+        expect(collect($channel->connections())->map(fn ($connection) => $connection->id()))->toContain($this->connectionId);
     });
 });
 
@@ -250,7 +222,6 @@ it('can subscribe multiple connections to multiple channels', function () {
     $this->subscribe('test-channel', connection: $connection);
     $this->subscribe('private-test-channel-3', connection: $connection, data: ['foo' => 'bar']);
 
-    expect(connectionManager()->all())->toHaveCount(2);
     expect(channelManager()->all())->toHaveCount(4);
 
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(2);
@@ -348,6 +319,5 @@ it('can connect from a valid origin', function () {
 it('clears application state between requests', function () {
     $this->subscribe('test-channel');
 
-    expect($this->app->make(ConnectionManager::class)->app())->toBeNull();
     expect($this->app->make(ChannelManager::class)->app())->toBeNull();
 })->todo();

@@ -40,6 +40,22 @@ class Channel
     }
 
     /**
+     * Find a connection.
+     */
+    public function find(Connection $connection): ?Connection
+    {
+        return $this->connections->find($connection);
+    }
+
+    /**
+     * Find a connection by its identifier.
+     */
+    public function findById(string $identifier): ?Connection
+    {
+        return $this->connections->findById($identifier);
+    }
+
+    /**
      * Subscribe to the given channel.
      */
     public function subscribe(Connection $connection, string $auth = null, string $data = null): void

@@ -6,7 +6,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection as ReverbConnection;
-use Laravel\Reverb\Contracts\ConnectionManager;
+use Laravel\Reverb\Http\Server;
 use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 use Laravel\Reverb\Tests\Connection;
@@ -37,24 +37,15 @@ function connections(int $count = 1, array $data = [], $serializable = false): a
 /**
  * Generate a valid Pusher authentication signature.
  */
-function validAuth(ReverbConnection $connection, string $channel, string $data = null): string
+function validAuth(string $connectionId, string $channel, string $data = null): string
 {
-    $signature = "{$connection->id()}:{$channel}";
+    $signature = "{$connectionId}:{$channel}";
 
     if ($data) {
         $signature .= ":{$data}";
     }
 
     return 'app-key:'.hash_hmac('sha256', $signature, 'pusher-secret');
-}
-
-/**
- * Return the connection manager.
- */
-function connectionManager(Application $app = null): ConnectionManager
-{
-    return App::make(ConnectionManager::class)
-        ->for($app ?: App::make(ApplicationProvider::class)->all()->first());
 }
 
 /**

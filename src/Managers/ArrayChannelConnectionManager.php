@@ -32,11 +32,20 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
-     * Find a connection by its identifier.
+     * Find a connection in the set.
      */
     public function find(Connection $connection): ?ChannelConnection
     {
-        return $this->connections[$connection->identifier()] ?? null;
+        return $this->findById($connection->identifier());
+    }
+
+    /**
+     * Find a connection in the set by its identifier.
+     */
+    public function findById(string $identifier): ?ChannelConnection
+    {
+        dump($this->connections, $identifier);
+        return $this->connections[$identifier] ?? null;
     }
 
     /**

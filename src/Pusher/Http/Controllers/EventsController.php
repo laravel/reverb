@@ -21,6 +21,10 @@ class EventsController extends Controller
         $payload = json_decode($this->body, true);
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
+        if(isset($payload['socket_id'])) {
+            dump($this->channels->find($channels[0])->findById($payload['socket_id']));
+        }
+
         Event::dispatch(
             $this->application,
             [
@@ -28,7 +32,7 @@ class EventsController extends Controller
                 'channels' => $channels,
                 'data' => $payload['data'],
             ],
-            isset($payload['socket_id']) ? $this->connections->find($payload['socket_id']) : null
+            isset($payload['socket_id']) ? $this->channels->find($channels[0])->findById($payload['socket_id']) : null
         );
 
         if (isset($payload['info'])) {

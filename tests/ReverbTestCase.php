@@ -33,6 +33,8 @@ class ReverbTestCase extends TestCase
 
     protected $loop;
 
+    protected $connectionId;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -146,12 +148,19 @@ class ReverbTestCase extends TestCase
             $promise->resolve((string) $message);
         });
 
+        $message = await($promise->promise());
+
         $this->assertTrue(
             Str::contains(
-                await($promise->promise()),
+                $message,
                 'connection_established'
             )
         );
+
+        $message = json_decode($message, true);
+        $data = json_decode($message['data'], true);
+
+        $this->connectionId = $data['socket_id'] ?? null;
 
         return $connection;
     }
@@ -199,8 +208,7 @@ class ReverbTestCase extends TestCase
 
         if (! $auth && Str::startsWith($channel, ['private-', 'presence-'])) {
             $connection = $connection ?: $this->connect();
-            $managed = $this->managedConnection($connection);
-            $auth = validAuth($managed, $channel, $data);
+            $auth = validAuth($this->connectionId, $channel, $data);
         }
 
         return $this->send([
@@ -211,14 +219,6 @@ class ReverbTestCase extends TestCase
                 'auth' => $auth,
             ]),
         ], $connection);
-    }
-
-    /**
-     * Return the latest connection set on the manager.
-     */
-    public function managedConnection(): ?Connection
-    {
-        return Arr::last(connectionManager()->all());
     }
 
     /**

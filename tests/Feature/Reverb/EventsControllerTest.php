@@ -86,7 +86,7 @@ it('can ignore a subscriber', function () {
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
-        'socket_id' => $this->managedConnection()->identifier(),
+        'socket_id' => (int) $connection->_stream->stream,
     ]));
 
     $this->assertSame(200, $response->getStatusCode());
