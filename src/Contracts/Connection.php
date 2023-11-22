@@ -12,7 +12,7 @@ abstract class Connection
     /**
      * The last time the connection was seen.
      */
-    protected int $lastSeenAt;
+    protected ?int $lastSeenAt;
 
     /**
      * Stores the ping state of the connection.

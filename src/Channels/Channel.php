@@ -84,7 +84,7 @@ class Channel
      */
     public function broadcast(array $payload, Connection $except = null): void
     {
-        foreach ($this->connections as $connection) {
+        foreach ($this->connections() as $connection) {
             if ($except && $except->id() === $connection->connection()->id()) {
                 return;
             }
