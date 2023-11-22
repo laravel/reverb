@@ -12,7 +12,7 @@ abstract class Connection
     /**
      * The last time the connection was seen.
      */
-    protected ?string $lastSeenAt = null;
+    protected int $lastSeenAt;
 
     /**
      * Stores the ping state of the connection.
@@ -27,6 +27,7 @@ abstract class Connection
         protected Application $application,
         protected ?string $origin
     ) {
+        $this->lastSeenAt = time();
         $this->pusher = new PusherEvent;
     }
 
@@ -83,7 +84,7 @@ abstract class Connection
      */
     public function touch(): Connection
     {
-        // $this->lastSeenAt = (string) Carbon::now();
+        $this->lastSeenAt = time();
 
         return $this;
     }
@@ -97,26 +98,11 @@ abstract class Connection
     }
 
     /**
-     * Get the last time the connection was seen.
-     */
-    public function lastSeenAt(): ?Carbon
-    {
-        return null;
-        // return $this->lastSeenAt ? Carbon::parse($this->lastSeenAt) : null;
-    }
-
-    /**
      * Determine whether the connection is still active.
      */
     public function isActive(): bool
     {
-        return true;
-        // return $this->lastSeenAt() &&
-        //     $this->lastSeenAt()->isAfter(
-        //         Carbon::now()->subMinutes(
-        //             $this->app()->pingInterval()
-        //         )
-        //     );
+        return time() < $this->lastSeenAt + $this->app()->pingInterval();
     }
 
     /**
