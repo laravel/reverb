@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb;
 
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Http\Route;
 use Laravel\Reverb\Http\Router;
 use Laravel\Reverb\Http\Server as HttpServer;
@@ -11,6 +12,7 @@ use Laravel\Reverb\Pusher\Http\Controllers\ChannelUsersController;
 use Laravel\Reverb\Pusher\Http\Controllers\EventsBatchController;
 use Laravel\Reverb\Pusher\Http\Controllers\EventsController;
 use Laravel\Reverb\Pusher\Http\Controllers\UsersTerminateController;
+use Laravel\Reverb\Server;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
@@ -39,7 +41,7 @@ class Factory
     {
         $routes = new RouteCollection;
 
-        $routes->add('sockets', Route::get('/app/{appKey}', new Controller));
+        $routes->add('sockets', Route::get('/app/{appKey}', new Controller(app(Server::class), app(ApplicationProvider::class))));
         $routes->add('events', Route::post('/apps/{appId}/events', new EventsController));
         $routes->add('events_batch', Route::post('/apps/{appId}/batch_events', new EventsBatchController));
         $routes->add('channels', Route::get('/apps/{appId}/channels', new ChannelsController));
