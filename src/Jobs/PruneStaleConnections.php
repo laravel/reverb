@@ -36,7 +36,7 @@ class PruneStaleConnections
 
                         $connection->disconnect();
 
-                        Output::info('Connection Pruned', $connection->id());
+                        // Output::info('Connection Pruned', $connection->id());
                     });
             });
     }

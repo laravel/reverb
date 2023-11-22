@@ -29,7 +29,7 @@ class Server
 
             PusherEvent::handle($connection, 'pusher:connection_established');
 
-            Output::info('Connection Established', $connection->id());
+            // Output::info('Connection Established', $connection->id());
         } catch (Exception $e) {
             $this->error($connection, $e);
         }
@@ -40,8 +40,8 @@ class Server
      */
     public function message(Connection $from, string $message): void
     {
-        Output::info('Message Received', $from->id());
-        Output::message($message);
+        // Output::info('Message Received', $from->id());
+        // Output::message($message);
 
         $from->touch();
 
@@ -58,7 +58,7 @@ class Server
                 default => ClientEvent::handle($from, $event)
             };
 
-            Output::info('Message Handled', $from->id());
+            // Output::info('Message Handled', $from->id());
         } catch (Exception $e) {
             $this->error($from, $e);
         }
@@ -75,7 +75,7 @@ class Server
 
         $connection->disconnect();
 
-        Output::info('Connection Closed', $connection->id());
+        // Output::info('Connection Closed', $connection->id());
     }
 
     /**
@@ -86,8 +86,8 @@ class Server
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
 
-            Output::error('Message from '.$connection->id().' resulted in a pusher error');
-            Output::info($exception->getMessage());
+            // Output::error('Message from '.$connection->id().' resulted in a pusher error');
+            // Output::info($exception->getMessage());
 
             return;
         }
@@ -100,8 +100,8 @@ class Server
             ]),
         ]));
 
-        Output::error('Message from '.$connection->id().' resulted in an unknown error');
-        Output::info($exception->getMessage());
+        // Output::error('Message from '.$connection->id().' resulted in an unknown error');
+        // Output::info($exception->getMessage());
     }
 
     /**

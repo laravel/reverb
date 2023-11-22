@@ -37,8 +37,8 @@ class SendToConnection implements ShouldQueue
                 'Data' => $this->message,
             ]);
         } catch (Throwable $e) {
-            Output::error('Unable to send message.');
-            Output::info($e->getMessage());
+            // Output::error('Unable to send message.');
+            // Output::info($e->getMessage());
         }
     }
 }

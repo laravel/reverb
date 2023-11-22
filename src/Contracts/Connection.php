@@ -72,7 +72,7 @@ abstract class Connection
 
         PusherEvent::ping($this);
 
-        Output::info('Connection Pinged', $this->id());
+        // Output::info('Connection Pinged', $this->id());
     }
 
     /**

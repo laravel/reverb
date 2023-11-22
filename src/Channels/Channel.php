@@ -101,8 +101,8 @@ class Channel
                         )
                     );
                 } catch (Exception $e) {
-                    Output::error('Broadcasting to '.$connection->id().' resulted in an error');
-                    Output::info($e->getMessage());
+                    // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
+                    // Output::info($e->getMessage());
                 }
             });
     }
