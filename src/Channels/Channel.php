@@ -82,29 +82,28 @@ class Channel
     /**
      * Send a message to all connections subscribed to the channel.
      */
-    public function broadcast(Application $app, array $payload, Connection $except = null): void
+    public function broadcast(array $payload, Connection $except = null): void
     {
-        collect($this->connections())
-            ->each(function ($connection) use ($payload, $except) {
-                if ($except && $except->id() === $connection->connection()->id()) {
-                    return;
-                }
+        foreach ($this->connections as $connection) {
+            if ($except && $except->id() === $connection->connection()->id()) {
+                return;
+            }
 
-                if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                    return;
-                }
+            if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+                return;
+            }
 
-                try {
-                    $connection->send(
-                        json_encode(
-                            Arr::except($payload, 'except')
-                        )
-                    );
-                } catch (Exception $e) {
-                    // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
-                    // Output::info($e->getMessage());
-                }
-            });
+            try {
+                $connection->send(
+                    json_encode(
+                        Arr::except($payload, 'except')
+                    )
+                );
+            } catch (Exception $e) {
+                // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
+                // Output::info($e->getMessage());
+            }
+        }
     }
 
     /**

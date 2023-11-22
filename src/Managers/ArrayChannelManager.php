@@ -2,7 +2,7 @@
 
 namespace Laravel\Reverb\Managers;
 
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
@@ -41,9 +41,9 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get all the channels.
      */
-    public function all(): Collection
+    public function all(): array
     {
-        return collect($this->channels());
+        return $this->channels();
     }
 
     /**
@@ -57,13 +57,13 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get all the connections for the given channels.
      */
-    public function connections(string $channel = null): Collection
+    public function connections(string $channel = null): array
     {
-        $channels = Collection::wrap($this->channels($channel));
+        $channels = Arr::wrap($this->channels($channel));
 
-        return $channels->reduce(function ($carry, $channel) {
-            return $carry = $carry->merge($channel->connections());
-        }, collect());
+        return array_reduce($channels, function ($carry, $channel) {
+            return $carry + $channel->connections();
+        }, []);
     }
 
     /**
