@@ -12,7 +12,7 @@ use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class Server
 {
-    public function __construct(protected ChannelManager $channels)
+    public function __construct(protected ChannelManager $channels, protected PusherEvent $pusher)
     {
         //
     }
@@ -27,7 +27,7 @@ class Server
 
             $connection->touch();
 
-            PusherEvent::handle($connection, 'pusher:connection_established');
+            $this->pusher->handle($connection, 'pusher:connection_established');
 
             // Output::info('Connection Established', $connection->id());
         } catch (Exception $e) {
@@ -49,7 +49,7 @@ class Server
 
         try {
             match (Str::startsWith($event['event'], 'pusher:')) {
-                true => PusherEvent::handle(
+                true => $this->pusher->handle(
                     $from,
                     $event['event'],
                     $event['data'] ?? [],

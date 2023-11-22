@@ -21,10 +21,13 @@ abstract class Connection
      */
     protected $hasBeenPinged = false;
 
+    protected $pusher;
+
     public function __construct(
         protected Application $application,
         protected ?string $origin
     ) {
+        $this->pusher = new PusherEvent;
     }
 
     /**
@@ -80,7 +83,7 @@ abstract class Connection
      */
     public function touch(): Connection
     {
-        // $this->lastSeenAt = (string) now();
+        $this->lastSeenAt = (string) Carbon::now();
 
         return $this;
     }
@@ -108,7 +111,7 @@ abstract class Connection
     {
         return $this->lastSeenAt() &&
             $this->lastSeenAt()->isAfter(
-                now()->subMinutes(
+                Carbon::now()->subMinutes(
                     $this->app()->pingInterval()
                 )
             );
