@@ -4,6 +4,7 @@ namespace Laravel\Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Exceptions\PusherException;
@@ -11,6 +12,11 @@ use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class Server
 {
+    public function __construct(protected ChannelManager $channels)
+    {
+        //
+    }
+
     /**
      * Handle the a client connection.
      */
@@ -63,6 +69,10 @@ class Server
      */
     public function close(Connection $connection): void
     {
+        $this->channels
+            ->for($connection->app())
+            ->unsubscribeFromAll($connection);
+
         $connection->disconnect();
 
         Output::info('Connection Closed', $connection->id());

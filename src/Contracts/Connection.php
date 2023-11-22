@@ -91,10 +91,6 @@ abstract class Connection
      */
     public function disconnect(): void
     {
-        App::make(ChannelManager::class)
-            ->for($this->app())
-            ->unsubscribeFromAll($this);
-
         $this->terminate();
     }
 
