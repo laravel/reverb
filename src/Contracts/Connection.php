@@ -80,7 +80,7 @@ abstract class Connection
      */
     public function touch(): Connection
     {
-        $this->lastSeenAt = (string) now();
+        // $this->lastSeenAt = (string) now();
 
         return $this;
     }
