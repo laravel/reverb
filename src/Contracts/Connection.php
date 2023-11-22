@@ -73,7 +73,7 @@ abstract class Connection
     {
         $this->hasBeenPinged = true;
 
-        PusherEvent::ping($this);
+        $this->pusher->ping($this);
 
         // Output::info('Connection Pinged', $this->id());
     }
@@ -83,7 +83,7 @@ abstract class Connection
      */
     public function touch(): Connection
     {
-        $this->lastSeenAt = (string) Carbon::now();
+        // $this->lastSeenAt = (string) Carbon::now();
 
         return $this;
     }
@@ -101,7 +101,8 @@ abstract class Connection
      */
     public function lastSeenAt(): ?Carbon
     {
-        return $this->lastSeenAt ? Carbon::parse($this->lastSeenAt) : null;
+        return null;
+        // return $this->lastSeenAt ? Carbon::parse($this->lastSeenAt) : null;
     }
 
     /**
@@ -109,12 +110,13 @@ abstract class Connection
      */
     public function isActive(): bool
     {
-        return $this->lastSeenAt() &&
-            $this->lastSeenAt()->isAfter(
-                Carbon::now()->subMinutes(
-                    $this->app()->pingInterval()
-                )
-            );
+        return true;
+        // return $this->lastSeenAt() &&
+        //     $this->lastSeenAt()->isAfter(
+        //         Carbon::now()->subMinutes(
+        //             $this->app()->pingInterval()
+        //         )
+        //     );
     }
 
     /**
