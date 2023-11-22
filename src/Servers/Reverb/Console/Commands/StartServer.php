@@ -60,10 +60,10 @@ class StartServer extends Command
     {
         $loop->addPeriodicTimer(60, function () {
             // Output::info('Pruning Stale Connections');
-            PruneStaleConnections::dispatch();
+            // PruneStaleConnections::dispatch();
 
             // Output::info('Pinging Inactive Connections');
-            PingInactiveConnections::dispatch();
+            // PingInactiveConnections::dispatch();
         });
     }
 }
