@@ -106,7 +106,7 @@ class Connection
      */
     public function close()
     {
-        $this->connection->end();
+        $this->connection->close();
 
         return $this;
     }
