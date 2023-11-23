@@ -17,10 +17,6 @@ class Server
 
     public function __construct(protected ServerInterface $socket, protected Router $router, protected ?LoopInterface $loop = null)
     {
-        gc_enable();
-        set_time_limit(0);
-        ob_implicit_flush();
-
         $this->loop = $loop ?: Loop::get();
 
         $socket->on('connection', $this);
@@ -33,12 +29,6 @@ class Server
         $connection->on('data', function ($data) use ($connection) {
             $this->handleRequest($data, $connection);
         });
-        // $connection->on('close', function () use ($connection) {
-        //     $this->handleEnd($conn);
-        // });
-        // $conn->on('error', function (\Exception $e) use ($conn) {
-        //     $this->handleError($e, $conn);
-        // });
     }
 
     /**

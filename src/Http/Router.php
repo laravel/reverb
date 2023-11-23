@@ -17,8 +17,11 @@ class Router
 {
     use ClosesConnections;
 
+    protected ServerNegotiator $negotiator;
+
     public function __construct(protected UrlMatcherInterface $matcher)
     {
+        $this->negotiator = new ServerNegotiator(new RequestVerifier);
     }
 
     /**
@@ -31,10 +34,6 @@ class Router
         $context->setMethod($request->getMethod());
         $context->setHost($uri->getHost());
 
-        if ($this->isWebSocketRequest($request)) {
-            $connection = $this->attemptUpgrade($request, $connection);
-        }
-
         try {
             $route = $this->matcher->match($uri->getPath());
         } catch (MethodNotAllowedException $e) {
@@ -43,13 +42,21 @@ class Router
             return $this->close($connection, 404, 'Not found.');
         }
 
-        $response = $route['_controller']($request, $connection, ...Arr::except($route, ['_controller', '_route']));
+        $controller = $this->controller($route);
 
-        if (! $this->isWebSocketRequest($request)) {
-            return $connection->send($response)->close();
+        if ($this->isWebSocketRequest($request)) {
+            $wsConnection = $this->attemptUpgrade($request, $connection);
+            return $controller($request, $wsConnection, ...Arr::except($route, ['_controller', '_route']));
         }
 
-        return null;
+        $response = $controller($request, $connection, ...Arr::except($route, ['_controller', '_route']));
+
+        return $connection->send($response)->close();
+    }
+
+    protected function controller($route): callable
+    {
+        return $route['_controller'];
     }
 
     /**
@@ -65,8 +72,7 @@ class Router
      */
     protected function attemptUpgrade(RequestInterface $request, Connection $connection): WsConnection
     {
-        $negotiator = new ServerNegotiator(new RequestVerifier);
-        $response = $negotiator->handshake($request);
+        $response = $this->negotiator->handshake($request);
 
         $connection->write(Message::toString($response));
 
