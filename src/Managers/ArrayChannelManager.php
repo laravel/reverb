@@ -101,7 +101,7 @@ class ArrayChannelManager implements ChannelManagerInterface
             return $this->applications[$this->application->id()][$channel];
         }
 
-        return $this->applications[$this->application->id()] ?? [];
+        return $this->applications[$this->application->id()];
     }
 
     /**

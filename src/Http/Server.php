@@ -17,6 +17,10 @@ class Server
 
     public function __construct(protected ServerInterface $socket, protected Router $router, protected ?LoopInterface $loop = null)
     {
+        gc_enable();
+        set_time_limit(0);
+        ob_implicit_flush();
+        
         $this->loop = $loop ?: Loop::get();
 
         $socket->on('connection', $this);
