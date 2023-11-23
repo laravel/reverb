@@ -20,7 +20,7 @@ class Server
         gc_enable();
         set_time_limit(0);
         ob_implicit_flush();
-        
+
         $this->loop = $loop ?: Loop::get();
 
         $socket->on('connection', $this);
