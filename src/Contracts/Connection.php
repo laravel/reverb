@@ -27,7 +27,7 @@ abstract class Connection
         protected ?string $origin
     ) {
         $this->lastSeenAt = time();
-        $this->pusher = new PusherEvent;
+        // $this->pusher = new PusherEvent;
     }
 
     /**
@@ -73,7 +73,7 @@ abstract class Connection
     {
         $this->hasBeenPinged = true;
 
-        $this->pusher->ping($this);
+        // $this->pusher->ping($this);
 
         // Output::info('Connection Pinged', $this->id());
     }

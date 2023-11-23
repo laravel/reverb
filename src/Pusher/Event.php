@@ -9,6 +9,11 @@ use Laravel\Reverb\Contracts\Connection;
 
 class Event
 {
+    public function __construct(protected ChannelManager $channels)
+    {
+        //
+    }
+
     /**
      * Handle a pusher event.
      */
@@ -45,7 +50,7 @@ class Event
      */
     public function subscribe(Connection $connection, string $channel, string $auth = null, string $data = null): void
     {
-        $channel = app(ChannelManager::class)
+        $channel = $this->channels
             ->for($connection->app())
             ->find($channel);
 
@@ -59,7 +64,7 @@ class Event
      */
     public function unsubscribe(Connection $connection, string $channel): void
     {
-        $channel = app(ChannelManager::class)
+        $channel = $this->channels
             ->for($connection->app())
             ->find($channel)
             ->unsubscribe($connection);
