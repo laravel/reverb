@@ -46,6 +46,7 @@ class Router
 
         if ($this->isWebSocketRequest($request)) {
             $wsConnection = $this->attemptUpgrade($request, $connection);
+
             return $controller($request, $wsConnection, ...Arr::except($route, ['_controller', '_route']));
         }
 
