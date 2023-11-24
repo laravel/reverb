@@ -5,9 +5,7 @@ namespace Laravel\Reverb;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Loggers\NullLogger;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -56,7 +54,5 @@ class ServiceProvider extends BaseServiceProvider
             ChannelConnectionManager::class,
             fn () => $server->buildChannelConnectionManager()
         );
-
-        $this->app->instance(Logger::class, new NullLogger);
     }
 }

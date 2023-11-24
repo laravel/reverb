@@ -6,7 +6,6 @@ use Aws\ApiGatewayManagementApi\ApiGatewayManagementApiClient;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Config;
-use Laravel\Reverb\Output;
 use Throwable;
 
 class SendToConnection implements ShouldQueue
@@ -37,8 +36,7 @@ class SendToConnection implements ShouldQueue
                 'Data' => $this->message,
             ]);
         } catch (Throwable $e) {
-            // Output::error('Unable to send message.');
-            // Output::info($e->getMessage());
+            //
         }
     }
 }

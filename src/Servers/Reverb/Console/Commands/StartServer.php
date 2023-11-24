@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Output;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
@@ -58,11 +57,9 @@ class StartServer extends Command
      */
     protected function scheduleCleanup(LoopInterface $loop): void
     {
-        $loop->addPeriodicTimer(60, function () {
-            // Output::info('Pruning Stale Connections');
+        $loop->addPeriodicTimer(300, function () {
             PruneStaleConnections::dispatch();
 
-            // Output::info('Pinging Inactive Connections');
             PingInactiveConnections::dispatch();
         });
     }

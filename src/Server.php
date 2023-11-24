@@ -28,8 +28,6 @@ class Server
             $connection->touch();
 
             $this->pusher->handle($connection, 'pusher:connection_established');
-
-            // Output::info('Connection Established', $connection->id());
         } catch (Exception $e) {
             $this->error($connection, $e);
         }
@@ -40,11 +38,6 @@ class Server
      */
     public function message(Connection $from, string $message): void
     {
-        // Output::info('Message Received', $from->id());
-        // Output::message($message);
-
-        $from->touch();
-
         $event = json_decode($message, true);
 
         try {
@@ -58,10 +51,11 @@ class Server
                 default => ClientEvent::handle($from, $event)
             };
 
-            // Output::info('Message Handled', $from->id());
         } catch (Exception $e) {
             $this->error($from, $e);
         }
+
+        $from->touch();
     }
 
     /**
@@ -74,8 +68,6 @@ class Server
             ->unsubscribeFromAll($connection);
 
         $connection->disconnect();
-
-        // Output::info('Connection Closed', $connection->id());
     }
 
     /**
@@ -85,9 +77,6 @@ class Server
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
-
-            // Output::error('Message from '.$connection->id().' resulted in a pusher error');
-            // Output::info($exception->getMessage());
 
             return;
         }
@@ -99,9 +88,6 @@ class Server
                 'message' => 'Invalid message format',
             ]),
         ]));
-
-        // Output::error('Message from '.$connection->id().' resulted in an unknown error');
-        // Output::info($exception->getMessage());
     }
 
     /**

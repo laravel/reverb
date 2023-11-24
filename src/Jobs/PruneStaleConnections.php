@@ -5,7 +5,6 @@ namespace Laravel\Reverb\Jobs;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Output;
 
 class PruneStaleConnections
 {
@@ -33,7 +32,6 @@ class PruneStaleConnections
                     ]));
 
                     $connection->disconnect();
-                    // Output::info('Connection Pruned', $connection->id());
                 }
             });
     }

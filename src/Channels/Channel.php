@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
-use React\Promise\Promise;
 
 class Channel
 {
@@ -90,24 +89,21 @@ class Channel
         $chunks = array_chunk($this->connections(), 100);
 
         foreach ($chunks as $connections) {
-            new Promise(function ($resolve, $reject) use ($connections, $message, $except) {
-                try {
-                    foreach ($connections as $connection) {
-                        if ($except && $except->id() === $connection->connection()->id()) {
-                            break;
-                        }
-
-                        if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                            break;
-                        }
-
-                        $connection->send($message);
-                        $resolve();
-                    }
-                } catch (Exception $e) {
-                    $reject($e);
+            foreach ($connections as $connection) {
+                if ($except && $except->id() === $connection->connection()->id()) {
+                    break;
                 }
-            });
+
+                if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+                    break;
+                }
+
+                try {
+                    $connection->send($message);
+                } catch (Exception $e) {
+                    //
+                }
+            }
         }
     }
 
