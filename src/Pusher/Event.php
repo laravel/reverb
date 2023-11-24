@@ -84,7 +84,7 @@ class Event
     public function ping(Connection $connection): void
     {
         static::send($connection, 'ping');
-        
+
         $connection->ping();
     }
 
