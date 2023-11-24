@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Channels;
 
 use Exception;
-use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Output;
