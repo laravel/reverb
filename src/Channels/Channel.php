@@ -87,20 +87,24 @@ class Channel
             Arr::except($payload, 'except')
         );
 
-        foreach ($this->connections() as $connection) {
-            if ($except && $except->id() === $connection->connection()->id()) {
-                break;
-            }
+        $chunks = array_chunk($this->connections(), 500);
 
-            if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                break;
-            }
+        foreach ($chunks as $connections) {
+            foreach ($connections as $connection) {
+                if ($except && $except->id() === $connection->connection()->id()) {
+                    break;
+                }
 
-            try {
-                $connection->send($message);
-            } catch (Exception $e) {
-                // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
-                // Output::info($e->getMessage());
+                if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+                    break;
+                }
+
+                try {
+                    $connection->send($message);
+                } catch (Exception $e) {
+                    // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
+                    // Output::info($e->getMessage());
+                }
             }
         }
     }
