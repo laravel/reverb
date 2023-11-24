@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Channels;
 
 use Exception;
+use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Output;
@@ -82,19 +83,21 @@ class Channel
      */
     public function broadcast(array $payload, Connection $except = null): void
     {
-        foreach ($this->connections() as $connection) {
-            // if ($except && $except->id() === $connection->connection()->id()) {
-            //     return;
-            // }
+        $message = json_encode(
+            Arr::except($payload, 'except')
+        );
 
-            // if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-            //     return;
-            // }
+        foreach ($this->connections() as $connection) {
+            if ($except && $except->id() === $connection->connection()->id()) {
+                break;
+            }
+
+            if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+                break;
+            }
 
             try {
-                $connection->send(
-                    json_encode($payload)
-                );
+                $connection->send($message);
             } catch (Exception $e) {
                 // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
                 // Output::info($e->getMessage());
