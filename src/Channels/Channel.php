@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Output;
 use React\Promise\Promise;
 
 class Channel
@@ -97,7 +96,7 @@ class Channel
                         if ($except && $except->id() === $connection->connection()->id()) {
                             break;
                         }
-        
+
                         if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
                             break;
                         }
@@ -106,8 +105,8 @@ class Channel
                         $resolve();
                     }
                 } catch (Exception $e) {
-                        $reject($e);
-                    } 
+                    $reject($e);
+                }
             });
         }
     }
