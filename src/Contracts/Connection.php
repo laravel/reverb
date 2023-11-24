@@ -69,8 +69,6 @@ abstract class Connection
     public function ping(): void
     {
         $this->hasBeenPinged = true;
-
-        // $this->pusher->ping($this);
     }
 
     /**
