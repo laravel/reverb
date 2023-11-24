@@ -93,7 +93,7 @@ class Channel
 
             try {
                 $connection->send(
-                    json_encode($payload, 'except')
+                    json_encode($payload)
                 );
             } catch (Exception $e) {
                 // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
