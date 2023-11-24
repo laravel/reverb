@@ -20,7 +20,7 @@ class WsConnection extends EventEmitter
 
     public function __construct(public Connection $connection)
     {
-        // 
+        //
     }
 
     public function openStream()

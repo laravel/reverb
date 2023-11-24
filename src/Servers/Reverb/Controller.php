@@ -25,11 +25,10 @@ class Controller
             return;
         }
 
-        
         $connection->onMessage(fn (string $message) => $this->server->message($reverbConnection, $message));
         $connection->onClose(fn () => $this->server->close($reverbConnection));
         $connection->openStream();
-        
+
         $this->server->open($reverbConnection);
         // $connection->on('message', fn (string $message) => $this->server->message($reverbConnection, $message));
         // $connection->on('close', fn () => $this->server->close($reverbConnection));
