@@ -87,7 +87,7 @@ class Channel
             Arr::except($payload, 'except')
         );
 
-        $chunks = array_chunk($this->connections(), 500);
+        $chunks = array_chunk($this->connections(), 100);
 
         foreach ($chunks as $connections) {
             foreach ($connections as $connection) {
