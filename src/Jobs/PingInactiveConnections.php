@@ -26,7 +26,7 @@ class PingInactiveConnections
                         return;
                     }
 
-                    $pusher->ping($connection);
+                    $pusher->ping($connection->connection());
                 }
             });
     }
