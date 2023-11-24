@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;

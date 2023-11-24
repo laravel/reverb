@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Tests;
 
-use Carbon\Carbon;
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
@@ -56,7 +55,6 @@ class Connection extends BaseConnection
 
         return $this;
     }
-
 
     public function setHasBeenPinged(): void
     {

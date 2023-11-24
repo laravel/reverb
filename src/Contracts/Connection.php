@@ -69,7 +69,7 @@ abstract class Connection
         $this->hasBeenPinged = true;
     }
 
-        /**
+    /**
      * Get the last time the connection was seen.
      */
     public function lastSeenAt(): ?int
