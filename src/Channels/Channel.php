@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Output;
+use React\Promise\Promise;
 
 class Channel
 {
@@ -90,22 +91,24 @@ class Channel
         $chunks = array_chunk($this->connections(), 100);
 
         foreach ($chunks as $connections) {
-            foreach ($connections as $connection) {
-                if ($except && $except->id() === $connection->connection()->id()) {
-                    break;
-                }
-
-                if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                    break;
-                }
-
+            new Promise(function ($resolve, $reject) use ($connections, $message, $except) {
                 try {
-                    $connection->send($message);
+                    foreach ($connections as $connection) {
+                        if ($except && $except->id() === $connection->connection()->id()) {
+                            break;
+                        }
+        
+                        if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+                            break;
+                        }
+
+                        $connection->send($message);
+                        $resolve();
+                    }
                 } catch (Exception $e) {
-                    // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
-                    // Output::info($e->getMessage());
-                }
-            }
+                        $reject($e);
+                    } 
+            });
         }
     }
 
