@@ -14,17 +14,26 @@ class WsConnection extends EventEmitter
 {
     protected $buffer;
 
+    protected $onMessage;
+
+    protected $onClose;
+
     public function __construct(public Connection $connection)
+    {
+        // 
+    }
+
+    public function openStream()
     {
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,
-            onMessage: fn (Message $message) => $this->emit('message', [$message->getPayload()]),
+            onMessage: $this->onMessage ?: fn () => null,
             onControl: fn (FrameInterface $message) => $this->control($message),
-            sender: [$connection, 'send']
+            sender: [$this->connection, 'send']
         );
 
-        $connection->on('data', [$this->buffer, 'onData']);
-        $connection->on('close', fn () => $this->emit('close'));
+        $this->connection->on('data', [$this->buffer, 'onData']);
+        $this->connection->on('close', $this->onClose ?: fn () => null);
     }
 
     /**
@@ -44,6 +53,16 @@ class WsConnection extends EventEmitter
             Frame::OP_PING => $this->send(new Frame('pong', opcode: Frame::OP_PONG)),
             Frame::OP_CLOSE => $this->close(),
         };
+    }
+
+    public function onMessage(callable $callback): void
+    {
+        $this->onMessage = $callback;
+    }
+
+    public function onClose(callable $callback): void
+    {
+        $this->onClose = $callback;
     }
 
     /**
