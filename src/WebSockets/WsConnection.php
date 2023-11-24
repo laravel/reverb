@@ -41,7 +41,9 @@ class WsConnection extends EventEmitter
      */
     public function send(string $message): void
     {
-        $this->buffer->sendMessage($message);
+        $message = new Frame($message);
+
+        $this->connection->send($message->getContents());
     }
 
     /**
