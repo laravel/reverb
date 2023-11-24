@@ -84,19 +84,17 @@ class Channel
     public function broadcast(array $payload, Connection $except = null): void
     {
         foreach ($this->connections() as $connection) {
-            if ($except && $except->id() === $connection->connection()->id()) {
-                return;
-            }
+            // if ($except && $except->id() === $connection->connection()->id()) {
+            //     return;
+            // }
 
-            if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                return;
-            }
+            // if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+            //     return;
+            // }
 
             try {
                 $connection->send(
-                    json_encode(
-                        Arr::except($payload, 'except')
-                    )
+                    json_encode($payload, 'except')
                 );
             } catch (Exception $e) {
                 // Output::error('Broadcasting to '.$connection->id().' resulted in an error');
