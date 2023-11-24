@@ -18,8 +18,6 @@ class Connection extends ConnectionContract
 
     /**
      * Stores the ping state of the connection.
-     *
-     * @var \Carbon\Carbon
      */
     protected $hasBeenPinged = false;
 

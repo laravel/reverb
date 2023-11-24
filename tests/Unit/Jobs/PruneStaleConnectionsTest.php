@@ -17,11 +17,11 @@ it('cleans up stale connections', function () {
 
     $this->channelManager->shouldReceive('connections')
         ->once()
-        ->andReturn(collect($connections));
+        ->andReturn($connections);
 
     collect($connections)->each(function ($connection) use ($channel) {
         $channel->subscribe($connection->connection());
-        $connection->setLastSeenAt(now()->subMinutes(10));
+        $connection->setLastSeenAt(time() - 60 * 10);
         $connection->setHasBeenPinged();
 
         $this->channelManager->shouldReceive('unsubscribeFromAll')

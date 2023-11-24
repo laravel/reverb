@@ -91,11 +91,11 @@ class Channel
         foreach ($chunks as $connections) {
             foreach ($connections as $connection) {
                 if ($except && $except->id() === $connection->connection()->id()) {
-                    break;
+                    continue;
                 }
 
                 if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                    break;
+                    continue;
                 }
 
                 try {

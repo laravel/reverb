@@ -13,8 +13,6 @@ abstract class Connection
 
     /**
      * Stores the ping state of the connection.
-     *
-     * @var \Carbon\Carbon
      */
     protected $hasBeenPinged = false;
 
@@ -71,12 +69,30 @@ abstract class Connection
         $this->hasBeenPinged = true;
     }
 
+        /**
+     * Get the last time the connection was seen.
+     */
+    public function lastSeenAt(): ?int
+    {
+        return $this->lastSeenAt;
+    }
+
+    /**
+     * Set the connection last seen at timestamp.
+     */
+    public function setLastSeenAt(int $time): Connection
+    {
+        $this->lastSeenAt = $time;
+
+        return $this;
+    }
+
     /**
      * Touch the connection last seen at timestamp.
      */
     public function touch(): Connection
     {
-        $this->lastSeenAt = time();
+        $this->setLastSeenAt(time());
 
         return $this;
     }

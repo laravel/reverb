@@ -31,6 +31,10 @@ class PruneStaleConnections
                         ]),
                     ]));
 
+                    $channels
+                        ->for($connection->app())
+                        ->unsubscribeFromAll($connection->connection());
+
                     $connection->disconnect();
                 }
             });

@@ -50,10 +50,13 @@ class Connection extends BaseConnection
         return 'http://localhost';
     }
 
-    public function setLastSeenAt(Carbon $lastSeenAt): void
+    public function setLastSeenAt(int $time): Connection
     {
-        $this->lastSeenAt = $lastSeenAt;
+        $this->lastSeenAt = $time;
+
+        return $this;
     }
+
 
     public function setHasBeenPinged(): void
     {

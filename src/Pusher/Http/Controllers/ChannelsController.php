@@ -15,7 +15,7 @@ class ChannelsController extends Controller
      */
     public function handle(RequestInterface $request, Connection $connection, ...$args): Response
     {
-        $channels = $this->channels->all();
+        $channels = collect($this->channels->all());
         $info = explode(',', $this->query['info'] ?? '');
 
         if (isset($this->query['filter_by_prefix'])) {

@@ -30,8 +30,9 @@ it('can handle a disconnection', function () {
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
+    $server = $this->app->make(Server::class);
 
-    $this->server->close(new Connection);
+    $server->close(new Connection);
 
     $channelManager->shouldHaveReceived('unsubscribeFromAll');
 });
@@ -160,8 +161,9 @@ it('unsubscribes a user from a channel on disconnection', function () {
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
+    $server = $this->app->make(Server::class);
 
-    $this->server->message(
+    $server->message(
         $connection = new Connection,
         json_encode([
             'event' => 'pusher:subscribe',
@@ -171,7 +173,7 @@ it('unsubscribes a user from a channel on disconnection', function () {
             ],
         ]));
 
-    $this->server->close($connection);
+    $server->close($connection);
 
     $channelManager->shouldHaveReceived('unsubscribeFromAll')
         ->once()
@@ -183,8 +185,9 @@ it('unsubscribes a user from a private channel on disconnection', function () {
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
+    $server = $this->app->make(Server::class);
 
-    $this->server->message(
+    $server->message(
         $connection = new Connection,
         json_encode([
             'event' => 'pusher:subscribe',
@@ -194,7 +197,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
             ],
         ]));
 
-    $this->server->close($connection);
+    $server->close($connection);
 
     $channelManager->shouldHaveReceived('unsubscribeFromAll')
         ->once()
@@ -206,8 +209,9 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
+    $server = $this->app->make(Server::class);
 
-    $this->server->message(
+    $server->message(
         $connection = new Connection,
         json_encode([
             'event' => 'pusher:subscribe',
@@ -217,7 +221,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
             ],
         ]));
 
-    $this->server->close($connection);
+    $server->close($connection);
 
     $channelManager->shouldHaveReceived('unsubscribeFromAll')
         ->once()
