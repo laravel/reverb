@@ -16,7 +16,7 @@ class ChannelsController extends Controller
     public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
         $this->verify($request, $connection, $appId);
-        
+
         $channels = collect($this->channels->all());
         $info = explode(',', $this->query['info'] ?? '');
 
