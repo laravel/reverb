@@ -56,6 +56,8 @@ class ArrayChannelManager implements ChannelManagerInterface
 
     /**
      * Get all the connections for the given channels.
+     *
+     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
     public function connections(string $channel = null): array
     {
@@ -79,15 +81,17 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel.
      */
-    public function channel(string $channel): array
+    public function channel(string $channel): Channel
     {
         return $this->channels($channel);
     }
 
     /**
      * Get the channels.
+     *
+     * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
      */
-    public function channels(string $channel = null): array|Channel
+    public function channels(string $channel = null): Channel|array
     {
         if (! isset($this->applications[$this->application->id()])) {
             $this->applications[$this->application->id()] = [];
