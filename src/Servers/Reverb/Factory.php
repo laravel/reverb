@@ -47,7 +47,7 @@ class Factory
         $routes->add('channels', Route::get('/apps/{appId}/channels', new ChannelsController));
         $routes->add('channel', Route::get('/apps/{appId}/channels/{channel}', new ChannelController));
         $routes->add('channel_users', Route::get('/apps/{appId}/channels/{channel}/users', new ChannelUsersController));
-        $routes->add('users_terminate', Route::post('/apps/{appId}/users/{user}/terminate_connections', new UsersTerminateController));
+        $routes->add('users_terminate', Route::post('/apps/{appId}/users/{userId}/terminate_connections', new UsersTerminateController));
 
         return $routes;
     }

@@ -13,8 +13,10 @@ class ChannelsController extends Controller
     /**
      * Handle the request.
      */
-    public function handle(RequestInterface $request, Connection $connection, ...$args): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
+        $this->verify($request, $connection, $appId);
+        
         $channels = collect($this->channels->all());
         $info = explode(',', $this->query['info'] ?? '');
 

@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Http;
 
+use Closure;
 use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Concerns\ClosesConnections;
@@ -9,6 +10,8 @@ use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
+use ReflectionFunction;
+use ReflectionMethod;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -50,12 +53,19 @@ class Router
             return $controller($request, $wsConnection, ...Arr::except($route, ['_controller', '_route']));
         }
 
-        $response = $controller($request, $connection, ...Arr::except($route, ['_controller', '_route']));
+        $routeParameters = Arr::except($route, ['_controller', '_route']) + ['request' => $request, 'connection' => $connection];
+
+        $response = $controller(
+            ...$this->arguments($controller, $routeParameters)
+        );
 
         return $connection->send($response)->close();
     }
 
-    protected function controller($route): callable
+    /**
+     * Get the controller callable for the route.
+     */
+    protected function controller(array $route): callable
     {
         return $route['_controller'];
     }
@@ -78,5 +88,44 @@ class Router
         $connection->write(Message::toString($response));
 
         return new WsConnection($connection);
+    }
+
+    /**
+     * Find the arguments for the controller.
+     *
+     * @return array<int, mixed>
+     */
+    public function arguments(callable $controller, array $routeParameters): array
+    {
+        $parameters = $this->parameters($controller);
+
+        return array_map(function ($parameter) use ($routeParameters) {
+            return $routeParameters[$parameter['name']] ?? null;
+        }, $parameters);
+    }
+
+    /**
+     * Find the parameters for the controller.
+     *
+     * @return array<int, array{ name: string, type: string, position: int }>
+     */
+    public function parameters(mixed $controller): array
+    {
+        $method = match (true) {
+            $controller instanceof Closure => new ReflectionFunction($controller),
+            is_string($controller) => count($parts = explode('::', $controller)) > 1 ? new ReflectionMethod(...$parts) : new ReflectionFunction($controller),
+            ! is_array($controller) => new ReflectionMethod($controller, '__invoke'),
+            is_array($controller) => new ReflectionMethod($controller[0], $controller[1]),
+        };
+
+        $parameters = $method->getParameters();
+
+        return array_map(function ($parameter) {
+            return [
+                'name' => $parameter->getName(),
+                'type' => $parameter->getType()->getName(),
+                'position' => $parameter->getPosition(),
+            ];
+        }, $parameters);
     }
 }

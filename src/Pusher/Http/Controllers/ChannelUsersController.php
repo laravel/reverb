@@ -13,9 +13,11 @@ class ChannelUsersController extends Controller
     /**
      * Handle the request.
      */
-    public function handle(RequestInterface $request, Connection $connection, ...$args): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $channel, string $appId): Response
     {
-        $channel = $this->channels->find($args['channel']);
+        $this->verify($request, $connection, $appId);
+
+        $channel = $this->channels->find($channel);
 
         if (! $channel instanceof PresenceChannel) {
             return new JsonResponse((object) [], 400);

@@ -12,9 +12,11 @@ class UsersTerminateController extends Controller
     /**
      * Handle the request.
      */
-    public function handle(RequestInterface $request, Connection $connection, ...$args): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId, string $userId): Response
     {
-        if (! $connection = $this->channels->connections()[$args['user']]) {
+        $this->verify($request, $connection, $appId);
+
+        if (! $connection = $this->channels->connections()[$userId]) {
             return new JsonResponse((object) [], 400);
         }
 

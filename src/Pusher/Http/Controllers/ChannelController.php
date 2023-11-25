@@ -12,10 +12,12 @@ class ChannelController extends Controller
     /**
      * Handle the request.
      */
-    public function handle(RequestInterface $request, Connection $connection, ...$args): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId, string $channel): Response
     {
+        $this->verify($request, $connection, $appId);
+
         $info = explode(',', $this->query['info'] ?? '');
-        $connections = $this->channels->find($args['channel'])->connections();
+        $connections = $this->channels->find($channel)->connections();
         $totalConnections = count($connections);
 
         return new JsonResponse((object) array_filter([

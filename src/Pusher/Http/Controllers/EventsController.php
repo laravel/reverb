@@ -14,8 +14,9 @@ class EventsController extends Controller
     /**
      * Handle the request.
      */
-    public function handle(RequestInterface $request, Connection $connection, ...$args): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
+        $this->verify($request, $connection, $appId);
         // @TODO Validate the request body as a JSON object in the correct format.
 
         $payload = json_decode($this->body, true);

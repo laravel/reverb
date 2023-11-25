@@ -10,43 +10,45 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 abstract class Controller
 {
     use ClosesConnections;
 
+    /**
+     * Current application instance.
+     */
     protected ?Application $application = null;
 
-    protected $connections;
+    /**
+     * Active chnnels for the application.
+     */
+    protected ?ChannelManager $channels = null;
 
-    protected $channels;
+    /**
+     * The request body
+     */
+    protected ?string $body;
 
-    protected $body;
+    /**
+     * The request query parameters
+     */
+    protected array $query = [];
 
-    protected $query;
-
-    public function __invoke(RequestInterface $request, Connection $connection, ...$args)
+    public function verify(RequestInterface $request, Connection $connection, $appId)
     {
         parse_str($request->getUri()->getQuery(), $query);
         $this->body = $request->getBody()->getContents();
         $this->query = $query;
 
         try {
-            $this->setApplication($args['appId'] ?? null);
+            $this->setApplication($appId);
             $this->setChannels();
         } catch (HttpException $e) {
             return $this->close($connection, $e->getStatusCode(), $e->getMessage());
         }
-
-        return $this->handle($request, $connection, ...$args);
     }
-
-    /**
-     * Handle the incoming request.
-     */
-    abstract public function handle(RequestInterface $request, Connection $connection, ...$args): Response;
 
     /**
      * Set the Reverb application instance.
