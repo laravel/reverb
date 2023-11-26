@@ -20,6 +20,11 @@ class Router
 {
     use ClosesConnections;
 
+    /**
+     * The server negotiator.
+     *
+     * @var \Ratchet\RFC6455\Handshake\ServerNegotiator
+     */
     protected ServerNegotiator $negotiator;
 
     public function __construct(protected UrlMatcherInterface $matcher)
@@ -64,6 +69,7 @@ class Router
 
     /**
      * Get the controller callable for the route.
+     * @param array<string, mixed> $route
      */
     protected function controller(array $route): callable
     {
