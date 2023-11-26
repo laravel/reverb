@@ -27,7 +27,7 @@ class Controller
 
         $connection->onMessage(fn (string $message) => $this->server->message($reverbConnection, $message));
         $connection->onClose(fn () => $this->server->close($reverbConnection));
-        $connection->openStream();
+        $connection->openBuffer();
 
         $this->server->open($reverbConnection);
     }

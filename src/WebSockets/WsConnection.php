@@ -7,15 +7,29 @@ use Laravel\Reverb\Http\Connection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
-use Ratchet\RFC6455\Messaging\Message;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
 
 class WsConnection extends EventEmitter
 {
+    /**
+     * The message buffer.
+     *
+     * @var \Ratchet\RFC6455\Messaging\MessageBuffer
+     */
     protected $buffer;
 
+    /**
+     * The message handler.
+     *
+     * @var ?callable
+     */
     protected $onMessage;
 
+    /**
+     * The connection close handler.
+     *
+     * @var ?callable
+     */
     protected $onClose;
 
     public function __construct(public Connection $connection)
@@ -23,7 +37,10 @@ class WsConnection extends EventEmitter
         //
     }
 
-    public function openStream()
+    /**
+     * Undocumented function
+     */
+    public function openBuffer(): void
     {
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,
@@ -41,9 +58,9 @@ class WsConnection extends EventEmitter
      */
     public function send(string $message): void
     {
-        $message = new Frame($message);
-
-        $this->connection->send($message->getContents());
+        $this->connection->send(
+            (new Frame($message))->getContents()
+        );
     }
 
     /**
@@ -57,11 +74,17 @@ class WsConnection extends EventEmitter
         };
     }
 
+    /**
+     * Set the message handler.
+     */
     public function onMessage(callable $callback): void
     {
         $this->onMessage = $callback;
     }
 
+    /**
+     * Set the close handler.
+     */
     public function onClose(callable $callback): void
     {
         $this->onClose = $callback;
@@ -75,6 +98,9 @@ class WsConnection extends EventEmitter
         $this->connection->close();
     }
 
+    /**
+     * Get the raw socket connection identifier.
+     */
     public function id()
     {
         return $this->connection->id();
