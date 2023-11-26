@@ -12,6 +12,7 @@ class ChannelBroker
     public static function create(string $name): Channel
     {
         return match (Str::before($name, '-')) {
+            'cache' => new CacheChannel($name),
             'private' => new PrivateChannel($name),
             'presence' => new PresenceChannel($name),
             default => new Channel($name),

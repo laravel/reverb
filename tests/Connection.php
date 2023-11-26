@@ -76,6 +76,11 @@ class Connection extends BaseConnection
         Assert::assertContains(json_encode($message), $this->messages);
     }
 
+    public function assertSendCount(int $count): void
+    {
+        Assert::assertCount($count, $this->messages);
+    }
+
     public function assertNothingSent(): void
     {
         Assert::assertEmpty($this->messages);

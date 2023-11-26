@@ -156,6 +156,54 @@ it('can subscribe a user to a presence channel', function () {
     ]);
 });
 
+it('receives no data when no previous event triggered when joining a cache channel', function () {
+    $this->server->message(
+        $connection = new Connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'cache-test-channel',
+            ],
+        ]));
+
+    $connection->assertSent([
+        'event' => 'pusher_internal:subscription_succeeded',
+        'channel' => 'cache-test-channel',
+    ]);
+    $connection->assertSendCount(1);
+});
+
+it('receives last triggered event when joining a cache channel', function () {
+    $this->server->message(
+        $connection = new Connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'cache-test-channel',
+            ],
+        ]));
+
+    $channel = app(ChannelManager::class)->find('cache-test-channel');
+
+    $channel->broadcast(['foo' => 'bar']);
+
+    $this->server->message(
+        $connection = new Connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'cache-test-channel',
+            ],
+        ]));
+
+    $connection->assertSent([
+        'event' => 'pusher_internal:subscription_succeeded',
+        'channel' => 'cache-test-channel',
+    ]);
+    $connection->assertSent(['foo' => 'bar']);
+    $connection->assertSendCount(2);
+});
+
 it('unsubscribes a user from a channel on disconnection', function () {
     $channelManager = Mockery::spy(ChannelManager::class);
     $channelManager->shouldReceive('for')
