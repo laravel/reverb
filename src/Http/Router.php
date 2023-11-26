@@ -22,8 +22,6 @@ class Router
 
     /**
      * The server negotiator.
-     *
-     * @var \Ratchet\RFC6455\Handshake\ServerNegotiator
      */
     protected ServerNegotiator $negotiator;
 
@@ -69,7 +67,8 @@ class Router
 
     /**
      * Get the controller callable for the route.
-     * @param array<string, mixed> $route
+     *
+     * @param  array<string, mixed>  $route
      */
     protected function controller(array $route): callable
     {
