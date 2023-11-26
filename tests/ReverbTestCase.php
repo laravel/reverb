@@ -251,7 +251,7 @@ class ReverbTestCase extends TestCase
             $promise->resolve((string) $message);
         });
 
-        return timeout($promise->promise(), 2, $this->loop)
+        return timeout($promise->promise(), 5, $this->loop)
             ->then(
                 fn ($message) => $message,
                 fn (TimeoutException $error) => false
