@@ -1,14 +1,16 @@
 <?php
 
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Pusher\Event as PusherEvent;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
     $this->connection = new Connection;
+    $this->pusher = new PusherEvent(app(ChannelManager::class));
 });
 
 it('can send an acknowledgement', function () {
-    PusherEvent::handle(
+    $this->pusher->handle(
         $this->connection,
         'pusher:connection_established'
     );
@@ -23,7 +25,7 @@ it('can send an acknowledgement', function () {
 });
 
 it('can subscribe to a channel', function () {
-    PusherEvent::handle(
+    $this->pusher->handle(
         $this->connection,
         'pusher:subscribe',
         ['channel' => 'test-channel']
@@ -36,7 +38,7 @@ it('can subscribe to a channel', function () {
 });
 
 it('can unsubscribe from a channel', function () {
-    PusherEvent::handle(
+    $this->pusher->handle(
         $this->connection,
         'pusher:unsubscribe',
         ['channel' => 'test-channel']
@@ -46,7 +48,7 @@ it('can unsubscribe from a channel', function () {
 });
 
 it('can respond to a ping', function () {
-    PusherEvent::handle(
+    $this->pusher->handle(
         $this->connection,
         'pusher:ping',
     );
@@ -57,7 +59,7 @@ it('can respond to a ping', function () {
 });
 
 it('can correctly format a payload', function () {
-    $payload = PusherEvent::formatPayload(
+    $payload = $this->pusher->formatPayload(
         'foo',
         ['bar' => 'baz'],
         'test-channel',
@@ -70,7 +72,7 @@ it('can correctly format a payload', function () {
         'channel' => 'test-channel',
     ]));
 
-    $payload = PusherEvent::formatPayload('foo');
+    $payload = $this->pusher->formatPayload('foo');
 
     expect($payload)->toBe(json_encode([
         'event' => 'pusher:foo',
@@ -78,7 +80,7 @@ it('can correctly format a payload', function () {
 });
 
 it('can correctly format an internal payload', function () {
-    $payload = PusherEvent::formatInternalPayload(
+    $payload = $this->pusher->formatInternalPayload(
         'foo',
         ['bar' => 'baz'],
         'test-channel',
@@ -91,7 +93,7 @@ it('can correctly format an internal payload', function () {
         'channel' => 'test-channel',
     ]));
 
-    $payload = PusherEvent::formatInternalPayload('foo');
+    $payload = $this->pusher->formatInternalPayload('foo');
 
     expect($payload)->toBe(json_encode([
         'event' => 'pusher_internal:foo',

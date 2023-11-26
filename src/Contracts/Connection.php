@@ -2,30 +2,27 @@
 
 namespace Laravel\Reverb\Contracts;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Output;
-use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 abstract class Connection
 {
     /**
      * The last time the connection was seen.
      */
-    protected ?string $lastSeenAt = null;
+    protected ?int $lastSeenAt;
 
     /**
      * Stores the ping state of the connection.
-     *
-     * @var \Carbon\Carbon
      */
     protected $hasBeenPinged = false;
+
+    protected $pusher;
 
     public function __construct(
         protected Application $application,
         protected ?string $origin
     ) {
+        $this->lastSeenAt = time();
     }
 
     /**
@@ -70,10 +67,24 @@ abstract class Connection
     public function ping(): void
     {
         $this->hasBeenPinged = true;
+    }
 
-        PusherEvent::ping($this);
+    /**
+     * Get the last time the connection was seen.
+     */
+    public function lastSeenAt(): ?int
+    {
+        return $this->lastSeenAt;
+    }
 
-        Output::info('Connection Pinged', $this->id());
+    /**
+     * Set the connection last seen at timestamp.
+     */
+    public function setLastSeenAt(int $time): Connection
+    {
+        $this->lastSeenAt = $time;
+
+        return $this;
     }
 
     /**
@@ -81,7 +92,7 @@ abstract class Connection
      */
     public function touch(): Connection
     {
-        $this->lastSeenAt = (string) now();
+        $this->setLastSeenAt(time());
 
         return $this;
     }
@@ -91,19 +102,7 @@ abstract class Connection
      */
     public function disconnect(): void
     {
-        App::make(ChannelManager::class)
-            ->for($this->app())
-            ->unsubscribeFromAll($this);
-
         $this->terminate();
-    }
-
-    /**
-     * Get the last time the connection was seen.
-     */
-    public function lastSeenAt(): ?Carbon
-    {
-        return $this->lastSeenAt ? Carbon::parse($this->lastSeenAt) : null;
     }
 
     /**
@@ -111,12 +110,7 @@ abstract class Connection
      */
     public function isActive(): bool
     {
-        return $this->lastSeenAt() &&
-            $this->lastSeenAt()->isAfter(
-                now()->subMinutes(
-                    $this->app()->pingInterval()
-                )
-            );
+        return time() < $this->lastSeenAt + $this->app()->pingInterval();
     }
 
     /**

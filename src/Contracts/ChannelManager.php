@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Contracts;
 
-use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 
@@ -21,7 +20,7 @@ interface ChannelManager
     /**
      * Get all the channels.
      */
-    public function all(): Collection;
+    public function all(): array;
 
     /**
      * Find the given channel.
@@ -31,7 +30,7 @@ interface ChannelManager
     /**
      * Get all the connections for the given channels.
      */
-    public function connections(string $channel = null): Collection;
+    public function connections(string $channel = null): array;
 
     /**
      * Unsubscribe from all channels.

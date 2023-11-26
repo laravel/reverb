@@ -4,6 +4,7 @@ namespace Laravel\Reverb;
 
 use Exception;
 use Illuminate\Support\Str;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Exceptions\PusherException;
@@ -11,6 +12,11 @@ use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class Server
 {
+    public function __construct(protected ChannelManager $channels, protected PusherEvent $pusher)
+    {
+        //
+    }
+
     /**
      * Handle the a client connection.
      */
@@ -21,9 +27,7 @@ class Server
 
             $connection->touch();
 
-            PusherEvent::handle($connection, 'pusher:connection_established');
-
-            Output::info('Connection Established', $connection->id());
+            $this->pusher->handle($connection, 'pusher:connection_established');
         } catch (Exception $e) {
             $this->error($connection, $e);
         }
@@ -34,16 +38,11 @@ class Server
      */
     public function message(Connection $from, string $message): void
     {
-        Output::info('Message Received', $from->id());
-        Output::message($message);
-
-        $from->touch();
-
         $event = json_decode($message, true);
 
         try {
             match (Str::startsWith($event['event'], 'pusher:')) {
-                true => PusherEvent::handle(
+                true => $this->pusher->handle(
                     $from,
                     $event['event'],
                     $event['data'] ?? [],
@@ -52,10 +51,11 @@ class Server
                 default => ClientEvent::handle($from, $event)
             };
 
-            Output::info('Message Handled', $from->id());
         } catch (Exception $e) {
             $this->error($from, $e);
         }
+
+        $from->touch();
     }
 
     /**
@@ -63,9 +63,11 @@ class Server
      */
     public function close(Connection $connection): void
     {
-        $connection->disconnect();
+        $this->channels
+            ->for($connection->app())
+            ->unsubscribeFromAll($connection);
 
-        Output::info('Connection Closed', $connection->id());
+        $connection->disconnect();
     }
 
     /**
@@ -75,9 +77,6 @@ class Server
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
-
-            Output::error('Message from '.$connection->id().' resulted in a pusher error');
-            Output::info($exception->getMessage());
 
             return;
         }
@@ -89,9 +88,6 @@ class Server
                 'message' => 'Invalid message format',
             ]),
         ]));
-
-        Output::error('Message from '.$connection->id().' resulted in an unknown error');
-        Output::info($exception->getMessage());
     }
 
     /**

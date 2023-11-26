@@ -31,9 +31,10 @@ it('can get all channels', function () {
 
     $channels->each(fn ($channel) => $this->channelManager->find($channel)->subscribe($this->connection));
 
-    $this->channelManager->all()->values()->each(function ($channel, $index) {
-        expect($channel->name())->toBe('test-channel-'.($index));
-    });
+    foreach ($this->channelManager->all() as $index => $channel) {
+        expect($channel->name())->toBe($index);
+    }
+
     expect($this->channelManager->all())->toHaveCount(4);
 });
 

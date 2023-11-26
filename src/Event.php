@@ -41,7 +41,7 @@ class Event
             $channel = app(ChannelManager::class)->for($app)->find($channel);
             $payload['channel'] = $channel->name();
 
-            $channel->broadcast($app, $payload, $connection);
+            $channel->broadcast($payload, $connection);
         }
     }
 }

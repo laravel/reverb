@@ -17,14 +17,7 @@ class Connection extends ConnectionContract
     protected ?string $id = null;
 
     /**
-     * The last time the connection was seen.
-     */
-    protected ?string $lastSeenAt = null;
-
-    /**
      * Stores the ping state of the connection.
-     *
-     * @var \Carbon\Carbon
      */
     protected $hasBeenPinged = false;
 

@@ -22,6 +22,9 @@ class Request
      */
     const MAX_SIZE = 4096;
 
+    /**
+     * Turn the raw message into a Psr7 request.
+     */
     public static function from(string $message, Connection $connection): ?RequestInterface
     {
         $connection->appendToBuffer($message);

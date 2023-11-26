@@ -13,8 +13,9 @@ class EventsBatchController extends Controller
     /**
      * Handle the request.
      */
-    public function handle(RequestInterface $request, Connection $connection, ...$args): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
+        $this->verify($request, $connection, $appId);
         // @TODO Validate the request body as a JSON array of events in the correct format and a max of 10 items.
 
         $items = collect(json_decode($this->body, true));
@@ -27,7 +28,7 @@ class EventsBatchController extends Controller
                     'channel' => $item['channel'],
                     'data' => $item['data'],
                 ],
-                isset($item['socket_id']) ? $this->channels->find($item['channel'])->connections()->findById($item['socket_id']) : null
+                isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null
             );
 
             return isset($item['info']) ? $this->getInfo($item['channel'], $item['info']) : [];

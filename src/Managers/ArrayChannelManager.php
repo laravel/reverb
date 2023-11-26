@@ -2,7 +2,7 @@
 
 namespace Laravel\Reverb\Managers;
 
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
@@ -41,9 +41,9 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get all the channels.
      */
-    public function all(): Collection
+    public function all(): array
     {
-        return collect($this->channels());
+        return $this->channels();
     }
 
     /**
@@ -56,14 +56,16 @@ class ArrayChannelManager implements ChannelManagerInterface
 
     /**
      * Get all the connections for the given channels.
+     *
+     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
-    public function connections(string $channel = null): Collection
+    public function connections(string $channel = null): array
     {
-        $channels = Collection::wrap($this->channels($channel));
+        $channels = Arr::wrap($this->channels($channel));
 
-        return $channels->reduce(function ($carry, $channel) {
-            return $carry = $carry->merge($channel->connections());
-        }, collect());
+        return array_reduce($channels, function ($carry, $channel) {
+            return $carry + $channel->connections();
+        }, []);
     }
 
     /**
@@ -79,15 +81,17 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel.
      */
-    public function channel(string $channel): array
+    public function channel(string $channel): Channel
     {
         return $this->channels($channel);
     }
 
     /**
      * Get the channels.
+     *
+     * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
      */
-    public function channels(string $channel = null): array|Channel
+    public function channels(string $channel = null): Channel|array
     {
         if (! isset($this->applications[$this->application->id()])) {
             $this->applications[$this->application->id()] = [];
@@ -101,7 +105,7 @@ class ArrayChannelManager implements ChannelManagerInterface
             return $this->applications[$this->application->id()][$channel];
         }
 
-        return $this->applications[$this->application->id()] ?? [];
+        return $this->applications[$this->application->id()];
     }
 
     /**

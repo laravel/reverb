@@ -14,7 +14,6 @@ class PresenceChannel extends PrivateChannel
         parent::subscribe($connection, $auth, $data);
 
         $this->broadcast(
-            $connection->app(),
             [
                 'event' => 'pusher_internal:member_added',
                 'data' => $data ? json_decode($data, true) : [],
@@ -37,7 +36,6 @@ class PresenceChannel extends PrivateChannel
 
         if ($userId = $subscription->data('user_id')) {
             $this->broadcast(
-                $connection->app(),
                 [
                     'event' => 'pusher_internal:member_removed',
                     'data' => ['user_id' => $userId],

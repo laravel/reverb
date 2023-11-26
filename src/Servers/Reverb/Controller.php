@@ -11,6 +11,11 @@ use Psr\Http\Message\RequestInterface;
 
 class Controller
 {
+    public function __construct(protected Server $server, protected ApplicationProvider $applications)
+    {
+        //
+    }
+
     /**
      * Invoke the Reverb WebSocket server.
      */
@@ -20,11 +25,11 @@ class Controller
             return;
         }
 
-        $server = app(Server::class);
-        $server->open($reverbConnection);
+        $connection->onMessage(fn (string $message) => $this->server->message($reverbConnection, $message));
+        $connection->onClose(fn () => $this->server->close($reverbConnection));
+        $connection->openBuffer();
 
-        $connection->on('message', fn (string $message) => $server->message($reverbConnection, $message));
-        $connection->on('close', fn () => $server->close($reverbConnection));
+        $this->server->open($reverbConnection);
     }
 
     /**
@@ -33,7 +38,7 @@ class Controller
     protected function connection(RequestInterface $request, WsConnection $connection, string $key): ?ReverbConnection
     {
         try {
-            $application = app(ApplicationProvider::class)->findByKey($key);
+            $application = $this->applications->findByKey($key);
         } catch (InvalidApplication $e) {
             $connection->send('{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
 

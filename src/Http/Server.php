@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Http;
 
-use GuzzleHttp\Psr7\Message;
 use Laravel\Reverb\Concerns\ClosesConnections;
 use OverflowException;
 use Psr\Http\Message\RequestInterface;
@@ -22,19 +21,16 @@ class Server
         $socket->on('connection', $this);
     }
 
-    public function __invoke(ConnectionInterface $connection)
+    /**
+     * Invoke the server.
+     */
+    public function __invoke(ConnectionInterface $connection): void
     {
         $connection = new Connection($connection);
 
         $connection->on('data', function ($data) use ($connection) {
             $this->handleRequest($data, $connection);
         });
-        // $connection->on('close', function () use ($connection) {
-        //     $this->handleEnd($conn);
-        // });
-        // $conn->on('error', function (\Exception $e) use ($conn) {
-        //     $this->handleError($e, $conn);
-        // });
     }
 
     /**

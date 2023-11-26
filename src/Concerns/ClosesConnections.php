@@ -16,6 +16,7 @@ trait ClosesConnections
         $response = new Response($statusCode, $headers, $message);
 
         $connection->send(Message::toString($response));
+
         $connection->close();
     }
 }

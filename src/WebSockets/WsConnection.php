@@ -7,24 +7,50 @@ use Laravel\Reverb\Http\Connection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
-use Ratchet\RFC6455\Messaging\Message;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
 
 class WsConnection extends EventEmitter
 {
+    /**
+     * The message buffer.
+     *
+     * @var \Ratchet\RFC6455\Messaging\MessageBuffer
+     */
     protected $buffer;
+
+    /**
+     * The message handler.
+     *
+     * @var ?callable
+     */
+    protected $onMessage;
+
+    /**
+     * The connection close handler.
+     *
+     * @var ?callable
+     */
+    protected $onClose;
 
     public function __construct(public Connection $connection)
     {
+        //
+    }
+
+    /**
+     * Undocumented function
+     */
+    public function openBuffer(): void
+    {
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,
-            onMessage: fn (Message $message) => $this->emit('message', [$message->getPayload()]),
+            onMessage: $this->onMessage ?: fn () => null,
             onControl: fn (FrameInterface $message) => $this->control($message),
-            sender: [$connection, 'send']
+            sender: [$this->connection, 'send']
         );
 
-        $connection->on('data', [$this->buffer, 'onData']);
-        $connection->on('close', fn () => $this->emit('close'));
+        $this->connection->on('data', [$this->buffer, 'onData']);
+        $this->connection->on('close', $this->onClose ?: fn () => null);
     }
 
     /**
@@ -32,7 +58,9 @@ class WsConnection extends EventEmitter
      */
     public function send(string $message): void
     {
-        $this->buffer->sendMessage($message);
+        $this->connection->send(
+            (new Frame($message))->getContents()
+        );
     }
 
     /**
@@ -47,6 +75,22 @@ class WsConnection extends EventEmitter
     }
 
     /**
+     * Set the message handler.
+     */
+    public function onMessage(callable $callback): void
+    {
+        $this->onMessage = $callback;
+    }
+
+    /**
+     * Set the close handler.
+     */
+    public function onClose(callable $callback): void
+    {
+        $this->onClose = $callback;
+    }
+
+    /**
      * Close the connection.
      */
     public function close(): void
@@ -54,6 +98,9 @@ class WsConnection extends EventEmitter
         $this->connection->close();
     }
 
+    /**
+     * Get the raw socket connection identifier.
+     */
     public function id()
     {
         return $this->connection->id();

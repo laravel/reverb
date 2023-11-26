@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Http;
 
+use Closure;
 use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Concerns\ClosesConnections;
@@ -9,6 +10,8 @@ use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
+use ReflectionFunction;
+use ReflectionMethod;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -17,8 +20,14 @@ class Router
 {
     use ClosesConnections;
 
+    /**
+     * The server negotiator.
+     */
+    protected ServerNegotiator $negotiator;
+
     public function __construct(protected UrlMatcherInterface $matcher)
     {
+        $this->negotiator = new ServerNegotiator(new RequestVerifier);
     }
 
     /**
@@ -31,10 +40,6 @@ class Router
         $context->setMethod($request->getMethod());
         $context->setHost($uri->getHost());
 
-        if ($this->isWebSocketRequest($request)) {
-            $connection = $this->attemptUpgrade($request, $connection);
-        }
-
         try {
             $route = $this->matcher->match($uri->getPath());
         } catch (MethodNotAllowedException $e) {
@@ -43,13 +48,31 @@ class Router
             return $this->close($connection, 404, 'Not found.');
         }
 
-        $response = $route['_controller']($request, $connection, ...Arr::except($route, ['_controller', '_route']));
+        $controller = $this->controller($route);
 
-        if (! $this->isWebSocketRequest($request)) {
-            return $connection->send($response)->close();
+        if ($this->isWebSocketRequest($request)) {
+            $wsConnection = $this->attemptUpgrade($request, $connection);
+
+            return $controller($request, $wsConnection, ...Arr::except($route, ['_controller', '_route']));
         }
 
-        return null;
+        $routeParameters = Arr::except($route, ['_controller', '_route']) + ['request' => $request, 'connection' => $connection];
+
+        $response = $controller(
+            ...$this->arguments($controller, $routeParameters)
+        );
+
+        return $connection->send($response)->close();
+    }
+
+    /**
+     * Get the controller callable for the route.
+     *
+     * @param  array<string, mixed>  $route
+     */
+    protected function controller(array $route): callable
+    {
+        return $route['_controller'];
     }
 
     /**
@@ -65,11 +88,49 @@ class Router
      */
     protected function attemptUpgrade(RequestInterface $request, Connection $connection): WsConnection
     {
-        $negotiator = new ServerNegotiator(new RequestVerifier);
-        $response = $negotiator->handshake($request);
+        $response = $this->negotiator->handshake($request);
 
         $connection->write(Message::toString($response));
 
         return new WsConnection($connection);
+    }
+
+    /**
+     * Find the arguments for the controller.
+     *
+     * @return array<int, mixed>
+     */
+    public function arguments(callable $controller, array $routeParameters): array
+    {
+        $parameters = $this->parameters($controller);
+
+        return array_map(function ($parameter) use ($routeParameters) {
+            return $routeParameters[$parameter['name']] ?? null;
+        }, $parameters);
+    }
+
+    /**
+     * Find the parameters for the controller.
+     *
+     * @return array<int, array{ name: string, type: string, position: int }>
+     */
+    public function parameters(mixed $controller): array
+    {
+        $method = match (true) {
+            $controller instanceof Closure => new ReflectionFunction($controller),
+            is_string($controller) => count($parts = explode('::', $controller)) > 1 ? new ReflectionMethod(...$parts) : new ReflectionFunction($controller),
+            ! is_array($controller) => new ReflectionMethod($controller, '__invoke'),
+            is_array($controller) => new ReflectionMethod($controller[0], $controller[1]),
+        };
+
+        $parameters = $method->getParameters();
+
+        return array_map(function ($parameter) {
+            return [
+                'name' => $parameter->getName(),
+                'type' => $parameter->getType()->getName(),
+                'position' => $parameter->getPosition(),
+            ];
+        }, $parameters);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -141,7 +141,7 @@ it('it can ping inactive subscribers', function () {
     $this->subscribe('test-channel', connection: $connection);
     $promise = $this->messagePromise($connection);
 
-    Carbon::setTestNow(now()->addMinutes(10));
+    Arr::first(channelManager()->connections())->setLastSeenAt(time() - 60 * 10);
 
     (new PingInactiveConnections)->handle(channelManager());
 
@@ -155,7 +155,7 @@ it('it can disconnect inactive subscribers', function () {
 
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(1);
 
-    Carbon::setTestNow(now()->addMinutes(10));
+    Arr::first(channelManager()->connections())->setLastSeenAt(time() - 60 * 10);
 
     $promiseTwo = $this->messagePromise($connection);
     (new PingInactiveConnections)->handle(
@@ -204,7 +204,7 @@ it('can subscribe a connection to multiple channels', function () {
     $this->subscribe('presence-test-channel-4', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
 
     expect(channelManager()->all())->toHaveCount(4);
-    channelManager()->all()->each(function ($channel) use ($connection) {
+    collect(channelManager()->all())->each(function ($channel) use ($connection) {
         expect($channel->connections())->toHaveCount(1);
         expect(collect($channel->connections())->map(fn ($connection) => $connection->id()))->toContain($this->connectionId);
     });
