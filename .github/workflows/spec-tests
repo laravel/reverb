@@ -1,0 +1,52 @@
+name: Autobahn WebSocket Spec Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.2, 8.3]
+        laravel: [10]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker
+      uses: actions/setup-docker@v2
+
+    - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+    - name: Install dependencies
+      run: |
+          composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update
+          composer update --prefer-dist --no-interaction --no-progress
+
+    - name: Pull Autobahn Docker image
+      run: docker pull crossbario/autobahn-testsuite
+
+    - name: Start WebSocket server
+      run: php echo.php &
+
+    - name: Run WebSocket specification tests
+      run: |
+        docker run -it --rm \
+          -v $PWD:/mnt/autobahn \
+          -v $PWD/reports:/mnt/autobahn/reports \
+          crossbario/autobahn-testsuite \
+          /usr/local/bin/docker-entrypoint.sh \
+          wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
+
+    - name: Set workflow status based on Autobahn exit status
+      run: exit $?

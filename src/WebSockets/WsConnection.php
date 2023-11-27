@@ -5,6 +5,7 @@ namespace Laravel\Reverb\WebSockets;
 use Evenement\EventEmitter;
 use Laravel\Reverb\Http\Connection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
+use Ratchet\RFC6455\Messaging\DataInterface;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
@@ -56,10 +57,12 @@ class WsConnection extends EventEmitter
     /**
      * Send a message to the connection.
      */
-    public function send(string $message): void
+    public function send(mixed $message): void
     {
         $this->connection->send(
-            (new Frame($message))->getContents()
+            $message instanceof DataInterface ?
+                $message->getContents() :
+                (new Frame($message))->getContents()
         );
     }
 
@@ -69,8 +72,9 @@ class WsConnection extends EventEmitter
     public function control(FrameInterface $message): void
     {
         match ($message->getOpcode()) {
-            Frame::OP_PING => $this->send(new Frame('pong', opcode: Frame::OP_PONG)),
-            Frame::OP_CLOSE => $this->close(),
+            Frame::OP_PING => $this->send(new Frame($message->getPayload(), opcode: Frame::OP_PONG)),
+            Frame::OP_PONG => fn () => null,
+            Frame::OP_CLOSE => $this->close($message),
         };
     }
 
@@ -93,8 +97,10 @@ class WsConnection extends EventEmitter
     /**
      * Close the connection.
      */
-    public function close(): void
+    public function close(FrameInterface $frame): void
     {
+        $this->send($frame);
+
         $this->connection->close();
     }
 

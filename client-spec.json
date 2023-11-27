@@ -1,0 +1,11 @@
+{
+    "options": { "failByDrop": false },
+    "outdir": "/mnt/autobahn/reports",
+    "servers": [{ "agent": "Reverb", "url": "ws://host.docker.internal:8080", "options": { "version": 18 } }],
+    "cases": ["*"],
+    "exclude-cases": [
+        "12.*",
+        "13.*"
+    ],
+    "exclude-agent-cases": {}
+ }
