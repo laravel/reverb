@@ -6,6 +6,7 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
+use Ratchet\RFC6455\Messaging\Frame;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect;
@@ -322,6 +323,13 @@ it('cconnections can be limited', function () {
 
     $this->connect();
 })->throws('Connection closed before handshake');
+
+it('limits the size of messages', function () {
+   $connection = $this->connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
+   $message = $this->send(['This message is waaaaaay longer than the 1 byte limit'], $connection);
+
+   expect($message)->toBe('Maximum message size exceeded');
+});
 
 it('clears application state between requests', function () {
     $this->subscribe('test-channel');

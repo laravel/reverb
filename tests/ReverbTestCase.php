@@ -67,6 +67,7 @@ class ReverbTestCase extends TestCase
             'capacity' => null,
             'allowed_origins' => ['*'],
             'ping_interval' => 10,
+            'max_message_size' => 1000000,
         ]);
 
         $app['config']->set('reverb.apps.apps.2', [
@@ -76,6 +77,7 @@ class ReverbTestCase extends TestCase
             'capacity' => null,
             'allowed_origins' => ['laravel.com'],
             'ping_interval' => 10,
+            'max_message_size' => 1,
         ]);
     }
 
@@ -174,6 +176,10 @@ class ReverbTestCase extends TestCase
         $connection = $connection ?: $this->connect();
 
         $connection->on('message', function ($message) use ($promise) {
+            $promise->resolve((string) $message);
+        });
+
+        $connection->on('close', function ($code, $message) use ($promise) {
             $promise->resolve((string) $message);
         });
 

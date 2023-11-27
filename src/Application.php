@@ -9,7 +9,8 @@ class Application
         protected string $key,
         protected string $secret,
         protected int $pingInterval,
-        protected array $allowedOrigins
+        protected array $allowedOrigins,
+        protected int $maxMessageSize,
     ) {
     }
 
@@ -51,5 +52,13 @@ class Application
     public function pingInterval(): int
     {
         return $this->pingInterval;
+    }
+
+    /**
+     * Get the maximum message size allowed from the client.
+     */
+    public function maxMessageSize(): int
+    {
+        return $this->maxMessageSize;
     }
 }

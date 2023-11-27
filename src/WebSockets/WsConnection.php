@@ -33,6 +33,13 @@ class WsConnection extends EventEmitter
      */
     protected $onClose;
 
+    /**
+     * The maximum number of allowed bytes for each message.
+     *
+     * @var int
+     */
+    protected $maxMessageSize;
+
     public function __construct(public Connection $connection)
     {
         //
@@ -45,6 +52,7 @@ class WsConnection extends EventEmitter
     {
         $this->buffer = new MessageBuffer(
             new CloseFrameChecker,
+            maxMessagePayloadSize: $this->maxMessageSize,
             onMessage: $this->onMessage ?: fn () => null,
             onControl: fn (FrameInterface $message) => $this->control($message),
             sender: [$this->connection, 'send']
@@ -92,6 +100,14 @@ class WsConnection extends EventEmitter
     public function onClose(callable $callback): void
     {
         $this->onClose = $callback;
+    }
+
+    /**
+     * Set the maximum number of allowed bytes for each message from the client.
+     */
+    public function withMaxMessageSize(int $size): void
+    {
+        $this->maxMessageSize = $size;
     }
 
     /**
