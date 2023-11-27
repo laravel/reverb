@@ -6,7 +6,6 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
-use Ratchet\RFC6455\Messaging\Frame;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect;
