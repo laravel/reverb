@@ -52,5 +52,6 @@ jobs:
           crossbario/autobahn-testsuite \
           wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
 
-    - name: Set workflow status based on Autobahn exit status
-      run: exit $?
+    - name: Analyze test results
+      working-directory: tests/Specification
+      run: php spec-analyze.php
