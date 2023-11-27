@@ -1,4 +1,4 @@
-name: Autobahn WebSocket Spec Tests
+name: spec tests
 
 on:
   push:
@@ -41,13 +41,12 @@ jobs:
     - name: Start WebSocket server
       run: php echo.php &
 
-    - name: Run WebSocket specification tests
+    - name: Run specification tests
       run: |
         docker run --rm \
           -v $PWD:/mnt/autobahn \
           -v $PWD/reports:/mnt/autobahn/reports \
           crossbario/autobahn-testsuite \
-          /usr/local/bin/docker-entrypoint.sh \
           wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
 
     - name: Set workflow status based on Autobahn exit status
