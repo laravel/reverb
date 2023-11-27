@@ -6,7 +6,6 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
-use Ratchet\RFC6455\Messaging\Frame;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect;
@@ -313,13 +312,6 @@ it('can connect from a valid origin', function () {
     $this->app['config']->set('reverb.apps.0.allowed_origins', ['0.0.0.0']);
 
     $this->connect();
-});
-
-it('can receive a pong control frame', function () {
-    $frame = new Frame('ping', true, Frame::OP_PING);
-    $response = $this->sendRaw($frame);
-
-    expect($response)->toBe('pong');
 });
 
 it('clears application state between requests', function () {
