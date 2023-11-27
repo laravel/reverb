@@ -46,7 +46,7 @@ jobs:
         docker run --rm \
           -v $PWD:/mnt/autobahn \
           -v $PWD/reports:/mnt/autobahn/reports \
-          -i -t crossbario/autobahn-testsuite \
+          crossbario/autobahn-testsuite \
           /usr/local/bin/docker-entrypoint.sh \
           wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
 
