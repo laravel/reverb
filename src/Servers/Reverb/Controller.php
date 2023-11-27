@@ -25,6 +25,7 @@ class Controller
             return;
         }
 
+        $connection->withMaxMessageSize($reverbConnection->app()->maxMessageSize());
         $connection->onMessage(fn (string $message) => $this->server->message($reverbConnection, $message));
         $connection->onClose(fn () => $this->server->close($reverbConnection));
         $connection->openBuffer();

@@ -63,6 +63,7 @@ class ConfigProvider implements ApplicationProvider
             $app['secret'],
             $app['ping_interval'],
             $app['allowed_origins'],
+            $app['max_message_size'],
         );
     }
 }

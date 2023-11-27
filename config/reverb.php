@@ -73,6 +73,7 @@ return [
                 'secret' => env('PUSHER_APP_SECRET'),
                 'allowed_origins' => ['*'],
                 'ping_interval' => env('REVERB_APP_PING_INTERVAL', 5),
+                'max_message_size' => env('REVERB_APP_MAX_MESSAGE_SIZE', 10000),
             ],
         ],
 
