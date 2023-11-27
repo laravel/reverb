@@ -41,6 +41,9 @@ jobs:
     - name: Start WebSocket server
       run: php echo.php &
 
+    - name: Set server URL
+      run: sed -i "s/ws:\/\/HOST:8080/ws:\/\/$(ip route show default | awk '/default/ {print $3}'):8080/g" ./client-spec.json
+
     - name: Run specification tests
       run: |
         docker run --rm \
