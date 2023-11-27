@@ -39,9 +39,11 @@ jobs:
       run: docker pull crossbario/autobahn-testsuite
 
     - name: Start WebSocket server
-      run: php echo.php &
+      working-directory: tests/Specification
+      run: php spec-server.php &
 
     - name: Run specification tests
+      working-directory: tests/Specification
       run: |
         docker run --rm \
           -v $PWD:/mnt/autobahn \
