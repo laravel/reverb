@@ -30,13 +30,18 @@ jobs:
         tools: composer:v2
         coverage: none
 
-    - name: Install dependencies
+    - name: Set up Python
+      uses: actions/setup-python@v4
+
+    - name: Install PHP dependencies
       run: |
           composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update
           composer update --prefer-dist --no-interaction --no-progress
 
-    - name: Pull Autobahn Docker image
-      run: docker pull crossbario/autobahn-testsuite
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install autobahntestsuite
 
     - name: Start WebSocket server
       run: php echo.php &
@@ -45,12 +50,7 @@ jobs:
       run: sed -i "s/ws:\/\/HOST:8080/ws:\/\/$(ip route show default | awk '/default/ {print $3}'):8080/g" client-spec.json
 
     - name: Run specification tests
-      run: |
-        docker run --rm \
-          -v $PWD:/mnt/autobahn \
-          -v $PWD/reports:/mnt/autobahn/reports \
-          crossbario/autobahn-testsuite \
-          wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
+      run: wstest -m fuzzingclient
 
     - name: Set workflow status based on Autobahn exit status
       run: exit $?
