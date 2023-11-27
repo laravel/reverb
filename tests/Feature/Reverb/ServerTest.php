@@ -319,8 +319,8 @@ it('cconnections can be limited', function () {
     $this->stopServer();
     $this->startServer();
     $this->connect();
-    
-  $this->connect();  
+
+    $this->connect();
 })->throws('Connection closed before handshake');
 
 it('clears application state between requests', function () {
