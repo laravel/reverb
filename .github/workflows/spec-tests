@@ -1,6 +1,11 @@
 name: Autobahn WebSocket Spec Tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - '*.x'
+  pull_request:
 
 jobs:
   test:
