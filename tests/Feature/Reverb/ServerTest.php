@@ -314,6 +314,15 @@ it('can connect from a valid origin', function () {
     $this->connect();
 });
 
+it('cconnections can be limited', function () {
+    $this->app['config']->set('reverb.servers.reverb.connection_limit', 1);
+    $this->stopServer();
+    $this->startServer();
+    $this->connect();
+    
+  $this->connect();  
+})->throws('Connection closed before handshake');
+
 it('clears application state between requests', function () {
     $this->subscribe('test-channel');
 

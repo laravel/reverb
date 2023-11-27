@@ -15,6 +15,7 @@ use Laravel\Reverb\Pusher\Http\Controllers\UsersTerminateController;
 use Laravel\Reverb\Server;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
+use React\Socket\LimitingServer;
 use React\Socket\SocketServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
@@ -25,10 +26,13 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', LoopInterface $loop = null)
+    public static function make(string $host = '0.0.0.0', string $port = '8080', ?int $connectionLimit = null, LoopInterface $loop = null)
     {
         $loop = $loop ?: Loop::get();
-        $socket = new SocketServer("{$host}:{$port}", [], $loop);
+        $socket = new LimitingServer(
+            new SocketServer("{$host}:{$port}", [], $loop), $connectionLimit
+        );
+
         $router = new Router(new UrlMatcher(static::routes(), new RequestContext));
 
         return new HttpServer($socket, $router, $loop);
