@@ -30,26 +30,25 @@ jobs:
         tools: composer:v2
         coverage: none
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '2.7' 
-
-    - name: Install PHP dependencies
+    - name: Install dependencies
       run: |
           composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update
           composer update --prefer-dist --no-interaction --no-progress
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install autobahntestsuite
+    - name: Pull Autobahn Docker image
+      run: docker pull crossbario/autobahn-testsuite
 
     - name: Start WebSocket server
       run: php echo.php &
 
     - name: Run specification tests
-      run: wstest -m fuzzingclient -s client-spec.json --debug
+      run: |
+        docker run --rm \
+          -v $PWD:/mnt/autobahn \
+          -v $PWD/reports:/mnt/autobahn/reports \
+          --add-host host.docker.internal:host-gateway \
+          crossbario/autobahn-testsuite \
+          wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
 
     - name: Set workflow status based on Autobahn exit status
       run: exit $?
