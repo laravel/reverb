@@ -43,7 +43,7 @@ jobs:
 
     - name: Run WebSocket specification tests
       run: |
-        docker run -it --rm \
+        docker run --rm \
           -v $PWD:/mnt/autobahn \
           -v $PWD/reports:/mnt/autobahn/reports \
           -i -t crossbario/autobahn-testsuite \
