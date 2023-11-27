@@ -15,12 +15,12 @@ use Symfony\Component\Routing\RouteCollection;
 require __DIR__ . '/vendor/autoload.php';
 
 $loop = Loop::get();
-$socket = new SocketServer("127.0.0.1:8080", [], $loop);
+$socket = new SocketServer("0.0.0.0:8080", [], $loop);
 $router = new Router(new UrlMatcher(routes(), new RequestContext));
 
 $server = new Server($socket, $router, $loop);
 
-echo "Server running at 127.0.0.1:8080\n";
+echo "Server running at 0.0.0.0:8080\n";
 
 $server->start();
 
