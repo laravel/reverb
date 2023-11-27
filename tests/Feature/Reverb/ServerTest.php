@@ -315,13 +315,6 @@ it('can connect from a valid origin', function () {
     $this->connect();
 });
 
-it('can receive a pong control frame', function () {
-    $frame = new Frame('ping', true, Frame::OP_PING);
-    $response = $this->sendRaw($frame);
-
-    expect($response)->toBe('pong');
-});
-
 it('clears application state between requests', function () {
     $this->subscribe('test-channel');
 

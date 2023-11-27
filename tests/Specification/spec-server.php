@@ -31,7 +31,6 @@ function routes()
         Route::get('/', function (RequestInterface $request, WsConnection $connection) {
             $connection->onMessage(function ($message) use ($connection) {
                 $connection->send($message);
-                $connection->send($message);
             });
             $connection->openBuffer();
         })
