@@ -314,15 +314,6 @@ it('can connect from a valid origin', function () {
     $this->connect();
 });
 
-it('cconnections can be limited', function () {
-    $this->app['config']->set('reverb.servers.reverb.connection_limit', 1);
-    $this->stopServer();
-    $this->startServer();
-    $this->connect();
-
-    $this->connect();
-})->throws('Connection closed before handshake');
-
 it('limits the size of messages', function () {
     $connection = $this->connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
     $message = $this->send(['This message is waaaaaay longer than the 1 byte limit'], $connection);

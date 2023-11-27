@@ -38,7 +38,6 @@ return [
                 'enabled' => env('REVERB_SCALING_ENABLED', false),
                 'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),
             ],
-            'connection_limit' => env('REVERB_CONNECTION_LIMIT', null),
         ],
 
         'api_gateway' => [

@@ -99,7 +99,7 @@ class ReverbTestCase extends TestCase
     public function startServer($host = '0.0.0.0', $port = '8080')
     {
         $this->resetFiber();
-        $this->server = Factory::make($host, $port, config('reverb.servers.reverb.connection_limit'), $this->loop);
+        $this->server = Factory::make($host, $port, $this->loop);
     }
 
     /**
