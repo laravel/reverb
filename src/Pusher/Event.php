@@ -79,10 +79,17 @@ class Event
     {
         $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
 
-        if (! ($channel instanceof CacheChannel)) {
-            return;
-        }
+        match (true) {
+            $channel instanceof CacheChannel => $this->sendCachedPayload($channel, $connection),
+            default => null,
+        };
+    }
 
+    /**
+     * Send the cached payload for the given channel.
+     */
+    protected function sendCachedPayload(CacheChannel $channel, Connection $connection): void
+    {
         if ($channel->hasCachedPayload()) {
             $connection->send(
                 json_encode($channel->cachedPayload())
