@@ -108,6 +108,14 @@ class Channel
     }
 
     /**
+     * Broadcast a message triggered from an internal source.
+     */
+    public function broadcastInternally(array $payload, Connection $except = null): void
+    {
+        $this->broadcast($payload, $except);
+    }
+
+    /**
      * Get the data associated with the channel.
      */
     public function data(): array
