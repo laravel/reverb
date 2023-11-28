@@ -170,7 +170,11 @@ it('receives no data when no previous event triggered when joining a cache chann
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'cache-test-channel',
     ]);
-    $connection->assertSendCount(1);
+    $connection->assertSent([
+        'event' => 'pusher:cache_miss',
+        'channel' => 'cache-test-channel',
+    ]);
+    $connection->assertSendCount(2);
 });
 
 it('receives last triggered event when joining a cache channel', function () {

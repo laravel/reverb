@@ -4,6 +4,8 @@ namespace Laravel\Reverb\Pusher;
 
 use Exception;
 use Illuminate\Support\Str;
+use Laravel\Reverb\Channels\CacheChannel;
+use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
@@ -56,7 +58,7 @@ class Event
 
         $channel->subscribe($connection, $auth, $data);
 
-        $this->sendInternally($connection, 'subscription_succeeded', $channel->name(), $channel->data());
+        $this->afterSubscribe($channel, $connection);
     }
 
     /**
@@ -68,6 +70,28 @@ class Event
             ->for($connection->app())
             ->find($channel)
             ->unsubscribe($connection);
+    }
+
+    /**
+     * Carry out any actions that should be performed after a subscription.
+     */
+    protected function afterSubscribe(Channel $channel, Connection $connection): void
+    {
+        $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
+
+        if (! ($channel instanceof CacheChannel)) {
+            return;
+        }
+
+        if ($channel->hasCachedPayload()) {
+            $connection->send(
+                json_encode($channel->cachedPayload())
+            );
+
+            return;
+        }
+
+        $this->send($connection, 'cache_miss', channel: $channel->name());
     }
 
     /**
@@ -91,17 +115,17 @@ class Event
     /**
      * Send a response to the given connection.
      */
-    public function send(Connection $connection, string $event, array $data = []): void
+    public function send(Connection $connection, string $event, array $data = [], string $channel = null): void
     {
         $connection->send(
-            static::formatPayload($event, $data)
+            static::formatPayload($event, $data, $channel)
         );
     }
 
     /**
      * Send an internal response to the given connection.
      */
-    public function sendInternally(Connection $connection, string $event, string $channel, array $data = []): void
+    public function sendInternally(Connection $connection, string $event, array $data = [], string $channel = null): void
     {
         $connection->send(
             static::formatInternalPayload($event, $data, $channel)

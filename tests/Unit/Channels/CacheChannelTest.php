@@ -1,5 +1,6 @@
 <?php
 
+use Laravel\Reverb\Channels\CacheChannel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Tests\Connection;
@@ -21,16 +22,13 @@ it('receives no data when no previous event triggered', function () {
     $this->connection->assertNothingSent();
 });
 
-it('receives last triggered event', function () {
-    $channel = ChannelBroker::create('cache-test-channel');
+it('stores last triggered event', function () {
+    $channel = new CacheChannel('cache-test-channel');
+
+    expect($channel->hasCachedPayload())->toBeFalse();
 
     $channel->broadcast(['foo' => 'bar']);
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
-
-    $channel->subscribe($this->connection);
-
-    $this->connection->assertSent(['foo' => 'bar']);
+    expect($channel->hasCachedPayload())->toBeTrue();
+    expect($channel->cachedPayload())->toEqual(['foo' => 'bar']);
 });
