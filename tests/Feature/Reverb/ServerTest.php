@@ -42,6 +42,26 @@ it('can subscribe to a presence channel', function () {
     expect(Str::contains($response, '"hash\":{\"1\":{\"name\":\"Test User\"}}'))->toBeTrue();
 });
 
+it('can subscribe to a cache channel', function () {
+    $response = $this->subscribe('cache-test-channel');
+
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"cache-test-channel"}');
+});
+
+it('can subscribe to a private cache channel', function () {
+    $response = $this->subscribe('private-cache-test-channel');
+
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"private-cache-test-channel"}');
+});
+
+it('can subscribe to a presence cache channel', function () {
+    $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User']];
+    $response = $this->subscribe('presence-cache-test-channel', data: $data);
+
+    expect(Str::contains($response, 'pusher_internal:subscription_succeeded'))->toBeTrue();
+    expect(Str::contains($response, '"hash\":{\"1\":{\"name\":\"Test User\"}}'))->toBeTrue();
+});
+
 it('can notify other subscribers of a presence channel when a new member joins', function () {
     $connectionOne = $this->connect();
     $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']];
@@ -86,6 +106,75 @@ it('can notify other subscribers of a presence channel when a member leaves', fu
 
     expect(await($promiseThree))->toBe('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
     expect(await($promiseFour))->toBe('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
+});
+
+it('can receive a cached message when joining a cache channel', function () {
+    $connection = $this->connect();
+
+    $this->triggerEvent(
+        'cache-test-channel',
+        'App\\Events\\TestEvent',
+        ['foo' => 'bar']
+    );
+
+    $this->subscribe('cache-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"cache-test-channel"}');
+});
+
+it('can receive a cached message when joining a private cache channel', function () {
+    $connection = $this->connect();
+
+    $this->triggerEvent(
+        'private-cache-test-channel',
+        'App\\Events\\TestEvent',
+        ['foo' => 'bar']
+    );
+
+    $this->subscribe('private-cache-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"private-cache-test-channel"}');
+});
+
+it('can receive a cached message when joining a presence cache channel', function () {
+    $connection = $this->connect();
+
+    $this->triggerEvent(
+        'presence-cache-test-channel',
+        'App\\Events\\TestEvent',
+        ['foo' => 'bar']
+    );
+
+    $this->subscribe('presence-cache-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-cache-test-channel"}');
+});
+
+it('can receive a cach missed message when joining a cache channel with an empty cache', function () {
+    $connection = $this->connect();
+    $this->subscribe('cache-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"pusher:cache_miss","channel":"cache-test-channel"}');
+});
+
+it('can receive a cach missed message when joining a private cache channel with an empty cache', function () {
+    $connection = $this->connect();
+    $this->subscribe('private-cache-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"pusher:cache_miss","channel":"private-cache-test-channel"}');
+});
+
+it('can receive a cach missed message when joining a presence cache channel with an empty cache', function () {
+    $connection = $this->connect();
+    $this->subscribe('presence-cache-test-channel', connection: $connection);
+    $promise = $this->messagePromise($connection);
+
+    expect(await($promise))->toBe('{"event":"pusher:cache_miss","channel":"presence-cache-test-channel"}');
 });
 
 it('can receive a message broadcast from the server', function () {
@@ -236,6 +325,18 @@ it('fails to subscribe to a private channel with invalid auth signature', functi
 
 it('fails to subscribe to a presence channel with invalid auth signature', function () {
     $response = $this->subscribe('presence-test-channel', auth: 'invalid-signature');
+
+    expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+});
+
+it('fails to subscribe to a private cache channel with invalid auth signature', function () {
+    $response = $this->subscribe('private-cache-test-channel', auth: 'invalid-signature');
+
+    expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+});
+
+it('fails to subscribe to a presence cache channel with invalid auth signature', function () {
+    $response = $this->subscribe('presence-cache-test-channel', auth: 'invalid-signature');
 
     expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
 });

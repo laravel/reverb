@@ -22,6 +22,14 @@ class CacheChannel extends Channel
     }
 
     /**
+     * Broadcast a message triggered from an internal source.
+     */
+    public function broadcastInternally(array $payload, Connection $except = null): void
+    {
+        parent::broadcast($payload, $except);
+    }
+
+    /**
      * Determine if the channel has a cached payload.
      */
     public function hasCachedPayload(): bool

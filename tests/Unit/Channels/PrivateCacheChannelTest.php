@@ -1,6 +1,6 @@
 <?php
 
-use Laravel\Reverb\Channels\PrivateChannel;
+use Laravel\Reverb\Channels\PrivateCacheChannel;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\Connection;
@@ -12,17 +12,17 @@ beforeEach(function () {
 });
 
 it('can subscribe a connection to a channel', function () {
-    $channel = new PrivateChannel('private-test-channel');
+    $channel = new PrivateCacheChannel('private-cache-test-channel');
 
     $this->channelConnectionManager->shouldReceive('add')
         ->once()
         ->with($this->connection, []);
 
-    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-test-channel'));
+    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-cache-test-channel'));
 });
 
 it('can unsubscribe a connection from a channel', function () {
-    $channel = new PrivateChannel('private-test-channel');
+    $channel = new PrivateCacheChannel('private-cache-test-channel');
 
     $this->channelConnectionManager->shouldReceive('remove')
         ->once()
@@ -32,7 +32,7 @@ it('can unsubscribe a connection from a channel', function () {
 });
 
 it('can broadcast to all connections of a channel', function () {
-    $channel = new PrivateChannel('test-channel');
+    $channel = new PrivateCacheChannel('test-channel');
 
     $this->channelConnectionManager->shouldReceive('add');
 
@@ -46,9 +46,32 @@ it('can broadcast to all connections of a channel', function () {
 });
 
 it('fails to subscribe if the signature is invalid', function () {
-    $channel = new PrivateChannel('private-test-channel');
+    $channel = new PrivateCacheChannel('presence-test-channel');
 
     $this->channelConnectionManager->shouldNotReceive('subscribe');
 
     $channel->subscribe($this->connection, 'invalid-signature');
 })->throws(ConnectionUnauthorized::class);
+
+it('receives no data when no previous event triggered', function () {
+    $channel = new PrivateCacheChannel('private-cache-test-channel');
+
+    $this->channelConnectionManager->shouldReceive('add')
+        ->once()
+        ->with($this->connection, []);
+
+    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-cache-test-channel'));
+
+    $this->connection->assertNothingSent();
+});
+
+it('stores last triggered event', function () {
+    $channel = new PrivateCacheChannel('presence-test-channel');
+
+    expect($channel->hasCachedPayload())->toBeFalse();
+
+    $channel->broadcast(['foo' => 'bar']);
+
+    expect($channel->hasCachedPayload())->toBeTrue();
+    expect($channel->cachedPayload())->toEqual(['foo' => 'bar']);
+});

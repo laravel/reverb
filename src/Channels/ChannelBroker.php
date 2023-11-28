@@ -11,10 +11,12 @@ class ChannelBroker
      */
     public static function create(string $name): Channel
     {
-        return match (Str::before($name, '-')) {
-            'cache' => new CacheChannel($name),
-            'private' => new PrivateChannel($name),
-            'presence' => new PresenceChannel($name),
+        return match (true) {
+            Str::startsWith($name, 'private-cache-') => new PrivateCacheChannel($name),
+            Str::startsWith($name, 'presence-cache-') => new PresenceCacheChannel($name),
+            Str::startsWith($name, 'cache') => new CacheChannel($name),
+            Str::startsWith($name, 'private') => new PrivateChannel($name),
+            Str::startsWith($name, 'presence') => new PresenceChannel($name),
             default => new Channel($name),
         };
     }

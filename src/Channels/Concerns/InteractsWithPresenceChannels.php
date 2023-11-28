@@ -17,7 +17,7 @@ trait InteractsWithPresenceChannels
 
         parent::subscribe($connection, $auth, $data);
 
-        parent::broadcast(
+        parent::broadcastInternally(
             [
                 'event' => 'pusher_internal:member_added',
                 'data' => $data ? json_decode($data, true) : [],
