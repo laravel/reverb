@@ -81,22 +81,16 @@ class Channel
      */
     public function broadcast(array $payload, Connection $except = null): void
     {
-        if ($except === null && ! isset($payload['except'])) {
+        if ($except === null) {
             $this->broadcastToAll($payload);
 
             return;
         }
 
-        $message = json_encode(
-            Arr::except($payload, 'except')
-        );
+        $message = json_encode($payload);
 
         foreach ($this->connections() as $connection) {
-            if ($except && $except->id() === $connection->connection()->id()) {
-                continue;
-            }
-
-            if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+            if ($except->id() === $connection->id()) {
                 continue;
             }
 
@@ -109,9 +103,7 @@ class Channel
      */
     public function broadcastToAll(array $payload): void
     {
-        $message = json_encode(
-            Arr::except($payload, 'except')
-        );
+        $message = json_encode($payload);
 
         foreach ($this->connections() as $connection) {
             $connection->send($message);

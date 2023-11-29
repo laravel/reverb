@@ -33,6 +33,14 @@ class ChannelConnection
     }
 
     /**
+     * Send a message to the connection.
+     */
+    public function send(string $message): void
+    {
+        $this->connection->send($message);
+    }
+
+    /**
      * Call the method on the connection.
      */
     public function __call(string $method, array $parameters): mixed
