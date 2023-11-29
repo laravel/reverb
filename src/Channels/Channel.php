@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Channels;
 
-use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
 
