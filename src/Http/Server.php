@@ -17,7 +17,7 @@ class Server
     public function __construct(protected ServerInterface $socket, protected Router $router, protected ?LoopInterface $loop = null)
     {
         gc_disable();
-        
+
         $this->loop = $loop ?: Loop::get();
 
         $this->loop->addPeriodicTimer(30, fn () => gc_collect_cycles());
