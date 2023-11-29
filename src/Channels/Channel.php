@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Channels;
 
-use Exception;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
@@ -82,28 +81,40 @@ class Channel
      */
     public function broadcast(array $payload, Connection $except = null): void
     {
+        if ($except === null && ! isset($payload['except'])) {
+            $this->broadcastToAll($payload);
+
+            return;
+        }
+
         $message = json_encode(
             Arr::except($payload, 'except')
         );
 
-        $chunks = array_chunk($this->connections(), 100);
-
-        foreach ($chunks as $connections) {
-            foreach ($connections as $connection) {
-                if ($except && $except->id() === $connection->connection()->id()) {
-                    continue;
-                }
-
-                if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
-                    continue;
-                }
-
-                try {
-                    $connection->send($message);
-                } catch (Exception $e) {
-                    //
-                }
+        foreach ($this->connections() as $connection) {
+            if ($except && $except->id() === $connection->connection()->id()) {
+                continue;
             }
+
+            if (isset($payload['except']) && $payload['except'] === $connection->connection()->id()) {
+                continue;
+            }
+
+            $connection->send($message);
+        }
+    }
+
+    /**
+     * Send a broadcast to all connections.
+     */
+    public function broadcastToAll(array $payload): void
+    {
+        $message = json_encode(
+            Arr::except($payload, 'except')
+        );
+
+        foreach ($this->connections() as $connection) {
+            $connection->send($message);
         }
     }
 
