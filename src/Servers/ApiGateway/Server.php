@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Server as ReverbServer;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
@@ -15,6 +16,7 @@ class Server
         protected ApplicationProvider $applications,
         protected ConnectionManager $connections,
     ) {
+        // 
     }
 
     /**

@@ -1,11 +1,12 @@
 <?php
 
-namespace Laravel\Reverb\Servers\ApiGateway;
+namespace Laravel\Reverb\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\ConnectionManager;
 
-class ConnectionManager
+class CacheConnectionManager implements ConnectionManager
 {
     public function __construct(
         protected Repository $repository,

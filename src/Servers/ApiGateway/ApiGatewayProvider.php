@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Managers\CacheChannelConnectionManager;
 use Laravel\Reverb\Managers\CacheChannelManager;
+use Laravel\Reverb\Managers\CacheConnectionManager;
 
 class ApiGatewayProvider extends ServerProvider
 {
@@ -52,7 +54,7 @@ class ApiGatewayProvider extends ServerProvider
         });
 
         $this->app->singleton(ConnectionManager::class, function () {
-            return new ConnectionManager(
+            return new CacheConnectionManager(
                 $this->app['cache']->store(
                     $this->config['connection_manager']['store']
                 ),
