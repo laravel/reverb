@@ -43,8 +43,8 @@ class CacheChannelConnectionManager implements ChannelConnectionManager
      */
     public function add(Connection $connection, array $data): void
     {
-        $connections =  $this->repository->get($this->key(), []);
-        
+        $connections = $this->repository->get($this->key(), []);
+
         $connections[$connection->identifier()] = $data;
 
         $this->repository->put($this->key(), $connections);
@@ -55,10 +55,10 @@ class CacheChannelConnectionManager implements ChannelConnectionManager
      */
     public function remove(Connection $connection): void
     {
-        $connections =  $this->repository->get($this->key());
-        
+        $connections = $this->repository->get($this->key());
+
         unset($connections[$connection->identifier()]);
-        
+
         $this->repository->put($this->key(), $connections);
     }
 
@@ -76,13 +76,13 @@ class CacheChannelConnectionManager implements ChannelConnectionManager
     public function findById(string $id): ?ChannelConnection
     {
         $connection = $this->connections->find($id);
-        
-        if(!$connection){
+
+        if (! $connection) {
             return null;
         }
 
         return new ChannelConnection(
-            $connection, 
+            $connection,
             $this->repository->get($this->key())[$id] ?? []
         );
     }

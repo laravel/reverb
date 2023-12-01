@@ -16,7 +16,7 @@ class Server
         protected ApplicationProvider $applications,
         protected ConnectionManager $connections,
     ) {
-        // 
+        //
     }
 
     /**

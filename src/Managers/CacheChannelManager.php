@@ -94,7 +94,7 @@ class CacheChannelManager implements ChannelManagerInterface
     {
         $channels = $this->repository->get($this->prefix, []);
 
-        if(!isset($channels[$this->application->id()])){
+        if (! isset($channels[$this->application->id()])) {
             $channels[$this->application->id()] = [];
         }
 
