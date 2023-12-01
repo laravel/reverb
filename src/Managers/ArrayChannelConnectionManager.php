@@ -8,12 +8,24 @@ use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 
 class ArrayChannelConnectionManager implements ChannelConnectionManager
 {
+    protected string $name;
+
     /**
      * Connection store.
      *
      * @var array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
     protected $connections = [];
+
+    /**
+     * The channel name.
+     */
+    public function for(string $name): ChannelConnectionManager
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     /**
      * Add a connection.

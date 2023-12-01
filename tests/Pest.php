@@ -6,6 +6,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Managers\Connections;
+use Laravel\Reverb\Servers\ApiGateway\ConnectionManager;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 use Laravel\Reverb\Tests\Connection;
 use Laravel\Reverb\Tests\SerializableConnection;
@@ -48,6 +49,14 @@ function validAuth(string $connectionId, string $channel, string $data = null): 
 
 /**
  * Return the connection manager.
+ */
+function connectionManager(): ConnectionManager
+{
+    return App::make(ConnectionManager::class);
+}
+
+/**
+ * Return the channel manager.
  */
 function channelManager(Application $app = null): ChannelManager
 {

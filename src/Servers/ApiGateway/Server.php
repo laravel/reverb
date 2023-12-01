@@ -13,6 +13,7 @@ class Server
     public function __construct(
         protected ReverbServer $server,
         protected ApplicationProvider $applications,
+        protected ConnectionManager $connections,
     ) {
     }
 
@@ -27,7 +28,7 @@ class Server
                     $this->connect($request)
                 ),
                 'DISCONNECT' => $this->server->close(
-                    $this->connect($request)
+                    $this->connect($request),
                 ),
                 'MESSAGE' => $this->server->message(
                     $this->connect($request),
@@ -52,11 +53,21 @@ class Server
      */
     protected function connect(Request $request): Connection
     {
-        return new Connection(
-            $request->connectionId(),
-            $this->application($request),
-            $request->headers['origin'] ?? null
+        $connection = $this->connections->find($request->connectionId());
+
+        if ($connection) {
+            return $connection;
+        }
+
+        $this->connections->connect(
+            $connection = new Connection(
+                $request->connectionId(),
+                $this->application($request),
+                $request->headers['origin'] ?? null
+            )
         );
+
+        return $connection;
     }
 
     /**

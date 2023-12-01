@@ -2,11 +2,14 @@
 
 namespace Laravel\Reverb\Channels;
 
+use Laravel\Reverb\Concerns\SerializesChannels;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class Channel
 {
+    use SerializesChannels;
+
     /**
      * The channel connections.
      *
@@ -16,7 +19,7 @@ class Channel
 
     public function __construct(protected string $name)
     {
-        $this->connections = app(ChannelConnectionManager::class);
+        $this->connections = app(ChannelConnectionManager::class)->for($this->name);
     }
 
     /**
