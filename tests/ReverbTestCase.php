@@ -127,43 +127,6 @@ class ReverbTestCase extends TestCase
     }
 
     /**
-     * Connect to the WebSocket server.
-     *
-     * @param  string  $host
-     * @param  string  $port
-     * @param  string  $key
-     * @return \Ratchet\Client\WebSocket
-     */
-    public function connect($host = '0.0.0.0', $port = '8080', $key = 'pusher-key', $headers = [])
-    {
-        $promise = new Deferred;
-
-        $connection = await(
-            connect("ws://{$host}:{$port}/app/{$key}", headers: $headers)
-        );
-
-        $connection->on('message', function ($message) use ($promise) {
-            $promise->resolve((string) $message);
-        });
-
-        $message = await($promise->promise());
-
-        $this->assertTrue(
-            Str::contains(
-                $message,
-                'connection_established'
-            )
-        );
-
-        $message = json_decode($message, true);
-        $data = json_decode($message['data'], true);
-
-        $this->connectionId = $data['socket_id'] ?? null;
-
-        return $connection;
-    }
-
-    /**
      * Send a message to the connected client.
      */
     public function send(array $message, ?WebSocket $connection = null): ?string

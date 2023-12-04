@@ -8,16 +8,15 @@ use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Promise\Deferred;
 
-use function Ratchet\Client\connect;
 use function React\Async\await;
 use function React\Promise\all;
 
 uses(ReverbTestCase::class);
 
 it('can handle connections to different applications', function () {
-    $this->connect();
-    $this->connect(key: 'pusher-key-2');
-    $this->connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
+    connect();
+    connect(key: 'pusher-key-2');
+    connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
 });
 
 it('can subscribe to a channel', function () {
@@ -29,7 +28,7 @@ it('can subscribe to a channel', function () {
 });
 
 it('can subscribe to a private channel', function () {
-    $response = $this->subscribe('private-test-channel');
+    $response = subscribe('private-test-channel');
 
     expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"private-test-channel"}');
 });
@@ -202,8 +201,8 @@ it('can receive a message broadcast from the server', function () {
 });
 
 it('can handle an event', function () {
-    $connection = $this->connect();
-    $this->subscribe('presence-test-channel', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+    $connection = connect();
+    subscribe('presence-test-channel', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
     $promise = $this->messagePromise($connection);
 
     $this->triggerEvent(
