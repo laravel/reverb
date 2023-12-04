@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
@@ -77,7 +76,7 @@ class ApiGatewayTestCase extends TestCase
      */
     public function connect($connectionId = 'abc-123', $appKey = 'pusher-key'): void
     {
-        App::make(Server::class)
+        resolve(Server::class)
             ->handle(Request::fromLambdaEvent(
                 [
                     'requestContext' => [
@@ -102,7 +101,7 @@ class ApiGatewayTestCase extends TestCase
     {
         $this->connect($connectionId, $appKey);
 
-        App::make(Server::class)
+        resolve(Server::class)
             ->handle(Request::fromLambdaEvent(
                 [
                     'requestContext' => [
@@ -146,7 +145,7 @@ class ApiGatewayTestCase extends TestCase
      */
     public function disconnect($connectionId = 'abc-123'): void
     {
-        App::make(Server::class)
+        resolve(Server::class)
             ->handle(Request::fromLambdaEvent(
                 [
                     'requestContext' => [

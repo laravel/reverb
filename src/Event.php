@@ -3,10 +3,8 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Contracts\ServerProvider;
 
 class Event
 {
@@ -15,7 +13,7 @@ class Event
      */
     public static function dispatch(Application $app, array $payload, Connection $connection = null): void
     {
-        $server = App::make(ServerProvider::class);
+        $server = app(ServerManager::class);
 
         if ($server->shouldNotPublishEvents()) {
             static::dispatchSynchronously($app, $payload, $connection);

@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Managers;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
@@ -113,7 +112,7 @@ class ArrayChannelManager implements ChannelManagerInterface
      */
     public function flush(): void
     {
-        App::make(ApplicationProvider::class)
+        app(ApplicationProvider::class)
             ->all()
             ->each(function (Application $application) {
                 $this->applications[$application->id()] = [];

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
@@ -52,7 +51,7 @@ function validAuth(string $connectionId, string $channel, string $data = null): 
  */
 function connectionManager(): ConnectionManager
 {
-    return App::make(ConnectionManager::class);
+    return app(ConnectionManager::class);
 }
 
 /**
@@ -60,6 +59,6 @@ function connectionManager(): ConnectionManager
  */
 function channelManager(Application $app = null): ChannelManager
 {
-    return App::make(ChannelManager::class)
-        ->for($app ?: App::make(ApplicationProvider::class)->all()->first());
+    return app(ChannelManager::class)
+        ->for($app ?: app(ApplicationProvider::class)->all()->first());
 }

@@ -7,9 +7,9 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\Logger;
-use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Loggers\NullLogger;
+use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
 use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
@@ -83,7 +83,7 @@ class ReverbTestCase extends TestCase
 
     public function usingRedis()
     {
-        app(ServerProvider::class)->withPublishing();
+        app(ServerManager::class)->withPublishing();
 
         $this->bindRedis($this->loop);
         $this->subscribeToRedis($this->loop);

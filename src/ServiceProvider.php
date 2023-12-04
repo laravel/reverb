@@ -5,7 +5,6 @@ namespace Laravel\Reverb;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ServerProvider;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -18,7 +17,9 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
         ]);
 
-        $this->app->make(ServerProvider::class)->boot();
+        $this->app->make(ServerManager::class)
+            ->driver()
+            ->boot();
     }
 
     /**
@@ -30,29 +31,28 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/reverb.php', 'reverb'
         );
 
-        $this->registerServer();
+        $this->app->singleton(ServerManager::class);
+
+        $this->initializeServer();
     }
 
-    public function registerServer()
+    /**
+     * Initialize the server.
+     */
+    public function initializeServer(): void
     {
-        $this->app->singleton(ServerManager::class);
-        $this->app->bind(
-            ServerProvider::class,
-            fn () => $this->app->make(ServerManager::class)->driver()
-        );
-
-        $server = $this->app->make(ServerProvider::class);
+        $server = $this->app->make(ServerManager::class);
 
         $server->register();
 
         $this->app->singleton(
             ChannelManager::class,
-            fn () => $server->buildChannelManager()
+            fn () => $server->getChannelManager()
         );
 
         $this->app->bind(
             ChannelConnectionManager::class,
-            fn () => $server->buildChannelConnectionManager()
+            fn () => $server->getChannelConnectionManager()
         );
     }
 }

@@ -53,12 +53,12 @@ abstract class ServerProvider
     }
 
     /**
-     * Build the channel manager for the server.
+     * Return the channel manager for the server.
      */
-    abstract public function buildChannelManager(): ChannelManager;
+    abstract public function getChannelManager(): ChannelManager;
 
     /**
-     * Build the channel manager for the server.
+     * Return the channel manager for the server.
      */
-    abstract public function buildChannelConnectionManager(): ChannelConnectionManager;
+    abstract public function getChannelConnectionManager(): ChannelConnectionManager;
 }
