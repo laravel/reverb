@@ -7,6 +7,11 @@ use Laravel\Reverb\Servers\Reverb\ChannelConnection;
 interface ChannelConnectionManager
 {
     /**
+     * The channel name.
+     */
+    public function for(string $name): ChannelConnectionManager;
+
+    /**
      * Add a connection.
      */
     public function add(Connection $connection, array $data): void;

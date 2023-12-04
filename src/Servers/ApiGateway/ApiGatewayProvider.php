@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Managers\ArrayChannelConnectionManager;
-use Laravel\Reverb\Managers\ArrayChannelManager;
+use Laravel\Reverb\Managers\CacheChannelConnectionManager;
+use Laravel\Reverb\Managers\CacheChannelManager;
+use Laravel\Reverb\Managers\CacheConnectionManager;
 
 class ApiGatewayProvider extends ServerProvider
 {
@@ -50,6 +52,15 @@ class ApiGatewayProvider extends ServerProvider
 
             return new JsonResponse((object) []);
         });
+
+        $this->app->singleton(ConnectionManager::class, function () {
+            return new CacheConnectionManager(
+                $this->app['cache']->store(
+                    $this->config['connection_manager']['store']
+                ),
+                $this->config['connection_manager']['prefix']
+            );
+        });
     }
 
     /**
@@ -57,7 +68,12 @@ class ApiGatewayProvider extends ServerProvider
      */
     public function buildChannelManager(): ChannelManager
     {
-        return new ArrayChannelManager;
+        return new CacheChannelManager(
+            $this->app['cache']->store(
+                $this->config['connection_manager']['store']
+            ),
+            $this->config['connection_manager']['prefix']
+        );
     }
 
     /**
@@ -65,6 +81,12 @@ class ApiGatewayProvider extends ServerProvider
      */
     public function buildChannelConnectionManager(): ChannelConnectionManager
     {
-        return new ArrayChannelConnectionManager;
+        return new CacheChannelConnectionManager(
+            $this->app['cache']->store(
+                $this->config['connection_manager']['store']
+            ),
+            app(ConnectionManager::class),
+            $this->config['connection_manager']['prefix']
+        );
     }
 }

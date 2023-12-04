@@ -16,8 +16,6 @@ abstract class Connection
      */
     protected $hasBeenPinged = false;
 
-    protected $pusher;
-
     public function __construct(
         protected Application $application,
         protected ?string $origin
@@ -127,25 +125,5 @@ abstract class Connection
     public function isStale(): bool
     {
         return $this->isInactive() && $this->hasBeenPinged;
-    }
-
-    /**
-     * Hydrate a serialized connection.
-     */
-    public static function hydrate(Connection|string $connection): Connection
-    {
-        return is_object($connection)
-            ? $connection
-            : unserialize($connection);
-    }
-
-    /**
-     * Hydrate a serialized connection.
-     */
-    public static function dehydrate(Connection $connection): Connection|string
-    {
-        return $connection instanceof SerializableConnection
-            ? serialize($connection)
-            : $connection;
     }
 }

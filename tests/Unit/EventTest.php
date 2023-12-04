@@ -21,6 +21,8 @@ it('can publish an event when enabled', function () {
 
 it('can broadcast an event directly when publishing disabled', function () {
     $channelConnectionManager = Mockery::mock(ChannelConnectionManager::class);
+    $channelConnectionManager->shouldReceive('for')
+        ->andReturn($channelConnectionManager);
     $channelConnectionManager->shouldReceive('all')->once()
         ->andReturn([]);
 
@@ -31,6 +33,8 @@ it('can broadcast an event directly when publishing disabled', function () {
 
 it('can broadcast an event for multiple channels', function () {
     $channelConnectionManager = Mockery::mock(ChannelConnectionManager::class);
+    $channelConnectionManager->shouldReceive('for')
+        ->andReturn($channelConnectionManager);
     $channelConnectionManager->shouldReceive('all')->twice()
         ->andReturn([]);
 

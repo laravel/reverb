@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Tests;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
@@ -64,6 +65,7 @@ class ApiGatewayTestCase extends TestCase
             'capacity' => null,
             'allowed_origins' => ['*'],
             'ping_interval' => 10,
+            'max_message_size' => 1000000,
         ]);
     }
 
@@ -124,7 +126,7 @@ class ApiGatewayTestCase extends TestCase
         if (! $auth && Str::startsWith($channel, ['private-', 'presence-'])) {
             $this->connect($connectionId, $appKey);
             $managed = $this->managedConnection();
-            $auth = validAuth($managed, $channel, $data);
+            $auth = validAuth($managed->id(), $channel, $data);
         }
 
         $this->send([
@@ -179,6 +181,8 @@ class ApiGatewayTestCase extends TestCase
      */
     public function managedConnection(): ?Connection
     {
-        return Connection::hydrate(connectionManager()->all()->last());
+        $connection = Arr::last(connectionManager()->all());
+
+        return connectionManager()->find($connection->identifier());
     }
 }
