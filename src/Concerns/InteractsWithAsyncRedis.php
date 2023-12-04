@@ -53,7 +53,7 @@ trait InteractsWithAsyncRedis
      */
     protected function subscribeToRedis(LoopInterface $loop): void
     {
-        $server = App::make(ServerManager::class);
+        $server = app(ServerManager::class);
 
         if ($server->doesNotSubscribeToEvents()) {
             return;

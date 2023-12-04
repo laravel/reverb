@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
@@ -246,7 +245,7 @@ it('fails to subscribe to a presence channel with invalid auth signature', funct
 });
 
 it('fails to connect when an invalid application is provided', function () {
-    App::make(Server::class)
+    resolve(Server::class)
         ->handle(Request::fromLambdaEvent(
             [
                 'requestContext' => [
@@ -265,7 +264,7 @@ it('fails to connect when an invalid application is provided', function () {
 it('cannot connect from an invalid origin', function () {
     $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['https://laravel.com']);
 
-    App::make(Server::class)
+    resolve(Server::class)
         ->handle(Request::fromLambdaEvent(
             [
                 'requestContext' => [
@@ -284,7 +283,7 @@ it('cannot connect from an invalid origin', function () {
 it('can connect from a valid origin', function () {
     $this->app['config']->set('reverb.apps.0.allowed_origins', ['laravel.com']);
 
-    App::make(Server::class)
+    resolve(Server::class)
         ->handle(Request::fromLambdaEvent(
             [
                 'requestContext' => [
