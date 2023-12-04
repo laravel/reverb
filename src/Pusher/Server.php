@@ -1,9 +1,10 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Pusher;
 
 use Exception;
 use Illuminate\Support\Str;
+use Laravel\Reverb\ClientEvent;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\InvalidOrigin;

@@ -4,14 +4,14 @@ namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
-use Laravel\Reverb\Server;
+use Laravel\Reverb\Pusher\Server as PusherServer;
 use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\RequestInterface;
 
 class Controller
 {
-    public function __construct(protected Server $server, protected ApplicationProvider $applications)
+    public function __construct(protected PusherServer $server, protected ApplicationProvider $applications)
     {
         //
     }

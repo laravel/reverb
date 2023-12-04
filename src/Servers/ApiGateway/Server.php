@@ -6,7 +6,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
-use Laravel\Reverb\Server as ReverbServer;
+use Laravel\Reverb\Pusher\Server as PusherServer;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Server
@@ -14,7 +14,7 @@ class Server
     protected ConnectionManager $connections;
 
     public function __construct(
-        protected ReverbServer $server,
+        protected PusherServer $server,
         protected ApplicationProvider $applications,
     ) {
         $this->connections = app(ConnectionManager::class);
