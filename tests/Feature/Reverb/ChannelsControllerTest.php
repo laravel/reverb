@@ -42,7 +42,7 @@ it('only returns occupied channels', function () {
     $this->subscribe('test-channel-two');
 
     $channels = channelManager();
-    $connection =  Arr::first($channels->connections());
+    $connection = Arr::first($channels->connections());
     $channels->unsubscribeFromAll($connection->connection());
 
     $response = await($this->signedRequest('channels'));

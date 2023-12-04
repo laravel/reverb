@@ -23,7 +23,7 @@ it('unsubscribes from all channels and terminates a user', function () {
     expect(collect(channelManager()->find('presence-test-channel-one')->connections()))->toHaveCount(2);
     expect(collect(channelManager()->find('test-channel-two')->connections()))->toHaveCount(2);
 
-    $response = await($this->signedPostRequest("users/456/terminate_connections"));
+    $response = await($this->signedPostRequest('users/456/terminate_connections'));
 
     $this->assertSame(200, $response->getStatusCode());
     $this->assertSame('{}', $response->getBody()->getContents());

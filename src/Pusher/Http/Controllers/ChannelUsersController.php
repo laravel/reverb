@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
-use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Http\Connection;
 use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;

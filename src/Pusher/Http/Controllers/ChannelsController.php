@@ -27,14 +27,14 @@ class ChannelsController extends Controller
         }
 
         $channels = $channels->filter(fn ($channel) => count($channel->connections()) > 0);
-        
+
         $channels = $this->infoForChannels(
             $channels->all(),
             $this->query['info'] ?? ''
         );
 
         return new JsonResponse([
-            'channels' => array_map(fn ($item) => (object) $item, $channels)
+            'channels' => array_map(fn ($item) => (object) $item, $channels),
         ]);
     }
 }

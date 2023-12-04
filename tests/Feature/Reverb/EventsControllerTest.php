@@ -84,34 +84,34 @@ it('can ignore a subscriber', function () {
 it('validates invalid data', function ($payload) {
     await($this->signedPostRequest('events', $payload));
 })
-->throws(ResponseException::class, exceptionCode: 422)
-->with([
-    [
+    ->throws(ResponseException::class, exceptionCode: 422)
+    ->with([
         [
-            'name' => 'NewEvent',
-            'channel' => 'test-channel',
+            [
+                'name' => 'NewEvent',
+                'channel' => 'test-channel',
+            ],
         ],
-    ],
-    [
         [
-            'name' => 'NewEvent',
-            'channels' => ['test-channel-one', 'test-channel-two'],
+            [
+                'name' => 'NewEvent',
+                'channels' => ['test-channel-one', 'test-channel-two'],
+            ],
         ],
-    ],
-    [
         [
-            'name' => 'NewEvent',
-            'channel' => 'test-channel',
-            'data' => ['some' => 'data'],
-            'socket_id' => 1234,
+            [
+                'name' => 'NewEvent',
+                'channel' => 'test-channel',
+                'data' => ['some' => 'data'],
+                'socket_id' => 1234,
+            ],
         ],
-    ],
-    [
         [
-            'name' => 'NewEvent',
-            'channel' => 'test-channel',
-            'data' => ['some' => 'data'],
-            'info' => 1234,
+            [
+                'name' => 'NewEvent',
+                'channel' => 'test-channel',
+                'data' => ['some' => 'data'],
+                'info' => 1234,
+            ],
         ],
-    ],
-]);
+    ]);
