@@ -2,7 +2,11 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Laravel\Reverb\Channels\Channel;
+use Laravel\Reverb\Channels\Concerns\InteractsWithPresenceChannels;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
@@ -17,9 +21,15 @@ class EventsController extends Controller
     public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
         $this->verify($request, $connection, $appId);
-        // @TODO Validate the request body as a JSON object in the correct format.
 
         $payload = json_decode($this->body, true);
+
+        $validator = $this->validate($payload);
+
+        if ($validator->fails()) {
+            return new JsonResponse($validator->errors(), 422);
+        }
+
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
         Event::dispatch(
@@ -50,15 +60,43 @@ class EventsController extends Controller
         $info = explode(',', $info);
 
         $channels = collect($channels)->mapWithKeys(function ($channel) use ($info) {
-            $count = count($this->channels->find($channel)->connections());
+            if (! $channel = $this->channels->find($channel)) {
+                return [];
+            }
+
+            $count = count($channel->connections());
+
             $info = [
-                'user_count' => in_array('user_count', $info) ? $count : null,
-                'subscription_count' => in_array('subscription_count', $info) ? $count : null,
+                'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $count : null,
+                'subscription_count' => in_array('subscription_count', $info) && ! $this->isPresenceChannel($channel) ? $count : null,
             ];
 
-            return [$channel => array_filter($info, fn ($item) => $item !== null)];
-        })->all();
+            return [$channel->name() => (object) array_filter($info, fn ($item) => $item !== null)];
+        })->filter()->all();
 
         return ['channels' => $channels];
+    }
+
+    /**
+     * Determine if the channel is a presence channel.
+     */
+    protected function isPresenceChannel(Channel $channel): bool
+    {
+        return in_array(InteractsWithPresenceChannels::class, class_uses($channel));
+    }
+
+    /**
+     * Validate the incoming request.
+     */
+    protected function validate(array $payload): Validator
+    {
+        return ValidatorFacade::make($payload, [
+            'name' => ['required', 'string'],
+            'data' => ['required', 'array'],
+            'channels' => ['required_without:channel', 'array'],
+            'channel' => ['required_without:channels', 'string'],
+            'socket_id' => ['string'],
+            'info' => ['string'],
+        ]);
     }
 }
