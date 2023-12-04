@@ -5,16 +5,17 @@ namespace Laravel\Reverb\Pusher\Http\Controllers;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
-use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Channels\Concerns\InteractsWithPresenceChannels;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class EventsController extends Controller
 {
+    use InteractsWithChannelInformation;
+
     /**
      * Handle the request.
      */
@@ -43,46 +44,12 @@ class EventsController extends Controller
         );
 
         if (isset($payload['info'])) {
-            return new JsonResponse((object) $this->getInfo($channels, $payload['info']));
+            return new JsonResponse([
+                'channels' => array_map(fn ($item) => (object) $item, $this->infoForChannels($channels, $payload['info'])),
+            ]);
         }
 
         return new JsonResponse((object) []);
-    }
-
-    /**
-     * Get the info for the given channels.
-     *
-     * @param  array<int, string>  $channels
-     * @return array<string, array<string, int>>
-     */
-    protected function getInfo(array $channels, string $info): array
-    {
-        $info = explode(',', $info);
-
-        $channels = collect($channels)->mapWithKeys(function ($channel) use ($info) {
-            if (! $channel = $this->channels->find($channel)) {
-                return [];
-            }
-
-            $count = count($channel->connections());
-
-            $info = [
-                'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $count : null,
-                'subscription_count' => in_array('subscription_count', $info) && ! $this->isPresenceChannel($channel) ? $count : null,
-            ];
-
-            return [$channel->name() => (object) array_filter($info, fn ($item) => $item !== null)];
-        })->filter()->all();
-
-        return ['channels' => $channels];
-    }
-
-    /**
-     * Determine if the channel is a presence channel.
-     */
-    protected function isPresenceChannel(Channel $channel): bool
-    {
-        return in_array(InteractsWithPresenceChannels::class, class_uses($channel));
     }
 
     /**

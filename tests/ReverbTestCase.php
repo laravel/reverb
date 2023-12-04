@@ -38,7 +38,6 @@ class ReverbTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->app->instance(Logger::class, new NullLogger);
         $this->loop = Loop::get();
         $this->startServer();
     }

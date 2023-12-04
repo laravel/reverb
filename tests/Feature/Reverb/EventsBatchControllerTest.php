@@ -7,18 +7,20 @@ use function React\Async\await;
 uses(ReverbTestCase::class);
 
 it('can receive an event batch trigger', function () {
-    $response = await($this->signedPostRequest('batch_events', [[
-        'name' => 'NewEvent',
-        'channel' => 'test-channel',
-        'data' => ['some' => 'data'],
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
+        [
+            'name' => 'NewEvent',
+            'channel' => 'test-channel',
+            'data' => ['some' => 'data'],
+        ],
     ]]));
 
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"batch":{}}');
 });
 
 it('can receive an event batch trigger with multiple events', function () {
-    $response = await($this->signedPostRequest('batch_events', [
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
         [
             'name' => 'NewEvent',
             'channel' => 'test-channel',
@@ -29,17 +31,17 @@ it('can receive an event batch trigger with multiple events', function () {
             'channel' => 'test-channel-two',
             'data' => ['some' => ['more' => 'data']],
         ],
-    ]));
+    ]]));
 
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"batch":{}}');
 });
 
 it('can receive an event batch trigger with multiple events and return info for each', function () {
-    $response = await($this->signedPostRequest('batch_events', [
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
         [
             'name' => 'NewEvent',
-            'channel' => 'test-channel',
+            'channel' => 'presence-test-channel',
             'data' => ['some' => 'data'],
             'info' => 'user_count',
         ],
@@ -55,17 +57,17 @@ it('can receive an event batch trigger with multiple events and return info for 
             'data' => ['some' => ['more' => 'data']],
             'info' => 'subscription_count,user_count',
         ],
-    ]));
+    ]]));
 
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"batch":[{"user_count":0},{"subscription_count":0},{"user_count":0,"subscription_count":0}]}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"batch":[{"user_count":0},{"subscription_count":0},{"subscription_count":0}]}');
 });
 
 it('can receive an event batch trigger with multiple events and return info for some', function () {
-    $response = await($this->signedPostRequest('batch_events', [
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
         [
             'name' => 'NewEvent',
-            'channel' => 'test-channel',
+            'channel' => 'presence-test-channel',
             'data' => ['some' => 'data'],
             'info' => 'user_count',
         ],
@@ -74,8 +76,8 @@ it('can receive an event batch trigger with multiple events and return info for 
             'channel' => 'test-channel-two',
             'data' => ['some' => ['more' => 'data']],
         ],
-    ]));
+    ]]));
 
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"batch":[{"user_count":0},[]]}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"batch":[{"user_count":0},[]]}');
 });
