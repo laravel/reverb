@@ -4,12 +4,15 @@ namespace Laravel\Reverb\Pusher\Http\Controllers;
 
 use Laravel\Reverb\Channels\PresenceChannel;
 use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ChannelUsersController extends Controller
 {
+    use InteractsWithChannelInformation;
+
     /**
      * Handle the request.
      */
@@ -19,7 +22,7 @@ class ChannelUsersController extends Controller
 
         $channel = $this->channels->find($channel);
 
-        if (! $channel instanceof PresenceChannel) {
+        if (! $this->isPresenceChannel($channel)) {
             return new JsonResponse((object) [], 400);
         }
 
