@@ -64,9 +64,9 @@ class ApiGatewayProvider extends ServerProvider
     }
 
     /**
-     * Build the channel manager for the server.
+     * Return the channel manager for the server.
      */
-    public function buildChannelManager(): ChannelManager
+    public function getChannelManager(): ChannelManager
     {
         return new CacheChannelManager(
             $this->app['cache']->store(
@@ -77,9 +77,9 @@ class ApiGatewayProvider extends ServerProvider
     }
 
     /**
-     * Build the channel manager for the server.
+     * Return the channel manager for the server.
      */
-    public function buildChannelConnectionManager(): ChannelConnectionManager
+    public function getChannelConnectionManager(): ChannelConnectionManager
     {
         return new CacheChannelConnectionManager(
             $this->app['cache']->store(
