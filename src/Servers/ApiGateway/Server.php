@@ -11,12 +11,13 @@ use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Server
 {
+    protected ConnectionManager $connections;
+
     public function __construct(
         protected ReverbServer $server,
         protected ApplicationProvider $applications,
-        protected ConnectionManager $connections,
     ) {
-        //
+        $this->connections = app(ConnectionManager::class);
     }
 
     /**
