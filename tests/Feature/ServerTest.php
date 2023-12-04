@@ -1,7 +1,7 @@
 <?php
 
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Server;
+use Laravel\Reverb\Pusher\Server;
 use Laravel\Reverb\Tests\Connection;
 use Laravel\Reverb\Tests\TestCase;
 
