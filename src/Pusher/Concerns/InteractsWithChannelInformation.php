@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Pusher\Concerns;
 
+use Laravel\Reverb\Channels\CacheChannel;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\Concerns\InteractsWithPresenceChannels;
 use Laravel\Reverb\Contracts\ChannelManager;
@@ -37,8 +38,10 @@ trait InteractsWithChannelInformation
         $count = count($channel->connections());
 
         $info = [
+            'occupied' => in_array('occupied', $info) ? $count > 0 : null,
             'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $count : null,
             'subscription_count' => in_array('subscription_count', $info) && ! $this->isPresenceChannel($channel) ? $count : null,
+            'cache' => in_array('cache', $info) && $this->isCacheChannel($channel) ? $channel->cachedPayload() : null,
         ];
 
         return array_filter($info, fn ($item) => $item !== null);
@@ -50,5 +53,13 @@ trait InteractsWithChannelInformation
     protected function isPresenceChannel(Channel $channel): bool
     {
         return in_array(InteractsWithPresenceChannels::class, class_uses($channel));
+    }
+
+    /**
+     * Determine if the channel is a cache channel.
+     */
+    protected function isCacheChannel(Channel $channel): bool
+    {
+        return $channel instanceof CacheChannel;
     }
 }
