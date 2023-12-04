@@ -13,7 +13,6 @@ trait SerializesChannels
     {
         return [
             'name' => $this->name,
-            'connections' => null,
         ];
     }
 
