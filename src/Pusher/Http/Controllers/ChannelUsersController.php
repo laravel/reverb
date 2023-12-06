@@ -21,6 +21,10 @@ class ChannelUsersController extends Controller
 
         $channel = $this->channels->find($channel);
 
+        if (! $channel) {
+            return new JsonResponse((object) [], 404);
+        }
+
         if (! $this->isPresenceChannel($channel)) {
             return new JsonResponse((object) [], 400);
         }
@@ -30,6 +34,6 @@ class ChannelUsersController extends Controller
             ->map(fn ($data) => ['id' => $data['user_id']])
             ->values();
 
-        return new JsonResponse((object) ['users' => $connections]);
+        return new JsonResponse(['users' => $connections]);
     }
 }

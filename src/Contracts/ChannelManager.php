@@ -25,7 +25,12 @@ interface ChannelManager
     /**
      * Find the given channel.
      */
-    public function find(string $channel): Channel;
+    public function find(string $channel): ?Channel;
+
+    /**
+     * Find the given channel or create it if it doesn't exist.
+     */
+    public function findOrCreate(string $channel): Channel;
 
     /**
      * Get all the connections for the given channels.

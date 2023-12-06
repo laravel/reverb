@@ -27,6 +27,8 @@ it('can broadcast an event directly when publishing disabled', function () {
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 
+    channels()->findOrCreate('test-channel');
+
     Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channel' => 'test-channel']);
 });
 
@@ -38,6 +40,9 @@ it('can broadcast an event for multiple channels', function () {
         ->andReturn([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
+
+    channels()->findOrCreate('test-channel-one');
+    channels()->findOrCreate('test-channel-two');
 
     Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channels' => ['test-channel-one', 'test-channel-two']]);
 });

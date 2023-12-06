@@ -98,6 +98,7 @@ it('can notify other subscribers of a presence channel when a member leaves', fu
 
 it('can receive a cached message when joining a cache channel', function () {
     $connection = connect();
+    subscribe('cache-test-channel');
 
     $this->triggerEvent(
         'cache-test-channel',
@@ -112,6 +113,7 @@ it('can receive a cached message when joining a cache channel', function () {
 
 it('can receive a cached message when joining a private cache channel', function () {
     $connection = connect();
+    subscribe('private-cache-test-channel');
 
     $this->triggerEvent(
         'private-cache-test-channel',
@@ -126,6 +128,7 @@ it('can receive a cached message when joining a private cache channel', function
 
 it('can receive a cached message when joining a presence cache channel', function () {
     $connection = connect();
+    subscribe('presence-cache-test-channel');
 
     $this->triggerEvent(
         'presence-cache-test-channel',
@@ -224,7 +227,7 @@ it('it can disconnect inactive subscribers', function () {
 
     (new PruneStaleConnections)->handle(channels());
 
-    expect(channels()->find('test-channel')->connections())->toHaveCount(0);
+    expect(channels()->find('test-channel'))->toBeNull();
 
     $connection->assertReceived('{"event":"pusher:ping"}');
     $connection->assertReceived('{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}');
