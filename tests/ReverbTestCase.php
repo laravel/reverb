@@ -2,10 +2,9 @@
 
 namespace Laravel\Reverb\Tests;
 
-use Clue\React\Redis\Client;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
@@ -13,14 +12,10 @@ use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
 use React\Http\Browser;
-use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use React\Promise\Timer\TimeoutException;
 use ReflectionObject;
 
-use function Ratchet\Client\connect;
 use function React\Async\await;
-use function React\Promise\Timer\timeout;
 
 class ReverbTestCase extends TestCase
 {

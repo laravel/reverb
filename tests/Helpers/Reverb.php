@@ -4,11 +4,9 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Tests\TestConnection;
 use Ratchet\Client\WebSocket;
 use React\Promise\Deferred;
-use React\Promise\Timer\TimeoutException;
 
 use function Ratchet\Client\connect as connector;
 use function React\Async\await;
-use function React\Promise\Timer\timeout;
 
 /**
  * Connect to the WebSocket server.

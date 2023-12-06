@@ -3,7 +3,6 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Servers\ApiGateway\Request;
