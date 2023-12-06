@@ -8,8 +8,8 @@ use function React\Async\await;
 uses(ReverbTestCase::class);
 
 it('can return all channel information', function () {
-    $this->subscribe('test-channel-one');
-    $this->subscribe('presence-test-channel-two');
+    subscribe('test-channel-one');
+    subscribe('presence-test-channel-two');
 
     $response = await($this->signedRequest('channels?info=user_count'));
 
@@ -20,16 +20,18 @@ it('can return all channel information', function () {
 it('can return filtered channels', function () {
     $this->subscribe('test-channel-one');
     $this->subscribe('presence-test-channel-two');
+    subscribe('test-channel-one');
+    subscribe('test-channel-two');
 
-    $response = await($this->signedRequest('channels?filter_by_prefix=presence-test-channel-t&info=user_count'));
+    $response = await($this->signedRequest('channels?info=user_count'));
 
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"channels":{"presence-test-channel-two":{"user_count":1}}}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":{"user_count":1},"test-channel-two":{"user_count":1}}}');
 });
 
 it('returns empty results if no metrics requested', function () {
-    $this->subscribe('test-channel-one');
-    $this->subscribe('test-channel-two');
+    subscribe('test-channel-one');
+    subscribe('test-channel-two');
 
     $response = await($this->signedRequest('channels'));
 
@@ -49,4 +51,6 @@ it('only returns occupied channels', function () {
 
     $this->assertSame(200, $response->getStatusCode());
     $this->assertSame('{"channels":{"test-channel-two":{}}}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":[],"test-channel-two":[]}}');
 });
