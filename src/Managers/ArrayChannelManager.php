@@ -48,9 +48,25 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Find the given channel
      */
-    public function find(string $channel): Channel
+    public function find(string $channel): ?Channel
     {
         return $this->channels($channel);
+    }
+
+    /**
+     * Find the given channel or create it if it doesn't exist.
+     */
+    public function findOrCreate(string $channelName): Channel
+    {
+        if ($channel = $this->find($channelName)) {
+            return $channel;
+        }
+
+        $channel = ChannelBroker::create($channelName);
+
+        $this->applications[$this->application->id()][$channel->name()] = $channel;
+
+        return $channel;
     }
 
     /**
@@ -98,18 +114,14 @@ class ArrayChannelManager implements ChannelManagerInterface
      *
      * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
      */
-    public function channels(?string $channel = null): Channel|array
+    public function channels(?string $channel = null): Channel|array|null
     {
         if (! isset($this->applications[$this->application->id()])) {
             $this->applications[$this->application->id()] = [];
         }
 
         if ($channel) {
-            if (! isset($this->applications[$this->application->id()][$channel])) {
-                $this->applications[$this->application->id()][$channel] = ChannelBroker::create($channel);
-            }
-
-            return $this->applications[$this->application->id()][$channel];
+            return $this->applications[$this->application->id()][$channel] ?? null;
         }
 
         return $this->applications[$this->application->id()];

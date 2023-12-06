@@ -54,7 +54,7 @@ class Event
     {
         $channel = $this->channels
             ->for($connection->app())
-            ->find($channel);
+            ->findOrCreate($channel);
 
         $channel->subscribe($connection, $auth, $data);
 
@@ -69,7 +69,7 @@ class Event
         $channel = $this->channels
             ->for($connection->app())
             ->find($channel)
-            ->unsubscribe($connection);
+            ?->unsubscribe($connection);
     }
 
     /**

@@ -48,9 +48,26 @@ class CacheChannelManager implements ChannelManagerInterface
     /**
      * Find the given channel
      */
-    public function find(string $channel): Channel
+    public function find(string $channel): ?Channel
     {
         return $this->channels($channel);
+    }
+
+    /**
+     * Find the given channel or create it if it doesn't exist.
+     */
+    public function findOrCreate(string $channelName): Channel
+    {
+        if ($channel = $this->channels($channelName)) {
+            return $channel;
+        }
+
+        $channels = $this->repository->get($this->prefix, []);
+        $channel = ChannelBroker::create($channelName);
+        $channels[$this->application->id()][$$channel->name()] = serialize($channel);
+        $this->repository->forever($this->prefix, $channels);
+
+        return $channel;
     }
 
     /**
@@ -102,7 +119,7 @@ class CacheChannelManager implements ChannelManagerInterface
      *
      * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
      */
-    public function channels(?string $channel = null): Channel|array
+    public function channels(?string $channel = null): Channel|array|null
     {
         $channels = $this->repository->get($this->prefix, []);
 
@@ -111,15 +128,9 @@ class CacheChannelManager implements ChannelManagerInterface
         }
 
         if ($channel) {
-            if (! isset($channels[$this->application->id()][$channel])) {
-                $channel = ChannelBroker::create($channel);
-                $channels[$this->application->id()][$channel->name()] = serialize($channel);
-                $this->repository->forever($this->prefix, $channels);
-
-                return $channel;
-            }
-
-            return unserialize($channels[$this->application->id()][$channel]);
+            return isset($channels[$this->application->id()][$channel])
+                ? unserialize($channels[$this->application->id()][$channel])
+                : null;
         }
 
         return array_map('unserialize', $channels[$this->application->id()] ?: []);
