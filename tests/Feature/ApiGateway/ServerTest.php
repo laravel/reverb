@@ -17,7 +17,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-    channelManager()->flush();
+    channels()->flush();
     connections()->flush();
 });
 
@@ -51,7 +51,7 @@ it('can subscribe to a channel', function () {
 
     expect(connections()->all())->toHaveCount(1);
 
-    expect(channelManager()->find('test-channel')->connections())->toHaveCount(1);
+    expect(channels()->find('test-channel')->connections())->toHaveCount(1);
 
     $this->assertSent('abc-123', '{"event":"pusher_internal:subscription_succeeded","channel":"test-channel"}');
 });
@@ -151,7 +151,7 @@ it('it can ping inactive subscribers', function () {
     connections()->connect($connection);
 
     (new PingInactiveConnections)->handle(
-        channelManager()
+        channels()
     );
 
     $this->assertSent('abc-123', '{"event":"pusher:ping"}', 1);
@@ -165,16 +165,16 @@ it('it can disconnect inactive subscribers', function () {
     connections()->connect($connection);
 
     (new PingInactiveConnections)->handle(
-        channelManager()
+        channels()
     );
     $this->assertSent('abc-123', '{"event":"pusher:ping"}');
 
     (new PruneStaleConnections)->handle(
-        channelManager()
+        channels()
     );
 
     // expect(connections()->all())->toHaveCount(0);
-    expect(channelManager()->find('test-channel')->connections())->toHaveCount(0);
+    expect(channels()->find('test-channel')->connections())->toHaveCount(0);
 
     $this->assertSent('abc-123', '{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}', 1);
 });
@@ -203,11 +203,11 @@ it('can subscribe a connection to multiple channels', function () {
     $this->subscribe('presence-test-channel-4', data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
 
     expect(connections()->all())->toHaveCount(1);
-    expect(channelManager()->all())->toHaveCount(4);
+    expect(channels()->all())->toHaveCount(4);
 
     $connection = $this->managedConnection();
 
-    collect(channelManager()->all())->each(function ($channel) use ($connection) {
+    collect(channels()->all())->each(function ($channel) use ($connection) {
         expect($channel->connections())->toHaveCount(1);
         expect(collect($channel->connections())->map(fn ($conn, $index) => (string) $index))->toContain($connection->identifier());
     });
@@ -224,12 +224,12 @@ it('can subscribe multiple connections to multiple channels', function () {
     $this->subscribe('private-test-channel-3', connectionId: 'def-456', data: ['foo' => 'bar']);
 
     expect(connections()->all())->toHaveCount(2);
-    expect(channelManager()->all())->toHaveCount(4);
+    expect(channels()->all())->toHaveCount(4);
 
-    expect(channelManager()->find('test-channel')->connections())->toHaveCount(2);
-    expect(channelManager()->find('test-channel-2')->connections())->toHaveCount(1);
-    expect(channelManager()->find('private-test-channel-3')->connections())->toHaveCount(2);
-    expect(channelManager()->find('presence-test-channel-4')->connections())->toHaveCount(1);
+    expect(channels()->find('test-channel')->connections())->toHaveCount(2);
+    expect(channels()->find('test-channel-2')->connections())->toHaveCount(1);
+    expect(channels()->find('private-test-channel-3')->connections())->toHaveCount(2);
+    expect(channels()->find('presence-test-channel-4')->connections())->toHaveCount(1);
 });
 
 it('fails to subscribe to a private channel with invalid auth signature', function () {

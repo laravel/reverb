@@ -49,7 +49,7 @@ function validAuth(string $connectionId, string $channel, ?string $data = null):
 /**
  * Return the channel manager.
  */
-function channelManager(?Application $app = null): ChannelManager
+function channels(?Application $app = null): ChannelManager
 {
     return app(ChannelManager::class)
         ->for($app ?: app(ApplicationProvider::class)->all()->first());
