@@ -4,10 +4,10 @@ use Laravel\Reverb\Channels\PresenceCacheChannel;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection();
+    $this->connection = new FakeConnection();
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
@@ -43,11 +43,11 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelConnectionManager->shouldReceive('all')
         ->once()
-        ->andReturn($connections = connections(3));
+        ->andReturn($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    collect($connections)->each(fn ($connection) => $connection->assertReceived(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {
@@ -62,8 +62,8 @@ it('can return data stored on the connection', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
     $connections = [
-        connections(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1])[0],
-        connections(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 2])[0],
+        collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first(),
+        collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 2]))->first(),
     ];
 
     $this->channelConnectionManager->shouldReceive('all')
@@ -90,11 +90,11 @@ it('sends notification of subscription', function () {
         ->with($this->connection, []);
 
     $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn($connections = connections(3));
+        ->andReturn($connections = factory(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-cache-test-channel'));
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
         'data' => [],
         'channel' => 'presence-cache-test-channel',
@@ -110,7 +110,7 @@ it('sends notification of subscription with data', function () {
         ->with($this->connection, ['name' => 'Joe']);
 
     $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn($connections = connections(3));
+        ->andReturn($connections = factory(3));
 
     $channel->subscribe(
         $this->connection,
@@ -122,7 +122,7 @@ it('sends notification of subscription with data', function () {
         $data
     );
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
         'data' => ['name' => 'Joe'],
         'channel' => 'presence-cache-test-channel',
@@ -147,7 +147,7 @@ it('sends notification of an unsubscribe', function () {
         ->andReturn(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
 
     $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn($connections = connections(3));
+        ->andReturn($connections = factory(3));
 
     $this->channelConnectionManager->shouldReceive('remove')
         ->once()
@@ -155,7 +155,7 @@ it('sends notification of an unsubscribe', function () {
 
     $channel->unsubscribe($this->connection);
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_removed',
         'data' => ['user_id' => 1],
         'channel' => 'presence-cache-test-channel',
@@ -171,7 +171,7 @@ it('receives no data when no previous event triggered', function () {
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-cache-test-channel'));
 
-    $this->connection->assertNothingSent();
+    $this->connection->assertNothingReceived();
 });
 
 it('stores last triggered event', function () {

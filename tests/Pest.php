@@ -4,10 +4,9 @@ use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 use Laravel\Reverb\Tests\SerializableConnection;
 use Laravel\Reverb\Tests\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -17,16 +16,15 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
 /**
  * Create a defined number of connections.
  *
- * @param  bool  $serializable
  * @return array<int, \Laravel\Reverb\Connection|string>
  */
-function connections(int $count = 1, array $data = [], $serializable = false): array
+function factory(int $count = 1, array $data = [], bool $serializable = false): array
 {
     return Collection::make(range(1, $count))->map(function () use ($data, $serializable) {
         return new ChannelConnection(
             $serializable
                 ? new SerializableConnection(Uuid::uuid4())
-                : new Connection(Uuid::uuid4()),
+                : new FakeConnection(Uuid::uuid4()),
             $data
         );
     })->all();
@@ -47,17 +45,9 @@ function validAuth(string $connectionId, string $channel, ?string $data = null):
 }
 
 /**
- * Return the connection manager.
- */
-function connectionManager(): ConnectionManager
-{
-    return app(ConnectionManager::class);
-}
-
-/**
  * Return the channel manager.
  */
-function channelManager(?Application $app = null): ChannelManager
+function channels(?Application $app = null): ChannelManager
 {
     return app(ChannelManager::class)
         ->for($app ?: app(ApplicationProvider::class)->all()->first());

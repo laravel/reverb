@@ -3,10 +3,10 @@
 use Laravel\Reverb\ClientEvent;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection;
+    $this->connection = new FakeConnection;
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
@@ -16,7 +16,7 @@ beforeEach(function () {
 it('can forward a client message', function () {
     $this->channelConnectionManager->shouldReceive('all')
         ->once()
-        ->andReturn($connections = connections());
+        ->andReturn($connections = factory());
 
     ClientEvent::handle(
         $this->connection, [
@@ -26,7 +26,7 @@ it('can forward a client message', function () {
         ]
     );
 
-    $connections[0]->assertSent([
+    collect($connections)->first()->assertReceived([
         'event' => 'client-test-message',
         'channel' => 'test-channel',
         'data' => ['foo' => 'bar'],
@@ -46,7 +46,7 @@ it('does not forward a message to itself', function () {
         ]
     );
 
-    $this->connection->assertNothingSent();
+    $this->connection->assertNothingReceived();
 });
 
 it('fails on unsupported message', function () {

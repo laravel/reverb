@@ -2,10 +2,8 @@
 
 namespace Laravel\Reverb\Tests;
 
-use Clue\React\Redis\Client;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
@@ -13,14 +11,10 @@ use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
 use React\Http\Browser;
-use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use React\Promise\Timer\TimeoutException;
 use ReflectionObject;
 
-use function Ratchet\Client\connect;
 use function React\Async\await;
-use function React\Promise\Timer\timeout;
 
 class ReverbTestCase extends TestCase
 {
@@ -51,9 +45,8 @@ class ReverbTestCase extends TestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function defineEnvironment($app)
+    protected function defineEnvironment($app): void
     {
         parent::defineEnvironment($app);
 
@@ -78,7 +71,10 @@ class ReverbTestCase extends TestCase
         ]);
     }
 
-    public function usingRedis()
+    /**
+     * Configure the server to use Redis.
+     */
+    public function usingRedis(): void
     {
         app(ServerManager::class)->withPublishing();
 
@@ -88,12 +84,8 @@ class ReverbTestCase extends TestCase
 
     /**
      * Start the WebSocket server.
-     *
-     * @param  string  $host
-     * @param  string  $port
-     * @return void
      */
-    public function startServer($host = '0.0.0.0', $port = '8080')
+    public function startServer(string $host = '0.0.0.0', string $port = '8080'): void
     {
         $this->resetFiber();
         $this->server = Factory::make($host, $port, $this->loop);
@@ -102,10 +94,8 @@ class ReverbTestCase extends TestCase
     /**
      * Reset the Fiber instance.
      * This prevents using a stale fiber between tests.
-     *
-     * @return void
      */
-    protected function resetFiber()
+    protected function resetFiber(): void
     {
         $fiber = new SimpleFiber();
         $fiberRef = new ReflectionObject($fiber);
@@ -116,162 +106,12 @@ class ReverbTestCase extends TestCase
 
     /**
      * Stop the running WebSocket server.
-     *
-     * @return void
      */
-    public function stopServer()
+    public function stopServer(): void
     {
         if ($this->server) {
             $this->server->stop();
         }
-    }
-
-    /**
-     * Connect to the WebSocket server.
-     *
-     * @param  string  $host
-     * @param  string  $port
-     * @param  string  $key
-     * @return \Ratchet\Client\WebSocket
-     */
-    public function connect($host = '0.0.0.0', $port = '8080', $key = 'pusher-key', $headers = [])
-    {
-        $promise = new Deferred;
-
-        $connection = await(
-            connect("ws://{$host}:{$port}/app/{$key}", headers: $headers)
-        );
-
-        $connection->on('message', function ($message) use ($promise) {
-            $promise->resolve((string) $message);
-        });
-
-        $message = await($promise->promise());
-
-        $this->assertTrue(
-            Str::contains(
-                $message,
-                'connection_established'
-            )
-        );
-
-        $message = json_decode($message, true);
-        $data = json_decode($message['data'], true);
-
-        $this->connectionId = $data['socket_id'] ?? null;
-
-        return $connection;
-    }
-
-    /**
-     * Send a message to the connected client.
-     */
-    public function send(array $message, ?WebSocket $connection = null): ?string
-    {
-        $promise = new Deferred;
-
-        $connection = $connection ?: $this->connect();
-
-        $connection->on('message', function ($message) use ($promise) {
-            $promise->resolve((string) $message);
-        });
-
-        $connection->on('close', function ($code, $message) use ($promise) {
-            $promise->resolve((string) $message);
-        });
-
-        $connection->send(json_encode($message));
-
-        return await(timeout($promise->promise(), 2, $this->loop)
-            ->then(
-                fn ($message) => $message,
-                fn (TimeoutException $error) => null
-            ));
-    }
-
-    /**
-     * Disconnect the connected client.
-     */
-    public function disconnect(WebSocket $connection): string
-    {
-        $promise = new Deferred;
-
-        $connection->on('close', function () use ($promise) {
-            $promise->resolve('Connection Closed.');
-        });
-
-        $connection->close();
-
-        return await($promise->promise());
-    }
-
-    /**
-     * Subscribe to a channel.
-     */
-    public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?WebSocket $connection = null): string
-    {
-        $data = ! empty($data) ? json_encode($data) : null;
-
-        if (! $auth && Str::startsWith($channel, ['private-', 'presence-'])) {
-            $connection = $connection ?: $this->connect();
-            $auth = validAuth($this->connectionId, $channel, $data);
-        }
-
-        return $this->send([
-            'event' => 'pusher:subscribe',
-            'data' => array_filter([
-                'channel' => $channel,
-                'channel_data' => $data,
-                'auth' => $auth,
-            ]),
-        ], $connection);
-    }
-
-    /**
-     * Unsubscribe to a channel.
-     */
-    public function unsubscribe(string $channel, ?WebSocket $connection = null): ?string
-    {
-        return $this->send([
-            'event' => 'pusher:unsubscribe',
-            'data' => ['channel' => $channel],
-        ], $connection);
-    }
-
-    /**
-     * Return a promise for the next message received to the given connection.
-     *
-     * @param  \Ratchet\Client\WebSocketWebSocket  $connection
-     */
-    public function messagePromise(WebSocket $connection)
-    {
-        $promise = new Deferred;
-
-        $connection->on('message', function ($message) use ($promise) {
-            $promise->resolve((string) $message);
-        });
-
-        return timeout($promise->promise(), 2, $this->loop)
-            ->then(
-                fn ($message) => $message,
-                fn (TimeoutException $error) => false
-            );
-    }
-
-    /**
-     * Return a promise when a given connection is disconnected.
-     *
-     * @param  \Ratchet\Client\WebSocketWebSocket  $connection
-     */
-    public function disconnectPromise(WebSocket $connection): PromiseInterface
-    {
-        $promise = new Deferred;
-
-        $connection->on('close', function ($message) use ($promise) {
-            $promise->resolve('Connection Closed.');
-        });
-
-        return $promise->promise();
     }
 
     /**
@@ -285,10 +125,13 @@ class ReverbTestCase extends TestCase
             'data' => $data,
         ]));
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('{}', $response->getBody()->getContents());
+        expect($response->getStatusCode())->toBe(200);
+        expect($response->getBody()->getContents())->toBe('{}');
     }
 
+    /**
+     * Send a request to the server.
+     */
     public function request(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         return (new Browser($this->loop))
@@ -300,6 +143,9 @@ class ReverbTestCase extends TestCase
             );
     }
 
+    /**
+     * Send a signed request to the server.
+     */
     public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         $hash = md5(json_encode($data));
@@ -313,7 +159,7 @@ class ReverbTestCase extends TestCase
     }
 
     /**
-     * Post a request to the server.
+     * Send a POST request to the server.
      */
     public function postReqeust(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
@@ -321,7 +167,7 @@ class ReverbTestCase extends TestCase
     }
 
     /**
-     * Post a signed request to the server.
+     * Send a signed POST request to the server.
      */
     public function signedPostRequest(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
@@ -334,13 +180,11 @@ class ReverbTestCase extends TestCase
         return $this->postReqeust("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
     }
 
-    public function getWithSignature(
-        string $path,
-        array $data = [],
-        string $host = '0.0.0.0',
-        string $port = '8080',
-        string $appId = '123456'
-    ): PromiseInterface {
+    /**
+     * Send a signed GET request to the server.
+     */
+    public function getWithSignature(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
         $hash = md5(json_encode($data));
         $timestamp = time();
         $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";

@@ -2,10 +2,10 @@
 
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Pusher\Event as PusherEvent;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection;
+    $this->connection = new FakeConnection;
     $this->pusher = new PusherEvent(app(ChannelManager::class));
 });
 
@@ -15,7 +15,7 @@ it('can send an acknowledgement', function () {
         'pusher:connection_established'
     );
 
-    $this->connection->assertSent([
+    $this->connection->assertReceived([
         'event' => 'pusher:connection_established',
         'data' => json_encode([
             'socket_id' => $this->connection->id(),
@@ -31,7 +31,7 @@ it('can subscribe to a channel', function () {
         ['channel' => 'test-channel']
     );
 
-    $this->connection->assertSent([
+    $this->connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'test-channel',
     ]);
@@ -44,7 +44,7 @@ it('can unsubscribe from a channel', function () {
         ['channel' => 'test-channel']
     );
 
-    $this->connection->assertNothingSent();
+    $this->connection->assertNothingReceived();
 });
 
 it('can respond to a ping', function () {
@@ -53,7 +53,7 @@ it('can respond to a ping', function () {
         'pusher:ping',
     );
 
-    $this->connection->assertSent([
+    $this->connection->assertReceived([
         'event' => 'pusher:pong',
     ]);
 });

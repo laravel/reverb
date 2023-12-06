@@ -1,24 +1,24 @@
 <?php
 
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection;
+    $this->connection = new FakeConnection;
     $this->channelManager = $this->app->make(ChannelManager::class)
         ->for($this->connection->app());
     $this->channel = $this->channelManager->find('test-channel-0');
 });
 
 it('can subscribe to a channel', function () {
-    collect(connections(5))
+    collect(factory(5))
         ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
     expect($this->channel->connections())->toHaveCount(5);
 });
 
 it('can unsubscribe from a channel', function () {
-    $connections = collect(connections(5))
+    $connections = collect(factory(5))
         ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
     $this->channel->unsubscribe($connections->first()->connection());
@@ -39,7 +39,7 @@ it('can get all channels', function () {
 });
 
 it('can get all connections subscribed to a channel', function () {
-    $connections = collect(connections(5))
+    $connections = collect(factory(5))
         ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));
 
     $connections->each(fn ($connection) => expect($connection->id())
@@ -59,7 +59,7 @@ it('can unsubscribe a connection for all channels', function () {
 });
 
 it('can get the data for a connection subscribed to a channel', function () {
-    collect(connections(5))->each(fn ($connection) => $this->channel->subscribe(
+    collect(factory(5))->each(fn ($connection) => $this->channel->subscribe(
         $connection->connection(),
         data: json_encode(['name' => 'Joe'])
     ));
@@ -70,7 +70,7 @@ it('can get the data for a connection subscribed to a channel', function () {
 });
 
 it('can get all connections for all channels', function () {
-    $connections = connections(12);
+    $connections = factory(12);
 
     $channelOne = $this->channelManager->find('test-channel-0');
     $channelTwo = $this->channelManager->find('test-channel-1');
