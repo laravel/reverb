@@ -44,7 +44,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $channel->broadcast(['foo' => 'bar']);
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    collect($connections)->each(fn ($connection) => $connection->assertReceived(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {
@@ -64,7 +64,7 @@ it('receives no data when no previous event triggered', function () {
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-cache-test-channel'));
 
-    $this->connection->assertNothingSent();
+    $this->connection->assertNothingReceived();
 });
 
 it('stores last triggered event', function () {

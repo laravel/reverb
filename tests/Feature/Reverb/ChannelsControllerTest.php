@@ -14,7 +14,7 @@ it('can return all channel information', function () {
     $response = await($this->signedRequest('channels?info=user_count'));
 
     expect($response->getStatusCode())->toBe(200);
-    $this->assertSame('{"channels":{"test-channel-one":{},"presence-test-channel-two":{"user_count":1}}}', $response->getBody()->getContents());
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":{},"presence-test-channel-two":{"user_count":1}}}');
 });
 
 it('can return filtered channels', function () {

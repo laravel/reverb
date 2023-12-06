@@ -27,7 +27,7 @@ it('pings inactive connections', function () {
     (new PingInactiveConnections)->handle($this->channelManager);
 
     $connections->each(function ($connection) {
-        $connection->assertSent([
+        $connection->assertReceived([
             'event' => 'pusher:ping',
         ]);
         $connection->assertHasBeenPinged();

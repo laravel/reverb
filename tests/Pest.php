@@ -16,10 +16,9 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
 /**
  * Create a defined number of connections.
  *
- * @param  bool  $serializable
  * @return array<int, \Laravel\Reverb\Connection|string>
  */
-function factory(int $count = 1, array $data = [], $serializable = false): array
+function factory(int $count = 1, array $data = [], bool $serializable = false): array
 {
     return Collection::make(range(1, $count))->map(function () use ($data, $serializable) {
         return new ChannelConnection(

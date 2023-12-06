@@ -70,11 +70,8 @@ class ApiGatewayTestCase extends TestCase
 
     /**
      * Connect to the server.
-     *
-     * @param  string  $connectionId $name
-     * @param  string  $appKey
      */
-    public function connect($connectionId = 'abc-123', $appKey = 'pusher-key'): void
+    public function connect(string $connectionId = 'abc-123', string $appKey = 'pusher-key'): void
     {
         resolve(Server::class)
             ->handle(Request::fromLambdaEvent(
@@ -94,10 +91,8 @@ class ApiGatewayTestCase extends TestCase
 
     /**
      * Send a message to the connected client.
-     *
-     * @param  string  $appKey
      */
-    public function send(array $message, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
+    public function send(array $message, ?string $connectionId = 'abc-123', string $appKey = 'pusher-key'): void
     {
         $this->connect($connectionId, $appKey);
 
@@ -115,10 +110,8 @@ class ApiGatewayTestCase extends TestCase
 
     /**
      * Subscribe to a channel.
-     *
-     * @param  string  $appKey
      */
-    public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
+    public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?string $connectionId = 'abc-123', string $appKey = 'pusher-key'): void
     {
         $data = ! empty($data) ? json_encode($data) : null;
 
@@ -140,10 +133,8 @@ class ApiGatewayTestCase extends TestCase
 
     /**
      * Disconnect a connected client.
-     *
-     * @param  string  $connectionId
      */
-    public function disconnect($connectionId = 'abc-123'): void
+    public function disconnect(string $connectionId = 'abc-123'): void
     {
         resolve(Server::class)
             ->handle(Request::fromLambdaEvent(
@@ -158,10 +149,8 @@ class ApiGatewayTestCase extends TestCase
 
     /**
      * Assert a message was sent to the given connection.
-     *
-     * @return void
      */
-    public function assertSent(?string $connectionId = null, mixed $message = null, ?int $times = null)
+    public function assertSent(?string $connectionId = null, mixed $message = null, ?int $times = null): void
     {
         Bus::assertDispatched(SendToConnection::class, function ($job) use ($connectionId, $message) {
             return ($connectionId ? $job->connectionId === $connectionId : true)

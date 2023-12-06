@@ -26,7 +26,7 @@ it('can forward a client message', function () {
         ]
     );
 
-    $connections[0]->assertSent([
+    collect($connections)->first()->assertReceived([
         'event' => 'client-test-message',
         'channel' => 'test-channel',
         'data' => ['foo' => 'bar'],
@@ -46,7 +46,7 @@ it('does not forward a message to itself', function () {
         ]
     );
 
-    $this->connection->assertNothingSent();
+    $this->connection->assertNothingReceived();
 });
 
 it('fails on unsupported message', function () {

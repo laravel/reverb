@@ -11,8 +11,18 @@ use function React\Promise\Timer\timeout;
 
 class TestConnection
 {
+    /**
+     * The socket ID.
+     *
+     * @var string
+     */
     public $socketId;
 
+    /**
+     * Messages received by the connection.
+     *
+     * @var array<int, string>
+     */
     public $receivedMessages = [];
 
     public function __construct(public WebSocket $connection)
@@ -26,17 +36,18 @@ class TestConnection
         });
     }
 
+    /**
+     * Get the socket ID of the connection.
+     */
     public function socketId(): string
     {
         return $this->socketId;
     }
 
-    public function __call($method, $arguments)
-    {
-        return $this->connection->{$method}(...$arguments);
-    }
-
-    public function await()
+    /**
+     * Await all messages to the connection to be resolved.
+     */
+    public function await(): mixed
     {
         $promise = new Deferred();
 
@@ -57,7 +68,10 @@ class TestConnection
         );
     }
 
-    public function assertReceived(string $message, ?int $count = null)
+    /**
+     * Assert that the connection received the given message.
+     */
+    public function assertReceived(string $message, ?int $count = null): void
     {
         if (! in_array($message, $this->receivedMessages) || $count !== null) {
             $this->await();
@@ -69,6 +83,14 @@ class TestConnection
             expect($matches)->toHaveCount($count);
         }
 
-        return expect($this->receivedMessages)->toContain($message);
+        expect($this->receivedMessages)->toContain($message);
+    }
+
+    /**
+     * Proxy method calls to the connection.
+     */
+    public function __call($method, $arguments)
+    {
+        return $this->connection->{$method}(...$arguments);
     }
 }

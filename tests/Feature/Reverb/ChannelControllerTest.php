@@ -19,8 +19,8 @@ it('can return data for a single channel', function () {
 it('returns unoccupied when no connections', function () {
     $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
 
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"occupied":false,"subscription_count":0}', $response->getBody()->getContents());
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":false,"subscription_count":0}');
 });
 
 it('can return cache channel attributes', function () {

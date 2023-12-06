@@ -16,7 +16,7 @@ it('can handle a connection', function () {
 
     expect($connection->lastSeenAt())->not->toBeNull();
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:connection_established',
         'data' => json_encode([
             'socket_id' => $connection->id(),
@@ -49,7 +49,7 @@ it('can handle a new message', function () {
             ],
         ]));
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:connection_established',
         'data' => json_encode([
             'socket_id' => $connection->id(),
@@ -57,7 +57,7 @@ it('can handle a new message', function () {
         ]),
     ]);
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'test-channel',
     ]);
@@ -79,7 +79,7 @@ it('sends an error if something fails', function () {
             ],
         ]));
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:error',
         'data' => json_encode([
             'code' => 4200,
@@ -87,7 +87,7 @@ it('sends an error if something fails', function () {
         ]),
     ]);
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:error',
         'data' => json_encode([
             'code' => 4009,
@@ -109,7 +109,7 @@ it('can subscribe a user to a channel', function () {
 
     expect($connection->lastSeenAt())->not->toBeNull();
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'test-channel',
     ]);
@@ -126,7 +126,7 @@ it('can subscribe a user to a private channel', function () {
             ],
         ]));
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'private-test-channel',
     ]);
@@ -143,7 +143,7 @@ it('can subscribe a user to a presence channel', function () {
             ],
         ]));
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'data' => json_encode([
             'presence' => [
@@ -166,15 +166,15 @@ it('receives no data when no previous event triggered when joining a cache chann
             ],
         ]));
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'cache-test-channel',
     ]);
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:cache_miss',
         'channel' => 'cache-test-channel',
     ]);
-    $connection->assertSendCount(2);
+    $connection->assertReceivedCount(2);
 });
 
 it('receives last triggered event when joining a cache channel', function () {
@@ -200,12 +200,12 @@ it('receives last triggered event when joining a cache channel', function () {
             ],
         ]));
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'channel' => 'cache-test-channel',
     ]);
-    $connection->assertSent(['foo' => 'bar']);
-    $connection->assertSendCount(2);
+    $connection->assertReceived(['foo' => 'bar']);
+    $connection->assertReceivedCount(2);
 });
 
 it('unsubscribes a user from a channel on disconnection', function () {
@@ -284,7 +284,7 @@ it('it rejects a connection from an invalid origin', function () {
     $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
     $this->server->open($connection = new FakeConnection);
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:error',
         'data' => json_encode([
             'code' => 4009,
@@ -297,7 +297,7 @@ it('it accepts a connection from an valid origin', function () {
     $this->app['config']->set('reverb.apps.0.allowed_origins', ['localhost']);
     $this->server->open($connection = new FakeConnection);
 
-    $connection->assertSent([
+    $connection->assertReceived([
         'event' => 'pusher:connection_established',
         'data' => json_encode([
             'socket_id' => $connection->id(),

@@ -21,7 +21,7 @@ it('receives no data when no previous event triggered', function () {
 
     $channel->subscribe($this->connection);
 
-    $this->connection->assertNothingSent();
+    $this->connection->assertNothingReceived();
 });
 
 it('stores last triggered event', function () {

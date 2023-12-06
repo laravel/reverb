@@ -12,10 +12,23 @@ class FakeConnection extends BaseConnection
 {
     use GeneratesPusherIdentifiers;
 
+    /**
+     * Messages reveived by the connection.
+     *
+     * @var array<int, string>
+     */
     public $messages = [];
 
-    public $identifier = '19c1c8e8-351b-4eb5-b6d9-6cbfc54a3446';
+    /**
+     * Connection identifier.
+     */
+    public string $identifier = '19c1c8e8-351b-4eb5-b6d9-6cbfc54a3446';
 
+    /**
+     * Connection socket ID.
+     *
+     * @var string
+     */
     public $id;
 
     public function __construct(?string $identifier = null)
@@ -25,11 +38,17 @@ class FakeConnection extends BaseConnection
         }
     }
 
+    /**
+     * Get the raw socket connection identifier.
+     */
     public function identifier(): string
     {
         return $this->identifier;
     }
 
+    /**
+     * Get the normalized socket ID.
+     */
     public function id(): string
     {
         if (! $this->id) {
@@ -39,16 +58,25 @@ class FakeConnection extends BaseConnection
         return $this->id;
     }
 
+    /**
+     * Get the application the connection belongs to.
+     */
     public function app(): Application
     {
         return app()->make(ApplicationProvider::class)->findByKey('pusher-key');
     }
 
+    /**
+     * Get the origin of the connection.
+     */
     public function origin(): string
     {
         return 'http://localhost';
     }
 
+    /**
+     * Set the connection last seen at timestamp.
+     */
     public function setLastSeenAt(int $time): FakeConnection
     {
         $this->lastSeenAt = $time;
@@ -56,36 +84,57 @@ class FakeConnection extends BaseConnection
         return $this;
     }
 
+    /**
+     * Set the connection as pinged.
+     */
     public function setHasBeenPinged(): void
     {
         $this->hasBeenPinged = true;
     }
 
+    /**
+     * Send a message to the connection.
+     */
     public function send(string $message): void
     {
         $this->messages[] = $message;
     }
 
+    /**
+     * Terminate a connection.
+     */
     public function terminate(): void
     {
         //
     }
 
-    public function assertSent(array $message): void
+    /**
+     * Assert the given message was received by the connection.
+     */
+    public function assertReceived(array $message): void
     {
         Assert::assertContains(json_encode($message), $this->messages);
     }
 
-    public function assertSendCount(int $count): void
+    /**
+     * Assert the connection received the given message count.
+     */
+    public function assertReceivedCount(int $count): void
     {
         Assert::assertCount($count, $this->messages);
     }
 
-    public function assertNothingSent(): void
+    /**
+     * Assert the connection didn't receive any messages.
+     */
+    public function assertNothingReceived(): void
     {
         Assert::assertEmpty($this->messages);
     }
 
+    /**
+     * Assert the connection has been pinged.
+     */
     public function assertHasBeenPinged(): void
     {
         Assert::assertTrue($this->hasBeenPinged);

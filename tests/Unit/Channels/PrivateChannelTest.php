@@ -44,7 +44,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $channel->broadcast(['foo' => 'bar']);
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    collect($connections)->each(fn ($connection) => $connection->assertReceived(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {

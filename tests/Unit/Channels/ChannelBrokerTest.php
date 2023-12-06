@@ -3,7 +3,9 @@
 use Laravel\Reverb\Channels\CacheChannel;
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Channels\PresenceCacheChannel;
 use Laravel\Reverb\Channels\PresenceChannel;
+use Laravel\Reverb\Channels\PrivateCacheChannel;
 use Laravel\Reverb\Channels\PrivateChannel;
 
 it('can return a channel instance', function () {
@@ -24,4 +26,14 @@ it('can return a presence channel instance', function () {
 it('can return a cache channel instance', function () {
     expect(ChannelBroker::create('cache-foo'))
         ->toBeInstanceOf(CacheChannel::class);
+});
+
+it('can return a private cache channel instance', function () {
+    expect(ChannelBroker::create('private-cache-foo'))
+        ->toBeInstanceOf(PrivateCacheChannel::class);
+});
+
+it('can return a presence cache channel instance', function () {
+    expect(ChannelBroker::create('presence-cache-foo'))
+        ->toBeInstanceOf(PresenceCacheChannel::class);
 });

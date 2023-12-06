@@ -45,9 +45,8 @@ class ReverbTestCase extends TestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function defineEnvironment($app)
+    protected function defineEnvironment($app): void
     {
         parent::defineEnvironment($app);
 
@@ -72,7 +71,10 @@ class ReverbTestCase extends TestCase
         ]);
     }
 
-    public function usingRedis()
+    /**
+     * Configure the server to use Redis.
+     */
+    public function usingRedis(): void
     {
         app(ServerManager::class)->withPublishing();
 
@@ -82,12 +84,8 @@ class ReverbTestCase extends TestCase
 
     /**
      * Start the WebSocket server.
-     *
-     * @param  string  $host
-     * @param  string  $port
-     * @return void
      */
-    public function startServer($host = '0.0.0.0', $port = '8080')
+    public function startServer(string $host = '0.0.0.0', string $port = '8080'): void
     {
         $this->resetFiber();
         $this->server = Factory::make($host, $port, $this->loop);
@@ -96,10 +94,8 @@ class ReverbTestCase extends TestCase
     /**
      * Reset the Fiber instance.
      * This prevents using a stale fiber between tests.
-     *
-     * @return void
      */
-    protected function resetFiber()
+    protected function resetFiber(): void
     {
         $fiber = new SimpleFiber();
         $fiberRef = new ReflectionObject($fiber);
@@ -110,10 +106,8 @@ class ReverbTestCase extends TestCase
 
     /**
      * Stop the running WebSocket server.
-     *
-     * @return void
      */
-    public function stopServer()
+    public function stopServer(): void
     {
         if ($this->server) {
             $this->server->stop();
@@ -131,10 +125,13 @@ class ReverbTestCase extends TestCase
             'data' => $data,
         ]));
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('{}', $response->getBody()->getContents());
+        expect($response->getStatusCode())->toBe(200);
+        expect($response->getBody()->getContents())->toBe('{}');
     }
 
+    /**
+     * Send a request to the server.
+     */
     public function request(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         return (new Browser($this->loop))
@@ -146,6 +143,9 @@ class ReverbTestCase extends TestCase
             );
     }
 
+    /**
+     * Send a signed request to the server.
+     */
     public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         $hash = md5(json_encode($data));
@@ -159,7 +159,7 @@ class ReverbTestCase extends TestCase
     }
 
     /**
-     * Post a request to the server.
+     * Send a POST request to the server.
      */
     public function postReqeust(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
@@ -167,7 +167,7 @@ class ReverbTestCase extends TestCase
     }
 
     /**
-     * Post a signed request to the server.
+     * Send a signed POST request to the server.
      */
     public function signedPostRequest(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
@@ -180,13 +180,11 @@ class ReverbTestCase extends TestCase
         return $this->postReqeust("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
     }
 
-    public function getWithSignature(
-        string $path,
-        array $data = [],
-        string $host = '0.0.0.0',
-        string $port = '8080',
-        string $appId = '123456'
-    ): PromiseInterface {
+    /**
+     * Send a signed GET request to the server.
+     */
+    public function getWithSignature(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    {
         $hash = md5(json_encode($data));
         $timestamp = time();
         $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";

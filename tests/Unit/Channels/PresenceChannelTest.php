@@ -47,7 +47,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $channel->broadcast(['foo' => 'bar']);
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent(['foo' => 'bar']));
+    collect($connections)->each(fn ($connection) => $connection->assertReceived(['foo' => 'bar']));
 });
 
 it('fails to subscribe if the signature is invalid', function () {
@@ -62,8 +62,8 @@ it('can return data stored on the connection', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
     $connections = [
-        factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1])[0],
-        factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 2])[0],
+        collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first(),
+        collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 2]))->first(),
     ];
 
     $this->channelConnectionManager->shouldReceive('all')
@@ -94,7 +94,7 @@ it('sends notification of subscription', function () {
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-test-channel'));
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
         'data' => [],
         'channel' => 'presence-test-channel',
@@ -122,7 +122,7 @@ it('sends notification of subscription with data', function () {
         $data
     );
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
         'data' => ['name' => 'Joe'],
         'channel' => 'presence-test-channel',
@@ -155,7 +155,7 @@ it('sends notification of an unsubscribe', function () {
 
     $channel->unsubscribe($this->connection);
 
-    collect($connections)->each(fn ($connection) => $connection->assertSent([
+    collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_removed',
         'data' => ['user_id' => 1],
         'channel' => 'presence-test-channel',

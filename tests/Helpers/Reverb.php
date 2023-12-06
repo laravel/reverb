@@ -94,19 +94,3 @@ function disconnect(TestConnection $connection): string
 
     return await($promise->promise());
 }
-
-/**
- * Return a promise when a given connection is disconnected.
- *
- * @param  \Ratchet\Client\WebSocketWebSocket  $connection
- */
-function disconnectPromise(WebSocket $connection): PromiseInterface
-{
-    $promise = new Deferred;
-
-    $connection->on('close', function ($message) use ($promise) {
-        $promise->resolve('Connection Closed.');
-    });
-
-    return $promise->promise();
-}

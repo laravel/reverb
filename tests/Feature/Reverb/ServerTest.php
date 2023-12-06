@@ -320,12 +320,8 @@ it('fails to connect when an invalid application is provided', function () {
         $promise->resolve((string) $message);
     });
 
-    $this->assertTrue(
-        Str::contains(
-            await($promise->promise()),
-            '{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}'
-        )
-    );
+    expect(await($promise->promise()))
+        ->toBe('{"event":"pusher:error","data":"{\"code\":4001,\"message\":\"Application does not exist\"}"}');
 });
 
 it('can publish and subscribe to a triggered event', function () {
