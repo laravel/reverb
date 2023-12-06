@@ -3,10 +3,10 @@
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection();
+    $this->connection = new FakeConnection();
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
@@ -66,7 +66,7 @@ it('can broadcast to all connections of a channel', function () {
 
     $this->channelConnectionManager->shouldReceive('all')
         ->once()
-        ->andReturn($connections = connections(3));
+        ->andReturn($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
 
@@ -80,7 +80,7 @@ it('does not broadcast to the connection sending the message', function () {
 
     $this->channelConnectionManager->shouldReceive('all')
         ->once()
-        ->andReturn($connections = connections(3));
+        ->andReturn($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar'], $connections[0]->connection());
 

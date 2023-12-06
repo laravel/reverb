@@ -2,7 +2,7 @@
 
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Pusher\Server;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 use Laravel\Reverb\Tests\TestCase;
 
 uses(TestCase::class);
@@ -12,7 +12,7 @@ beforeEach(function () {
 });
 
 it('can handle a connection', function () {
-    $this->server->open($connection = new Connection);
+    $this->server->open($connection = new FakeConnection);
 
     expect($connection->lastSeenAt())->not->toBeNull();
 
@@ -32,13 +32,13 @@ it('can handle a disconnection', function () {
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
-    $server->close(new Connection);
+    $server->close(new FakeConnection);
 
     $channelManager->shouldHaveReceived('unsubscribeFromAll');
 });
 
 it('can handle a new message', function () {
-    $this->server->open($connection = new Connection);
+    $this->server->open($connection = new FakeConnection);
     $this->server->message(
         $connection,
         json_encode([
@@ -65,7 +65,7 @@ it('can handle a new message', function () {
 
 it('sends an error if something fails', function () {
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         'Hi'
     );
 
@@ -98,7 +98,7 @@ it('sends an error if something fails', function () {
 
 it('can subscribe a user to a channel', function () {
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -117,7 +117,7 @@ it('can subscribe a user to a channel', function () {
 
 it('can subscribe a user to a private channel', function () {
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -134,7 +134,7 @@ it('can subscribe a user to a private channel', function () {
 
 it('can subscribe a user to a presence channel', function () {
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -158,7 +158,7 @@ it('can subscribe a user to a presence channel', function () {
 
 it('receives no data when no previous event triggered when joining a cache channel', function () {
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -179,7 +179,7 @@ it('receives no data when no previous event triggered when joining a cache chann
 
 it('receives last triggered event when joining a cache channel', function () {
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -192,7 +192,7 @@ it('receives last triggered event when joining a cache channel', function () {
     $channel->broadcast(['foo' => 'bar']);
 
     $this->server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -216,7 +216,7 @@ it('unsubscribes a user from a channel on disconnection', function () {
     $server = $this->app->make(Server::class);
 
     $server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -240,7 +240,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
     $server = $this->app->make(Server::class);
 
     $server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -264,7 +264,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
     $server = $this->app->make(Server::class);
 
     $server->message(
-        $connection = new Connection,
+        $connection = new FakeConnection,
         json_encode([
             'event' => 'pusher:subscribe',
             'data' => [
@@ -282,7 +282,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
 
 it('it rejects a connection from an invalid origin', function () {
     $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
-    $this->server->open($connection = new Connection);
+    $this->server->open($connection = new FakeConnection);
 
     $connection->assertSent([
         'event' => 'pusher:error',
@@ -295,7 +295,7 @@ it('it rejects a connection from an invalid origin', function () {
 
 it('it accepts a connection from an valid origin', function () {
     $this->app['config']->set('reverb.apps.0.allowed_origins', ['localhost']);
-    $this->server->open($connection = new Connection);
+    $this->server->open($connection = new FakeConnection);
 
     $connection->assertSent([
         'event' => 'pusher:connection_established',

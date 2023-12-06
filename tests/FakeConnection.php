@@ -8,7 +8,7 @@ use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
 
-class Connection extends BaseConnection
+class FakeConnection extends BaseConnection
 {
     use GeneratesPusherIdentifiers;
 
@@ -49,7 +49,7 @@ class Connection extends BaseConnection
         return 'http://localhost';
     }
 
-    public function setLastSeenAt(int $time): Connection
+    public function setLastSeenAt(int $time): FakeConnection
     {
         $this->lastSeenAt = $time;
 

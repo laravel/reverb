@@ -180,8 +180,8 @@ class ApiGatewayTestCase extends TestCase
      */
     public function managedConnection(): ?Connection
     {
-        $connection = Arr::last(connectionManager()->all());
+        $connection = Arr::last(connections()->all());
 
-        return connectionManager()->find($connection->identifier());
+        return connections()->find($connection->identifier());
     }
 }

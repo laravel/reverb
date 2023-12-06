@@ -3,10 +3,10 @@
 use Laravel\Reverb\ClientEvent;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection;
+    $this->connection = new FakeConnection;
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
@@ -16,7 +16,7 @@ beforeEach(function () {
 it('can forward a client message', function () {
     $this->channelConnectionManager->shouldReceive('all')
         ->once()
-        ->andReturn($connections = connections());
+        ->andReturn($connections = factory());
 
     ClientEvent::handle(
         $this->connection, [

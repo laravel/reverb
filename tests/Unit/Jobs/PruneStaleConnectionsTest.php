@@ -12,7 +12,7 @@ beforeEach(function () {
 });
 
 it('cleans up stale connections', function () {
-    $connections = connections(5);
+    $connections = factory(5);
     $channel = ChannelBroker::create('test-channel');
 
     $this->channelManager->shouldReceive('connections')

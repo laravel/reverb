@@ -18,27 +18,27 @@ beforeEach(function () {
 
 afterEach(function () {
     channelManager()->flush();
-    connectionManager()->flush();
+    connections()->flush();
 });
 
 it('can handle a new connection', function () {
     $this->connect();
 
-    $this->assertCount(1, connectionManager()->all());
+    $this->assertCount(1, connections()->all());
 });
 
 it('can handle multiple new connections', function () {
     $this->connect();
     $this->connect('def-456');
 
-    $this->assertCount(2, connectionManager()->all());
+    $this->assertCount(2, connections()->all());
 });
 
 it('can handle connections to different applications', function () {
     $this->connect();
     $this->connect('def-456', appKey: 'pusher-key-2');
 
-    $connections = connectionManager()->all();
+    $connections = connections()->all();
 
     expect(Arr::first($connections)->identifier())->toBe('abc-123');
     expect(Arr::first($connections)->app()->id())->toBe('123456');
@@ -49,7 +49,7 @@ it('can handle connections to different applications', function () {
 it('can subscribe to a channel', function () {
     $this->subscribe('test-channel');
 
-    expect(connectionManager()->all())->toHaveCount(1);
+    expect(connections()->all())->toHaveCount(1);
 
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(1);
 
@@ -97,11 +97,11 @@ it('can notify other subscribers of a presence channel when a member leaves', fu
     $this->subscribe('presence-test-channel', data: $data, connectionId: 'ghi-789');
     $this->assertSent('def-456', '{"event":"pusher_internal:member_added","data":{"user_id":3,"user_info":{"name":"Test User 3"}},"channel":"presence-test-channel"}');
 
-    expect(connectionManager()->all())->toHaveCount(3);
+    expect(connections()->all())->toHaveCount(3);
 
     $this->disconnect('ghi-789');
 
-    expect(connectionManager()->all())->toHaveCount(2);
+    expect(connections()->all())->toHaveCount(2);
 
     $this->assertSent(
         message: '{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}',
@@ -146,9 +146,9 @@ it('it can ping inactive subscribers', function () {
     $this->subscribe('test-channel');
     $this->assertSent('abc-123', 'subscription_succeeded', 1);
 
-    $connection = Arr::first(connectionManager()->all());
+    $connection = Arr::first(connections()->all());
     $connection->setLastSeenAt(time() - 60 * 10);
-    connectionManager()->connect($connection);
+    connections()->connect($connection);
 
     (new PingInactiveConnections)->handle(
         channelManager()
@@ -160,9 +160,9 @@ it('it can ping inactive subscribers', function () {
 it('it can disconnect inactive subscribers', function () {
     $this->subscribe('test-channel');
 
-    $connection = Arr::first(connectionManager()->all());
+    $connection = Arr::first(connections()->all());
     $connection->setLastSeenAt(time() - 60 * 10);
-    connectionManager()->connect($connection);
+    connections()->connect($connection);
 
     (new PingInactiveConnections)->handle(
         channelManager()
@@ -173,7 +173,7 @@ it('it can disconnect inactive subscribers', function () {
         channelManager()
     );
 
-    // expect(connectionManager()->all())->toHaveCount(0);
+    // expect(connections()->all())->toHaveCount(0);
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(0);
 
     $this->assertSent('abc-123', '{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}', 1);
@@ -202,7 +202,7 @@ it('can subscribe a connection to multiple channels', function () {
     $this->subscribe('private-test-channel-3', data: ['foo' => 'bar']);
     $this->subscribe('presence-test-channel-4', data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
 
-    expect(connectionManager()->all())->toHaveCount(1);
+    expect(connections()->all())->toHaveCount(1);
     expect(channelManager()->all())->toHaveCount(4);
 
     $connection = $this->managedConnection();
@@ -223,7 +223,7 @@ it('can subscribe multiple connections to multiple channels', function () {
     $this->subscribe('test-channel', connectionId: 'def-456');
     $this->subscribe('private-test-channel-3', connectionId: 'def-456', data: ['foo' => 'bar']);
 
-    expect(connectionManager()->all())->toHaveCount(2);
+    expect(connections()->all())->toHaveCount(2);
     expect(channelManager()->all())->toHaveCount(4);
 
     expect(channelManager()->find('test-channel')->connections())->toHaveCount(2);

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use Laravel\Reverb\Tests\FakeConnection;
 use Ratchet\Client\WebSocket;
 use React\Promise\Deferred;
 
@@ -10,7 +11,7 @@ use function React\Async\await;
 /**
  * Connect to the WebSocket server.
  */
-function connect(string $host = '0.0.0.0', string $port = '8080', string $key = 'pusher-key', array $headers = []): WebSocket
+function connect(string $host = '0.0.0.0', string $port = '8080', string $key = 'pusher-key', array $headers = []): FakeConnection
 {
     $promise = new Deferred;
 
@@ -93,5 +94,5 @@ function socketId(WebSocket $connection)
 {
     $connections = channelManager()->connections();
 
-    dd($connections);
+    // dd($connections);
 }

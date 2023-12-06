@@ -3,10 +3,10 @@
 use Laravel\Reverb\Channels\CacheChannel;
 use Laravel\Reverb\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Tests\Connection;
+use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new Connection();
+    $this->connection = new FakeConnection();
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);

@@ -12,7 +12,7 @@ beforeEach(function () {
 });
 
 it('pings inactive connections', function () {
-    $connections = connections(5);
+    $connections = factory(5);
     $channel = ChannelBroker::create('test-channel');
 
     $this->channelManager->shouldReceive('connections')
