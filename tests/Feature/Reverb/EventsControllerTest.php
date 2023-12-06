@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Reverb\Tests\ReverbTestCase;
+use React\Http\Message\ResponseException;
 
 use function React\Async\await;
 
@@ -29,17 +30,17 @@ it('can receive and event trigger for multiple channels', function () {
 });
 
 it('can return user counts when requested', function () {
-    $this->subscribe('test-channel-one');
+    $this->subscribe('presence-test-channel-one');
 
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
-        'channels' => ['test-channel-one', 'test-channel-two'],
+        'channels' => ['presence-test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
         'info' => 'user_count',
     ]));
 
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"channels":{"test-channel-one":{"user_count":1},"test-channel-two":{"user_count":0}}}', $response->getBody()->getContents());
+    $this->assertSame('{"channels":{"presence-test-channel-one":{"user_count":1},"test-channel-two":{}}}', $response->getBody()->getContents());
 });
 
 it('can return subscription counts when requested', function () {
@@ -47,27 +48,13 @@ it('can return subscription counts when requested', function () {
 
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
-        'channels' => ['test-channel-one', 'test-channel-two'],
+        'channels' => ['presence-test-channel-one', 'test-channel-two'],
         'data' => ['some' => 'data'],
         'info' => 'subscription_count',
     ]));
 
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"channels":{"test-channel-one":{"subscription_count":0},"test-channel-two":{"subscription_count":1}}}', $response->getBody()->getContents());
-});
-
-it('can return user and subscription counts when requested', function () {
-    $this->subscribe('test-channel-two');
-
-    $response = await($this->signedPostRequest('events', [
-        'name' => 'NewEvent',
-        'channels' => ['test-channel-one', 'test-channel-two'],
-        'data' => ['some' => 'data'],
-        'info' => 'subscription_count,user_count',
-    ]));
-
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"channels":{"test-channel-one":{"user_count":0,"subscription_count":0},"test-channel-two":{"user_count":1,"subscription_count":1}}}', $response->getBody()->getContents());
+    $this->assertSame('{"channels":{"presence-test-channel-one":{},"test-channel-two":{"subscription_count":1}}}', $response->getBody()->getContents());
 });
 
 it('can ignore a subscriber', function () {
@@ -93,3 +80,38 @@ it('can ignore a subscriber', function () {
     $this->assertSame('{}', $response->getBody()->getContents());
     expect(await($promiseTwo))->toBeFalse();
 });
+
+it('validates invalid data', function ($payload) {
+    await($this->signedPostRequest('events', $payload));
+})
+    ->throws(ResponseException::class, exceptionCode: 422)
+    ->with([
+        [
+            [
+                'name' => 'NewEvent',
+                'channel' => 'test-channel',
+            ],
+        ],
+        [
+            [
+                'name' => 'NewEvent',
+                'channels' => ['test-channel-one', 'test-channel-two'],
+            ],
+        ],
+        [
+            [
+                'name' => 'NewEvent',
+                'channel' => 'test-channel',
+                'data' => ['some' => 'data'],
+                'socket_id' => 1234,
+            ],
+        ],
+        [
+            [
+                'name' => 'NewEvent',
+                'channel' => 'test-channel',
+                'data' => ['some' => 'data'],
+                'info' => 1234,
+            ],
+        ],
+    ]);

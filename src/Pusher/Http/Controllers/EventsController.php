@@ -2,24 +2,35 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class EventsController extends Controller
 {
+    use InteractsWithChannelInformation;
+
     /**
      * Handle the request.
      */
     public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
         $this->verify($request, $connection, $appId);
-        // @TODO Validate the request body as a JSON object in the correct format.
 
         $payload = json_decode($this->body, true);
+
+        $validator = $this->validate($payload);
+
+        if ($validator->fails()) {
+            return new JsonResponse($validator->errors(), 422);
+        }
+
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
         Event::dispatch(
@@ -33,32 +44,26 @@ class EventsController extends Controller
         );
 
         if (isset($payload['info'])) {
-            return new JsonResponse((object) $this->getInfo($channels, $payload['info']));
+            return new JsonResponse([
+                'channels' => array_map(fn ($item) => (object) $item, $this->infoForChannels($channels, $payload['info'])),
+            ]);
         }
 
         return new JsonResponse((object) []);
     }
 
     /**
-     * Get the info for the given channels.
-     *
-     * @param  array<int, string>  $channels
-     * @return array<string, array<string, int>>
+     * Validate the incoming request.
      */
-    protected function getInfo(array $channels, string $info): array
+    protected function validate(array $payload): Validator
     {
-        $info = explode(',', $info);
-
-        $channels = collect($channels)->mapWithKeys(function ($channel) use ($info) {
-            $count = count($this->channels->find($channel)->connections());
-            $info = [
-                'user_count' => in_array('user_count', $info) ? $count : null,
-                'subscription_count' => in_array('subscription_count', $info) ? $count : null,
-            ];
-
-            return [$channel => array_filter($info, fn ($item) => $item !== null)];
-        })->all();
-
-        return ['channels' => $channels];
+        return ValidatorFacade::make($payload, [
+            'name' => ['required', 'string'],
+            'data' => ['required', 'array'],
+            'channels' => ['required_without:channel', 'array'],
+            'channel' => ['required_without:channels', 'string'],
+            'socket_id' => ['string'],
+            'info' => ['string'],
+        ]);
     }
 }

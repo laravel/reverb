@@ -20,7 +20,7 @@ class Request
      *
      * @var int
      */
-    const MAX_SIZE = 4096;
+    const MAX_SIZE = 10000;
 
     /**
      * Turn the raw message into a Psr7 request.

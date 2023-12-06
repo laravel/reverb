@@ -2,23 +2,35 @@
 
 namespace Laravel\Reverb\Pusher\Http\Controllers;
 
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class EventsBatchController extends Controller
 {
+    use InteractsWithChannelInformation;
+
     /**
      * Handle the request.
      */
     public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
     {
         $this->verify($request, $connection, $appId);
-        // @TODO Validate the request body as a JSON array of events in the correct format and a max of 10 items.
 
-        $items = collect(json_decode($this->body, true));
+        $payload = json_decode($this->body, true);
+
+        $validator = $this->validate($payload);
+
+        if ($validator->fails()) {
+            return new JsonResponse($validator->errors(), 422);
+        }
+
+        $items = collect($payload['batch']);
 
         $info = $items->map(function ($item) {
             Event::dispatch(
@@ -31,10 +43,16 @@ class EventsBatchController extends Controller
                 isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null
             );
 
-            return isset($item['info']) ? $this->getInfo($item['channel'], $item['info']) : [];
+            return isset($item['info']) ? $this->info($item['channel'], $item['info']) : [];
         });
 
-        return $info->some(fn ($item) => count($item) > 0) ? new JsonResponse((object) ['batch' => $info->all()]) : new JsonResponse((object) []);
+        if ($info->some(fn ($item) => count($item) > 0)) {
+            return new JsonResponse(
+                ['batch' => $info->each(fn ($item) => (object) $item)->all()]
+            );
+        }
+
+        return new JsonResponse(['batch' => (object) []]);
     }
 
     /**
@@ -53,5 +71,20 @@ class EventsBatchController extends Controller
         ];
 
         return array_filter($info, fn ($item) => $item !== null);
+    }
+
+    /**
+     * Validate the incoming request.
+     */
+    protected function validate(array $payload): Validator
+    {
+        return ValidatorFacade::make($payload, [
+            'batch' => ['required', 'array'],
+            'batch.*.name' => ['required', 'string'],
+            'batch.*.data' => ['required', 'array'],
+            'batch.*.channel' => ['required_without:channels', 'string'],
+            'batch.*.socket_id' => ['string'],
+            'batch.*.info' => ['string'],
+        ]);
     }
 }

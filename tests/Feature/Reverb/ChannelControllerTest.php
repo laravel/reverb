@@ -13,28 +13,21 @@ it('can return data for a single channel', function () {
     $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
 
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"occupied":true,"user_count":2,"subscription_count":2,"cache":"{}"}', $response->getBody()->getContents());
+    $this->assertSame('{"occupied":true,"subscription_count":2}', $response->getBody()->getContents());
 });
 
 it('returns unoccupied when no connections', function () {
     $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
 
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"occupied":false,"user_count":0,"subscription_count":0,"cache":"{}"}', $response->getBody()->getContents());
+    $this->assertSame('{"occupied":false,"subscription_count":0}', $response->getBody()->getContents());
 });
 
-it('can return only the requested attributes', function () {
-    $this->subscribe('test-channel-one');
+it('can return cache channel attributes', function () {
+    $this->subscribe('cache-test-channel-one');
+    channelManager()->find('cache-test-channel-one')->broadcast(['some' => 'data']);
 
-    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+    $response = await($this->signedRequest('channels/cache-test-channel-one?info=subscription_count,cache'));
     $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"occupied":true,"user_count":1,"subscription_count":1,"cache":"{}"}', $response->getBody()->getContents());
-
-    $response = await($this->signedRequest('channels/test-channel-one?info=cache'));
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"occupied":true,"cache":"{}"}', $response->getBody()->getContents());
-
-    $response = await($this->signedRequest('channels/test-channel-one?info=subscription_count,user_count'));
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame('{"occupied":true,"user_count":1,"subscription_count":1}', $response->getBody()->getContents());
+    $this->assertSame('{"occupied":true,"subscription_count":1,"cache":{"some":"data"}}', $response->getBody()->getContents());
 });

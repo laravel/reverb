@@ -16,11 +16,13 @@ class UsersTerminateController extends Controller
     {
         $this->verify($request, $connection, $appId);
 
-        if (! $connection = $this->channels->connections()[$userId]) {
-            return new JsonResponse((object) [], 400);
-        }
+        $connections = collect($this->channels->connections());
 
-        $connection->connection()->disconnect();
+        $connections->each(function ($connection) use ($userId) {
+            if ((string) $connection->data()['user_id'] === $userId) {
+                $connection->disconnect();
+            }
+        });
 
         return new JsonResponse((object) []);
     }
