@@ -59,7 +59,7 @@ class WsConnection extends EventEmitter
         );
 
         $this->connection->on('data', [$this->buffer, 'onData']);
-        $this->connection->on('close', $this->onClose ?: fn () => dump('werhwerh'));
+        $this->connection->on('close', $this->onClose ?: fn () => null);
     }
 
     /**
