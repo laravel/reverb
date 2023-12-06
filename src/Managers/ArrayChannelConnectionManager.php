@@ -68,6 +68,14 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
+     * Determine whether any connections remain on the channel.
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->connections);
+    }
+
+    /**
      * Flush the channel connection manager.
      */
     public function flush(): void

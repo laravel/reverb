@@ -24,7 +24,7 @@ class CliLogger implements Logger
     /**
      * Log an infomational message.
      */
-    public function info(string $title, string $message = null): void
+    public function info(string $title, ?string $message = null): void
     {
         $this->components->twoColumnDetail($title, $message);
     }

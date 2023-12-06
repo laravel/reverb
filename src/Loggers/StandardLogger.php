@@ -10,7 +10,7 @@ class StandardLogger implements Logger
     /**
      * Log an infomational message
      */
-    public function info(string $title, string $message = null): void
+    public function info(string $title, ?string $message = null): void
     {
         $output = $title;
 

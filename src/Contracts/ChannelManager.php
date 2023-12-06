@@ -30,12 +30,17 @@ interface ChannelManager
     /**
      * Get all the connections for the given channels.
      */
-    public function connections(string $channel = null): array;
+    public function connections(?string $channel = null): array;
 
     /**
      * Unsubscribe from all channels.
      */
     public function unsubscribeFromAll(Connection $connection): void;
+
+    /**
+     * Remove the given channel.
+     */
+    public function remove(Channel $channel): void;
 
     /**
      * Flush the channel manager repository.

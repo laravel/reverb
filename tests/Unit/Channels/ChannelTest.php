@@ -2,6 +2,7 @@
 
 use Laravel\Reverb\Channels\Channel;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Tests\Connection;
 
 beforeEach(function () {
@@ -29,6 +30,32 @@ it('can unsubscribe a connection from a channel', function () {
         ->once()
         ->with($this->connection);
 
+    $channel->unsubscribe($this->connection);
+});
+
+it('removes a channel when no subscribers remain', function () {
+    $channelManager = Mockery::spy(ChannelManager::class);
+    $this->app->instance(ChannelManager::class, $channelManager);
+
+    $channel = new Channel('test-channel');
+
+    $this->channelConnectionManager->shouldReceive('add')
+        ->once()
+        ->with($this->connection, []);
+    $this->channelConnectionManager->shouldReceive('remove')
+        ->once()
+        ->with($this->connection);
+    $this->channelConnectionManager->shouldReceive('isEmpty')
+        ->once()
+        ->andReturn(true);
+    $channelManager->shouldReceive('for')
+        ->once()
+        ->andReturn($channelManager);
+    $channelManager->shouldReceive('remove')
+        ->once()
+        ->with($channel);
+
+    $channel->subscribe($this->connection);
     $channel->unsubscribe($this->connection);
 });
 

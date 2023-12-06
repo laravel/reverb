@@ -11,7 +11,7 @@ class Event
     /**
      * Dispatch a message to a channel.
      */
-    public static function dispatch(Application $app, array $payload, Connection $connection = null): void
+    public static function dispatch(Application $app, array $payload, ?Connection $connection = null): void
     {
         $server = app(ServerManager::class);
 
@@ -30,7 +30,7 @@ class Event
     /**
      * Notify all connections subscribed to the given channel.
      */
-    public static function dispatchSynchronously(Application $app, array $payload, Connection $connection = null): void
+    public static function dispatchSynchronously(Application $app, array $payload, ?Connection $connection = null): void
     {
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 

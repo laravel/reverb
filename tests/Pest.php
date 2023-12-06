@@ -35,7 +35,7 @@ function connections(int $count = 1, array $data = [], $serializable = false): a
 /**
  * Generate a valid Pusher authentication signature.
  */
-function validAuth(string $connectionId, string $channel, string $data = null): string
+function validAuth(string $connectionId, string $channel, ?string $data = null): string
 {
     $signature = "{$connectionId}:{$channel}";
 
@@ -57,7 +57,7 @@ function connectionManager(): ConnectionManager
 /**
  * Return the channel manager.
  */
-function channelManager(Application $app = null): ChannelManager
+function channelManager(?Application $app = null): ChannelManager
 {
     return app(ChannelManager::class)
         ->for($app ?: app(ApplicationProvider::class)->all()->first());

@@ -18,7 +18,7 @@ class Connection extends BaseConnection
 
     public $id;
 
-    public function __construct(string $identifier = null)
+    public function __construct(?string $identifier = null)
     {
         if ($identifier) {
             $this->identifier = $identifier;

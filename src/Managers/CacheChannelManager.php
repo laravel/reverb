@@ -58,7 +58,7 @@ class CacheChannelManager implements ChannelManagerInterface
      *
      * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
-    public function connections(string $channel = null): array
+    public function connections(?string $channel = null): array
     {
         $channels = Arr::wrap($this->channels($channel));
 
@@ -78,6 +78,18 @@ class CacheChannelManager implements ChannelManagerInterface
     }
 
     /**
+     * Remove the given channel.
+     */
+    public function remove(Channel $channel): void
+    {
+        $channels = $this->channels();
+
+        unset($channels[$channel->name()]);
+
+        $this->repository->forever($this->prefix, $channels);
+    }
+
+    /**
      * Get the given channel.
      */
     public function channel(string $channel): Channel
@@ -90,7 +102,7 @@ class CacheChannelManager implements ChannelManagerInterface
      *
      * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
      */
-    public function channels(string $channel = null): Channel|array
+    public function channels(?string $channel = null): Channel|array
     {
         $channels = $this->repository->get($this->prefix, []);
 

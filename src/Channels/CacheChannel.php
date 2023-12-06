@@ -14,7 +14,7 @@ class CacheChannel extends Channel
     /**
      * Send a message to all connections subscribed to the channel.
      */
-    public function broadcast(array $payload, Connection $except = null): void
+    public function broadcast(array $payload, ?Connection $except = null): void
     {
         $this->payload = $payload;
 
@@ -24,7 +24,7 @@ class CacheChannel extends Channel
     /**
      * Broadcast a message triggered from an internal source.
      */
-    public function broadcastInternally(array $payload, Connection $except = null): void
+    public function broadcastInternally(array $payload, ?Connection $except = null): void
     {
         parent::broadcast($payload, $except);
     }

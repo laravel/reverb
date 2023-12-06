@@ -7,7 +7,7 @@ interface Logger
     /**
      * Log an infomational message.
      */
-    public function info(string $title, string $message = null): void;
+    public function info(string $title, ?string $message = null): void;
 
     /**
      * Log an error message.

@@ -39,6 +39,11 @@ interface ChannelConnectionManager
     public function all(): array;
 
     /**
+     * Determine whether any connections remain on the channel.
+     */
+    public function isEmpty(): bool;
+
+    /**
      * Flush the channel connection manager.
      */
     public function flush(): void;

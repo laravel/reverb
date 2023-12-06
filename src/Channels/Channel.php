@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Channels;
 
 use Laravel\Reverb\Concerns\SerializesChannels;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class Channel
@@ -57,7 +58,7 @@ class Channel
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, string $auth = null, string $data = null): void
+    public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
         $this->connections->add($connection, $data ? json_decode($data, true) : []);
     }
@@ -68,6 +69,10 @@ class Channel
     public function unsubscribe(Connection $connection): void
     {
         $this->connections->remove($connection);
+
+        if ($this->connections->isEmpty()) {
+            app(ChannelManager::class)->for($connection->app())->remove($this);
+        }
     }
 
     /**
@@ -81,7 +86,7 @@ class Channel
     /**
      * Send a message to all connections subscribed to the channel.
      */
-    public function broadcast(array $payload, Connection $except = null): void
+    public function broadcast(array $payload, ?Connection $except = null): void
     {
         if ($except === null) {
             $this->broadcastToAll($payload);
@@ -115,7 +120,7 @@ class Channel
     /**
      * Broadcast a message triggered from an internal source.
      */
-    public function broadcastInternally(array $payload, Connection $except = null): void
+    public function broadcastInternally(array $payload, ?Connection $except = null): void
     {
         $this->broadcast($payload, $except);
     }
