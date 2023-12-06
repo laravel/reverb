@@ -11,7 +11,7 @@ trait InteractsWithPrivateChannels
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, string $auth = null, string $data = null): void
+    public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
         $this->verify($connection, $auth, $data);
 
@@ -21,7 +21,7 @@ trait InteractsWithPrivateChannels
     /**
      * Deteremine whether the given auth token is valid.
      */
-    protected function verify(Connection $connection, string $auth, string $data = null): bool
+    protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
 

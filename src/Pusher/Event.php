@@ -50,7 +50,7 @@ class Event
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, string $channel, string $auth = null, string $data = null): void
+    public function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
     {
         $channel = $this->channels
             ->for($connection->app())
@@ -122,7 +122,7 @@ class Event
     /**
      * Send a response to the given connection.
      */
-    public function send(Connection $connection, string $event, array $data = [], string $channel = null): void
+    public function send(Connection $connection, string $event, array $data = [], ?string $channel = null): void
     {
         $connection->send(
             static::formatPayload($event, $data, $channel)
@@ -132,7 +132,7 @@ class Event
     /**
      * Send an internal response to the given connection.
      */
-    public function sendInternally(Connection $connection, string $event, array $data = [], string $channel = null): void
+    public function sendInternally(Connection $connection, string $event, array $data = [], ?string $channel = null): void
     {
         $connection->send(
             static::formatInternalPayload($event, $data, $channel)
@@ -142,7 +142,7 @@ class Event
     /**
      * Format the payload for the given event.
      */
-    public function formatPayload(string $event, array $data = [], string $channel = null, string $prefix = 'pusher:'): string|false
+    public function formatPayload(string $event, array $data = [], ?string $channel = null, string $prefix = 'pusher:'): string|false
     {
         return json_encode(
             array_filter([

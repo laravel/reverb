@@ -23,7 +23,7 @@ class ChannelConnection
     /**
      * Get the connection data.
      */
-    public function data(string $key = null): mixed
+    public function data(?string $key = null): mixed
     {
         if ($key) {
             return Arr::get($this->data, $key);

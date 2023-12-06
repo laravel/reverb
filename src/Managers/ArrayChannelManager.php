@@ -58,7 +58,7 @@ class ArrayChannelManager implements ChannelManagerInterface
      *
      * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
-    public function connections(string $channel = null): array
+    public function connections(?string $channel = null): array
     {
         $channels = Arr::wrap($this->channels($channel));
 
@@ -98,7 +98,7 @@ class ArrayChannelManager implements ChannelManagerInterface
      *
      * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
      */
-    public function channels(string $channel = null): Channel|array
+    public function channels(?string $channel = null): Channel|array
     {
         if (! isset($this->applications[$this->application->id()])) {
             $this->applications[$this->application->id()] = [];

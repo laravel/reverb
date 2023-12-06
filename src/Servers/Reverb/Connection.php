@@ -21,7 +21,7 @@ class Connection extends ConnectionContract
      */
     protected $hasBeenPinged = false;
 
-    public function __construct(protected WsConnection $connection, Application $application, string $origin = null)
+    public function __construct(protected WsConnection $connection, Application $application, ?string $origin = null)
     {
         parent::__construct($application, $origin);
     }

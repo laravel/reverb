@@ -118,7 +118,7 @@ class ApiGatewayTestCase extends TestCase
      *
      * @param  string  $appKey
      */
-    public function subscribe(string $channel, ?array $data = [], string $auth = null, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
+    public function subscribe(string $channel, ?array $data = [], ?string $auth = null, ?string $connectionId = 'abc-123', $appKey = 'pusher-key'): void
     {
         $data = ! empty($data) ? json_encode($data) : null;
 
@@ -161,7 +161,7 @@ class ApiGatewayTestCase extends TestCase
      *
      * @return void
      */
-    public function assertSent(string $connectionId = null, mixed $message = null, int $times = null)
+    public function assertSent(?string $connectionId = null, mixed $message = null, ?int $times = null)
     {
         Bus::assertDispatched(SendToConnection::class, function ($job) use ($connectionId, $message) {
             return ($connectionId ? $job->connectionId === $connectionId : true)

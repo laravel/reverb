@@ -30,7 +30,7 @@ interface ChannelManager
     /**
      * Get all the connections for the given channels.
      */
-    public function connections(string $channel = null): array;
+    public function connections(?string $channel = null): array;
 
     /**
      * Unsubscribe from all channels.

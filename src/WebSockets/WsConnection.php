@@ -113,7 +113,7 @@ class WsConnection extends EventEmitter
     /**
      * Close the connection.
      */
-    public function close(FrameInterface $frame = null): void
+    public function close(?FrameInterface $frame = null): void
     {
         if ($frame) {
             $this->send($frame);
