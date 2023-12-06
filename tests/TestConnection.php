@@ -57,10 +57,16 @@ class TestConnection
         );
     }
 
-    public function assertReceived(string $message)
+    public function assertReceived(string $message, ?int $count = null)
     {
-        if (! in_array($message, $this->receivedMessages)) {
+        if (! in_array($message, $this->receivedMessages) || $count !== null) {
             $this->await();
+        }
+
+        if ($count) {
+            $matches = array_filter($this->receivedMessages, fn ($m) => $m === $message);
+
+            expect($matches)->toHaveCount($count);
         }
 
         return expect($this->receivedMessages)->toContain($message);
