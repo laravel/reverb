@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
@@ -408,9 +407,3 @@ it('removes a channel when no subscribers remain', function () {
 
     expect(channels()->all())->toHaveCount(0);
 });
-
-it('clears application state between requests', function () {
-    subscribe('test-channel');
-
-    expect($this->app->make(ChannelManager::class)->app())->toBeNull();
-})->todo();

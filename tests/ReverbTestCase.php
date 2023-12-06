@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Event;
 use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
