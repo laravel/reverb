@@ -20,7 +20,7 @@ it('returns unoccupied when no connections', function () {
     $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
 
     expect($response->getStatusCode())->toBe(200);
-    expect($response->getBody()->getContents())->toBe('{"occupied":false,"subscription_count":0}');
+    expect($response->getBody()->getContents())->toBe('{"occupied":false}');
 });
 
 it('can return cache channel attributes', function () {

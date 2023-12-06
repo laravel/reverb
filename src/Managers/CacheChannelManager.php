@@ -64,7 +64,7 @@ class CacheChannelManager implements ChannelManagerInterface
 
         $channels = $this->repository->get($this->prefix, []);
         $channel = ChannelBroker::create($channelName);
-        $channels[$this->application->id()][$$channel->name()] = serialize($channel);
+        $channels[$this->application->id()][$channel->name()] = serialize($channel);
         $this->repository->forever($this->prefix, $channels);
 
         return $channel;

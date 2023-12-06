@@ -48,7 +48,7 @@ class EventsBatchController extends Controller
 
         if ($info->some(fn ($item) => count($item) > 0)) {
             return new JsonResponse(
-                ['batch' => $info->each(fn ($item) => (object) $item)->all()]
+                ['batch' => $info->map(fn ($item) => (object) $item)->all()]
             );
         }
 

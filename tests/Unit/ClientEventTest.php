@@ -11,6 +11,7 @@ beforeEach(function () {
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
+    channels()->findOrCreate('test-channel');
 });
 
 it('can forward a client message', function () {

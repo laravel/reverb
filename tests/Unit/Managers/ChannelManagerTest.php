@@ -7,7 +7,7 @@ beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelManager = $this->app->make(ChannelManager::class)
         ->for($this->connection->app());
-    $this->channel = $this->channelManager->find('test-channel-0');
+    $this->channel = $this->channelManager->findOrCreate('test-channel-0');
 });
 
 it('can subscribe to a channel', function () {
@@ -29,7 +29,7 @@ it('can unsubscribe from a channel', function () {
 it('can get all channels', function () {
     $channels = collect(['test-channel-1', 'test-channel-2', 'test-channel-3']);
 
-    $channels->each(fn ($channel) => $this->channelManager->find($channel)->subscribe($this->connection));
+    $channels->each(fn ($channel) => $this->channelManager->findOrCreate($channel)->subscribe($this->connection));
 
     foreach ($this->channelManager->all() as $index => $channel) {
         expect($channel->name())->toBe($index);
@@ -46,10 +46,10 @@ it('can get all connections subscribed to a channel', function () {
         ->toBeIn(array_keys($this->channel->connections())));
 });
 
-it('can unsubscribe a connection for all channels', function () {
+it('can unsubscribe a connection from all channels', function () {
     $channels = collect(['test-channel-0', 'test-channel-1', 'test-channel-2']);
 
-    $channels->each(fn ($channel) => $this->channelManager->find($channel)->subscribe($this->connection));
+    $channels->each(fn ($channel) => $this->channelManager->findOrCreate($channel)->subscribe($this->connection));
 
     collect($this->channelManager->all())->each(fn ($channel) => expect($channel->connections())->toHaveCount(1));
 
@@ -72,9 +72,9 @@ it('can get the data for a connection subscribed to a channel', function () {
 it('can get all connections for all channels', function () {
     $connections = factory(12);
 
-    $channelOne = $this->channelManager->find('test-channel-0');
-    $channelTwo = $this->channelManager->find('test-channel-1');
-    $channelThree = $this->channelManager->find('test-channel-2');
+    $channelOne = $this->channelManager->findOrCreate('test-channel-0');
+    $channelTwo = $this->channelManager->findOrCreate('test-channel-1');
+    $channelThree = $this->channelManager->findOrCreate('test-channel-2');
 
     $connections = collect($connections)->split(3);
 
