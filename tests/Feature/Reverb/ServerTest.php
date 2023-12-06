@@ -108,7 +108,7 @@ it('can receive a cached message when joining a cache channel', function () {
 
     subscribe('cache-test-channel', connection: $connection);
 
-    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"cache-test-channel"}');
+    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"cache-test-channel"}');
 });
 
 it('can receive a cached message when joining a private cache channel', function () {
@@ -123,7 +123,7 @@ it('can receive a cached message when joining a private cache channel', function
 
     subscribe('private-cache-test-channel', connection: $connection);
 
-    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"private-cache-test-channel"}');
+    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"private-cache-test-channel"}');
 });
 
 it('can receive a cached message when joining a presence cache channel', function () {
@@ -138,7 +138,7 @@ it('can receive a cached message when joining a presence cache channel', functio
 
     subscribe('presence-cache-test-channel', connection: $connection);
 
-    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-cache-test-channel"}');
+    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"presence-cache-test-channel"}');
 });
 
 it('can receive a cach missed message when joining a cache channel with an empty cache', function () {
@@ -178,9 +178,9 @@ it('can receive a message broadcast from the server', function () {
         ['foo' => 'bar']
     );
 
-    $connectionOne->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"test-channel"}');
-    $connectionTwo->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"test-channel"}');
-    $connectionThree->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"test-channel"}');
+    $connectionOne->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"test-channel"}');
+    $connectionTwo->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"test-channel"}');
+    $connectionThree->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"test-channel"}');
 });
 
 it('can handle an event', function () {
@@ -193,7 +193,7 @@ it('can handle an event', function () {
         ['foo' => 'bar']
     );
 
-    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
+    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"presence-test-channel"}');
 });
 
 it('can respond to a ping', function () {
@@ -338,7 +338,7 @@ it('can publish and subscribe to a triggered event', function () {
         ['foo' => 'bar']
     );
 
-    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":{"foo":"bar"},"channel":"presence-test-channel"}');
+    $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"presence-test-channel"}');
 });
 
 it('can publish and subscribe to a client whisper', function () {

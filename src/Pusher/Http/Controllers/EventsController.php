@@ -59,7 +59,7 @@ class EventsController extends Controller
     {
         return ValidatorFacade::make($payload, [
             'name' => ['required', 'string'],
-            'data' => ['required', 'array'],
+            'data' => ['required', 'string'],
             'channels' => ['required_without:channel', 'array'],
             'channel' => ['required_without:channels', 'string'],
             'socket_id' => ['string'],

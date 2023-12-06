@@ -81,7 +81,7 @@ class EventsBatchController extends Controller
         return ValidatorFacade::make($payload, [
             'batch' => ['required', 'array'],
             'batch.*.name' => ['required', 'string'],
-            'batch.*.data' => ['required', 'array'],
+            'batch.*.data' => ['required', 'string'],
             'batch.*.channel' => ['required_without:channels', 'string'],
             'batch.*.socket_id' => ['string'],
             'batch.*.info' => ['string'],

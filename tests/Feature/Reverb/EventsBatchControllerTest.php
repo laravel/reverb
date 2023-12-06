@@ -11,7 +11,7 @@ it('can receive an event batch trigger', function () {
         [
             'name' => 'NewEvent',
             'channel' => 'test-channel',
-            'data' => ['some' => 'data'],
+            'data' => json_encode(['some' => 'data']),
         ],
     ]]));
 
@@ -24,12 +24,12 @@ it('can receive an event batch trigger with multiple events', function () {
         [
             'name' => 'NewEvent',
             'channel' => 'test-channel',
-            'data' => ['some' => 'data'],
+            'data' => json_encode(['some' => 'data']),
         ],
         [
             'name' => 'AnotherNewEvent',
             'channel' => 'test-channel-two',
-            'data' => ['some' => ['more' => 'data']],
+            'data' => json_encode(['some' => ['more' => 'data']]),
         ],
     ]]));
 
@@ -45,19 +45,19 @@ it('can receive an event batch trigger with multiple events and return info for 
         [
             'name' => 'NewEvent',
             'channel' => 'presence-test-channel',
-            'data' => ['some' => 'data'],
+            'data' => json_encode(['some' => 'data']),
             'info' => 'user_count',
         ],
         [
             'name' => 'AnotherNewEvent',
             'channel' => 'test-channel-two',
-            'data' => ['some' => ['more' => 'data']],
+            'data' => json_encode(['some' => ['more' => 'data']]),
             'info' => 'subscription_count',
         ],
         [
             'name' => 'YetAnotherNewEvent',
             'channel' => 'test-channel-three',
-            'data' => ['some' => ['more' => 'data']],
+            'data' => json_encode(['some' => ['more' => 'data']]),
             'info' => 'subscription_count,user_count',
         ],
     ]]));
@@ -72,13 +72,13 @@ it('can receive an event batch trigger with multiple events and return info for 
         [
             'name' => 'NewEvent',
             'channel' => 'presence-test-channel',
-            'data' => ['some' => 'data'],
+            'data' => json_encode(['some' => 'data']),
             'info' => 'user_count',
         ],
         [
             'name' => 'AnotherNewEvent',
             'channel' => 'test-channel-two',
-            'data' => ['some' => ['more' => 'data']],
+            'data' => json_encode(['some' => ['more' => 'data']]),
         ],
     ]]));
 

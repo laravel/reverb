@@ -11,7 +11,7 @@ it('can receive and event trigger', function () {
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channel' => 'test-channel',
-        'data' => ['some' => 'data'],
+        'data' => json_encode(['some' => 'data']),
     ]));
 
     expect($response->getStatusCode())->toBe(200);
@@ -22,7 +22,7 @@ it('can receive and event trigger for multiple channels', function () {
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
-        'data' => ['some' => 'data'],
+        'data' => json_encode(['some' => 'data']),
     ]));
 
     expect($response->getStatusCode())->toBe(200);
@@ -35,7 +35,7 @@ it('can return user counts when requested', function () {
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['presence-test-channel-one', 'test-channel-two'],
-        'data' => ['some' => 'data'],
+        'data' => json_encode(['some' => 'data']),
         'info' => 'user_count',
     ]));
 
@@ -49,7 +49,7 @@ it('can return subscription counts when requested', function () {
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['presence-test-channel-one', 'test-channel-two'],
-        'data' => ['some' => 'data'],
+        'data' => json_encode(['some' => 'data']),
         'info' => 'subscription_count',
     ]));
 
@@ -63,17 +63,17 @@ it('can ignore a subscriber', function () {
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
-        'data' => ['some' => 'data'],
+        'data' => json_encode(['some' => 'data']),
     ]));
 
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
-        'data' => ['some' => 'data'],
+        'data' => json_encode(['some' => 'data']),
         'socket_id' => $connection->socketId(),
     ]));
 
-    $connection->assertReceived('{"event":"NewEvent","data":{"some":"data"},"channel":"test-channel-two"}', 1);
+    $connection->assertReceived('{"event":"NewEvent","data":"{\"some\":\"data\"}","channel":"test-channel-two"}', 1);
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
 });
@@ -99,7 +99,7 @@ it('validates invalid data', function ($payload) {
             [
                 'name' => 'NewEvent',
                 'channel' => 'test-channel',
-                'data' => ['some' => 'data'],
+                'data' => json_encode(['some' => 'data']),
                 'socket_id' => 1234,
             ],
         ],
@@ -107,7 +107,7 @@ it('validates invalid data', function ($payload) {
             [
                 'name' => 'NewEvent',
                 'channel' => 'test-channel',
-                'data' => ['some' => 'data'],
+                'data' => json_encode(['some' => 'data']),
                 'info' => 1234,
             ],
         ],

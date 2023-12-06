@@ -122,7 +122,7 @@ class ReverbTestCase extends TestCase
         $response = await($this->signedPostRequest('events', [
             'name' => $event,
             'channel' => $channel,
-            'data' => $data,
+            'data' => json_encode($data),
         ]));
 
         expect($response->getStatusCode())->toBe(200);
