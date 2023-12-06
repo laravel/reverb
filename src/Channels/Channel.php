@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Channels;
 
 use Laravel\Reverb\Concerns\SerializesChannels;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class Channel
@@ -68,6 +69,10 @@ class Channel
     public function unsubscribe(Connection $connection): void
     {
         $this->connections->remove($connection);
+
+        if ($this->connections->isEmpty()) {
+            app(ChannelManager::class)->for($connection->app())->remove($this);
+        }
     }
 
     /**

@@ -78,6 +78,14 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
+     * Remove the given channel.
+     */
+    public function remove(Channel $channel): void
+    {
+        unset($this->applications[$this->application->id()][$channel->name()]);
+    }
+
+    /**
      * Get the given channel.
      */
     public function channel(string $channel): Channel

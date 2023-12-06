@@ -169,7 +169,7 @@ class ReverbTestCase extends TestCase
     /**
      * Send a message to the connected client.
      */
-    public function send(array $message, WebSocket $connection = null): string
+    public function send(array $message, WebSocket $connection = null): ?string
     {
         $promise = new Deferred;
 
@@ -185,7 +185,11 @@ class ReverbTestCase extends TestCase
 
         $connection->send(json_encode($message));
 
-        return await($promise->promise());
+        return await(timeout($promise->promise(), 2, $this->loop)
+            ->then(
+                fn ($message) => $message,
+                fn (TimeoutException $error) => null
+            ));
     }
 
     /**
@@ -223,6 +227,17 @@ class ReverbTestCase extends TestCase
                 'channel_data' => $data,
                 'auth' => $auth,
             ]),
+        ], $connection);
+    }
+
+    /**
+     * Unsubscribe to a channel.
+     */
+    public function unsubscribe(string $channel, WebSocket $connection = null): ?string
+    {
+        return $this->send([
+            'event' => 'pusher:unsubscribe',
+            'data' => ['channel' => $channel],
         ], $connection);
     }
 

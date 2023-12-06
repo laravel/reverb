@@ -422,6 +422,17 @@ it('limits the size of messages', function () {
     expect($message)->toBe('Maximum message size exceeded');
 });
 
+it('removes a channel when no subscribers remain', function () {
+    $connection = $this->connect();
+    $this->subscribe('test-channel', connection: $connection);
+
+    expect(channelManager()->all())->toHaveCount(1);
+
+    $this->unsubscribe('test-channel', $connection);
+
+    expect(channelManager()->all())->toHaveCount(0);
+});
+
 it('clears application state between requests', function () {
     $this->subscribe('test-channel');
 

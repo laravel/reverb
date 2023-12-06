@@ -88,6 +88,14 @@ class CacheChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
+     * Determine whether any connections remain on the channel.
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->repository->get($this->key(), []));
+    }
+
+    /**
      * Get all the connections.
      */
     public function all(): array

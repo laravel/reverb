@@ -78,6 +78,18 @@ class CacheChannelManager implements ChannelManagerInterface
     }
 
     /**
+     * Remove the given channel.
+     */
+    public function remove(Channel $channel): void
+    {
+        $channels = $this->channels();
+
+        unset($channels[$channel->name()]);
+
+        $this->repository->forever($this->prefix, $channels);
+    }
+
+    /**
      * Get the given channel.
      */
     public function channel(string $channel): Channel

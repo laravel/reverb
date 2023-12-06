@@ -38,6 +38,11 @@ interface ChannelManager
     public function unsubscribeFromAll(Connection $connection): void;
 
     /**
+     * Remove the given channel.
+     */
+    public function remove(Channel $channel): void;
+
+    /**
      * Flush the channel manager repository.
      */
     public function flush(): void;
