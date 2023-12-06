@@ -21,7 +21,7 @@ class ChannelUsersController extends Controller
 
         $channel = $this->channels->find($channel);
 
-        if(! $channel) {
+        if (! $channel) {
             return new JsonResponse((object) [], 404);
         }
 
