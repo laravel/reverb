@@ -23,7 +23,7 @@ class PingInactiveConnections
             ->each(function ($application) use ($channels, $pusher) {
                 foreach ($channels->for($application)->connections() as $connection) {
                     if ($connection->isActive()) {
-                        return;
+                        continue;
                     }
 
                     $pusher->ping($connection->connection());

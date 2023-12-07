@@ -20,7 +20,7 @@ class PruneStaleConnections
             ->each(function ($application) use ($channels) {
                 foreach ($channels->for($application)->connections() as $connection) {
                     if (! $connection->isStale()) {
-                        return;
+                        continue;
                     }
 
                     $connection->send(json_encode([
