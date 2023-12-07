@@ -54,7 +54,7 @@ The API Gateway implementation leverages the WebSocket API type. The user connec
 - The WebSocket specification has a concept of extensions. They are completely optional and Reverb doesn't support them right now. There is only really one official extension which allows inflating and deflating messages. Moving forward, it could be possible to add hooks / middleware to the message lifecycle to allow forextensions such as permessage-deflate, but also to allow others to implement their own.
 - Pusher now allow opt-in access to something called [Watchlists](https://pusher.com/docs/channels/using_channels/watchlist-events/). It could be possible to look at implementing this functionality.
 
-### Installation
+## Installation
 
 Add the following `repostories` block to your `composer.json` file.
 
