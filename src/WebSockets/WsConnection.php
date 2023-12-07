@@ -40,6 +40,9 @@ class WsConnection extends EventEmitter
      */
     protected $maxMessageSize;
 
+    /**
+     * Create a new websocket connection instance.
+     */
     public function __construct(public Connection $connection)
     {
         //

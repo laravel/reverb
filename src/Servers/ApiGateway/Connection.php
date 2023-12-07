@@ -3,11 +3,11 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\SerializableConnection;
+use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Connection extends BaseConnection implements SerializableConnection
@@ -21,6 +21,9 @@ class Connection extends BaseConnection implements SerializableConnection
      */
     protected $id;
 
+    /**
+     * Create a new connection instance.
+     */
     public function __construct(
         protected string $identifier,
         protected Application $application,

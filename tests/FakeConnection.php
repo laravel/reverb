@@ -4,9 +4,9 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
+use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 
 class FakeConnection extends BaseConnection
 {
@@ -31,6 +31,9 @@ class FakeConnection extends BaseConnection
      */
     public $id;
 
+    /**
+     * Create a new fake connection instance.
+     */
     public function __construct(?string $identifier = null)
     {
         if ($identifier) {

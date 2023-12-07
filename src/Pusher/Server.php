@@ -14,6 +14,9 @@ use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class Server
 {
+    /**
+     * Create a new server instance.
+     */
     public function __construct(protected ChannelManager $channels, protected PusherEvent $pusher)
     {
         //

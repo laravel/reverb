@@ -11,6 +11,9 @@ use Laravel\Reverb\Contracts\Connection;
 
 class Event
 {
+    /**
+     * Create a new Pusher event instance.
+     */
     public function __construct(protected ChannelManager $channels)
     {
         //

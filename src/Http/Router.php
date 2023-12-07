@@ -25,6 +25,9 @@ class Router
      */
     protected ServerNegotiator $negotiator;
 
+    /**
+     * Create a new router instance.
+     */
     public function __construct(protected UrlMatcherInterface $matcher)
     {
         $this->negotiator = new ServerNegotiator(new RequestVerifier);

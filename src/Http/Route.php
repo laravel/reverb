@@ -10,6 +10,9 @@ class Route
 {
     use RouteTrait;
 
+    /**
+     * Create a new route instance.
+     */
     public function __construct(string $path)
     {
         $this->route = new BaseRoute($path);

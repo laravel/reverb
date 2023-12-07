@@ -16,10 +16,11 @@ abstract class Connection
      */
     protected $hasBeenPinged = false;
 
-    public function __construct(
-        protected Application $application,
-        protected ?string $origin
-    ) {
+    /**
+     * Create a new connection instance.
+     */
+    public function __construct(protected Application $application, protected ?string $origin)
+    {
         $this->lastSeenAt = time();
     }
 

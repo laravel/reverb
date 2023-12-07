@@ -27,6 +27,9 @@ class ReverbProvider extends ServerProvider
      */
     protected $publishesEvents;
 
+    /**
+     * Create a new Reverb server provider instance.
+     */
     public function __construct(protected Application $app, protected array $config)
     {
         $this->publishesEvents = (bool) $this->config['publish_events']['enabled'] ?? false;

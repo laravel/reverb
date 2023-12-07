@@ -11,6 +11,9 @@ use Psr\Http\Message\RequestInterface;
 
 class Controller
 {
+    /**
+     * Create a new controller instance.
+     */
     public function __construct(protected PusherServer $server, protected ApplicationProvider $applications)
     {
         //

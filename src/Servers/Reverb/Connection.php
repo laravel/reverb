@@ -3,8 +3,8 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
+use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\WebSockets\WsConnection;
 
 class Connection extends ConnectionContract
@@ -21,6 +21,9 @@ class Connection extends ConnectionContract
      */
     protected $hasBeenPinged = false;
 
+    /**
+     * Create a new connection instance.
+     */
     public function __construct(protected WsConnection $connection, Application $application, ?string $origin = null)
     {
         parent::__construct($application, $origin);

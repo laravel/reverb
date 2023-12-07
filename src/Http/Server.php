@@ -14,6 +14,9 @@ class Server
 {
     use ClosesConnections;
 
+    /**
+     * Create a new Http server instance.
+     */
     public function __construct(protected ServerInterface $socket, protected Router $router, protected ?LoopInterface $loop = null)
     {
         gc_disable();

@@ -9,6 +9,9 @@ use Laravel\Reverb\Servers\Reverb\ReverbProvider;
 
 class ServerManager extends Manager
 {
+    /**
+     * Create a new server manager instance.
+     */
     public function __construct(protected Application $app)
     {
         parent::__construct($app);

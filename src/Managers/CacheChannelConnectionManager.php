@@ -12,10 +12,13 @@ class CacheChannelConnectionManager implements ChannelConnectionManager
 {
     protected string $name;
 
+    /**
+     * Create a new cache channel connection manager instance.
+     */
     public function __construct(
         protected Repository $repository,
         protected ConnectionManager $connections,
-        protected $prefix = 'reverb'
+        protected string $prefix = 'reverb'
     ) {
         //
     }

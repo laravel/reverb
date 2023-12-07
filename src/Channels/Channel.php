@@ -18,6 +18,9 @@ class Channel
      */
     protected $connections;
 
+    /**
+     * Create a new channel instance.
+     */
     public function __construct(protected string $name)
     {
         $this->connections = app(ChannelConnectionManager::class)->for($this->name);

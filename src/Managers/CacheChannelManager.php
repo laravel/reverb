@@ -22,10 +22,11 @@ class CacheChannelManager implements ChannelManagerInterface
      */
     protected $application;
 
-    public function __construct(
-        protected Repository $repository,
-        protected $prefix = 'reverb'
-    ) {
+    /**
+     * Create a new cache channel manager instance.
+     */
+    public function __construct(protected Repository $repository, protected string $prefix = 'reverb')
+    {
         //
     }
 

@@ -16,6 +16,7 @@ class Request
         public string $connectionId,
         public string $event
     ) {
+        //
     }
 
     /**

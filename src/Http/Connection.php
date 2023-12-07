@@ -22,6 +22,9 @@ class Connection
      */
     protected string $buffer = '';
 
+    /**
+     * Create a new connection instance.
+     */
     public function __construct(protected ConnectionInterface $connection)
     {
         $this->id = (int) $connection->stream;

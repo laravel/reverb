@@ -13,10 +13,11 @@ class Server
 {
     protected ConnectionManager $connections;
 
-    public function __construct(
-        protected PusherServer $server,
-        protected ApplicationProvider $applications,
-    ) {
+    /**
+     * Create an new server instance.
+     */
+    public function __construct(protected PusherServer $server, protected ApplicationProvider $applications)
+    {
         $this->connections = app(ConnectionManager::class);
     }
 

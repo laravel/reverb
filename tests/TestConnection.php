@@ -25,6 +25,9 @@ class TestConnection
      */
     public $receivedMessages = [];
 
+    /**
+     * Create a new test connection instance.
+     */
     public function __construct(public WebSocket $connection)
     {
         $connection->on('message', function ($message) {

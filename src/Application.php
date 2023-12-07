@@ -4,6 +4,9 @@ namespace Laravel\Reverb;
 
 class Application
 {
+    /**
+     * Create a new application instance.
+     */
     public function __construct(
         protected string $id,
         protected string $key,

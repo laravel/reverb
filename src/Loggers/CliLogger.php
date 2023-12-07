@@ -16,6 +16,9 @@ class CliLogger implements Logger
      */
     protected $components;
 
+    /**
+     * Create a new CLI logger instance.
+     */
     public function __construct(protected OutputStyle $output)
     {
         $this->components = new Factory($output);

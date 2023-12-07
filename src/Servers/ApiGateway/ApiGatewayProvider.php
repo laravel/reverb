@@ -21,9 +21,12 @@ use Laravel\Reverb\Managers\CacheConnectionManager;
 
 class ApiGatewayProvider extends ServerProvider
 {
+    /**
+     * Create a new API Gateway server provider instance.
+     */
     public function __construct(protected Application $app, protected array $config)
     {
-        // 
+        //
     }
 
     /**

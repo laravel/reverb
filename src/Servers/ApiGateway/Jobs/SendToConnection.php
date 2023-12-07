@@ -18,6 +18,7 @@ class SendToConnection implements ShouldQueue
      */
     public function __construct(public string $connectionId, public string $message)
     {
+        //
     }
 
     /**

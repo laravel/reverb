@@ -8,8 +8,12 @@ use Laravel\Reverb\Exceptions\InvalidApplication;
 
 class ConfigProvider implements ApplicationProvider
 {
+    /**
+     * Create a new config provider instance.
+     */
     public function __construct(protected Collection $applications)
     {
+        //
     }
 
     /**

@@ -8,10 +8,11 @@ use Laravel\Reverb\Contracts\ConnectionManager;
 
 class CacheConnectionManager implements ConnectionManager
 {
-    public function __construct(
-        protected Repository $repository,
-        protected $prefix = 'reverb'
-    ) {
+    /**
+     * Create a new cache connection manager instance.
+     */
+    public function __construct(protected Repository $repository, protected string $prefix = 'reverb')
+    {
         //
     }
 
