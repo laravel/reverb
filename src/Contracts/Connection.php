@@ -60,11 +60,19 @@ abstract class Connection
     }
 
     /**
-     * Ping the connection to ensure it is still active.
+     * Mark the connection as pinged.
      */
     public function ping(): void
     {
         $this->hasBeenPinged = true;
+    }
+
+    /**
+     * Mark the connection as ponged.
+     */
+    public function pong(): void
+    {
+        $this->hasBeenPinged = false;
     }
 
     /**
@@ -91,6 +99,7 @@ abstract class Connection
     public function touch(): Connection
     {
         $this->setLastSeenAt(time());
+        $this->pong();
 
         return $this;
     }
