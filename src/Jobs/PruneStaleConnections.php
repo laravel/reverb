@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Jobs;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Loggers\Log;
 
 class PruneStaleConnections
 {
@@ -15,6 +16,8 @@ class PruneStaleConnections
      */
     public function handle(ChannelManager $channels): void
     {
+        Log::info('Pruning Stale Connections');
+
         app(ApplicationProvider::class)
             ->all()
             ->each(function ($application) use ($channels) {
@@ -36,6 +39,8 @@ class PruneStaleConnections
                         ->unsubscribeFromAll($connection->connection());
 
                     $connection->disconnect();
+
+                    Log::info('Connection Pruned', $connection->id());
                 }
             });
     }

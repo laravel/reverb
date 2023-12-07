@@ -9,6 +9,7 @@ use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Exceptions\PusherException;
+use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class Server
@@ -29,6 +30,8 @@ class Server
             $connection->touch();
 
             $this->pusher->handle($connection, 'pusher:connection_established');
+
+            Log::info('Connection Established', $connection->id());
         } catch (Exception $e) {
             $this->error($connection, $e);
         }
@@ -39,6 +42,11 @@ class Server
      */
     public function message(Connection $from, string $message): void
     {
+        Log::info('Message Received', $from->id());
+        Log::message($message);
+
+        $from->touch();
+
         $event = json_decode($message, true);
 
         try {
@@ -52,11 +60,11 @@ class Server
                 default => ClientEvent::handle($from, $event)
             };
 
+            Log::info('Message Handled', $from->id());
+
         } catch (Exception $e) {
             $this->error($from, $e);
         }
-
-        $from->touch();
     }
 
     /**
@@ -69,6 +77,8 @@ class Server
             ->unsubscribeFromAll($connection);
 
         $connection->disconnect();
+
+        Log::info('Connection Closed', $connection->id());
     }
 
     /**
@@ -78,6 +88,9 @@ class Server
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
+
+            Log::error('Message from '.$connection->id().' resulted in a pusher error');
+            Log::info($exception->getMessage());
 
             return;
         }
@@ -89,6 +102,9 @@ class Server
                 'message' => 'Invalid message format',
             ]),
         ]));
+
+        Log::error('Message from '.$connection->id().' resulted in an unknown error');
+        Log::info($exception->getMessage());
     }
 
     /**

@@ -5,6 +5,8 @@ namespace Laravel\Reverb;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Loggers\NullLogger;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -30,6 +32,8 @@ class ServiceProvider extends BaseServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../config/reverb.php', 'reverb'
         );
+
+        $this->app->instance(Logger::class, new NullLogger);
 
         $this->app->singleton(ServerManager::class);
 

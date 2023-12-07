@@ -4,8 +4,10 @@ namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 
 use Illuminate\Console\Command;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
+use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
+use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
@@ -21,7 +23,8 @@ class StartServer extends Command
      */
     protected $signature = 'reverb:start
                 {--host=}
-                {--port=}';
+                {--port=}
+                {--debug}';
 
     /**
      * The console command description.
@@ -35,6 +38,10 @@ class StartServer extends Command
      */
     public function handle(): void
     {
+        if ($this->option('debug')) {
+            $this->laravel->instance(Logger::class, new CliLogger($this->output));
+        }
+
         $config = $this->laravel['config']['reverb.servers.reverb'];
         $host = $this->option('host') ?: $config['host'];
         $port = $this->option('port') ?: $config['port'];
