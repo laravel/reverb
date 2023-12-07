@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Jobs;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Pusher\Event as PusherEvent;
 
 class PingInactiveConnections
@@ -16,6 +17,8 @@ class PingInactiveConnections
      */
     public function handle(ChannelManager $channels): void
     {
+        Log::info('Pinging Inactive Connections');
+
         $pusher = new PusherEvent($channels);
 
         app(ApplicationProvider::class)
@@ -27,6 +30,8 @@ class PingInactiveConnections
                     }
 
                     $pusher->ping($connection->connection());
+
+                    Log::info('Connection Pinged', $connection->id());
                 }
             });
     }
