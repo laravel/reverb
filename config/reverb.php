@@ -71,7 +71,7 @@ return [
                 'key' => env('PUSHER_APP_KEY'),
                 'secret' => env('PUSHER_APP_SECRET'),
                 'allowed_origins' => ['*'],
-                'ping_interval' => env('REVERB_APP_PING_INTERVAL', 5),
+                'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
                 'max_message_size' => env('REVERB_APP_MAX_MESSAGE_SIZE', 10000),
             ],
         ],

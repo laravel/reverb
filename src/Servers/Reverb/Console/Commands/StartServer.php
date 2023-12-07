@@ -57,7 +57,7 @@ class StartServer extends Command
      */
     protected function scheduleCleanup(LoopInterface $loop): void
     {
-        $loop->addPeriodicTimer(300, function () {
+        $loop->addPeriodicTimer(60, function () {
             PruneStaleConnections::dispatch();
 
             PingInactiveConnections::dispatch();
