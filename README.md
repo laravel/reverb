@@ -1,7 +1,4 @@
 # Laravel Reverb
-
-## Introduction
-
 Laravel Reverb brings real-time WebSocket communication for Laravel applications.
 
 ## Architecture
@@ -55,7 +52,6 @@ The API Gateway implementation leverages the WebSocket API type. The user connec
 - Pusher now allow opt-in access to something called [Watchlists](https://pusher.com/docs/channels/using_channels/watchlist-events/). It could be possible to look at implementing this functionality.
 
 ## Installation
-
 Add the following `repostories` block to your `composer.json` file.
 
 ```json
