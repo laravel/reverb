@@ -69,7 +69,7 @@ class ReverbProvider extends ServerProvider
     /**
      * Subscribe to the configured channel.
      */
-    public function subscribe(LoopInterface $loop)
+    public function subscribe(LoopInterface $loop): void
     {
         $redis = (new Factory($loop))->createLazyClient(
             $this->redisUrl()

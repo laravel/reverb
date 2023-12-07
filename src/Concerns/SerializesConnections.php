@@ -8,6 +8,8 @@ trait SerializesConnections
 {
     /**
      * Prepare the connection instance values for serialization.
+     *
+     * @return array<string, mixed>
      */
     public function __serialize(): array
     {

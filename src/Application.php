@@ -12,6 +12,7 @@ class Application
         protected array $allowedOrigins,
         protected int $maxMessageSize,
     ) {
+        //
     }
 
     /**
@@ -40,6 +41,8 @@ class Application
 
     /**
      * Get the allowed origins.
+     *
+     * @return array<int, string>
      */
     public function allowedOrigins(): array
     {

@@ -62,7 +62,7 @@ class Connection
     /**
      * Determine whether the connection has an HTTP message buffer set.
      */
-    public function hasBuffer()
+    public function hasBuffer(): bool
     {
         return $this->buffer !== '';
     }
@@ -70,7 +70,7 @@ class Connection
     /**
      * Return the HTTP message buffer length.
      */
-    public function bufferLength()
+    public function bufferLength(): int
     {
         return strlen($this->buffer);
     }
@@ -78,7 +78,7 @@ class Connection
     /**
      * Append to the HTTP message buffer.
      */
-    public function appendToBuffer($message)
+    public function appendToBuffer($message): void
     {
         $this->buffer .= $message;
     }
@@ -86,7 +86,7 @@ class Connection
     /**
      * Clear the HTTP message buffer.
      */
-    public function clearBuffer()
+    public function clearBuffer(): void
     {
         $this->buffer = '';
     }
@@ -94,7 +94,7 @@ class Connection
     /**
      * Send a message to the connection.
      */
-    public function send($data)
+    public function send($data): self
     {
         $this->connection->write($data);
 
@@ -104,7 +104,7 @@ class Connection
     /**
      * Close the connection.
      */
-    public function close()
+    public function close(): self
     {
         $this->connection->end();
 

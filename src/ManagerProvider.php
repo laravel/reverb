@@ -23,6 +23,8 @@ class ManagerProvider extends ServiceProvider implements DeferrableProvider
 
     /**
      * Get the services provided by the provider.
+     *
+     * @return array<int, class-string>
      */
     public function provides(): array
     {

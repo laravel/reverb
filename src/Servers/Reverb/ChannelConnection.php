@@ -7,6 +7,9 @@ use Laravel\Reverb\Contracts\Connection;
 
 class ChannelConnection
 {
+    /**
+     * Create a new channel connection instance.
+     */
     public function __construct(protected Connection $connection, protected array $data = [])
     {
         //

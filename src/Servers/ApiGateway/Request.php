@@ -74,6 +74,8 @@ class Request
 
     /**
      * Get the URI and query string for the given event.
+     *
+     * @return array{0: string, 1: string}
      */
     protected static function getUriAndQueryString(array $event): array
     {
@@ -135,6 +137,8 @@ class Request
 
     /**
      * Get the request headers from the event.
+     *
+     * @return array<string, string>
      */
     protected static function getHeaders(array $event): array
     {
@@ -166,6 +170,8 @@ class Request
 
     /**
      * Ensure the request headers / server variables contain a content type.
+     *
+     * @return array{0: array<string, string>, 1: array<string, string>}
      */
     protected static function ensureContentTypeIsSet(array $event, array $headers, array $serverVariables): array
     {
@@ -183,6 +189,8 @@ class Request
 
     /**
      * Ensure the request headers / server variables contain a content length.
+     *
+     * @return array{0: array<string, string>, 1: array<string, string>}
      */
     protected static function ensureContentLengthIsSet(array $event, array $headers, array $serverVariables, $requestBody): array
     {
@@ -200,6 +208,8 @@ class Request
 
     /**
      * Ensure the request headers contain a source IP address.
+     *
+     * @return array<string, string>
      */
     protected static function ensureSourceIpAddressIsSet(array $event, array $headers): array
     {

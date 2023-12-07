@@ -23,6 +23,7 @@ class ApiGatewayProvider extends ServerProvider
 {
     public function __construct(protected Application $app, protected array $config)
     {
+        // 
     }
 
     /**

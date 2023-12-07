@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
+use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
 use Laravel\Reverb\WebSockets\WsConnection;
 

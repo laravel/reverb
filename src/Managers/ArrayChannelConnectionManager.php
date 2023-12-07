@@ -61,6 +61,8 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
 
     /**
      * Get all the connections.
+     *
+     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
     public function all(): array
     {

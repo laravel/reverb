@@ -39,6 +39,8 @@ class ArrayChannelManager implements ChannelManagerInterface
 
     /**
      * Get all the channels.
+     *
+     * @return array<string, \Laravel\Reverb\Channels\Channel>
      */
     public function all(): array
     {

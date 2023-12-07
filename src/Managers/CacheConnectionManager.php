@@ -51,6 +51,8 @@ class CacheConnectionManager implements ConnectionManager
 
     /**
      * Get all the connections.
+     *
+     * @return array<string, \Laravel\Reverb\Contracts\Connection>
      */
     public function all(): array
     {
@@ -87,6 +89,8 @@ class CacheConnectionManager implements ConnectionManager
 
     /**
      * Get all the connections from the store.
+     *
+     *  @return array<string, string>
      */
     protected function get(): array
     {

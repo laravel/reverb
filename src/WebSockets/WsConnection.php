@@ -125,7 +125,7 @@ class WsConnection extends EventEmitter
     /**
      * Get the raw socket connection identifier.
      */
-    public function id()
+    public function id(): int
     {
         return $this->connection->id();
     }

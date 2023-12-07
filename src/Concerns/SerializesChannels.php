@@ -8,6 +8,8 @@ trait SerializesChannels
 {
     /**
      * Prepare the connection instance values for serialization.
+     *
+     * @return array<string, mixed>
      */
     public function __serialize(): array
     {

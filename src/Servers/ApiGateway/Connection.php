@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\GeneratesPusherIdentifiers;
+use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
 use Laravel\Reverb\Contracts\ConnectionManager;

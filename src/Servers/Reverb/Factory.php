@@ -25,7 +25,7 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', ?LoopInterface $loop = null)
+    public static function make(string $host = '0.0.0.0', string $port = '8080', ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
         $socket = new SocketServer("{$host}:{$port}", [], $loop);

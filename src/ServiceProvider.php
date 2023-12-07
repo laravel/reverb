@@ -13,7 +13,7 @@ class ServiceProvider extends BaseServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
@@ -27,7 +27,7 @@ class ServiceProvider extends BaseServiceProvider
     /**
      * Register any application services.
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/reverb.php', 'reverb'

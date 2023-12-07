@@ -19,6 +19,8 @@ interface ChannelManager
 
     /**
      * Get all the channels.
+     *
+     * @return array<string, \Laravel\Reverb\Channels\Channel>
      */
     public function all(): array;
 
@@ -34,6 +36,8 @@ interface ChannelManager
 
     /**
      * Get all the connections for the given channels.
+     *
+     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
      */
     public function connections(?string $channel = null): array;
 

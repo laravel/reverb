@@ -36,7 +36,7 @@ abstract class Controller
      */
     protected array $query = [];
 
-    public function verify(RequestInterface $request, Connection $connection, $appId)
+    public function verify(RequestInterface $request, Connection $connection, $appId): void
     {
         parse_str($request->getUri()->getQuery(), $query);
         $this->body = $request->getBody()->getContents();
@@ -46,7 +46,7 @@ abstract class Controller
             $this->setApplication($appId);
             $this->setChannels();
         } catch (HttpException $e) {
-            return $this->close($connection, $e->getStatusCode(), $e->getMessage());
+            $this->close($connection, $e->getStatusCode(), $e->getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ abstract class Controller
     /**
      * Set the Reverb channel manager instance.
      */
-    protected function setChannels()
+    protected function setChannels(): void
     {
         $this->channels = app(ChannelManager::class)->for($this->application);
     }

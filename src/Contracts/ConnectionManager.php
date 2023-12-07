@@ -16,6 +16,8 @@ interface ConnectionManager
 
     /**
      * Get all the connections.
+     *
+     * @return array<string, \Laravel\Reverb\Contracts\Connection>
      */
     public function all(): array;
 
