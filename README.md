@@ -45,7 +45,9 @@ Reverb supports seven channel types:
 The API Gateway implementation leverages the WebSocket API type. The user connects and the request is sent to Lambda for processing. When a user connects, disconnects or sends a message it is sent via API Gateway to Lambda. Reverb takes the request creates a Reverb Connection object from it and sends the payload on to the Reverb server for processing. The channel manager cannot be in memory, so a cache manager is used instead. Messages cannot be sent in response to the request so, instead are queued and posted to the endpoint provided by AWS. In turn, they send the message on to the user.
 
 ## Outstanding
-- [ ] **Pulse Card(s)** - this can interact with some of the addtional Pusher endpoints in order to show channels and connections
+- [ ] **Forge integration** - spin up servers with `ev` extension, change open file limits, etc
+- [ ] **Pulse card(s)** - this can interact with some of the addtional Pusher endpoints in order to show channels and connections
+- [ ] **Vapor integration** - if we decide to continue with API Gateway
 
 ## Considerations
 - The WebSocket specification has a concept of extensions. They are completely optional and Reverb doesn't support them right now. There is only really one official extension which allows inflating and deflating messages. Moving forward, it could be possible to add hooks / middleware to the message lifecycle to allow forextensions such as permessage-deflate, but also to allow others to implement their own.
