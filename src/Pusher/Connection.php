@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Reverb;
+namespace Laravel\Reverb\Pusher;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;

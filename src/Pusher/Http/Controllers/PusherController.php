@@ -1,15 +1,15 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Reverb;
+namespace Laravel\Reverb\Pusher\Http\Controllers;
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Pusher\Server as PusherServer;
-use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
+use Laravel\Reverb\Pusher\Connection as ReverbConnection;
 use Laravel\Reverb\WebSockets\WsConnection;
 use Psr\Http\Message\RequestInterface;
 
-class Controller
+class PusherController
 {
     /**
      * Create a new controller instance.
