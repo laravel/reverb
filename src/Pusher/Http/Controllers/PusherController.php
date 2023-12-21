@@ -6,7 +6,7 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Pusher\Server as PusherServer;
 use Laravel\Reverb\Pusher\Connection as ReverbConnection;
-use Laravel\Reverb\WebSockets\WsConnection;
+use Laravel\Reverb\Servers\Reverb\Connection;
 use Psr\Http\Message\RequestInterface;
 
 class PusherController
@@ -22,7 +22,7 @@ class PusherController
     /**
      * Invoke the Reverb WebSocket server.
      */
-    public function __invoke(RequestInterface $request, WsConnection $connection, string $appKey): void
+    public function __invoke(RequestInterface $request, Connection $connection, string $appKey): void
     {
         if (! $reverbConnection = $this->connection($request, $connection, $appKey)) {
             return;
@@ -39,7 +39,7 @@ class PusherController
     /**
      * Get the Reverb connection instance for the request.
      */
-    protected function connection(RequestInterface $request, WsConnection $connection, string $key): ?ReverbConnection
+    protected function connection(RequestInterface $request, Connection $connection, string $key): ?ReverbConnection
     {
         try {
             $application = $this->applications->findByKey($key);

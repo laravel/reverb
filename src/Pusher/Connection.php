@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Pusher;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
 use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
-use Laravel\Reverb\WebSockets\WsConnection;
+use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 
 class Connection extends ConnectionContract
 {
@@ -24,7 +24,7 @@ class Connection extends ConnectionContract
     /**
      * Create a new connection instance.
      */
-    public function __construct(protected WsConnection $connection, Application $application, ?string $origin = null)
+    public function __construct(protected ReverbConnection $connection, Application $application, ?string $origin = null)
     {
         parent::__construct($application, $origin);
     }
@@ -52,7 +52,7 @@ class Connection extends ConnectionContract
     /**
      * Create a new connection instance.
      */
-    public static function make(WsConnection $connection, Application $application, string $origin): Connection
+    public static function make(ReverbConnection $connection, Application $application, string $origin): Connection
     {
         return new static($connection, $application, $origin);
     }

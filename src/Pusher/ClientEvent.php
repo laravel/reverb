@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Pusher;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
@@ -31,7 +31,7 @@ class ClientEvent
      */
     public static function whisper(Connection $connection, array $payload): void
     {
-        Event::dispatch(
+        EventDispatcher::dispatch(
             $connection->app(),
             $payload,
             $connection

@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Event;
+use Laravel\Reverb\Pusher\EventDispatcher;
 use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
 use Ratchet\Client\WebSocket;

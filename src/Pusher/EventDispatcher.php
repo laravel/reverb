@@ -1,12 +1,14 @@
 <?php
 
-namespace Laravel\Reverb;
+namespace Laravel\Reverb\Pusher;
 
 use Illuminate\Support\Arr;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\ServerManager;
 
-class Event
+class EventDispatcher
 {
     /**
      * Dispatch a message to a channel.

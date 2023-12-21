@@ -10,7 +10,7 @@ use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Event;
+use Laravel\Reverb\Pusher\EventDispatcher;
 use Laravel\Reverb\Managers\ArrayChannelConnectionManager;
 use Laravel\Reverb\Managers\ArrayChannelManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
@@ -82,7 +82,7 @@ class ReverbProvider extends ServerProvider
 
         $redis->on('message', function (string $channel, string $payload) {
             $event = json_decode($payload, true);
-            Event::dispatchSynchronously(
+            EventDispatcher::dispatchSynchronously(
                 unserialize($event['application']),
                 $event['payload']
             );

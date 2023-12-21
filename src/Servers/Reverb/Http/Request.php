@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Http;
+namespace Laravel\Reverb\Servers\Reverb\Http;
 
 use GuzzleHttp\Psr7\Message;
 use OverflowException;

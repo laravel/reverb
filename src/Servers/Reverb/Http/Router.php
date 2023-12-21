@@ -1,12 +1,12 @@
 <?php
 
-namespace Laravel\Reverb\Http;
+namespace Laravel\Reverb\Servers\Reverb\Http;
 
 use Closure;
 use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Concerns\ClosesConnections;
-use Laravel\Reverb\WebSockets\WsConnection;
+use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
@@ -89,13 +89,13 @@ class Router
     /**
      * Negotiate the WebSocket connection upgrade.
      */
-    protected function attemptUpgrade(RequestInterface $request, Connection $connection): WsConnection
+    protected function attemptUpgrade(RequestInterface $request, Connection $connection): ReverbConnection
     {
         $response = $this->negotiator->handshake($request);
 
         $connection->write(Message::toString($response));
 
-        return new WsConnection($connection);
+        return new ReverbConnection($connection);
     }
 
     /**

@@ -1,16 +1,16 @@
 <?php
 
-namespace Laravel\Reverb\WebSockets;
+namespace Laravel\Reverb\Servers\Reverb;
 
 use Evenement\EventEmitter;
-use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Connection as HttpConnection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\DataInterface;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
 
-class WsConnection extends EventEmitter
+class Connection extends EventEmitter
 {
     /**
      * The message buffer.
@@ -43,7 +43,7 @@ class WsConnection extends EventEmitter
     /**
      * Create a new websocket connection instance.
      */
-    public function __construct(public Connection $connection)
+    public function __construct(public HttpConnection $connection)
     {
         //
     }

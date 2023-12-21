@@ -12,7 +12,7 @@ use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Event;
+use Laravel\Reverb\Pusher\EventDispatcher;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Managers\CacheChannelConnectionManager;
@@ -47,7 +47,7 @@ class ApiGatewayProvider extends ServerProvider
     public function register(): void
     {
         Route::post('/apps/{appId}/events', function (Request $request, $appId) {
-            Event::dispatch($this->app->make(ApplicationProvider::class)
+            EventDispatcher::dispatch($this->app->make(ApplicationProvider::class)
                 ->findById($appId), [
                     'event' => $request->name,
                     'channel' => $request->channel,

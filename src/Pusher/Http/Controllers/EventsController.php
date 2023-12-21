@@ -5,8 +5,8 @@ namespace Laravel\Reverb\Pusher\Http\Controllers;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
-use Laravel\Reverb\Event;
-use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Pusher\EventDispatcher;
+use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,7 +33,7 @@ class EventsController extends Controller
 
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
 
-        Event::dispatch(
+        EventDispatcher::dispatch(
             $this->application,
             [
                 'event' => $payload['name'],

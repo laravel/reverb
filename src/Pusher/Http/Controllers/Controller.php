@@ -8,7 +8,7 @@ use Laravel\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
-use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

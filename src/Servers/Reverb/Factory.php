@@ -3,9 +3,9 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Http\Route;
-use Laravel\Reverb\Http\Router;
-use Laravel\Reverb\Http\Server as HttpServer;
+use Laravel\Reverb\Servers\Reverb\Http\Route;
+use Laravel\Reverb\Servers\Reverb\Http\Router;
+use Laravel\Reverb\Servers\Reverb\Http\Server as HttpServer;
 use Laravel\Reverb\Pusher\Http\Controllers\ChannelController;
 use Laravel\Reverb\Pusher\Http\Controllers\ChannelsController;
 use Laravel\Reverb\Pusher\Http\Controllers\ChannelUsersController;

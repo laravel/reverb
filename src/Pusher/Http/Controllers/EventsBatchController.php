@@ -4,8 +4,8 @@ namespace Laravel\Reverb\Pusher\Http\Controllers;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
-use Laravel\Reverb\Event;
-use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Pusher\EventDispatcher;
+use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Laravel\Reverb\Pusher\Concerns\InteractsWithChannelInformation;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,7 +33,7 @@ class EventsBatchController extends Controller
         $items = collect($payload['batch']);
 
         $info = $items->map(function ($item) {
-            Event::dispatch(
+            EventDispatcher::dispatch(
                 $this->application,
                 [
                     'event' => $item['name'],

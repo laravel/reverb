@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Http;
+namespace Laravel\Reverb\Servers\Reverb\Http;
 
 use BadMethodCallException;
 use React\Socket\ConnectionInterface;

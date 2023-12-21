@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Concerns;
 
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Reverb\Http\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Connection;
 
 trait ClosesConnections
 {

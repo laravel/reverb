@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Http;
+namespace Laravel\Reverb\Servers\Reverb\Http;
 
 use Illuminate\Support\Arr;
 use Symfony\Component\Routing\Loader\Configurator\Traits\RouteTrait;
