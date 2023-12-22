@@ -4,14 +4,12 @@ namespace Laravel\Reverb\Pusher;
 
 use Exception;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Pusher\ClientEvent;
-use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Exceptions\InvalidOrigin;
-use Laravel\Reverb\Pusher\Exceptions\PusherException;
 use Laravel\Reverb\Loggers\Log;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Pusher\Event as PusherEvent;
+use Laravel\Reverb\Pusher\Exceptions\InvalidOrigin;
+use Laravel\Reverb\Pusher\Exceptions\PusherException;
 
 class Server
 {

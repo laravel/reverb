@@ -43,7 +43,7 @@ class Server
         } catch (InvalidApplication $e) {
             SendToConnection::dispatch(
                 $request->connectionId(),
-                $e->message()
+                $e->getMessage()
             );
         } catch (\Exception $e) {
             $this->server->error(

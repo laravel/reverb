@@ -2,17 +2,10 @@
 
 namespace Laravel\Reverb\Exceptions;
 
-use Laravel\Reverb\Pusher\Exceptions\PusherException;
+use Exception;
 
-class InvalidOrigin extends PusherException
+class InvalidOrigin extends Exception
 {
-    /**
-     * The error code associated with the exception.
-     *
-     * @var int
-     */
-    protected $code = 4009;
-
     /**
      * The error message associated with the exception.
      *
