@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Channels;
+namespace Laravel\Reverb\Pusher\Channels;
 
 use Illuminate\Support\Str;
 

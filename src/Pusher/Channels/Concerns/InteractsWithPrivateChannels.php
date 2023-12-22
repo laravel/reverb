@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Channels\Concerns;
+namespace Laravel\Reverb\Pusher\Channels\Concerns;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;

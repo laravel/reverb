@@ -4,9 +4,9 @@ namespace Laravel\Reverb\Pusher;
 
 use Exception;
 use Illuminate\Support\Str;
-use Laravel\Reverb\Channels\CacheChannel;
-use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Channels\CacheChannel;
+use Laravel\Reverb\Pusher\Channels\Channel;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class Event

@@ -8,7 +8,7 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Pusher\EventDispatcher;
 use Laravel\Reverb\Managers\ArrayChannelConnectionManager;

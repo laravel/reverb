@@ -1,12 +1,12 @@
 <?php
 
-use Laravel\Reverb\Channels\CacheChannel;
-use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Channels\PresenceCacheChannel;
-use Laravel\Reverb\Channels\PresenceChannel;
-use Laravel\Reverb\Channels\PrivateCacheChannel;
-use Laravel\Reverb\Channels\PrivateChannel;
+use Laravel\Reverb\Pusher\Channels\CacheChannel;
+use Laravel\Reverb\Pusher\Channels\Channel;
+use Laravel\Reverb\Pusher\Channels\ChannelBroker;
+use Laravel\Reverb\Pusher\Channels\PresenceCacheChannel;
+use Laravel\Reverb\Pusher\Channels\PresenceChannel;
+use Laravel\Reverb\Pusher\Channels\PrivateCacheChannel;
+use Laravel\Reverb\Pusher\Channels\PrivateChannel;
 
 it('can return a channel instance', function () {
     expect(ChannelBroker::create('foo'))

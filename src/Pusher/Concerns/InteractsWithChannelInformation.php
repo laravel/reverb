@@ -2,10 +2,10 @@
 
 namespace Laravel\Reverb\Pusher\Concerns;
 
-use Laravel\Reverb\Channels\CacheChannel;
-use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Channels\Concerns\InteractsWithPresenceChannels;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Channels\CacheChannel;
+use Laravel\Reverb\Pusher\Channels\Channel;
+use Laravel\Reverb\Pusher\Channels\Concerns\InteractsWithPresenceChannels;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 
 trait InteractsWithChannelInformation
 {

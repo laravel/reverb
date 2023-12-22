@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Contracts;
 
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
+
 abstract class ServerProvider
 {
     /**

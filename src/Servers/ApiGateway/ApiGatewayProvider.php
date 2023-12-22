@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Pusher\EventDispatcher;

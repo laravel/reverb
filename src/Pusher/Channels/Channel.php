@@ -1,10 +1,10 @@
 <?php
 
-namespace Laravel\Reverb\Channels;
+namespace Laravel\Reverb\Pusher\Channels;
 
 use Laravel\Reverb\Concerns\SerializesChannels;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 
 class Channel

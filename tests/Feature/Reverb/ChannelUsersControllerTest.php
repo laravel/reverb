@@ -1,7 +1,7 @@
 <?php
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Tests\FakeConnection;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Message\ResponseException;

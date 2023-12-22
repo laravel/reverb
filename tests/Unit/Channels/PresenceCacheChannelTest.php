@@ -1,6 +1,6 @@
 <?php
 
-use Laravel\Reverb\Channels\PresenceCacheChannel;
+use Laravel\Reverb\Pusher\Channels\PresenceCacheChannel;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Servers\Reverb\ChannelConnection;

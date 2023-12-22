@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Channels\ChannelBroker;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 
 beforeEach(function () {

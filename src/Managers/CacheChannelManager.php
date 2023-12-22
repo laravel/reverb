@@ -5,10 +5,10 @@ namespace Laravel\Reverb\Managers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Channels\Channel;
-use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Pusher\Channels\Channel;
+use Laravel\Reverb\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
-use Laravel\Reverb\Contracts\ChannelManager as ChannelManagerInterface;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\Connection;
 
 class CacheChannelManager implements ChannelManagerInterface

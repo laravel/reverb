@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Reverb\Channels\CacheChannel;
-use Laravel\Reverb\Channels\ChannelBroker;
+use Laravel\Reverb\Pusher\Channels\CacheChannel;
+use Laravel\Reverb\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Tests\FakeConnection;
 

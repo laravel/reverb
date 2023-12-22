@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Pusher;
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\ServerManager;
 

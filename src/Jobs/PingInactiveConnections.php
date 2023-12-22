@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Pusher\Event as PusherEvent;
 
