@@ -7,7 +7,7 @@ use Laravel\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
-use Laravel\Reverb\Pusher\Server as PusherServer;
+use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Server

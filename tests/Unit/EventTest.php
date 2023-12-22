@@ -2,8 +2,8 @@
 
 use Clue\React\Redis\Client;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\ServerManager;
 
 it('can publish an event when enabled', function () {

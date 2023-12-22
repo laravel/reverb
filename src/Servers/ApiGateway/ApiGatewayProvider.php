@@ -8,15 +8,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Pusher\Managers\CacheChannelConnectionManager;
-use Laravel\Reverb\Pusher\Managers\CacheChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Managers\CacheChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Managers\CacheChannelManager;
 use Laravel\Reverb\CacheConnectionManager;
 
 class ApiGatewayProvider extends ServerProvider

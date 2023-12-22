@@ -1,9 +1,9 @@
 <?php
 
-use Laravel\Reverb\Pusher\Channels\PresenceCacheChannel;
-use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Pusher\Exceptions\ConnectionUnauthorized;
-use Laravel\Reverb\Pusher\Channels\ChannelConnection;
+use Laravel\Reverb\Protocols\Pusher\Channels\PresenceCacheChannel;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {

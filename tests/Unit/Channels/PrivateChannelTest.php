@@ -1,8 +1,8 @@
 <?php
 
-use Laravel\Reverb\Pusher\Channels\PrivateChannel;
-use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Pusher\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Protocols\Pusher\Channels\PrivateChannel;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {

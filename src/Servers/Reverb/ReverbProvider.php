@@ -7,12 +7,12 @@ use Clue\React\Redis\Factory;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Pusher\EventDispatcher;
-use Laravel\Reverb\Pusher\Managers\ArrayChannelConnectionManager;
-use Laravel\Reverb\Pusher\Managers\ArrayChannelManager;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 

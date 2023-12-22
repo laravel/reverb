@@ -1,8 +1,8 @@
 <?php
 
-use Laravel\Reverb\Pusher\Channels\Channel;
-use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {

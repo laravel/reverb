@@ -6,20 +6,20 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Servers\Reverb\Http\Route;
 use Laravel\Reverb\Servers\Reverb\Http\Router;
 use Laravel\Reverb\Servers\Reverb\Http\Server as HttpServer;
-use Laravel\Reverb\Pusher\Http\Controllers\ChannelController;
-use Laravel\Reverb\Pusher\Http\Controllers\ChannelsController;
-use Laravel\Reverb\Pusher\Http\Controllers\ChannelUsersController;
-use Laravel\Reverb\Pusher\Http\Controllers\EventsBatchController;
-use Laravel\Reverb\Pusher\Http\Controllers\EventsController;
-use Laravel\Reverb\Pusher\Http\Controllers\UsersTerminateController;
-use Laravel\Reverb\Pusher\Server as PusherServer;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelsController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelUsersController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsBatchController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\UsersTerminateController;
+use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
-use Laravel\Reverb\Pusher\Http\Controllers\PusherController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\PusherController;
 
 class Factory
 {

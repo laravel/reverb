@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Reverb\Pusher\Channels\ChannelBroker;
-use Laravel\Reverb\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 
 beforeEach(function () {
