@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Concerns;
+namespace Laravel\Reverb\Servers\Reverb\Concerns;
 
 use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;

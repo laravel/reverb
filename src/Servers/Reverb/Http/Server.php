@@ -2,7 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Http;
 
-use Laravel\Reverb\Concerns\ClosesConnections;
+use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use OverflowException;
 use Psr\Http\Message\RequestInterface;
 use React\EventLoop\Loop;

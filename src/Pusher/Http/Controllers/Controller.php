@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Pusher\Http\Controllers;
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\ClosesConnections;
+use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Concerns;
+namespace Laravel\Reverb\Pusher\Concerns;
 
 use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 

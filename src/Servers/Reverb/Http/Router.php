@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Servers\Reverb\Http;
 use Closure;
 use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Arr;
-use Laravel\Reverb\Concerns\ClosesConnections;
+use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
