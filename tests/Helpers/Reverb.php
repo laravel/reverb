@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Tests\TestConnection;
-use Ratchet\Client\WebSocket;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as connector;

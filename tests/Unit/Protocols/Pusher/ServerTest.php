@@ -3,9 +3,6 @@
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Server;
 use Laravel\Reverb\Tests\FakeConnection;
-use Laravel\Reverb\Tests\TestCase;
-
-uses(TestCase::class);
 
 beforeEach(function () {
     $this->server = $this->app->make(Server::class);
