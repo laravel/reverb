@@ -51,14 +51,4 @@ abstract class ServerProvider
     {
         return $this->shouldNotPublishEvents();
     }
-
-    /**
-     * Return the channel manager for the server.
-     */
-    abstract public function getChannelManager(): ChannelManager;
-
-    /**
-     * Return the channel manager for the server.
-     */
-    abstract public function getChannelConnectionManager(): ChannelConnectionManager;
 }

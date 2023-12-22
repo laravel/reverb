@@ -2,8 +2,8 @@
 
 use Clue\React\Redis\Client;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Event;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\ServerManager;
 
 it('can publish an event when enabled', function () {
@@ -15,7 +15,7 @@ it('can publish an event when enabled', function () {
 
     $this->app->bind(Client::class, fn () => $redis);
 
-    Event::dispatch($app, ['channel' => 'test-channel']);
+    EventDispatcher::dispatch($app, ['channel' => 'test-channel']);
 });
 
 it('can broadcast an event directly when publishing disabled', function () {
@@ -29,7 +29,7 @@ it('can broadcast an event directly when publishing disabled', function () {
 
     channels()->findOrCreate('test-channel');
 
-    Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channel' => 'test-channel']);
+    EventDispatcher::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channel' => 'test-channel']);
 });
 
 it('can broadcast an event for multiple channels', function () {
@@ -44,5 +44,5 @@ it('can broadcast an event for multiple channels', function () {
     channels()->findOrCreate('test-channel-one');
     channels()->findOrCreate('test-channel-two');
 
-    Event::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channels' => ['test-channel-one', 'test-channel-two']]);
+    EventDispatcher::dispatch(app(ApplicationProvider::class)->findByKey('pusher-key'), ['channels' => ['test-channel-one', 'test-channel-two']]);
 });

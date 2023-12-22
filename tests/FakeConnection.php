@@ -4,13 +4,13 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
 
 class FakeConnection extends BaseConnection
 {
-    use GeneratesPusherIdentifiers;
+    use GeneratesIdentifiers;
 
     /**
      * Messages reveived by the connection.

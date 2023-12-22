@@ -1,9 +1,9 @@
 <?php
 
-use Laravel\Reverb\Http\Route;
-use Laravel\Reverb\Http\Router;
-use Laravel\Reverb\Http\Server;
-use Laravel\Reverb\WebSockets\WsConnection;
+use Laravel\Reverb\Servers\Reverb\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Route;
+use Laravel\Reverb\Servers\Reverb\Http\Router;
+use Laravel\Reverb\Servers\Reverb\Http\Server;
 use Psr\Http\Message\RequestInterface;
 use React\EventLoop\Loop;
 use React\Socket\SocketServer;
@@ -28,7 +28,7 @@ function routes()
     $routes = new RouteCollection;
     $routes->add(
         'sockets',
-        Route::get('/', function (RequestInterface $request, WsConnection $connection) {
+        Route::get('/', function (RequestInterface $request, Connection $connection) {
             $connection->onMessage(function ($message) use ($connection) {
                 $connection->send($message);
             });

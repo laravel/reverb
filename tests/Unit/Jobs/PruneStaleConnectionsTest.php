@@ -1,8 +1,8 @@
 <?php
 
-use Laravel\Reverb\Channels\ChannelBroker;
-use Laravel\Reverb\Contracts\ChannelManager;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
+use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
 beforeEach(function () {
     $this->channelManager = Mockery::spy(ChannelManager::class);

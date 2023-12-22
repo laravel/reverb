@@ -3,10 +3,11 @@
 namespace Laravel\Reverb\Servers\ApiGateway;
 
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
-use Laravel\Reverb\Pusher\Server as PusherServer;
+use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
 class Server
@@ -37,12 +38,12 @@ class Server
                 'MESSAGE' => $this->server->message(
                     $this->connect($request),
                     $request->message()
-                )
+                ),
             };
         } catch (InvalidApplication $e) {
             SendToConnection::dispatch(
                 $request->connectionId(),
-                $e->message()
+                $e->getMessage()
             );
         } catch (\Exception $e) {
             $this->server->error(
@@ -55,7 +56,7 @@ class Server
     /**
      * Create a Reverb connection from the API Gateway request.
      */
-    protected function connect(Request $request): Connection
+    protected function connect(Request $request): ReverbConnection
     {
         $connection = $this->connections->find($request->connectionId());
 
@@ -64,8 +65,8 @@ class Server
         }
 
         $this->connections->connect(
-            $connection = new Connection(
-                $request->connectionId(),
+            $connection = new ReverbConnection(
+                new Connection($request->connectionId()),
                 $this->application($request),
                 $request->headers['origin'] ?? null
             )

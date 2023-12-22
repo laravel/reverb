@@ -3,16 +3,21 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Http\Route;
-use Laravel\Reverb\Http\Router;
-use Laravel\Reverb\Http\Server as HttpServer;
-use Laravel\Reverb\Pusher\Http\Controllers\ChannelController;
-use Laravel\Reverb\Pusher\Http\Controllers\ChannelsController;
-use Laravel\Reverb\Pusher\Http\Controllers\ChannelUsersController;
-use Laravel\Reverb\Pusher\Http\Controllers\EventsBatchController;
-use Laravel\Reverb\Pusher\Http\Controllers\EventsController;
-use Laravel\Reverb\Pusher\Http\Controllers\UsersTerminateController;
-use Laravel\Reverb\Pusher\Server as PusherServer;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelsController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelUsersController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsBatchController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\PusherController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\UsersTerminateController;
+use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
+use Laravel\Reverb\Servers\Reverb\Http\Route;
+use Laravel\Reverb\Servers\Reverb\Http\Router;
+use Laravel\Reverb\Servers\Reverb\Http\Server as HttpServer;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
@@ -25,24 +30,46 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', ?LoopInterface $loop = null): HttpServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
-        $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
-        $router = new Router(new UrlMatcher(static::routes(), new RequestContext));
+        $router = match ($protocol) {
+            'pusher' => static::makePusherServer(),
+            default => throw new \InvalidArgumentException("Unsupported protocol [{$protocol}]"),
+        };
+
+        $socket = new SocketServer("{$host}:{$port}", [], $loop);
 
         return new HttpServer($socket, $router, $loop);
     }
 
     /**
+     * Create a new WebSocket server for the Pusher protocol.
+     */
+    public static function makePusherServer(): Router
+    {
+        app()->singleton(
+            ChannelManager::class,
+            fn () => new ArrayChannelManager
+        );
+
+        app()->bind(
+            ChannelConnectionManager::class,
+            fn () => new ArrayChannelConnectionManager
+        );
+
+        return new Router(new UrlMatcher(static::pusherRoutes(), new RequestContext));
+    }
+
+    /**
      * Generate the routes required to handle Pusher requests.
      */
-    protected static function routes(): RouteCollection
+    protected static function pusherRoutes(): RouteCollection
     {
         $routes = new RouteCollection;
 
-        $routes->add('sockets', Route::get('/app/{appKey}', new Controller(app(PusherServer::class), app(ApplicationProvider::class))));
+        $routes->add('sockets', Route::get('/app/{appKey}', new PusherController(app(PusherServer::class), app(ApplicationProvider::class))));
         $routes->add('events', Route::post('/apps/{appId}/events', new EventsController));
         $routes->add('events_batch', Route::post('/apps/{appId}/batch_events', new EventsBatchController));
         $routes->add('channels', Route::get('/apps/{appId}/channels', new ChannelsController));
