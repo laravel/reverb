@@ -124,7 +124,6 @@ class FakeConnection extends BaseConnection
      */
     public function assertReceivedCount(int $count): void
     {
-        dump($this->messages);
         Assert::assertCount($count, $this->messages);
     }
 
