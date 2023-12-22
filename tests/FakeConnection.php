@@ -6,11 +6,11 @@ use Illuminate\Testing\Assert;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
+use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 
 class FakeConnection extends BaseConnection
 {
-    use GeneratesPusherIdentifiers;
+    use GeneratesIdentifiers;
 
     /**
      * Messages reveived by the connection.
@@ -124,6 +124,7 @@ class FakeConnection extends BaseConnection
      */
     public function assertReceivedCount(int $count): void
     {
+        dump($this->messages);
         Assert::assertCount($count, $this->messages);
     }
 

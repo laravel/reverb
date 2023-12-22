@@ -2,7 +2,7 @@
 
 use Laravel\Reverb\Pusher\Channels\PresenceCacheChannel;
 use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Tests\FakeConnection;
 

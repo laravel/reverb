@@ -2,60 +2,32 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\SerializesConnections;
-use Laravel\Reverb\Contracts\Connection as BaseConnection;
 use Laravel\Reverb\Contracts\ConnectionManager;
-use Laravel\Reverb\Contracts\SerializableConnection;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
+use Laravel\Reverb\Contracts\WebSocketConnection;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
-class Connection extends BaseConnection implements SerializableConnection
+class Connection implements WebSocketConnection
 {
-    use GeneratesPusherIdentifiers, SerializesConnections;
-
-    /**
-     * The normalized socket ID.
-     *
-     * @var string
-     */
-    protected $id;
-
     /**
      * Create a new connection instance.
      */
-    public function __construct(
-        protected string $identifier,
-        protected Application $application,
-        protected ?string $origin
-    ) {
-        parent::__construct($application, $origin);
+    public function __construct(protected string $identifier)
+    {
+        //
     }
 
     /**
      * Get the raw socket connection identifier.
      */
-    public function identifier(): string
+    public function id(): int|string
     {
-        return (string) $this->identifier;
-    }
-
-    /**
-     * Get the normalized socket ID.
-     */
-    public function id(): string
-    {
-        if (! $this->id) {
-            $this->id = $this->generateId();
-        }
-
-        return $this->id;
+        return $this->identifier;
     }
 
     /**
      * Send a message to the connection.
      */
-    public function send(string $message): void
+    public function send(mixed $message): void
     {
         SendToConnection::dispatch($this->identifier, $message);
     }
@@ -63,38 +35,8 @@ class Connection extends BaseConnection implements SerializableConnection
     /**
      * Terminate a connection.
      */
-    public function terminate(): void
+    public function close(mixed $message = null): void
     {
-        app(ConnectionManager::class)->forget($this);
-    }
-
-    /**
-     * Ping the connection to ensure it is still active.
-     */
-    public function ping(): void
-    {
-        parent::ping();
-
-        $this->save();
-    }
-
-    /**
-     * Touch the connection last seen at timestamp.
-     */
-    public function touch(): Connection
-    {
-        parent::touch();
-
-        $this->save();
-
-        return $this;
-    }
-
-    /**
-     * Persist the state change to the connection manager.
-     */
-    public function save(): void
-    {
-        app(ConnectionManager::class)->update($this);
+        // 
     }
 }

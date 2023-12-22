@@ -28,6 +28,7 @@ trait SerializesConnections
      */
     public function __unserialize(array $values): void
     {
+        dd($values);
         $this->id = $values['id'];
         $this->identifier = $values['identifier'];
         $this->application = app(ApplicationProvider::class)->findById($values['application']);

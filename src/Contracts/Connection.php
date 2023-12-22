@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Contracts;
 
+use Evenement\EventEmitter;
 use Laravel\Reverb\Application;
 
 abstract class Connection
@@ -19,7 +20,7 @@ abstract class Connection
     /**
      * Create a new connection instance.
      */
-    public function __construct(protected Application $application, protected ?string $origin)
+    public function __construct(protected WebSocketConnection $connection, protected Application $application, protected ?string $origin)
     {
         $this->lastSeenAt = time();
     }

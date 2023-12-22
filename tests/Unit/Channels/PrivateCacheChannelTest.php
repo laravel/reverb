@@ -2,7 +2,7 @@
 
 use Laravel\Reverb\Pusher\Channels\PrivateCacheChannel;
 use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {

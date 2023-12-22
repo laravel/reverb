@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Exceptions;
 
+use Laravel\Reverb\Pusher\Exceptions\PusherException;
+
 class InvalidApplication extends PusherException
 {
     /**

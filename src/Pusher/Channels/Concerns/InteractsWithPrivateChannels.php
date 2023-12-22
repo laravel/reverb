@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Pusher\Channels\Concerns;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Pusher\Exceptions\ConnectionUnauthorized;
 
 trait InteractsWithPrivateChannels
 {
@@ -24,11 +24,11 @@ trait InteractsWithPrivateChannels
     protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
-
+        
         if ($data) {
             $signature .= ":{$data}";
         }
-
+        
         if (! hash_equals(
             hash_hmac(
                 'sha256',

@@ -11,8 +11,8 @@ use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Pusher\EventDispatcher;
-use Laravel\Reverb\Managers\ArrayChannelConnectionManager;
-use Laravel\Reverb\Managers\ArrayChannelManager;
+use Laravel\Reverb\Pusher\Managers\ArrayChannelConnectionManager;
+use Laravel\Reverb\Pusher\Managers\ArrayChannelManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 

@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use Evenement\EventEmitter;
+use Laravel\Reverb\Contracts\WebSocketConnection;
 use Laravel\Reverb\Servers\Reverb\Http\Connection as HttpConnection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\DataInterface;
@@ -10,7 +11,7 @@ use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Ratchet\RFC6455\Messaging\MessageBuffer;
 
-class Connection extends EventEmitter
+class Connection extends EventEmitter implements WebSocketConnection
 {
     /**
      * The message buffer.
@@ -116,9 +117,13 @@ class Connection extends EventEmitter
     /**
      * Close the connection.
      */
-    public function close(?FrameInterface $frame = null): void
+    public function close(mixed $message = null): void
     {
-        if ($frame) {
+        if ($message) {
+            $frame = $message instanceof FrameInterface ?
+                $message :
+                new Frame($message, opcode: Frame::OP_CLOSE);
+
             $this->send($frame);
         }
 

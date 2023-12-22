@@ -1,15 +1,13 @@
 <?php
 
-namespace Laravel\Reverb\Pusher;
+namespace Laravel\Reverb;
 
-use Laravel\Reverb\Application;
+use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
-use Laravel\Reverb\Pusher\Concerns\GeneratesPusherIdentifiers;
-use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 
 class Connection extends ConnectionContract
 {
-    use GeneratesPusherIdentifiers;
+    use GeneratesIdentifiers;
 
     /**
      * The normalized socket ID.
@@ -20,14 +18,6 @@ class Connection extends ConnectionContract
      * Stores the ping state of the connection.
      */
     protected $hasBeenPinged = false;
-
-    /**
-     * Create a new connection instance.
-     */
-    public function __construct(protected ReverbConnection $connection, Application $application, ?string $origin = null)
-    {
-        parent::__construct($application, $origin);
-    }
 
     /**
      * Get the raw socket connection identifier.
@@ -47,14 +37,6 @@ class Connection extends ConnectionContract
         }
 
         return $this->id;
-    }
-
-    /**
-     * Create a new connection instance.
-     */
-    public static function make(ReverbConnection $connection, Application $application, string $origin): Connection
-    {
-        return new static($connection, $application, $origin);
     }
 
     /**

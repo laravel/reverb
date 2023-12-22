@@ -1,26 +1,19 @@
 <?php
 
-namespace Laravel\Reverb\Managers;
+namespace Laravel\Reverb\Pusher\Managers;
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Pusher\Channels\Channel;
 use Laravel\Reverb\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
-use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Pusher\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\Connection;
 
-class ArrayChannelManager implements ChannelManagerInterface
+class CacheChannelManager implements ChannelManagerInterface
 {
     use InteractsWithApplications;
-
-    /**
-     * Application store.
-     *
-     * @var array<string, array<string, array<string, \Laravel\Reverb\Channels\Channel>>>
-     */
-    protected $applications = [];
 
     /**
      * The appliation instance.
@@ -28,6 +21,14 @@ class ArrayChannelManager implements ChannelManagerInterface
      * @var \Laravel\Reverb\Application
      */
     protected $application;
+
+    /**
+     * Create a new cache channel manager instance.
+     */
+    public function __construct(protected Repository $repository, protected string $prefix = 'reverb')
+    {
+        //
+    }
 
     /**
      * Get the application instance.
@@ -40,7 +41,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get all the channels.
      *
-     * @return array<string, \Laravel\Reverb\Channels\Channel>
+     * @return array<string, \Laravel\Reverb\Pusher\Channels\Channel>
      */
     public function all(): array
     {
@@ -60,13 +61,14 @@ class ArrayChannelManager implements ChannelManagerInterface
      */
     public function findOrCreate(string $channelName): Channel
     {
-        if ($channel = $this->find($channelName)) {
+        if ($channel = $this->channels($channelName)) {
             return $channel;
         }
 
+        $channels = $this->repository->get($this->prefix, []);
         $channel = ChannelBroker::create($channelName);
-
-        $this->applications[$this->application->id()][$channel->name()] = $channel;
+        $channels[$this->application->id()][$channel->name()] = serialize($channel);
+        $this->repository->forever($this->prefix, $channels);
 
         return $channel;
     }
@@ -100,7 +102,11 @@ class ArrayChannelManager implements ChannelManagerInterface
      */
     public function remove(Channel $channel): void
     {
-        unset($this->applications[$this->application->id()][$channel->name()]);
+        $channels = $this->channels();
+
+        unset($channels[$channel->name()]);
+
+        $this->repository->forever($this->prefix, $channels);
     }
 
     /**
@@ -114,19 +120,23 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the channels.
      *
-     * @return \Laravel\Reverb\Channels\Channel|array<string, \Laravel\Reverb\Channels\Channel>
+     * @return \Laravel\Reverb\Pusher\Channels\Channel|array<string, \Laravel\Reverb\Pusher\Channels\Channel>
      */
     public function channels(?string $channel = null): Channel|array|null
     {
-        if (! isset($this->applications[$this->application->id()])) {
-            $this->applications[$this->application->id()] = [];
+        $channels = $this->repository->get($this->prefix, []);
+
+        if (! isset($channels[$this->application->id()])) {
+            $channels[$this->application->id()] = [];
         }
 
         if ($channel) {
-            return $this->applications[$this->application->id()][$channel] ?? null;
+            return isset($channels[$this->application->id()][$channel])
+                ? unserialize($channels[$this->application->id()][$channel])
+                : null;
         }
 
-        return $this->applications[$this->application->id()];
+        return array_map('unserialize', $channels[$this->application->id()] ?: []);
     }
 
     /**
@@ -134,10 +144,6 @@ class ArrayChannelManager implements ChannelManagerInterface
      */
     public function flush(): void
     {
-        app(ApplicationProvider::class)
-            ->all()
-            ->each(function (Application $application) {
-                $this->applications[$application->id()] = [];
-            });
+        $this->repository->forever($this->prefix, []);
     }
 }

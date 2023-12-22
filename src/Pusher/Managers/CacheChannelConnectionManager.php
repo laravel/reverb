@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Managers;
+namespace Laravel\Reverb\Pusher\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;

@@ -15,9 +15,9 @@ use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Pusher\EventDispatcher;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Managers\CacheChannelConnectionManager;
-use Laravel\Reverb\Managers\CacheChannelManager;
-use Laravel\Reverb\Managers\CacheConnectionManager;
+use Laravel\Reverb\Pusher\Managers\CacheChannelConnectionManager;
+use Laravel\Reverb\Pusher\Managers\CacheChannelManager;
+use Laravel\Reverb\CacheConnectionManager;
 
 class ApiGatewayProvider extends ServerProvider
 {

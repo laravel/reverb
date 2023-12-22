@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Reverb\Pusher\Concerns;
+namespace Laravel\Reverb\Concerns;
 
-trait GeneratesPusherIdentifiers
+trait GeneratesIdentifiers
 {
     /**
      * Generate a Pusher-compatible socket ID.

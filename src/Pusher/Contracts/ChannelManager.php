@@ -21,7 +21,7 @@ interface ChannelManager
     /**
      * Get all the channels.
      *
-     * @return array<string, \Laravel\Reverb\Channels\Channel>
+     * @return array<string, \Laravel\Reverb\Pusher\Channels\Channel>
      */
     public function all(): array;
 
