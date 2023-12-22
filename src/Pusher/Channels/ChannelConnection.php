@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Reverb;
+namespace Laravel\Reverb\Pusher\Channels;
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Contracts\Connection;

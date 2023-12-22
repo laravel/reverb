@@ -5,7 +5,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Managers\Connections;
-use Laravel\Reverb\Servers\Reverb\ChannelConnection;
+use Laravel\Reverb\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Tests\FakeConnection;
 use Laravel\Reverb\Tests\SerializableConnection;
 use Laravel\Reverb\Tests\TestCase;

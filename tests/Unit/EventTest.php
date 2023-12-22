@@ -2,7 +2,7 @@
 
 use Clue\React\Redis\Client;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Pusher\EventDispatcher;
 use Laravel\Reverb\ServerManager;
 

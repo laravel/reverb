@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Pusher\Channels;
 
 use Laravel\Reverb\Concerns\SerializesChannels;
-use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
 

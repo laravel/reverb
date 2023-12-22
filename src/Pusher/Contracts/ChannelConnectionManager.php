@@ -1,8 +1,9 @@
 <?php
 
-namespace Laravel\Reverb\Contracts;
+namespace Laravel\Reverb\Pusher\Contracts;
 
-use Laravel\Reverb\Servers\Reverb\ChannelConnection;
+use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Pusher\Channels\ChannelConnection;
 
 interface ChannelConnectionManager
 {

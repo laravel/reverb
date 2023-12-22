@@ -2,7 +2,7 @@
 
 namespace Laravel\Reverb\Concerns;
 
-use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 
 trait SerializesChannels
 {

@@ -1,7 +1,7 @@
 <?php
 
 use Laravel\Reverb\Pusher\Channels\PrivateChannel;
-use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
 

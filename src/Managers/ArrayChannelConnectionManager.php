@@ -2,9 +2,9 @@
 
 namespace Laravel\Reverb\Managers;
 
-use Laravel\Reverb\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Servers\Reverb\ChannelConnection;
+use Laravel\Reverb\Pusher\Channels\ChannelConnection;
 
 class ArrayChannelConnectionManager implements ChannelConnectionManager
 {
