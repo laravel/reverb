@@ -6,24 +6,24 @@ Laravel Reverb brings real-time WebSocket communication for Laravel applications
 ### Message Lifecycle
 When the `reverb:start` [command](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Console/Commands/StartServer.php) is run, a new React PHP socket server and event loop are created and started on a given host and port.
 
-Reverb wraps the socket server and a lightweight request router in its own [HTTP server](https://github.com/laravel/reverb/blob/main/src/Http/Server.php) class which decides how to route the request.
+Reverb wraps the socket server and a lightweight request router in its own [HTTP server](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Http/Server.php) class which decides how to route the request.
 
-To do this, it first attempts to turn the incoming socket connection into a PSR7 RequestInterface object before passing it to the [router](https://github.com/laravel/reverb/blob/main/src/Http/Router.php) to determine which controller should process it by matching the request path.
+To do this, it first attempts to turn the incoming socket connection into a PSR7 RequestInterface object before passing it to the [router](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Http/Router.php) to determine which controller should process it by matching the request path.
 
-The router will also determine whether the given request is attempting a WebSocket connection by inspecting the incoming headers. If it is, it will attempt to negotiate the upgrade with the client and, if successful, [decorate the connection](https://github.com/laravel/reverb/blob/main/src/WebSockets/WsConnection.php) object with the WebSocket connection details and pass it along to the controller.
+The router will also determine whether the given request is attempting a WebSocket connection by inspecting the incoming headers. If it is, it will attempt to negotiate the upgrade with the client and, if successful, [decorate the connection](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Connection.php) object with the WebSocket connection details and pass it along to the controller.
 
 If it’s not a WebSocket request, the PSR7 object will be send directly to the matching controller which processes the request and writes the response back to the connection and closes it.
 
-In the [WebSocket controller](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Controller.php), the connection is decorated again with information such as the Pusher socket ID and the app the user is connected to. We also validate the app is valid at this point.
+In the [Pusher WebSocket controller](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/Http/Controllers/PusherController.php), the connection is decorated again with information such as the Pusher socket ID and the app the user is connected to. We also validate the app is valid at this point.
 
 The WebSocket connection object instantiates a [MessageBuffer](https://github.com/ratchetphp/RFC6455/blob/master/src/Messaging/MessageBuffer.php) provided by the Ratchet RFC6455 (WebSocket spec) package. This handles parsing and decoding the messages received across the socket connection. This buffer is opened in the controller and event listeners are hooked up. 
 
-Events emitted from the connection are routed through the message buffer. When a message has been parsed, it is passed to the [Pusher Server](https://github.com/laravel/reverb/blob/main/src/Pusher/Server.php) which takes the message and decides how to route it.
+Events emitted from the connection are routed through the message buffer. When a message has been parsed, it is passed to the [Pusher Server](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/Server.php) which takes the message and decides how to route it.
 
-First, it checks the [Pusher protocol](https://github.com/laravel/reverb/blob/main/src/Pusher/Event.php) and responds accordingly to open connections, channel subscriptions, disconnections, etc. If the message is not part of the Pusher protocol, a check is made for [client events](https://github.com/laravel/reverb/blob/main/src/ClientEvent.php) such as whispers. Essentially here, it’s a string match on the start of the message to see whether it’s something which requires a response. In the event it does, it’s written back to the socket.
+First, it checks the [Pusher protocol](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/Event.php) and responds accordingly to open connections, channel subscriptions, disconnections, etc. If the message is not part of the Pusher protocol, a check is made for [client events](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/ClientEvent.php) such as whispers. Essentially here, it’s a string match on the start of the message to see whether it’s something which requires a response. In the event it does, it’s written back to the socket.
 
 ### Channel Subscription
-Reverb provides a [driver based approach](https://github.com/laravel/reverb/tree/main/src/Managers) to channel subscription. For standard Reverb, an in-memory array channel store is used, but for something like API Gateway which can’t store connections in memory, a cache driver alternative can be used.
+Reverb provides a to channel subscription. For standard Reverb, an in-memory array channel store is used, but for something like API Gateway which can’t store connections in memory, a cache driver alternative can be used.
 
 When a user subscribes to a channel, Reverb attempts to resolve the channel from the manager and connects the user to it. When the user disconnects, they are removed from the channel. When there are no connections in the channel, it’s removed from memory.
 
