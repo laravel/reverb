@@ -3,10 +3,10 @@
 namespace Laravel\Reverb\Protocols\Pusher\Managers;
 
 use Illuminate\Contracts\Cache\Repository;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 
 class CacheChannelConnectionManager implements ChannelConnectionManager
 {

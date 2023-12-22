@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Servers\ApiGateway;
 
-use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\WebSocketConnection;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 
@@ -37,6 +36,6 @@ class Connection implements WebSocketConnection
      */
     public function close(mixed $message = null): void
     {
-        // 
+        //
     }
 }

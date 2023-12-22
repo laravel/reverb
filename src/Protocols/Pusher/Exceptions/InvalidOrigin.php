@@ -2,8 +2,6 @@
 
 namespace Laravel\Reverb\Protocols\Pusher\Exceptions;
 
-use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
-
 class InvalidOrigin extends PusherException
 {
     /**

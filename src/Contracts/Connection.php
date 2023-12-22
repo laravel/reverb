@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Contracts;
 
-use Evenement\EventEmitter;
 use Laravel\Reverb\Application;
 
 abstract class Connection

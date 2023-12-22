@@ -4,8 +4,8 @@ namespace Laravel\Reverb\Protocols\Pusher;
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\ServerManager;
 
 class EventDispatcher

@@ -7,17 +7,13 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Reverb\CacheConnectionManager;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ConnectionManager;
 use Laravel\Reverb\Contracts\ServerProvider;
-use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
-use Laravel\Reverb\Protocols\Pusher\Managers\CacheChannelConnectionManager;
-use Laravel\Reverb\Protocols\Pusher\Managers\CacheChannelManager;
-use Laravel\Reverb\CacheConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 
 class ApiGatewayProvider extends ServerProvider
 {
@@ -65,32 +61,5 @@ class ApiGatewayProvider extends ServerProvider
                 $this->config['connection_manager']['prefix']
             );
         });
-    }
-
-    /**
-     * Return the channel manager for the server.
-     */
-    public function getChannelManager(): ChannelManager
-    {
-        return new CacheChannelManager(
-            $this->app['cache']->store(
-                $this->config['connection_manager']['store']
-            ),
-            $this->config['connection_manager']['prefix']
-        );
-    }
-
-    /**
-     * Return the channel manager for the server.
-     */
-    public function getChannelConnectionManager(): ChannelConnectionManager
-    {
-        return new CacheChannelConnectionManager(
-            $this->app['cache']->store(
-                $this->config['connection_manager']['store']
-            ),
-            app(ConnectionManager::class),
-            $this->config['connection_manager']['prefix']
-        );
     }
 }

@@ -3,8 +3,8 @@
 namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
+use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

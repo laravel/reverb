@@ -2,10 +2,10 @@
 
 namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
+use Laravel\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
-use Laravel\Reverb\Connection as ReverbConnection;
 use Laravel\Reverb\Servers\Reverb\Connection;
 use Psr\Http\Message\RequestInterface;
 

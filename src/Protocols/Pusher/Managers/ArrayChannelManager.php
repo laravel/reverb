@@ -4,12 +4,12 @@ namespace Laravel\Reverb\Protocols\Pusher\Managers;
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
-use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager as ChannelManagerInterface;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
+use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager as ChannelManagerInterface;
 
 class ArrayChannelManager implements ChannelManagerInterface
 {

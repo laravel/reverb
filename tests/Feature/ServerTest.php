@@ -293,7 +293,7 @@ it('it rejects a connection from an invalid origin', function () {
     ]);
 });
 
-it('it accepts a connection from an valid origin', function () {
+it('accepts a connection from an valid origin', function () {
     $this->app['config']->set('reverb.apps.0.allowed_origins', ['localhost']);
     $this->server->open($connection = new FakeConnection);
 

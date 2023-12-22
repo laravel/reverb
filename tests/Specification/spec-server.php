@@ -1,9 +1,9 @@
 <?php
 
+use Laravel\Reverb\Servers\Reverb\Connection;
 use Laravel\Reverb\Servers\Reverb\Http\Route;
 use Laravel\Reverb\Servers\Reverb\Http\Router;
 use Laravel\Reverb\Servers\Reverb\Http\Server;
-use Laravel\Reverb\Servers\Reverb\Connection;
 use Psr\Http\Message\RequestInterface;
 use React\EventLoop\Loop;
 use React\Socket\SocketServer;

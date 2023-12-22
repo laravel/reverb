@@ -2,9 +2,6 @@
 
 namespace Laravel\Reverb\Contracts;
 
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-
 abstract class ServerProvider
 {
     /**
@@ -54,14 +51,4 @@ abstract class ServerProvider
     {
         return $this->shouldNotPublishEvents();
     }
-
-    /**
-     * Return the channel manager for the server.
-     */
-    abstract public function getChannelManager(): ChannelManager;
-
-    /**
-     * Return the channel manager for the server.
-     */
-    abstract public function getChannelConnectionManager(): ChannelConnectionManager;
 }

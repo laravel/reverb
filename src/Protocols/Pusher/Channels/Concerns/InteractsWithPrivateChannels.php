@@ -24,11 +24,11 @@ trait InteractsWithPrivateChannels
     protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
-        
+
         if ($data) {
             $signature .= ":{$data}";
         }
-        
+
         if (! hash_equals(
             hash_hmac(
                 'sha256',

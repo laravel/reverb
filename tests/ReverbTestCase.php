@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
 use Ratchet\Client\WebSocket;
@@ -88,7 +87,7 @@ class ReverbTestCase extends TestCase
     public function startServer(string $host = '0.0.0.0', string $port = '8080'): void
     {
         $this->resetFiber();
-        $this->server = Factory::make($host, $port, $this->loop);
+        $this->server = Factory::make($host, $port, loop: $this->loop);
     }
 
     /**

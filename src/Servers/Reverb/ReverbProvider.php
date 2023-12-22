@@ -7,12 +7,8 @@ use Clue\React\Redis\Factory;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
-use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
-use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelManager;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 
@@ -95,21 +91,5 @@ class ReverbProvider extends ServerProvider
     public function withPublishing(): void
     {
         $this->publishesEvents = true;
-    }
-
-    /**
-     * Return the channel manager for the server.
-     */
-    public function getChannelManager(): ChannelManager
-    {
-        return new ArrayChannelManager;
-    }
-
-    /**
-     * Return the channel manager for the server.
-     */
-    public function getChannelConnectionManager(): ChannelConnectionManager
-    {
-        return new ArrayChannelConnectionManager;
     }
 }

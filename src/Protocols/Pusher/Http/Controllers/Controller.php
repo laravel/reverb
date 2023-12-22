@@ -4,10 +4,10 @@ namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Contracts\ApplicationProvider;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Exceptions\InvalidApplication;
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
