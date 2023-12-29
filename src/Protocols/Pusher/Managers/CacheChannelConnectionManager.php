@@ -101,7 +101,7 @@ class CacheChannelConnectionManager implements ChannelConnectionManager
     /**
      * Get all the connections.
      *
-     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
+     * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */
     public function all(): array
     {

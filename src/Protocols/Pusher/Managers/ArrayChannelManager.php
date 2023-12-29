@@ -74,7 +74,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get all the connections for the given channels.
      *
-     * @return array<string, \Laravel\Reverb\Servers\Reverb\ChannelConnection>
+     * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */
     public function connections(?string $channel = null): array
     {
