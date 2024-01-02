@@ -29,11 +29,8 @@ return [
     'servers' => [
 
         'reverb' => [
-            'host' => env('REVERB_HOST', '127.0.0.1'),
+            'host' => env('REVERB_HOST', 'localhost'),
             'port' => env('REVERB_PORT', 8080),
-            'connection_manager' => [
-                'prefix' => env('REVERB_CONNECTION_CACHE_PREFIX', 'reverb'),
-            ],
             'publish_events' => [
                 'enabled' => env('REVERB_SCALING_ENABLED', false),
                 'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),

@@ -2,11 +2,11 @@
 
 namespace Laravel\Reverb;
 
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
 
-class ServiceProvider extends BaseServiceProvider
+class ReverbServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
@@ -15,7 +15,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->publishes([
             __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
-        ]);
+        ], ['reverb', 'reverb-config']);
 
         $this->app->make(ServerManager::class)
             ->driver()

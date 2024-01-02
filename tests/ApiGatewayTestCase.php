@@ -12,7 +12,7 @@ use Laravel\Reverb\ManagerProvider;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 use Laravel\Reverb\Servers\ApiGateway\Request;
 use Laravel\Reverb\Servers\ApiGateway\Server;
-use Laravel\Reverb\ServiceProvider;
+use Laravel\Reverb\ReverbServiceProvider;
 
 class ApiGatewayTestCase extends TestCase
 {
@@ -44,7 +44,7 @@ class ApiGatewayTestCase extends TestCase
     protected function getPackageProviders($app)
     {
         return [
-            ServiceProvider::class,
+            ReverbServiceProvider::class,
             ManagerProvider::class,
         ];
     }

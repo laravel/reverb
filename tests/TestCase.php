@@ -9,7 +9,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelManager;
-use Laravel\Reverb\ServiceProvider;
+use Laravel\Reverb\ReverbServiceProvider;
 use Orchestra\Testbench\TestCase as TestbenchTestCase;
 
 class TestCase extends TestbenchTestCase
@@ -43,7 +43,7 @@ class TestCase extends TestbenchTestCase
     protected function getPackageProviders($app)
     {
         return [
-            ServiceProvider::class,
+            ReverbServiceProvider::class,
             ManagerProvider::class,
         ];
     }

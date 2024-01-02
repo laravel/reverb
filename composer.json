@@ -49,7 +49,7 @@
         "laravel": {
             "providers": [
                 "Laravel\\Reverb\\ManagerProvider",
-                "Laravel\\Reverb\\ServiceProvider"
+                "Laravel\\Reverb\\ReverbServiceProvider"
             ],
             "aliases": {
                 "Output": "Laravel\\Reverb\\Output"
