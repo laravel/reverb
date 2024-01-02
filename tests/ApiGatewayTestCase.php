@@ -9,10 +9,10 @@ use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\ManagerProvider;
+use Laravel\Reverb\ReverbServiceProvider;
 use Laravel\Reverb\Servers\ApiGateway\Jobs\SendToConnection;
 use Laravel\Reverb\Servers\ApiGateway\Request;
 use Laravel\Reverb\Servers\ApiGateway\Server;
-use Laravel\Reverb\ReverbServiceProvider;
 
 class ApiGatewayTestCase extends TestCase
 {
