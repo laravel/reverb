@@ -118,15 +118,13 @@ class ArrayChannelManager implements ChannelManagerInterface
      */
     public function channels(?string $channel = null): Channel|array|null
     {
-        if (! isset($this->applications[$this->application->id()])) {
-            $this->applications[$this->application->id()] = [];
-        }
+        $channels = $this->applications[$this->application->id()] ?? [];
 
         if ($channel) {
-            return $this->applications[$this->application->id()][$channel] ?? null;
+            return $channels[$channel] ?? null;
         }
 
-        return $this->applications[$this->application->id()];
+        return $channels;
     }
 
     /**
