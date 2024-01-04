@@ -11,7 +11,7 @@ return [
     | messages received from and when sending messages to connected
     | clients. You must specify one of the servers listed below.
     |
-    | Supported: "reverb", "api_gateway"
+    | Supported: "reverb"
     */
 
     'default' => env('REVERB_SERVER', 'reverb'),
