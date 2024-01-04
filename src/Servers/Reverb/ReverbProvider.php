@@ -28,7 +28,7 @@ class ReverbProvider extends ServerProvider
      */
     public function __construct(protected Application $app, protected array $config)
     {
-        $this->publishesEvents = (bool) $this->config['publish_events']['enabled'] ?? false;
+        $this->publishesEvents = (bool) $this->config['scaling']['enabled'] ?? false;
     }
 
     /**
@@ -60,7 +60,7 @@ class ReverbProvider extends ServerProvider
     {
         $this->app->make(Client::class)
             ->publish(
-                $this->config['publish_events']['channel'] ?? 'reverb',
+                $this->config['scaling']['channel'] ?? 'reverb',
                 json_encode($payload)
             );
     }
@@ -74,7 +74,7 @@ class ReverbProvider extends ServerProvider
             $this->redisUrl()
         );
 
-        $redis->subscribe($this->config['publish_events']['channel'] ?? 'reverb');
+        $redis->subscribe($this->config['scaling']['channel'] ?? 'reverb');
 
         $redis->on('message', function (string $channel, string $payload) {
             $event = json_decode($payload, true);

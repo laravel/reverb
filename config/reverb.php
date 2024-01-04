@@ -31,18 +31,9 @@ return [
         'reverb' => [
             'host' => env('REVERB_HOST', 'localhost'),
             'port' => env('REVERB_PORT', 8080),
-            'publish_events' => [
+            'scaling' => [
                 'enabled' => env('REVERB_SCALING_ENABLED', false),
                 'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),
-            ],
-        ],
-
-        'api_gateway' => [
-            'region' => env('REVERB_API_GATEWAY_REGION', 'us-east-1'),
-            'endpoint' => env('REVERB_API_GATEWAY_ENDPOINT'),
-            'connection_manager' => [
-                'store' => env('REVERB_API_GATEWAY_CONNECTION_CACHE', 'dynamodb'),
-                'prefix' => env('REVERB_API_GATEWAY_CONNECTION_CACHE_PREFIX', 'reverb'),
             ],
         ],
 
