@@ -3,9 +3,9 @@
 namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\Concerns\InteractsWithServerState;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Command\SignalableCommandInterface;
 
 class StartServer extends Command implements SignalableCommandInterface
 {
-    use InteractsWithAsyncRedis, InteractsWithServerState;
+    use InteractsWithAsyncRedis;
 
     /**
      * The name and signature of the console command.
@@ -45,7 +45,7 @@ class StartServer extends Command implements SignalableCommandInterface
      */
     public function handle(): void
     {
-        if ($debug = $this->option('debug')) {
+        if ($this->option('debug')) {
             $this->laravel->instance(Logger::class, new CliLogger($this->output));
         }
 
@@ -60,8 +60,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->bindRedis($loop);
         $this->subscribeToRedis($loop);
         $this->scheduleCleanup($loop);
-        $this->checkForRestartSignal($server, $loop);
-        $this->setState($host, $port, $debug ??= false);
+        $this->checkForRestartSignal($server, $loop, $host, $port);
 
         $this->components->info("Starting server on {$host}:{$port}");
 
@@ -82,7 +81,6 @@ class StartServer extends Command implements SignalableCommandInterface
     public function handleSignal(int $signal): void
     {
         $this->gracefullyDisconnect();
-        $this->destroyState();
     }
 
     /**
@@ -100,22 +98,20 @@ class StartServer extends Command implements SignalableCommandInterface
     /**
      * Check to see whether the restart signal has been sent.
      */
-    protected function checkForRestartSignal(Server $server, LoopInterface $loop): void
+    protected function checkForRestartSignal(Server $server, LoopInterface $loop, string $host, string $port): void
     {
-        $loop->addPeriodicTimer(5, function () use ($server) {
-            $state = $this->getState();
+        $lastRestart = Cache::get('laravel:reverb:restart');
 
-            if (! $state['RESTART']) {
+        $loop->addPeriodicTimer(5, function () use ($server, $host, $port, $lastRestart) {
+            if ($lastRestart === Cache::get('laravel:pulse:restart')) {
                 return;
             }
-
-            $this->components->info('Stopping Reverb server.');
 
             $this->gracefullyDisconnect();
 
             $server->stop();
 
-            $this->destroyState();
+            $this->components->info("Stopping server on {$host}:{$port}");
         });
     }
 
