@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Servers\Reverb\Console\Commands\RestartServer;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
 use React\EventLoop\LoopInterface;
 
@@ -40,6 +41,7 @@ class ReverbProvider extends ServerProvider
             Artisan::starting(function ($artisan) {
                 $artisan->resolveCommands([
                     StartServer::class,
+                    RestartServer::class,
                 ]);
             });
         }
