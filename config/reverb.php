@@ -29,7 +29,7 @@ return [
     'servers' => [
 
         'reverb' => [
-            'host' => env('REVERB_HOST', 'localhost'),
+            'host' => env('REVERB_HOST', '0.0.0.0'),
             'port' => env('REVERB_PORT', 8080),
             'scaling' => [
                 'enabled' => env('REVERB_SCALING_ENABLED', false),

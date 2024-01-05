@@ -80,6 +80,8 @@ class StartServer extends Command implements SignalableCommandInterface
      */
     public function handleSignal(int $signal): void
     {
+        $this->components->info('Gracefully terminating connections.');
+
         $this->gracefullyDisconnect();
     }
 
@@ -103,7 +105,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $lastRestart = Cache::get('laravel:reverb:restart');
 
         $loop->addPeriodicTimer(5, function () use ($server, $host, $port, $lastRestart) {
-            if ($lastRestart === Cache::get('laravel:pulse:restart')) {
+            if ($lastRestart === Cache::get('laravel:reverb:restart')) {
                 return;
             }
 
