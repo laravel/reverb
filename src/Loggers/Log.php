@@ -20,12 +20,10 @@ class Log
      * @param  array  $arguments
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic($method, $arguments)
     {
-        if (! static::$logger) {
-            static::$logger = app(Logger::class);
-        }
+        static::$logger ??= app(Logger::class);
 
-        return static::$logger->$name(...$arguments);
+        return static::$logger->{$method}(...$arguments);
     }
 }
