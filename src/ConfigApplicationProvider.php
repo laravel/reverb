@@ -17,25 +17,15 @@ class ConfigApplicationProvider implements ApplicationProvider
     }
 
     /**
-     * Return all of the configured applications as Application instances.
+     * Get all of the configured applications as Application instances.
      *
-     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Application[]
+     * @return \Illuminate\Support\Collection<\Laravel\Reverb\Application>
      */
     public function all(): Collection
     {
         return $this->applications->map(function ($app) {
             return $this->findById($app['id']);
         });
-    }
-
-    /**
-     * Find an application instance by key.
-     *
-     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
-     */
-    public function findByKey(string $key): Application
-    {
-        return $this->find('key', $key);
     }
 
     /**
@@ -49,11 +39,21 @@ class ConfigApplicationProvider implements ApplicationProvider
     }
 
     /**
+     * Find an application instance by key.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
+    public function findByKey(string $key): Application
+    {
+        return $this->find('key', $key);
+    }
+
+    /**
      * Find an application instance.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
-    public function find(string $key, $value): Application
+    public function find(string $key, mixed $value): Application
     {
         $app = $this->applications->firstWhere($key, $value);
 

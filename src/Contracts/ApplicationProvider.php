@@ -8,18 +8,11 @@ use Laravel\Reverb\Application;
 interface ApplicationProvider
 {
     /**
-     * Return all of the configured applications as Application instances.
+     * Get all of the configured applications as Application instances.
      *
-     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Application[]
+     * @return \Illuminate\Support\Collection<\Laravel\Reverb\Application>
      */
     public function all(): Collection;
-
-    /**
-     * Find an application instance by key.
-     *
-     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
-     */
-    public function findByKey(string $key): Application;
 
     /**
      * Find an application instance by ID.
@@ -27,4 +20,11 @@ interface ApplicationProvider
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
     public function findById(string $id): Application;
+
+    /**
+     * Find an application instance by key.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
+    public function findByKey(string $key): Application;
 }
