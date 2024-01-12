@@ -9,9 +9,9 @@ class ApplicationManager extends Manager
     /**
      * Create an instance of the configuration driver.
      */
-    public function createConfigDriver(): ConfigProvider
+    public function createConfigDriver(): ConfigApplicationProvider
     {
-        return new ConfigProvider(
+        return new ConfigApplicationProvider(
             collect($this->config->get('reverb.apps.apps', []))
         );
     }

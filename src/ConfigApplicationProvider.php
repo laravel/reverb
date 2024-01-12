@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 
-class ConfigProvider implements ApplicationProvider
+class ConfigApplicationProvider implements ApplicationProvider
 {
     /**
      * Create a new config provider instance.

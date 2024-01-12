@@ -17,7 +17,7 @@ class ApplicationManagerServiceProvider extends ServiceProvider implements Defer
 
         $this->app->bind(
             ApplicationProvider::class,
-            fn () => $this->app->make(ApplicationManager::class)->driver()
+            fn ($app) => $app->make(ApplicationManager::class)->driver()
         );
     }
 
