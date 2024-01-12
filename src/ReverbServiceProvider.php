@@ -9,20 +9,6 @@ use Laravel\Reverb\Loggers\NullLogger;
 class ReverbServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        $this->publishes([
-            __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
-        ], ['reverb', 'reverb-config']);
-
-        $this->app->make(ServerManager::class)
-            ->driver()
-            ->boot();
-    }
-
-    /**
      * Register any application services.
      */
     public function register(): void
@@ -35,16 +21,22 @@ class ReverbServiceProvider extends ServiceProvider
 
         $this->app->singleton(ServerManager::class);
 
-        $this->initializeServer();
+        $this->app->make(ServerManager::class)->register();
     }
 
     /**
-     * Initialize the server.
+     * Bootstrap any application services.
      */
-    public function initializeServer(): void
+    public function boot(): void
     {
-        $server = $this->app->make(ServerManager::class);
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
+            ], ['reverb', 'reverb-config']);
+        }
 
-        $server->register();
+        $this->app->make(ServerManager::class)
+            ->driver()
+            ->boot();
     }
 }

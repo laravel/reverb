@@ -1,6 +1,6 @@
 {
     "name": "laravel/reverb",
-    "description": "Laravel Reverb brings real-time WebSocket communication for Laravel applications.",
+    "description": "Laravel Reverb provides a real-time WebSocket communication backend for Laravel applications.",
     "keywords": [
         "laravel",
         "websocket",
@@ -10,8 +10,12 @@
     "license": "MIT",
     "authors": [
         {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        },
+        {
             "name": "Joe Dixon",
-            "email": "hello@joedixon.co.uk"
+            "email": "joe@laravel.com"
         }
     ],
     "require": {
@@ -48,7 +52,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Laravel\\Reverb\\ManagerProvider",
+                "Laravel\\Reverb\\ManagerServiceProvider",
                 "Laravel\\Reverb\\ReverbServiceProvider"
             ],
             "aliases": {

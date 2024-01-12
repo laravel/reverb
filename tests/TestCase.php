@@ -2,9 +2,9 @@
 
 namespace Laravel\Reverb\Tests;
 
+use Laravel\Reverb\ApplicationManagerServiceProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
-use Laravel\Reverb\ManagerProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
@@ -44,7 +44,7 @@ class TestCase extends TestbenchTestCase
     {
         return [
             ReverbServiceProvider::class,
-            ManagerProvider::class,
+            ApplicationManagerServiceProvider::class,
         ];
     }
 }

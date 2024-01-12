@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 
-class ManagerProvider extends ServiceProvider implements DeferrableProvider
+class ApplicationManagerServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register any application services.
