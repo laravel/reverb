@@ -22,18 +22,18 @@ class Connections
 
     public function record(SharedBeat $event): void
     {
+        if ($event->time->second % 15 !== 0) {
+            return;
+        }
+
         if (! $this->shouldSample()) {
             return;
         }
 
-        $channels = Broadcast::driver()
+        $connections = Broadcast::driver()
             ->getPusher()
-            ->get('/channels', ['info' => 'subscription_count'])
-            ->channels;
-
-        $connections = collect($channels)
-            ->map(fn ($channel) => $channel->subscription_count)
-            ->sum();
+            ->get('/connections')
+            ->connections;
 
         $this->pulse->lazy(function () use ($connections) {
             $this->pulse->record(
