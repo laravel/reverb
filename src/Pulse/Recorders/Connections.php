@@ -7,9 +7,12 @@ use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\Broadcast;
 use Laravel\Pulse\Events\SharedBeat;
 use Laravel\Pulse\Pulse;
+use Laravel\Pulse\Recorders\Concerns\Sampling;
 
 class Connections
 {
+    use Sampling;
+
     public string $listen = SharedBeat::class;
 
     public function __construct(protected Pulse $pulse, protected Repository $config)
@@ -19,6 +22,10 @@ class Connections
 
     public function record(SharedBeat $event): void
     {
+        if (! $this->shouldSample()) {
+            return;
+        }
+
         $channels = Broadcast::driver()
             ->getPusher()
             ->get('/channels', ['info' => 'subscription_count'])

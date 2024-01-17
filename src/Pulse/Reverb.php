@@ -43,13 +43,16 @@ class Reverb extends Card
             ['reverb_messages'],
             'count'
         ), 'reverb_messages_count');
+
         $messagesCount = $this->formatReadings($messagesCount, 'reverb_messages');
 
         [$messageRate, $messageRateUnit] = $this->calculateMessageRate($messagesCount);
 
-        // if (Request::hasHeader('X-Livewire')) {
-        //     $this->dispatch('reverb-chart-update', average: $average, peak: $peak);
-        // }
+        $messages = collect(['count' => $messagesCount, 'rate' => $messageRate]);
+
+        if (Request::hasHeader('X-Livewire')) {
+            $this->dispatch('reverb-chart-update', connections: $connections, messages: $messages);
+        }
 
         return view('reverb::livewire.reverb', [
             'averageConnectionsTime' => $averageConnectionsTime,
@@ -61,7 +64,7 @@ class Reverb extends Card
             'messagesCountTime' => $messagesCountTime,
             'messagesCountRunAt' => $messagesCountRunAt,
             'connections' => $connections,
-            'messages' => collect(['count' => $messagesCount, 'rate' => $messageRate]),
+            'messages' => $messages,
             'messageRateUnit' => $messageRateUnit,
             'empty' => $connections->average->isEmpty() && $connections->peak->isEmpty() && $connections->count->isEmpty() && $messagesCount->isEmpty(),
             'config' => Config::get('pulse.recorders.'.RecordersConnections::class),
@@ -98,14 +101,14 @@ class Reverb extends Card
         $maxDataPoints = 60;
         $secondsPerPeriod = ($interval->totalSeconds / $maxDataPoints);
 
-        [$unit, $divisor] = match ($this->period) {
+        [$unit, $period] = match ($this->period) {
             '6_hours' => ['minute', 60], // per minute
             '24_hours' => ['hour', 60 * 60], // per hour
             '7_days' => ['day', 60 * 60 * 24], // per day
             default => ['second', 1], // per second
         };
 
-        $multiplier = $divisor > $secondsPerPeriod ? $secondsPerPeriod / $divisor : $divisor / $secondsPerPeriod;
+        $multiplier = $period > $secondsPerPeriod ? $secondsPerPeriod / $period : $period / $secondsPerPeriod;
 
         $sends = $sends->map(fn ($send) => $send === 0 || $send === null ? null : round($send * $multiplier));
 
