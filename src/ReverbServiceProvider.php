@@ -2,9 +2,12 @@
 
 namespace Laravel\Reverb;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
+use Laravel\Reverb\Pulse\Reverb;
+use Livewire\LivewireManager;
 
 class ReverbServiceProvider extends ServiceProvider
 {
@@ -34,6 +37,12 @@ class ReverbServiceProvider extends ServiceProvider
                 __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
             ], ['reverb', 'reverb-config']);
         }
+
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
+
+        $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
+            $livewire->component('reverb', Reverb::class);
+        });
 
         $this->app->make(ServerProviderManager::class)->boot();
     }
