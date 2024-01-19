@@ -15,6 +15,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use Laravel\Reverb\Servers\Reverb\Http\Server;
+use Laravel\Reverb\ServerServiceProviderManager;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
