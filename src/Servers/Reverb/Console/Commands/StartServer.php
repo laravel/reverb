@@ -60,6 +60,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->ensureHorizontalScalability($loop);
         $this->ensureStaleConnectionsAreCleaned($loop);
         $this->ensureRestartCommandIsRespected($server, $loop, $host, $port);
+        $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
 
         $this->components->info("Starting server on {$host}:{$port}");
 
@@ -85,6 +86,20 @@ class StartServer extends Command implements SignalableCommandInterface
         $loop->addPeriodicTimer(60, function () {
             PruneStaleConnections::dispatch();
             PingInactiveConnections::dispatch();
+        });
+    }
+
+    /**
+     * Schedule Pulse to ingest events if enabled.
+     */
+    protected function ensurePulseEventsAreCollected(LoopInterface $loop, int $interval): void
+    {
+        if (! $this->laravel->bound(\Laravel\Pulse\Pulse::class)) {
+            return;
+        }
+
+        $loop->addPeriodicTimer($interval, function () {
+            $this->laravel->make(\Laravel\Pulse\Pulse::class)->ingest();
         });
     }
 
