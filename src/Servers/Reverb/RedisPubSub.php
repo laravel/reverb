@@ -2,8 +2,6 @@
 
 namespace Laravel\Reverb\Servers\Reverb;
 
-use Clue\React\Redis\Client;
-use Clue\React\Redis\Factory;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
