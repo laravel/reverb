@@ -10,7 +10,6 @@ use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
-use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
