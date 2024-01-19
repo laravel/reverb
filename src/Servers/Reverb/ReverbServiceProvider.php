@@ -31,8 +31,7 @@ class ReverbServiceProvider extends ServerProvider
      */
     public function register(): void
     {
-        $this->app->bind(PubSub::class, fn ($app) =>
-            new RedisPubSub($this->config['scaling']['channel'] ?? 'reverb')
+        $this->app->bind(PubSub::class, fn ($app) => new RedisPubSub($this->config['scaling']['channel'] ?? 'reverb')
         );
     }
 
