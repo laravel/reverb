@@ -13,10 +13,11 @@ class RedisPubSubProvider implements PubSubProvider
     use InteractsWithAsyncRedis;
 
     protected $publishingClient;
+
     protected $subscribingClient;
 
     public function __construct(protected RedisClientFactory $clientFactory,
-                                protected string $channel)
+        protected string $channel)
     {
     }
 
@@ -64,7 +65,7 @@ class RedisPubSubProvider implements PubSubProvider
     protected function ensureConnected(): void
     {
         if (! $this->publishingClient) {
-            throw new RuntimeException("Connection to Redis has not been established.");
+            throw new RuntimeException('Connection to Redis has not been established.');
         }
     }
 }

@@ -13,6 +13,7 @@ use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
 use React\Http\Browser;
 use React\Promise\PromiseInterface;
+
 use ReflectionObject;
 
 class ReverbTestCase extends TestCase
