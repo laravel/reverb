@@ -4,11 +4,11 @@ use Clue\React\Redis\Client;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
-use Laravel\Reverb\ServerManager;
+use Laravel\Reverb\ServerServiceProviderManager;
 
 it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('pusher-key');
-    app(ServerManager::class)->withPublishing();
+    app(ServerServiceProviderManager::class)->withPublishing();
     $redis = Mockery::mock(Client::class);
     $redis->shouldReceive('publish')->once()
         ->with('reverb', json_encode(['application' => serialize($app), 'payload' => ['channel' => 'test-channel']]));

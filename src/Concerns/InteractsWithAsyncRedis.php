@@ -6,7 +6,8 @@ use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Laravel\Reverb\ServerManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\ServerServiceProviderManager;
 use React\EventLoop\LoopInterface;
 
 trait InteractsWithAsyncRedis
@@ -53,12 +54,12 @@ trait InteractsWithAsyncRedis
      */
     protected function subscribeToRedis(LoopInterface $loop): void
     {
-        $server = app(ServerManager::class);
+        $server = app(ServerServiceProviderManager::class);
 
         if ($server->doesNotSubscribeToEvents()) {
             return;
         }
 
-        $server->subscribe($loop);
+        app(PubSub::class)->subscribe($loop);
     }
 }

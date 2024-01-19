@@ -19,9 +19,9 @@ class ReverbServiceProvider extends ServiceProvider
 
         $this->app->instance(Logger::class, new NullLogger);
 
-        $this->app->singleton(ServerManager::class);
+        $this->app->singleton(ServerServiceProviderManager::class);
 
-        $this->app->make(ServerManager::class)->register();
+        $this->app->make(ServerServiceProviderManager::class)->register();
     }
 
     /**
@@ -35,8 +35,6 @@ class ReverbServiceProvider extends ServiceProvider
             ], ['reverb', 'reverb-config']);
         }
 
-        $this->app->make(ServerManager::class)
-            ->driver()
-            ->boot();
+        $this->app->make(ServerServiceProviderManager::class)->boot();
     }
 }

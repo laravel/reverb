@@ -6,7 +6,8 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-use Laravel\Reverb\ServerManager;
+use Laravel\Reverb\ServerServiceProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
 
 class EventDispatcher
 {
@@ -15,7 +16,7 @@ class EventDispatcher
      */
     public static function dispatch(Application $app, array $payload, ?Connection $connection = null): void
     {
-        $server = app(ServerManager::class);
+        $server = app(ServerServiceProviderManager::class);
 
         if ($server->shouldNotPublishEvents()) {
             static::dispatchSynchronously($app, $payload, $connection);
@@ -23,7 +24,7 @@ class EventDispatcher
             return;
         }
 
-        $server->publish([
+        app(PubSub::class)->publish([
             'application' => serialize($app),
             'payload' => $payload,
         ]);

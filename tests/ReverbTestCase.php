@@ -4,16 +4,15 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\ServerManager;
 use Laravel\Reverb\Servers\Reverb\Factory;
+use Laravel\Reverb\ServerServiceProviderManager;
 use Ratchet\Client\WebSocket;
+use function React\Async\await;
 use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
 use React\Http\Browser;
 use React\Promise\PromiseInterface;
 use ReflectionObject;
-
-use function React\Async\await;
 
 class ReverbTestCase extends TestCase
 {
@@ -75,7 +74,7 @@ class ReverbTestCase extends TestCase
      */
     public function usingRedis(): void
     {
-        app(ServerManager::class)->withPublishing();
+        app(ServerServiceProviderManager::class)->withPublishing();
 
         $this->bindRedis($this->loop);
         $this->subscribeToRedis($this->loop);

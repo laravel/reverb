@@ -4,9 +4,9 @@ namespace Laravel\Reverb;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Manager;
-use Laravel\Reverb\Servers\Reverb\ReverbProvider;
+use Laravel\Reverb\Servers\Reverb\ReverbServiceProvider;
 
-class ServerManager extends Manager
+class ServerServiceProviderManager extends Manager
 {
     /**
      * Create a new server manager instance.
@@ -19,9 +19,9 @@ class ServerManager extends Manager
     /**
      * Creates the Reverb driver.
      */
-    public function createReverbDriver(): ReverbProvider
+    public function createReverbDriver(): ReverbServiceProvider
     {
-        return new ReverbProvider(
+        return new ReverbServiceProvider(
             $this->app,
             $this->config->get('reverb.servers.reverb', [])
         );
