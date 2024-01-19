@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Tests;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory;
-use Laravel\Reverb\ServerServiceProviderManager;
+use Laravel\Reverb\ServerProviderManager;
 use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
@@ -73,7 +73,7 @@ class ReverbTestCase extends TestCase
      */
     public function usingRedis(): void
     {
-        app(ServerServiceProviderManager::class)->withPublishing();
+        app(ServerProviderManager::class)->withPublishing();
 
         app(PubSubProvider::class)->connect($this->loop);
         app(PubSubProvider::class)->subscribe();

@@ -12,6 +12,7 @@ use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use Laravel\Reverb\Servers\Reverb\Http\Server;
@@ -55,7 +56,7 @@ class StartServer extends Command implements SignalableCommandInterface
 
         $server = ServerFactory::make($host, $port, loop: $loop);
 
-        if ($this->laravel->make(ServerServiceProviderManager::class)->subscribesToEvents()) {
+        if ($this->laravel->make(ServerProviderManager::class)->subscribesToEvents()) {
             $this->laravel->make(PubSubProvider::class)->connect($loop);
             $this->laravel->make(PubSubProvider::class)->subscribe();
         }

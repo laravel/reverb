@@ -11,7 +11,7 @@ use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 
-class ReverbServiceProvider extends ServerProvider
+class ReverbServerProvider extends ServerProvider
 {
     /**
      * Indicates whether the Reverb server should publish events.

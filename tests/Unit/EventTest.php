@@ -4,11 +4,11 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
-use Laravel\Reverb\ServerServiceProviderManager;
+use Laravel\Reverb\ServerProviderManager;
 
 it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('pusher-key');
-    app(ServerServiceProviderManager::class)->withPublishing();
+    app(ServerProviderManager::class)->withPublishing();
     $pubSub = Mockery::mock(PubSubProvider::class);
     $pubSub->shouldReceive('publish')->once()
         ->with(['application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);

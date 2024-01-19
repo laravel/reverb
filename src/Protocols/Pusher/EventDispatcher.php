@@ -7,7 +7,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
-use Laravel\Reverb\ServerServiceProviderManager;
+use Laravel\Reverb\ServerProviderManager;
 
 class EventDispatcher
 {
@@ -16,7 +16,7 @@ class EventDispatcher
      */
     public static function dispatch(Application $app, array $payload, ?Connection $connection = null): void
     {
-        $server = app(ServerServiceProviderManager::class);
+        $server = app(ServerProviderManager::class);
 
         if ($server->shouldNotPublishEvents()) {
             static::dispatchSynchronously($app, $payload, $connection);
