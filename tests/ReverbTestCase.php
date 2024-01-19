@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory;
 use Laravel\Reverb\ServerServiceProviderManager;
@@ -18,8 +17,6 @@ use ReflectionObject;
 
 class ReverbTestCase extends TestCase
 {
-    use InteractsWithAsyncRedis;
-
     protected $server;
 
     protected $loop;
@@ -79,7 +76,7 @@ class ReverbTestCase extends TestCase
         app(ServerServiceProviderManager::class)->withPublishing();
 
         app(PubSubProvider::class)->connect($this->loop);
-        $this->subscribeToRedis($this->loop);
+        app(PubSubProvider::class)->subscribe();
     }
 
     /**

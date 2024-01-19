@@ -2,7 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
-use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
+use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
@@ -10,8 +10,6 @@ use RuntimeException;
 
 class RedisPubSubProvider implements PubSubProvider
 {
-    use InteractsWithAsyncRedis;
-
     protected $publishingClient;
 
     protected $subscribingClient;
@@ -57,6 +55,31 @@ class RedisPubSubProvider implements PubSubProvider
         $this->ensureConnected();
 
         $this->publishingClient->publish($this->channel, json_encode($payload));
+    }
+
+    /**
+     * Get the connection URL for Redis.
+     */
+    protected function redisUrl(): string
+    {
+        $config = Config::get('database.redis.default');
+
+        $host = $config['host'];
+        $port = $config['port'] ?: 6379;
+
+        $query = [];
+
+        if ($config['password']) {
+            $query['password'] = $config['password'];
+        }
+
+        if ($config['database']) {
+            $query['db'] = $config['database'];
+        }
+
+        $query = http_build_query($query);
+
+        return "redis://{$host}:{$port}".($query ? "?{$query}" : '');
     }
 
     /**

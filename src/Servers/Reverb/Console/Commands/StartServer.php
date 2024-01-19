@@ -5,7 +5,6 @@ namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -22,8 +21,6 @@ use Symfony\Component\Console\Command\SignalableCommandInterface;
 
 class StartServer extends Command implements SignalableCommandInterface
 {
-    use InteractsWithAsyncRedis;
-
     /**
      * The name and signature of the console command.
      *
@@ -58,8 +55,11 @@ class StartServer extends Command implements SignalableCommandInterface
 
         $server = ServerFactory::make($host, $port, loop: $loop);
 
-        $this->laravel->make(PubSubProvider::class)->connect($loop);
-        $this->subscribeToRedis($loop);
+        if ($this->laravel->make(ServerServiceProviderManager::class)->subscribesToEvents()) {
+            $this->laravel->make(PubSubProvider::class)->connect($loop);
+            $this->laravel->make(PubSubProvider::class)->subscribe();
+        }
+
         $this->scheduleCleanup($loop);
         $this->checkForRestartSignal($server, $loop, $host, $port);
 
