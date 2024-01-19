@@ -7,9 +7,14 @@ use React\EventLoop\LoopInterface;
 interface PubSub
 {
     /**
+     * Connect to the publisher.
+     */
+    public function connect(LoopInterface $loop): void;
+
+    /**
      * Subscribe to the publisher.
      */
-    public function subscribe(LoopInterface $loop): void;
+    public function subscribe(): void;
 
     /**
      * Publish a payload to the publisher.

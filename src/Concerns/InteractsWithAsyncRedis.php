@@ -2,13 +2,9 @@
 
 namespace Laravel\Reverb\Concerns;
 
-use Clue\React\Redis\Client;
-use Clue\React\Redis\Factory;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
 use Laravel\Reverb\ServerServiceProviderManager;
-use React\EventLoop\LoopInterface;
 
 trait InteractsWithAsyncRedis
 {
@@ -38,21 +34,9 @@ trait InteractsWithAsyncRedis
     }
 
     /**
-     * Bind the Redis client to the container.
-     */
-    protected function bindRedis(LoopInterface $loop): void
-    {
-        App::singleton(Client::class, function () use ($loop) {
-            return (new Factory($loop))->createLazyClient(
-                $this->redisUrl()
-            );
-        });
-    }
-
-    /**
      * Subscribe to the Redis pub / sub channel.
      */
-    protected function subscribeToRedis(LoopInterface $loop): void
+    protected function subscribeToRedis(): void
     {
         $server = app(ServerServiceProviderManager::class);
 
@@ -60,6 +44,6 @@ trait InteractsWithAsyncRedis
             return;
         }
 
-        app(PubSub::class)->subscribe($loop);
+        app(PubSub::class)->subscribe();
     }
 }

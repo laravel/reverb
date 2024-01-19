@@ -5,15 +5,17 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\ServerServiceProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\Servers\Reverb\RedisClientFactory;
 
 it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('pusher-key');
     app(ServerServiceProviderManager::class)->withPublishing();
-    $redis = Mockery::mock(Client::class);
-    $redis->shouldReceive('publish')->once()
-        ->with('reverb', json_encode(['application' => serialize($app), 'payload' => ['channel' => 'test-channel']]));
+    $pubSub = Mockery::mock(PubSub::class);
+    $pubSub->shouldReceive('publish')->once()
+        ->with(['application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
 
-    $this->app->bind(Client::class, fn () => $redis);
+    $this->app->instance(PubSub::class, $pubSub);
 
     EventDispatcher::dispatch($app, ['channel' => 'test-channel']);
 });

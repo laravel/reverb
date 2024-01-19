@@ -8,27 +8,39 @@ use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
 use React\EventLoop\LoopInterface;
+use RuntimeException;
 
 class RedisPubSub implements PubSub
 {
     use InteractsWithAsyncRedis;
 
-    public function __construct(protected string $channel)
+    protected $publishingClient;
+    protected $subscribingClient;
+
+    public function __construct(protected RedisClientFactory $clientFactory,
+                                protected string $channel)
     {
+    }
+
+    /**
+     * Connect to the publisher.
+     */
+    public function connect(LoopInterface $loop): void
+    {
+        $this->publishingClient = $this->clientFactory->make($loop, $this->redisUrl());
+        $this->subscribingClient = $this->clientFactory->make($loop, $this->redisUrl());
     }
 
     /**
      * Subscribe to the publisher.
      */
-    public function subscribe(LoopInterface $loop): void
+    public function subscribe(): void
     {
-        $redis = (new Factory($loop))->createLazyClient(
-            $this->redisUrl()
-        );
+        $this->ensureConnected();
 
-        $redis->subscribe($this->channel);
+        $this->subscribingClient->subscribe($this->channel);
 
-        $redis->on('message', function (string $channel, string $payload) {
+        $this->subscribingClient->on('message', function (string $channel, string $payload) {
             $event = json_decode($payload, true);
 
             EventDispatcher::dispatchSynchronously(
@@ -43,6 +55,18 @@ class RedisPubSub implements PubSub
      */
     public function publish(array $payload): void
     {
-        app(Client::class)->publish($this->channel, json_encode($payload));
+        $this->ensureConnected();
+
+        $this->publishingClient->publish($this->channel, json_encode($payload));
+    }
+
+    /**
+     * Ensure that a connection to Redis has been established.
+     */
+    protected function ensureConnected(): void
+    {
+        if (! $this->publishingClient) {
+            throw new RuntimeException("Connection to Redis has not been established.");
+        }
     }
 }

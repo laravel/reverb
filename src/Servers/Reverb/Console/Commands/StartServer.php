@@ -57,7 +57,7 @@ class StartServer extends Command implements SignalableCommandInterface
 
         $server = ServerFactory::make($host, $port, loop: $loop);
 
-        $this->bindRedis($loop);
+        $this->laravel->make(PubSub::class)->connect($loop);
         $this->subscribeToRedis($loop);
         $this->scheduleCleanup($loop);
         $this->checkForRestartSignal($server, $loop, $host, $port);
