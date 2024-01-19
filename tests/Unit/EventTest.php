@@ -1,12 +1,10 @@
 <?php
 
-use Clue\React\Redis\Client;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
-use Laravel\Reverb\ServerServiceProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
-use Laravel\Reverb\Servers\Reverb\RedisClientFactory;
+use Laravel\Reverb\ServerServiceProviderManager;
 
 it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('pusher-key');
