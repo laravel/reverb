@@ -39,6 +39,7 @@ class EventDispatcher
 
         foreach ($channels as $channel) {
             unset($payload['channels']);
+
             if (! $channel = app(ChannelManager::class)->for($app)->find($channel)) {
                 continue;
             }

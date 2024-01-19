@@ -57,7 +57,7 @@ class StartServer extends Command implements SignalableCommandInterface
 
         $server = ServerFactory::make($host, $port, loop: $loop);
 
-        if ($this->laravel->make(ServerProviderManager::class)->subscribesToEvents()) {
+        if ($this->laravel->make(ServerProviderManager::class)->driver('reverb')->subscribesToEvents()) {
             $this->laravel->make(PubSubProvider::class)->connect($loop);
             $this->laravel->make(PubSubProvider::class)->subscribe();
         }
