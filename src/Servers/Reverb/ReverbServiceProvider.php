@@ -33,11 +33,10 @@ class ReverbServiceProvider extends ServerProvider
      */
     public function register(): void
     {
-        $this->app->singleton(PubSubProvider::class, fn ($app) =>
-            new RedisPubSubProvider(
-                $app->make(RedisClientFactory::class),
-                $this->config['scaling']['channel'] ?? 'reverb'
-            )
+        $this->app->singleton(PubSubProvider::class, fn ($app) => new RedisPubSubProvider(
+            $app->make(RedisClientFactory::class),
+            $this->config['scaling']['channel'] ?? 'reverb'
+        )
         );
     }
 
