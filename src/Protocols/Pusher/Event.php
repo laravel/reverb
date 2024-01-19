@@ -20,7 +20,7 @@ class Event
     }
 
     /**
-     * Handle a pusher event.
+     * Handle a Pusher event.
      */
     public function handle(Connection $connection, string $event, array $payload = []): void
     {

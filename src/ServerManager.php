@@ -17,14 +17,6 @@ class ServerManager extends Manager
     }
 
     /**
-     * Get the default driver name.
-     */
-    public function getDefaultDriver(): string
-    {
-        return $this->config->get('reverb.default', 'reverb');
-    }
-
-    /**
      * Creates the Reverb driver.
      */
     public function createReverbDriver(): ReverbProvider
@@ -33,5 +25,13 @@ class ServerManager extends Manager
             $this->app,
             $this->config->get('reverb.servers.reverb', [])
         );
+    }
+
+    /**
+     * Get the default driver name.
+     */
+    public function getDefaultDriver(): string
+    {
+        return $this->config->get('reverb.default', 'reverb');
     }
 }
