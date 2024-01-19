@@ -28,9 +28,9 @@ class StartServer extends Command implements SignalableCommandInterface
      * @var string
      */
     protected $signature = 'reverb:start
-                {--host=}
-                {--port=}
-                {--debug}';
+                {--host= : The IP address the server should bind to}
+                {--port= : The port the server should listen on}
+                {--debug : Indicates whether debug messages should be displayed in the terminal}';
 
     /**
      * The console command description.
