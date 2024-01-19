@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb;
 
+use InvalidArgumentException;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -36,7 +37,7 @@ class Factory
 
         $router = match ($protocol) {
             'pusher' => static::makePusherServer(),
-            default => throw new \InvalidArgumentException("Unsupported protocol [{$protocol}]"),
+            default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
         $socket = new SocketServer("{$host}:{$port}", [], $loop);
