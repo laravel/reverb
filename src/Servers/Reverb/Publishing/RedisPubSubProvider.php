@@ -1,14 +1,14 @@
 <?php
 
-namespace Laravel\Reverb\Servers\Reverb;
+namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
-use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 
-class RedisPubSub implements PubSub
+class RedisPubSubProvider implements PubSubProvider
 {
     use InteractsWithAsyncRedis;
 

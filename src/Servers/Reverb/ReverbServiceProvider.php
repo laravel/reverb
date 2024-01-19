@@ -7,7 +7,9 @@ use Illuminate\Contracts\Foundation\Application;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\RestartServer;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
-use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
+use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
+use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 
 class ReverbServiceProvider extends ServerProvider
 {
@@ -31,8 +33,8 @@ class ReverbServiceProvider extends ServerProvider
      */
     public function register(): void
     {
-        $this->app->singleton(PubSub::class, fn ($app) =>
-            new RedisPubSub(
+        $this->app->singleton(PubSubProvider::class, fn ($app) =>
+            new RedisPubSubProvider(
                 $app->make(RedisClientFactory::class),
                 $this->config['scaling']['channel'] ?? 'reverb'
             )

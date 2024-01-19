@@ -13,6 +13,7 @@ use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use Laravel\Reverb\Servers\Reverb\Http\Server;
 use React\EventLoop\Loop;
@@ -57,7 +58,7 @@ class StartServer extends Command implements SignalableCommandInterface
 
         $server = ServerFactory::make($host, $port, loop: $loop);
 
-        $this->laravel->make(PubSub::class)->connect($loop);
+        $this->laravel->make(PubSubProvider::class)->connect($loop);
         $this->subscribeToRedis($loop);
         $this->scheduleCleanup($loop);
         $this->checkForRestartSignal($server, $loop, $host, $port);

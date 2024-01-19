@@ -4,7 +4,7 @@ namespace Laravel\Reverb\Servers\Reverb\Contracts;
 
 use React\EventLoop\LoopInterface;
 
-interface PubSub
+interface PubSubProvider
 {
     /**
      * Connect to the publisher.

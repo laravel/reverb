@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Concerns;
 
 use Illuminate\Support\Facades\Config;
-use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\ServerServiceProviderManager;
 
 trait InteractsWithAsyncRedis
@@ -44,6 +44,6 @@ trait InteractsWithAsyncRedis
             return;
         }
 
-        app(PubSub::class)->subscribe();
+        app(PubSubProvider::class)->subscribe();
     }
 }

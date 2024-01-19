@@ -4,16 +4,16 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
 use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\ServerServiceProviderManager;
-use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory;
+use Laravel\Reverb\ServerServiceProviderManager;
 use Ratchet\Client\WebSocket;
+use function React\Async\await;
 use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
 use React\Http\Browser;
 use React\Promise\PromiseInterface;
 use ReflectionObject;
-use function React\Async\await;
 
 class ReverbTestCase extends TestCase
 {
@@ -77,7 +77,7 @@ class ReverbTestCase extends TestCase
     {
         app(ServerServiceProviderManager::class)->withPublishing();
 
-        app(PubSub::class)->connect($this->loop);
+        app(PubSubProvider::class)->connect($this->loop);
         $this->subscribeToRedis($this->loop);
     }
 

@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\ServerServiceProviderManager;
 
 class EventDispatcher
@@ -24,7 +24,7 @@ class EventDispatcher
             return;
         }
 
-        app(PubSub::class)->publish([
+        app(PubSubProvider::class)->publish([
             'application' => serialize($app),
             'payload' => $payload,
         ]);
