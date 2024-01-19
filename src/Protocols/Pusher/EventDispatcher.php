@@ -6,8 +6,8 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-use Laravel\Reverb\ServerServiceProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSub;
+use Laravel\Reverb\ServerServiceProviderManager;
 
 class EventDispatcher
 {
