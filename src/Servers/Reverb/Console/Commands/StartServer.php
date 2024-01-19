@@ -49,20 +49,18 @@ class StartServer extends Command implements SignalableCommandInterface
         }
 
         $config = $this->laravel['config']['reverb.servers.reverb'];
-        $host = $this->option('host') ?: $config['host'];
-        $port = $this->option('port') ?: $config['port'];
 
         $loop = Loop::get();
 
-        $server = ServerFactory::make($host, $port, loop: $loop);
+        $server = ServerFactory::make(
+            $host = $this->option('host') ?: $config['host'],
+            $port = $this->option('port') ?: $config['port'],
+            loop: $loop
+        );
 
-        if ($this->laravel->make(ServerProviderManager::class)->driver('reverb')->subscribesToEvents()) {
-            $this->laravel->make(PubSubProvider::class)->connect($loop);
-            $this->laravel->make(PubSubProvider::class)->subscribe();
-        }
-
-        $this->scheduleCleanup($loop);
-        $this->checkForRestartSignal($server, $loop, $host, $port);
+        $this->ensureHorizontalScalability($loop);
+        $this->ensureStaleConnectionsAreCleaned($loop);
+        $this->ensureRestartCommandIsRespected($server, $loop, $host, $port);
 
         $this->components->info("Starting server on {$host}:{$port}");
 
@@ -70,31 +68,23 @@ class StartServer extends Command implements SignalableCommandInterface
     }
 
     /**
-     * Get the list of signals handled by the command.
+     * Ensure that horizontal scalability via broadcasting is enabled if configured.
      */
-    public function getSubscribedSignals(): array
+    protected function ensureHorizontalScalability(LoopInterface $loop): void
     {
-        return [SIGINT, SIGTERM];
-    }
-
-    /**
-     * Handle the signals sent to the server.
-     */
-    public function handleSignal(int $signal): void
-    {
-        $this->components->info('Gracefully terminating connections.');
-
-        $this->gracefullyDisconnect();
+        if ($this->laravel->make(ServerProviderManager::class)->driver('reverb')->subscribesToEvents()) {
+            $this->laravel->make(PubSubProvider::class)->connect($loop);
+            $this->laravel->make(PubSubProvider::class)->subscribe();
+        }
     }
 
     /**
      * Use the event loop to schedule periodic cleanup of connections.
      */
-    protected function scheduleCleanup(LoopInterface $loop): void
+    protected function ensureStaleConnectionsAreCleaned(LoopInterface $loop): void
     {
         $loop->addPeriodicTimer(60, function () {
             PruneStaleConnections::dispatch();
-
             PingInactiveConnections::dispatch();
         });
     }
@@ -102,7 +92,7 @@ class StartServer extends Command implements SignalableCommandInterface
     /**
      * Check to see whether the restart signal has been sent.
      */
-    protected function checkForRestartSignal(Server $server, LoopInterface $loop, string $host, string $port): void
+    protected function ensureRestartCommandIsRespected(Server $server, LoopInterface $loop, string $host, string $port): void
     {
         $lastRestart = Cache::get('laravel:reverb:restart');
 
@@ -131,7 +121,25 @@ class StartServer extends Command implements SignalableCommandInterface
                     $this->laravel->make(ChannelManager::class)
                         ->for($application)
                         ->connections()
-                )->each(fn (ChannelConnection $connection) => $connection->disconnect());
+                )->each->disconnect();
             });
+    }
+
+    /**
+     * Get the list of signals handled by the command.
+     */
+    public function getSubscribedSignals(): array
+    {
+        return [SIGINT, SIGTERM];
+    }
+
+    /**
+     * Handle the signals sent to the server.
+     */
+    public function handleSignal(int $signal): void
+    {
+        $this->components->info('Gracefully terminating connections.');
+
+        $this->gracefullyDisconnect();
     }
 }
