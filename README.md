@@ -1,9 +1,19 @@
 # Laravel Reverb
+
+<a href="https://github.com/laravel/reverb/actions"><img src="https://github.com/laravel/reverb/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/dt/laravel/reverb" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/v/laravel/reverb" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/l/laravel/reverb" alt="License"></a>
+
+## Introduction
+
 Laravel Reverb brings real-time WebSocket communication for Laravel applications.
 
-## Architecture
+## Official Documentation
 
-### Message Lifecycle
+### Architecture
+
+#### Message Lifecycle
 When the `reverb:start` [command](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Console/Commands/StartServer.php) is run, a new React PHP socket server and event loop are created and started on a given host and port.
 
 Reverb wraps the socket server and a lightweight request router in its own [HTTP server](https://github.com/laravel/reverb/blob/main/src/Servers/Reverb/Http/Server.php) class which decides how to route the request.
@@ -22,7 +32,7 @@ Events emitted from the connection are routed through the message buffer. When a
 
 First, it checks the [Pusher protocol](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/Event.php) and responds accordingly to open connections, channel subscriptions, disconnections, etc. If the message is not part of the Pusher protocol, a check is made for [client events](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/ClientEvent.php) such as whispers. Essentially here, it’s a string match on the start of the message to see whether it’s something which requires a response. In the event it does, it’s written back to the socket.
 
-### Channel Subscription
+#### Channel Subscription
 Reverb provides a to channel subscription. For standard Reverb, an in-memory array channel store is used, but for something like API Gateway which can’t store connections in memory, a cache driver alternative can be used.
 
 When a user subscribes to a channel, Reverb attempts to resolve the channel from the manager and connects the user to it. When the user disconnects, they are removed from the channel. When there are no connections in the channel, it’s removed from memory.
@@ -41,19 +51,19 @@ Reverb supports seven channel types:
 - **Presence Cache Channels** - a mix of the presence and cache channels above
 - **Encrypted channels** - Reverb is dumb here, it just forwards encrypted messages sent from server or client
 
-### API Gateway
+#### API Gateway
 The API Gateway implementation leverages the WebSocket API type. The user connects and the request is sent to Lambda for processing. When a user connects, disconnects or sends a message it is sent via API Gateway to Lambda. Reverb takes the request creates a Reverb Connection object from it and sends the payload on to the Reverb server for processing. The channel manager cannot be in memory, so a cache manager is used instead. Messages cannot be sent in response to the request so, instead are queued and posted to the endpoint provided by AWS. In turn, they send the message on to the user.
 
-## Outstanding
+### Outstanding
 - [ ] **Forge integration** - spin up servers with `ev` extension, change open file limits, etc
 - [ ] **Pulse card(s)** - this can interact with some of the addtional Pusher endpoints in order to show channels and connections
 - [ ] **Vapor integration** - if we decide to continue with API Gateway
 
-## Considerations
+### Considerations
 - The WebSocket specification has a concept of extensions. They are completely optional and Reverb doesn't support them right now. There is only really one official extension which allows inflating and deflating messages. Moving forward, it could be possible to add hooks / middleware to the message lifecycle to allow forextensions such as permessage-deflate, but also to allow others to implement their own.
 - Pusher now allow opt-in access to something called [Watchlists](https://pusher.com/docs/channels/using_channels/watchlist-events/). It could be possible to look at implementing this functionality.
 
-## Installation
+### Installation
 Add the following `repostories` block to your `composer.json` file.
 
 ```json
@@ -71,7 +81,7 @@ Now, install the package.
 composer require laravel/reverb
 ```
 
-### Run Socket Server
+#### Run Socket Server
 
 ```shell
 php artisan reverb:start
@@ -79,13 +89,13 @@ php artisan reverb:start
 
 This will start the server running on localhost port 8080. You may use the `--host` and `--port` should you wish.
 
-### Install Dependencies
+#### Install Dependencies
 
 Follow the instructions to [install the Pusher Channels SDK](https://laravel.com/docs/9.x/broadcasting#pusher-channels).
 
 Follow the instructions to [install Echo](https://laravel.com/docs/9.x/broadcasting#client-side-installation).
 
-### Update Environment
+#### Update Environment
 
 ```
 BROADCAST_DRIVER=pusher
@@ -112,7 +122,7 @@ MIX_PUSHER_SCHEME="${PUSHER_SCHEME}"
 MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 ```
 
-### Service Provider
+#### Service Provider
 
 Uncomment the `BroadcastServiceProvider` in the `app.php` config file.
 
@@ -120,7 +130,7 @@ Uncomment the `BroadcastServiceProvider` in the `app.php` config file.
 App\Providers\BroadcastServiceProvider::class,
 ```
 
-### Update Echo Configuration
+#### Update Echo Configuration
 
 ```javascript
 // Using Vite
@@ -147,3 +157,19 @@ new Echo({
     enabledTransports: ['ws', 'wss'],
 })
 ```
+
+## Contributing
+
+Thank you for considering contributing to Reverb! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+Please review [our security policy](https://github.com/laravel/reverb/security/policy) on how to report security vulnerabilities.
+
+## License
+
+Laravel Reverb is open-sourced software licensed under the [MIT license](LICENSE.md).
