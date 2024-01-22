@@ -20,20 +20,22 @@ class Reverb extends Card
     #[Lazy]
     public function render()
     {
+        dump($this->appId);
+
         [$averageConnections, $averageConnectionsTime, $averageConnectionsRunAt] = $this->remember(fn () => $this->graph(
             ["reverb_connections:{$this->appId}"],
             'avg'
-        ), 'reverb_connections_average');
+        ), "reverb_connections_average:{$this->appId}");
 
         [$peakConnections, $peakConnectionsTime, $peakConnectionsRunAt] = $this->remember(fn () => $this->graph(
             ["reverb_connections:{$this->appId}"],
             'max'
-        ), 'reverb_connections_peak');
+        ), "reverb_connections_peak:{$this->appId}");
 
         [$connectionsCount, $connectionsCountTime, $connectionsCountRunAt] = $this->remember(fn () => $this->graph(
             ["reverb_connections:{$this->appId}"],
             'count'
-        ), 'reverb_connections_count');
+        ), "reverb_connections_count:{$this->appId}");
 
         $connections = $this->formatConnections(
             $averageConnections,
@@ -44,9 +46,9 @@ class Reverb extends Card
         [$messagesCount, $messagesCountTime, $messagesCountRunAt] = $this->remember(fn () => $this->graph(
             ["reverb_messages:{$this->appId}"],
             'count'
-        ), 'reverb_messages_count');
+        ), "reverb_messages_count:{$this->appId}");
 
-        $messagesCount = $this->formatReadings($messagesCount, 'reverb_messages');
+        $messagesCount = $this->formatReadings($messagesCount, "reverb_messages:{$this->appId}");
 
         [$messageRate, $messageRateUnit] = $this->calculateMessageRate($messagesCount);
 
