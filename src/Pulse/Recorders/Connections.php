@@ -40,7 +40,7 @@ class Connections
                     key: "reverb_connections:{$app['app_id']}",
                     value: $connections,
                     timestamp: CarbonImmutable::now()->getTimestamp(),
-                )->avg()->max()->count();
+                )->avg()->max()->sum();
             });
         }
     }

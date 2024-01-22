@@ -3,7 +3,7 @@
 <x-pulse::card :cols="$cols" :rows="$rows" :class="$class">
     <x-pulse::card-header
         name="Reverb"
-        title="Connection Count Time: {{ number_format($connectionsCountTime) }}ms; Run at: {{ $connectionsCountRunAt }}; Peak Connections Time: {{ number_format($peakConnectionsTime) }}ms; Run at: {{ $peakConnectionsRunAt }}; Average Connections Time: {{ number_format($averageConnectionsTime) }}ms; Run at: {{ $averageConnectionsRunAt }}; Message Count Time: {{ number_format($messagesCountTime) }}ms; Run at: {{ $messagesCountRunAt }};"
+        title="Connection Sum Time: {{ number_format($connectionsSumTime) }}ms; Run at: {{ $connectionsSumRunAt }}; Peak Connections Time: {{ number_format($peakConnectionsTime) }}ms; Run at: {{ $peakConnectionsRunAt }}; Average Connections Time: {{ number_format($averageConnectionsTime) }}ms; Run at: {{ $averageConnectionsRunAt }}; Message Count Time: {{ number_format($messagesCountTime) }}ms; Run at: {{ $messagesCountRunAt }};"
         details="past {{ $this->periodForHumans() }}"
     >
         <x-slot:icon>
@@ -128,7 +128,7 @@ Alpine.data('connectionsChart', (config) => ({
                         {
                             label: 'Count',
                             borderColor: 'rgba(107,114,128,0.5)',
-                            data: this.scale(config.readings.count),
+                            data: this.scale(config.readings.sum),
                             order: 1,
                         },
                         {
@@ -203,7 +203,7 @@ Alpine.data('connectionsChart', (config) => ({
 
             chart.data.labels = this.labels(connections)
             chart.options.scales.y.max = this.highest(connections)
-            chart.data.datasets[0].data = this.scale(connections.count)
+            chart.data.datasets[0].data = this.scale(connections.sum)
             chart.data.datasets[1].data = this.scale(connections.peak)
             chart.data.datasets[2].data = this.scale(connections.average)
             chart.update()

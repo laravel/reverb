@@ -30,15 +30,15 @@ class Reverb extends Card
             'max'
         ), "reverb_connections_peak:{$this->appId}");
 
-        [$connectionsCount, $connectionsCountTime, $connectionsCountRunAt] = $this->remember(fn () => $this->graph(
+        [$connectionsSum, $connectionsSumTime, $connectionsSumRunAt] = $this->remember(fn () => $this->graph(
             ["reverb_connections:{$this->appId}"],
-            'count'
-        ), "reverb_connections_count:{$this->appId}");
+            'sum'
+        ), "reverb_connections_sum:{$this->appId}");
 
         $connections = $this->formatConnections(
             $averageConnections,
             $peakConnections,
-            $connectionsCount
+            $connectionsSum
         );
 
         [$messagesCount, $messagesCountTime, $messagesCountRunAt] = $this->remember(fn () => $this->graph(
@@ -61,14 +61,14 @@ class Reverb extends Card
             'averageConnectionsRunAt' => $averageConnectionsRunAt,
             'peakConnectionsTime' => $peakConnectionsTime,
             'peakConnectionsRunAt' => $peakConnectionsRunAt,
-            'connectionsCountTime' => $connectionsCountTime,
-            'connectionsCountRunAt' => $connectionsCountRunAt,
+            'connectionsSumTime' => $connectionsSumTime,
+            'connectionsSumRunAt' => $connectionsSumRunAt,
             'messagesCountTime' => $messagesCountTime,
             'messagesCountRunAt' => $messagesCountRunAt,
             'connections' => $connections,
             'messages' => $messages,
             'messageRateUnit' => $messageRateUnit,
-            'empty' => $connections['average']->isEmpty() && $connections['peak']->isEmpty() && $connections['count']->isEmpty() && $messagesCount->isEmpty(),
+            'empty' => $connections['average']->isEmpty() && $connections['peak']->isEmpty() && $connections['sum']->isEmpty() && $messagesCount->isEmpty(),
             'config' => Config::get('pulse.recorders.'.RecordersConnections::class),
         ]);
     }
@@ -76,12 +76,12 @@ class Reverb extends Card
     /**
      * Format all the given connection objects for graphing
      */
-    protected function formatConnections(Collection $average, Collection $peak, Collection $count): Collection
+    protected function formatConnections(Collection $average, Collection $peak, Collection $sum): Collection
     {
         return collect([
             'average' => $this->formatReadings($average, "reverb_connections:{$this->appId}"),
             'peak' => $this->formatReadings($peak, "reverb_connections:{$this->appId}"),
-            'count' => $this->formatReadings($count, "reverb_connections:{$this->appId}"),
+            'sum' => $this->formatReadings($sum, "reverb_connections:{$this->appId}"),
         ]);
     }
 
