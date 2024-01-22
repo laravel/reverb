@@ -36,8 +36,8 @@ class Connections
 
             $this->pulse->lazy(function () use ($app, $connections) {
                 $this->pulse->record(
-                    type: "reverb_connections{$app['app_id']}",
-                    key: "reverb_connections{$app['app_id']}",
+                    type: "reverb_connections:{$app['app_id']}",
+                    key: "reverb_connections:{$app['app_id']}",
                     value: $connections,
                     timestamp: CarbonImmutable::now()->getTimestamp(),
                 )->avg()->max()->count();
