@@ -68,7 +68,7 @@ class Reverb extends Card
             'connections' => $connections,
             'messages' => $messages,
             'messageRateUnit' => $messageRateUnit,
-            'empty' => $connections->average->isEmpty() && $connections->peak->isEmpty() && $connections->count->isEmpty() && $messagesCount->isEmpty(),
+            'empty' => $connections['average']->isEmpty() && $connections['peak']->isEmpty() && $connections['count']->isEmpty() && $messagesCount->isEmpty(),
             'config' => Config::get('pulse.recorders.'.RecordersConnections::class),
         ]);
     }
