@@ -20,8 +20,6 @@ class Reverb extends Card
     #[Lazy]
     public function render()
     {
-        dump($this->appId);
-
         [$averageConnections, $averageConnectionsTime, $averageConnectionsRunAt] = $this->remember(fn () => $this->graph(
             ["reverb_connections:{$this->appId}"],
             'avg'
