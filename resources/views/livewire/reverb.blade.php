@@ -3,7 +3,7 @@
 <x-pulse::card :cols="$cols" :rows="$rows" :class="$class">
     <x-pulse::card-header
         name="Reverb"
-        title="Connection Sum Time: {{ number_format($connectionsSumTime) }}ms; Run at: {{ $connectionsSumRunAt }}; Peak Connections Time: {{ number_format($peakConnectionsTime) }}ms; Run at: {{ $peakConnectionsRunAt }}; Average Connections Time: {{ number_format($averageConnectionsTime) }}ms; Run at: {{ $averageConnectionsRunAt }}; Message Count Time: {{ number_format($messagesCountTime) }}ms; Run at: {{ $messagesCountRunAt }};"
+        title="Peak Connections Time: {{ number_format($peakConnectionsTime) }}ms; Run at: {{ $peakConnectionsRunAt }}; Average Connections Time: {{ number_format($averageConnectionsTime) }}ms; Run at: {{ $averageConnectionsRunAt }}; Message Count Time: {{ number_format($messagesCountTime) }}ms; Run at: {{ $messagesCountRunAt }};"
         details="past {{ $this->periodForHumans() }}"
     >
         <x-slot:icon>
@@ -23,10 +23,6 @@
                         </h3>
 
                         <div class="flex flex-wrap gap-4">
-                            <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                                <div class="h-0.5 w-3 rounded-full bg-[rgba(107,114,128,0.5)]"></div>
-                                Count
-                            </div>
                             <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
                                 <div class="h-0.5 w-3 rounded-full bg-[rgba(147,51,234,0.5)]"></div>
                                 Peak
@@ -126,12 +122,6 @@ Alpine.data('connectionsChart', (config) => ({
                     labels: this.labels(config.readings),
                     datasets: [
                         {
-                            label: 'Count',
-                            borderColor: 'rgba(107,114,128,0.5)',
-                            data: this.scale(config.readings.sum),
-                            order: 1,
-                        },
-                        {
                             label: 'Peak',
                             borderColor: 'rgba(147,51,234,0.5)',
                             data: this.scale(config.readings.peak),
@@ -203,7 +193,6 @@ Alpine.data('connectionsChart', (config) => ({
 
             chart.data.labels = this.labels(connections)
             chart.options.scales.y.max = this.highest(connections)
-            chart.data.datasets[0].data = this.scale(connections.sum)
             chart.data.datasets[1].data = this.scale(connections.peak)
             chart.data.datasets[2].data = this.scale(connections.average)
             chart.update()
