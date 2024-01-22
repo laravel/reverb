@@ -8,7 +8,6 @@ use Illuminate\Config\Repository;
 use Laravel\Pulse\Events\SharedBeat;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders\Concerns\Sampling;
-use Pusher\Pusher;
 
 class Connections
 {
@@ -31,15 +30,14 @@ class Connections
             return;
         }
 
-        foreach (config('reverb.apps') as $app) {
-            $config = app(BroadcastManager::class)->pusher($app);
-            $client = new Pusher($config);
+        foreach (config('reverb.apps.apps') as $app) {
+            $client = app(BroadcastManager::class)->pusher($app);
             $connections = $client->get('/connections')->connections;
 
-            $this->pulse->lazy(function () use ($config, $connections) {
+            $this->pulse->lazy(function () use ($app, $connections) {
                 $this->pulse->record(
-                    type: "reverb_connections{$config['app_id']}",
-                    key: $config['app_id'],
+                    type: "reverb_connections{$app['app_id']}",
+                    key: $app['app_id'],
                     value: $connections,
                     timestamp: CarbonImmutable::now()->getTimestamp(),
                 )->avg()->max()->count();
