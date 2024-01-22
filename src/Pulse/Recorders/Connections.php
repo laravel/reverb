@@ -3,11 +3,12 @@
 namespace Laravel\Reverb\Pulse\Recorders;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Config\Repository;
-use Illuminate\Support\Facades\Broadcast;
 use Laravel\Pulse\Events\SharedBeat;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders\Concerns\Sampling;
+use Pusher\Pusher;
 
 class Connections
 {
@@ -30,18 +31,19 @@ class Connections
             return;
         }
 
-        $connections = Broadcast::driver()
-            ->getPusher()
-            ->get('/connections')
-            ->connections;
+        foreach (config('reverb.apps') as $app) {
+            $config = app(BroadcastManager::class)->pusher($app);
+            $client = new Pusher($config);
+            $connections = $client->get('/connections')->connections;
 
-        $this->pulse->lazy(function () use ($connections) {
-            $this->pulse->record(
-                type: 'reverb_connections',
-                key: 'reverb_connections',
-                value: $connections,
-                timestamp: CarbonImmutable::now()->getTimestamp(),
-            )->avg()->max()->count();
-        });
+            $this->pulse->lazy(function () use ($config, $connections) {
+                $this->pulse->record(
+                    type: "reverb_connections{$config['app_id']}",
+                    key: $config['app_id'],
+                    value: $connections,
+                    timestamp: CarbonImmutable::now()->getTimestamp(),
+                )->avg()->max()->count();
+            });
+        }
     }
 }

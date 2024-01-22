@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
-use Laravel\Reverb\Servers\Reverb\Connection;
+use Laravel\Reverb\Contracts\Connection;
 
 class MessageSent
 {

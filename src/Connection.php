@@ -4,6 +4,7 @@ namespace Laravel\Reverb;
 
 use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
+use Laravel\Reverb\Events\MessageSent;
 
 class Connection extends ConnectionContract
 {
@@ -45,6 +46,8 @@ class Connection extends ConnectionContract
     public function send(string $message): void
     {
         $this->connection->send($message);
+
+        MessageSent::dispatch($this, $message);
     }
 
     /**

@@ -25,10 +25,10 @@ class Messages
             return;
         }
 
-        $this->pulse->lazy(function () {
+        $this->pulse->lazy(function () use ($event) {
             $this->pulse->record(
-                type: 'reverb_messages',
-                key: 'reverb_messages',
+                type: "reverb_messages:{$event->connection->app()->id()}",
+                key: $event->connection->app()->id(),
                 value: $timestamp = CarbonImmutable::now()->getTimestamp(),
                 timestamp: $timestamp,
             )->count();

@@ -15,23 +15,25 @@ class Reverb extends Card
 {
     use HasPeriod, RemembersQueries;
 
+    public string $appId;
+
     #[Lazy]
     public function render()
     {
         [$averageConnections, $averageConnectionsTime, $averageConnectionsRunAt] = $this->remember(fn () => $this->graph(
-            ['reverb_connections'],
+            ["reverb_connections:{$this->appId}"],
             'avg'
         ), 'reverb_connections_average');
 
         [$peakConnections, $peakConnectionsTime, $peakConnectionsRunAt] = $this->remember(fn () => $this->graph(
-            ['reverb_connections'],
+            ["reverb_connections:{$this->appId}"],
             'max'
         ), 'reverb_connections_peak');
 
         [$connectionsCount, $connectionsCountTime, $connectionsCountRunAt] = $this->remember(fn () => $this->graph(
-            ['reverb_connections'],
-            'max'
-        ), 'reverb_connections_peak');
+            ["reverb_connections:{$this->appId}"],
+            'count'
+        ), 'reverb_connections_count');
 
         $connections = $this->formatConnections(
             $averageConnections,
@@ -40,7 +42,7 @@ class Reverb extends Card
         );
 
         [$messagesCount, $messagesCountTime, $messagesCountRunAt] = $this->remember(fn () => $this->graph(
-            ['reverb_messages'],
+            ["reverb_messages:{$this->appId}"],
             'count'
         ), 'reverb_messages_count');
 
@@ -77,9 +79,9 @@ class Reverb extends Card
     protected function formatConnections(Collection $average, Collection $peak, Collection $count): Collection
     {
         return collect([
-            'average' => $this->formatReadings($average, 'reverb_connections'),
-            'peak' => $this->formatReadings($peak, 'reverb_connections'),
-            'count' => $this->formatReadings($count, 'reverb_connections'),
+            'average' => $this->formatReadings($average, "reverb_connections:{$this->appId}"),
+            'peak' => $this->formatReadings($peak, "reverb_connections:{$this->appId}"),
+            'count' => $this->formatReadings($count, "reverb_connections:{$this->appId}"),
         ]);
     }
 

@@ -4,7 +4,6 @@ namespace Laravel\Reverb\Servers\Reverb;
 
 use Evenement\EventEmitter;
 use Laravel\Reverb\Contracts\WebSocketConnection;
-use Laravel\Reverb\Events\MessageSent;
 use Laravel\Reverb\Servers\Reverb\Http\Connection as HttpConnection;
 use Ratchet\RFC6455\Messaging\CloseFrameChecker;
 use Ratchet\RFC6455\Messaging\DataInterface;
@@ -77,8 +76,6 @@ class Connection extends EventEmitter implements WebSocketConnection
             (new Frame($message))->getContents();
 
         $this->connection->send($message);
-
-        MessageSent::dispatch($this, $message);
     }
 
     /**
