@@ -24,7 +24,7 @@ class ConfigApplicationProvider implements ApplicationProvider
     public function all(): Collection
     {
         return $this->applications->map(function ($app) {
-            return $this->findById($app['id']);
+            return $this->findById($app['app_id']);
         });
     }
 
@@ -35,7 +35,7 @@ class ConfigApplicationProvider implements ApplicationProvider
      */
     public function findById(string $id): Application
     {
-        return $this->find('id', $id);
+        return $this->find('app_id', $id);
     }
 
     /**
@@ -62,7 +62,7 @@ class ConfigApplicationProvider implements ApplicationProvider
         }
 
         return new Application(
-            $app['id'],
+            $app['app_id'],
             $app['key'],
             $app['secret'],
             $app['ping_interval'],
