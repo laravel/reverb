@@ -4,7 +4,7 @@ parameters:
     - src
 
   excludePaths:
-    - src/Pulse/Recorders
+    - src/Pulse
 
   level: 0
 
