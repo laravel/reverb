@@ -23,11 +23,17 @@ class Messages
         MessageSent::class,
     ];
 
+    /**
+     * Create a new recorder instance.
+     */
     public function __construct(protected Pulse $pulse, protected Repository $config)
     {
         //
     }
 
+    /**
+     * Record the message.
+     */
     public function record(MessageSent $event): void
     {
         if (! $this->shouldSample()) {

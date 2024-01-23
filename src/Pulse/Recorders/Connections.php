@@ -13,13 +13,24 @@ class Connections
 {
     use Sampling;
 
+    /**
+     * The events to listen for.
+     *
+     * @var class-string
+     */
     public string $listen = SharedBeat::class;
 
+    /**
+     * Create a new recorder instance.
+     */
     public function __construct(protected Pulse $pulse, protected Repository $config)
     {
         //
     }
 
+    /**
+     * Record the connection count.
+     */
     public function record(SharedBeat $event): void
     {
         if ($event->time->second % 15 !== 0) {
