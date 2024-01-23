@@ -15,6 +15,9 @@ class Reverb extends Card
 {
     use HasPeriod, RemembersQueries;
 
+    /**
+     * The application ID to scope metrics to.
+     */
     public string $appId;
 
     #[Lazy]
