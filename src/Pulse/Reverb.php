@@ -11,7 +11,6 @@ use Laravel\Pulse\Livewire\Concerns\RemembersQueries;
 use Laravel\Reverb\Pulse\Recorders\Connections as RecordersConnections;
 use Livewire\Attributes\Lazy;
 
-#[Lazy]
 class Reverb extends Card
 {
     use HasPeriod, RemembersQueries;
@@ -24,6 +23,7 @@ class Reverb extends Card
     /**
      * Render the component.
      */
+    #[Lazy]
     public function render()
     {
         [$averageConnections, $averageConnectionsTime, $averageConnectionsRunAt] = $this->remember(fn () => $this->graph(
