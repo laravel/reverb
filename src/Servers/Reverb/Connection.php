@@ -71,11 +71,11 @@ class Connection extends EventEmitter implements WebSocketConnection
      */
     public function send(mixed $message): void
     {
-        $message = $message instanceof DataInterface ?
-            $message->getContents() :
-            (new Frame($message))->getContents();
-
-        $this->connection->send($message);
+        $this->connection->send(
+            $message instanceof DataInterface ?
+                $message->getContents() :
+                (new Frame($message))->getContents()
+        );
     }
 
     /**
