@@ -48,7 +48,7 @@ class ReverbTestCase extends TestCase
         parent::defineEnvironment($app);
 
         $app['config']->set('reverb.apps.apps.1', [
-            'id' => '654321',
+            'app_id' => '654321',
             'key' => 'pusher-key-2',
             'secret' => 'pusher-secret-2',
             'capacity' => null,
@@ -58,7 +58,7 @@ class ReverbTestCase extends TestCase
         ]);
 
         $app['config']->set('reverb.apps.apps.2', [
-            'id' => '987654',
+            'app_id' => '987654',
             'key' => 'pusher-key-3',
             'secret' => 'pusher-secret-3',
             'capacity' => null,

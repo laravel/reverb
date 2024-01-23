@@ -65,7 +65,7 @@ class Server
 
             Log::info('Message Handled', $from->id());
 
-            MessageReceived::dispatch($from, $event);
+            MessageReceived::dispatch($from, $message);
         } catch (Exception $e) {
             $this->error($from, $e);
         }
