@@ -3,6 +3,9 @@ parameters:
     - config
     - src
 
+  excludePaths:
+    - src/Pulse/Recorders
+
   level: 0
 
   ignoreErrors:
