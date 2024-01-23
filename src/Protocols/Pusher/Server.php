@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Event as PusherEvent;
@@ -64,6 +65,7 @@ class Server
 
             Log::info('Message Handled', $from->id());
 
+            MessageReceived::dispatch($from, $event);
         } catch (Exception $e) {
             $this->error($from, $e);
         }

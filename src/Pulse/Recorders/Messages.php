@@ -6,13 +6,22 @@ use Carbon\CarbonImmutable;
 use Illuminate\Config\Repository;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders\Concerns\Sampling;
+use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Events\MessageSent;
 
 class Messages
 {
     use Sampling;
 
-    public string $listen = MessageSent::class;
+    /**
+     * The events to listen for.
+     *
+     * @var list<class-string>
+     */
+    public array $listen = [
+        MessageReceived::class,
+        MessageSent::class,
+    ];
 
     public function __construct(protected Pulse $pulse, protected Repository $config)
     {
