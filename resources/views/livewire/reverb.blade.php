@@ -193,8 +193,8 @@ Alpine.data('connectionsChart', (config) => ({
 
             chart.data.labels = this.labels(connections)
             chart.options.scales.y.max = this.highest(connections)
-            chart.data.datasets[1].data = this.scale(connections.peak)
-            chart.data.datasets[2].data = this.scale(connections.average)
+            chart.data.datasets[0].data = this.scale(connections.peak)
+            chart.data.datasets[1].data = this.scale(connections.average)
             chart.update()
         })
     },
