@@ -12,4 +12,4 @@ parameters:
     - "#Unsafe usage of new static\\(\\)#"
     - "#\\(void\\) is used.#"
     - "#Parameter \\$livewire of anonymous function has invalid type#"
-    - "#Class Laravel\\Pulse\\Pulse not found#"
+    - "#Class Laravel\\\\Pulse\\\\Pulse not found#"
