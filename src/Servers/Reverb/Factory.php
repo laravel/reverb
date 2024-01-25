@@ -9,6 +9,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelsController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelUsersController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ConnectionsController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsBatchController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\PusherController;
@@ -73,6 +74,7 @@ class Factory
         $routes->add('sockets', Route::get('/app/{appKey}', new PusherController(app(PusherServer::class), app(ApplicationProvider::class))));
         $routes->add('events', Route::post('/apps/{appId}/events', new EventsController));
         $routes->add('events_batch', Route::post('/apps/{appId}/batch_events', new EventsBatchController));
+        $routes->add('connections', Route::get('/apps/{appId}/connections', new ConnectionsController));
         $routes->add('channels', Route::get('/apps/{appId}/channels', new ChannelsController));
         $routes->add('channel', Route::get('/apps/{appId}/channels/{channel}', new ChannelController));
         $routes->add('channel_users', Route::get('/apps/{appId}/channels/{channel}/users', new ChannelUsersController));
