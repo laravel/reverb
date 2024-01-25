@@ -49,6 +49,6 @@ abstract class ServerProvider
      */
     public function doesNotSubscribeToEvents(): bool
     {
-        return $this->shouldNotPublishEvents();
+        return ! $this->subscribesToEvents();
     }
 }

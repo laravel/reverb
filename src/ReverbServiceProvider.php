@@ -2,26 +2,15 @@
 
 namespace Laravel\Reverb;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
+use Laravel\Reverb\Pulse\Reverb;
+use Livewire\LivewireManager;
 
 class ReverbServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        $this->publishes([
-            __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
-        ], ['reverb', 'reverb-config']);
-
-        $this->app->make(ServerManager::class)
-            ->driver()
-            ->boot();
-    }
-
     /**
      * Register any application services.
      */
@@ -33,18 +22,28 @@ class ReverbServiceProvider extends ServiceProvider
 
         $this->app->instance(Logger::class, new NullLogger);
 
-        $this->app->singleton(ServerManager::class);
+        $this->app->singleton(ServerProviderManager::class);
 
-        $this->initializeServer();
+        $this->app->make(ServerProviderManager::class)->register();
     }
 
     /**
-     * Initialize the server.
+     * Bootstrap any application services.
      */
-    public function initializeServer(): void
+    public function boot(): void
     {
-        $server = $this->app->make(ServerManager::class);
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
+            ], ['reverb', 'reverb-config']);
+        }
 
-        $server->register();
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
+
+        $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
+            $livewire->component('reverb', Reverb::class);
+        });
+
+        $this->app->make(ServerProviderManager::class)->boot();
     }
 }

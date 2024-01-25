@@ -65,7 +65,7 @@ class CliLogger implements Logger
 
         $message = json_encode($message, JSON_PRETTY_PRINT);
 
-        with(new Message($this->output))->render(
+        (new Message($this->output))->render(
             $message
         );
     }

@@ -3,8 +3,8 @@
 namespace Laravel\Reverb\Tests;
 
 use Illuminate\Support\Str;
-use Laravel\Reverb\Concerns\InteractsWithAsyncRedis;
-use Laravel\Reverb\ServerManager;
+use Laravel\Reverb\ServerProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory;
 use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
@@ -17,8 +17,6 @@ use function React\Async\await;
 
 class ReverbTestCase extends TestCase
 {
-    use InteractsWithAsyncRedis;
-
     protected $server;
 
     protected $loop;
@@ -50,7 +48,7 @@ class ReverbTestCase extends TestCase
         parent::defineEnvironment($app);
 
         $app['config']->set('reverb.apps.apps.1', [
-            'id' => '654321',
+            'app_id' => '654321',
             'key' => 'pusher-key-2',
             'secret' => 'pusher-secret-2',
             'capacity' => null,
@@ -60,7 +58,7 @@ class ReverbTestCase extends TestCase
         ]);
 
         $app['config']->set('reverb.apps.apps.2', [
-            'id' => '987654',
+            'app_id' => '987654',
             'key' => 'pusher-key-3',
             'secret' => 'pusher-secret-3',
             'capacity' => null,
@@ -75,10 +73,10 @@ class ReverbTestCase extends TestCase
      */
     public function usingRedis(): void
     {
-        app(ServerManager::class)->withPublishing();
+        app(ServerProviderManager::class)->withPublishing();
 
-        $this->bindRedis($this->loop);
-        $this->subscribeToRedis($this->loop);
+        app(PubSubProvider::class)->connect($this->loop);
+        app(PubSubProvider::class)->subscribe();
     }
 
     /**

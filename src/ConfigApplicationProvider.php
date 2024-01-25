@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 
-class ConfigProvider implements ApplicationProvider
+class ConfigApplicationProvider implements ApplicationProvider
 {
     /**
      * Create a new config provider instance.
@@ -17,15 +17,25 @@ class ConfigProvider implements ApplicationProvider
     }
 
     /**
-     * Return all of the configured applications as Application instances.
+     * Get all of the configured applications as Application instances.
      *
-     * @return \Illuminate\Support\Collection|\Laravel\Reverb\Application[]
+     * @return \Illuminate\Support\Collection<\Laravel\Reverb\Application>
      */
     public function all(): Collection
     {
         return $this->applications->map(function ($app) {
-            return $this->findById($app['id']);
+            return $this->findById($app['app_id']);
         });
+    }
+
+    /**
+     * Find an application instance by ID.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
+    public function findById(string $id): Application
+    {
+        return $this->find('app_id', $id);
     }
 
     /**
@@ -39,21 +49,11 @@ class ConfigProvider implements ApplicationProvider
     }
 
     /**
-     * Find an application instance by ID.
-     *
-     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
-     */
-    public function findById(string $id): Application
-    {
-        return $this->find('id', $id);
-    }
-
-    /**
      * Find an application instance.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidApplication
      */
-    public function find(string $key, $value): Application
+    public function find(string $key, mixed $value): Application
     {
         $app = $this->applications->firstWhere($key, $value);
 
@@ -62,7 +62,7 @@ class ConfigProvider implements ApplicationProvider
         }
 
         return new Application(
-            $app['id'],
+            $app['app_id'],
             $app['key'],
             $app['secret'],
             $app['ping_interval'],
