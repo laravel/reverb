@@ -40,9 +40,11 @@ class ReverbServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
 
-        $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
-            $livewire->component('reverb', Reverb::class);
-        });
+        if ($this->app->bound(\Laravel\Pulse\Pulse::class)) {
+            $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
+                $livewire->component('reverb', Reverb::class);
+            });
+        }
 
         $this->app->make(ServerProviderManager::class)->boot();
     }
