@@ -1,9 +1,13 @@
-# Laravel Reverb
+<p align="center">
+    <img src="/art/logo.svg" width="50%" alt="laravel reverb logo">
+</p>
 
-<a href="https://github.com/laravel/reverb/actions"><img src="https://github.com/laravel/reverb/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/dt/laravel/reverb" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/v/laravel/reverb" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/l/laravel/reverb" alt="License"></a>
+<p align="center">
+    <a href="https://github.com/laravel/reverb/actions"><img src="https://github.com/laravel/reverb/workflows/tests/badge.svg" alt="Build Status"></a>
+    <a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/dt/laravel/reverb" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/v/laravel/reverb" alt="Latest Stable Version"></a>
+    <a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/l/laravel/reverb" alt="License"></a>
+</p>
 
 ## Introduction
 
@@ -26,7 +30,7 @@ If it’s not a WebSocket request, the PSR7 object will be send directly to the 
 
 In the [Pusher WebSocket controller](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/Http/Controllers/PusherController.php), the connection is decorated again with information such as the Pusher socket ID and the app the user is connected to. We also validate the app is valid at this point.
 
-The WebSocket connection object instantiates a [MessageBuffer](https://github.com/ratchetphp/RFC6455/blob/master/src/Messaging/MessageBuffer.php) provided by the Ratchet RFC6455 (WebSocket spec) package. This handles parsing and decoding the messages received across the socket connection. This buffer is opened in the controller and event listeners are hooked up. 
+The WebSocket connection object instantiates a [MessageBuffer](https://github.com/ratchetphp/RFC6455/blob/master/src/Messaging/MessageBuffer.php) provided by the Ratchet RFC6455 (WebSocket spec) package. This handles parsing and decoding the messages received across the socket connection. This buffer is opened in the controller and event listeners are hooked up.
 
 Events emitted from the connection are routed through the message buffer. When a message has been parsed, it is passed to the [Pusher Server](https://github.com/laravel/reverb/blob/main/src/Protocols/Pusher/Server.php) which takes the message and decides how to route it.
 
