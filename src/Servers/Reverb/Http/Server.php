@@ -86,6 +86,6 @@ class Server
             $this->close($connection, 413, 'Payload too large.');
         }
 
-        return $request;
+        return $request ?? null;
     }
 }
