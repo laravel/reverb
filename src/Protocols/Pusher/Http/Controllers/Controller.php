@@ -57,10 +57,6 @@ abstract class Controller
      */
     protected function setApplication(?string $appId): Application
     {
-        if ($this->application) {
-            return $this->application;
-        }
-
         if (! $appId) {
             throw new HttpException(400, 'Application ID not provided.');
         }
