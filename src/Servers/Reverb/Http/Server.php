@@ -9,6 +9,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\ServerInterface;
+use Throwable;
 
 class Server
 {
@@ -72,7 +73,11 @@ class Server
 
         $connection->connect();
 
-        $this->router->dispatch($request, $connection);
+        try {
+            $this->router->dispatch($request, $connection);
+        } catch (Throwable $e) {
+            $this->close($connection, 500, 'Internal Server Error');
+        }
     }
 
     /**
