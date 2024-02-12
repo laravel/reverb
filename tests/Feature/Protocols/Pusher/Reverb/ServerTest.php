@@ -13,8 +13,8 @@ uses(ReverbTestCase::class);
 
 it('can handle connections to different applications', function () {
     connect();
-    connect(key: 'pusher-key-2');
-    connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
+    connect(key: 'reverb-key-2');
+    connect(key: 'reverb-key-3', headers: ['Origin' => 'http://laravel.com']);
 });
 
 it('can subscribe to a channel', function () {
@@ -366,7 +366,7 @@ it('can publish and subscribe to a client whisper', function () {
 
 it('cannot connect from an invalid origin', function () {
     $connection = await(
-        wsConnect('ws://0.0.0.0:8080/app/pusher-key-3')
+        wsConnect('ws://0.0.0.0:8080/app/reverb-key-3')
     );
 
     $promise = new Deferred();
@@ -387,7 +387,7 @@ it('can connect from a valid origin', function () {
 });
 
 it('limits the size of messages', function () {
-    $connection = connect(key: 'pusher-key-3', headers: ['Origin' => 'http://laravel.com']);
+    $connection = connect(key: 'reverb-key-3', headers: ['Origin' => 'http://laravel.com']);
     send(['This message is waaaaaay longer than the 1 byte limit'], $connection);
 
     $connection->assertReceived('Maximum message size exceeded');

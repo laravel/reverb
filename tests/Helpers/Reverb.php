@@ -10,7 +10,7 @@ use function React\Async\await;
 /**
  * Connect to the WebSocket server.
  */
-function connect(string $host = '0.0.0.0', string $port = '8080', string $key = 'pusher-key', array $headers = []): TestConnection
+function connect(string $host = '0.0.0.0', string $port = '8080', string $key = 'reverb-key', array $headers = []): TestConnection
 {
     $promise = new Deferred;
 

@@ -66,7 +66,7 @@ class FakeConnection extends BaseConnection
      */
     public function app(): Application
     {
-        return app()->make(ApplicationProvider::class)->findByKey('pusher-key');
+        return app()->make(ApplicationProvider::class)->findByKey('reverb-key');
     }
 
     /**

@@ -21,7 +21,7 @@ it('returns an error when unoccupied channel provided', function () {
 
 it('returns the user data', function () {
     $channel = app(ChannelManager::class)
-        ->for(app()->make(ApplicationProvider::class)->findByKey('pusher-key'))
+        ->for(app()->make(ApplicationProvider::class)->findByKey('reverb-key'))
         ->findOrCreate('presence-test-channel');
     $channel->subscribe($connection = new FakeConnection('test-connection-one'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 1, 'user_info' => ['name' => 'Taylor']])), $data);
     $channel->subscribe($connection = new FakeConnection('test-connection-two'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 2, 'user_info' => ['name' => 'Joe']])), $data);
