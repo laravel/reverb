@@ -119,7 +119,7 @@ it('can subscribe a user to a private channel', function () {
             'event' => 'pusher:subscribe',
             'data' => [
                 'channel' => 'private-test-channel',
-                'auth' => 'app-key:'.hash_hmac('sha256', $connection->id().':private-test-channel', 'pusher-secret'),
+                'auth' => 'app-key:'.hash_hmac('sha256', $connection->id().':private-test-channel', 'reverb-secret'),
             ],
         ]));
 
@@ -136,7 +136,7 @@ it('can subscribe a user to a presence channel', function () {
             'event' => 'pusher:subscribe',
             'data' => [
                 'channel' => 'presence-test-channel',
-                'auth' => 'app-key:'.hash_hmac('sha256', $connection->id().':presence-test-channel', 'pusher-secret'),
+                'auth' => 'app-key:'.hash_hmac('sha256', $connection->id().':presence-test-channel', 'reverb-secret'),
             ],
         ]));
 
@@ -242,7 +242,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
             'event' => 'pusher:subscribe',
             'data' => [
                 'channel' => 'private-test-channel',
-                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:private-test-channel', 'pusher-secret'),
+                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:private-test-channel', 'reverb-secret'),
             ],
         ]));
 
@@ -266,7 +266,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
             'event' => 'pusher:subscribe',
             'data' => [
                 'channel' => 'presence-test-channel',
-                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:presence-test-channel', 'pusher-secret'),
+                'auth' => 'app-key:'.hash_hmac('sha256', '10000.00001:presence-test-channel', 'reverb-secret'),
             ],
         ]));
 

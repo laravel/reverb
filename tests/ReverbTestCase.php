@@ -49,8 +49,8 @@ class ReverbTestCase extends TestCase
 
         $app['config']->set('reverb.apps.apps.1', [
             'app_id' => '654321',
-            'key' => 'pusher-key-2',
-            'secret' => 'pusher-secret-2',
+            'key' => 'reverb-key-2',
+            'secret' => 'reverb-secret-2',
             'capacity' => null,
             'allowed_origins' => ['*'],
             'ping_interval' => 10,
@@ -59,8 +59,8 @@ class ReverbTestCase extends TestCase
 
         $app['config']->set('reverb.apps.apps.2', [
             'app_id' => '987654',
-            'key' => 'pusher-key-3',
-            'secret' => 'pusher-secret-3',
+            'key' => 'reverb-key-3',
+            'secret' => 'reverb-secret-3',
             'capacity' => null,
             'allowed_origins' => ['laravel.com'],
             'ping_interval' => 10,
@@ -147,9 +147,9 @@ class ReverbTestCase extends TestCase
     {
         $hash = md5(json_encode($data));
         $timestamp = time();
-        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $query = "auth_key=reverb-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
         $string = "POST\n/apps/{$appId}/{$path}\n$query";
-        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+        $signature = hash_hmac('sha256', $string, 'reverb-secret');
         $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
 
         return $this->request("{$path}&auth_signature={$signature}", $method, $data, $host, $port, $appId);
@@ -170,9 +170,9 @@ class ReverbTestCase extends TestCase
     {
         $hash = md5(json_encode($data));
         $timestamp = time();
-        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $query = "auth_key=reverb-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
         $string = "POST\n/apps/{$appId}/{$path}\n$query";
-        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+        $signature = hash_hmac('sha256', $string, 'reverb-secret');
 
         return $this->postReqeust("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
     }
@@ -184,9 +184,9 @@ class ReverbTestCase extends TestCase
     {
         $hash = md5(json_encode($data));
         $timestamp = time();
-        $query = "auth_key=pusher-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
+        $query = "auth_key=reverb-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
         $string = "POST\n/apps/{$appId}/{$path}\n$query";
-        $signature = hash_hmac('sha256', $string, 'pusher-secret');
+        $signature = hash_hmac('sha256', $string, 'reverb-secret');
 
         $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
 

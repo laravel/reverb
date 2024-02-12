@@ -41,7 +41,7 @@ function validAuth(string $connectionId, string $channel, ?string $data = null):
         $signature .= ":{$data}";
     }
 
-    return 'app-key:'.hash_hmac('sha256', $signature, 'pusher-secret');
+    return 'app-key:'.hash_hmac('sha256', $signature, 'reverb-secret');
 }
 
 /**

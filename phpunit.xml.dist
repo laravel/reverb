@@ -11,9 +11,9 @@
   <coverage/>
   <php>
     <env name="APP_KEY" value="base64:uz4B1RtFO57QGzbZX1kRYX9hIRB50+QzqFeg9zbFJlY="/>
-    <env name="PUSHER_APP_ID" value="123456"/>
-    <env name="PUSHER_APP_KEY" value="pusher-key"/>
-    <env name="PUSHER_APP_SECRET" value="pusher-secret"/>
+    <env name="REVERB_APP_ID" value="123456"/>
+    <env name="REVERB_APP_KEY" value="reverb-key"/>
+    <env name="REVERB_APP_SECRET" value="reverb-secret"/>
     <env name="REVERB_API_GATEWAY_CONNECTION_CACHE" value="file"/>
   </php>
   <source>
