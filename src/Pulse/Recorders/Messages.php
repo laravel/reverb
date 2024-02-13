@@ -51,7 +51,7 @@ class Messages
                 key: "reverb_messages:{$id}",
                 value: $timestamp,
                 timestamp: $timestamp,
-            )->count();
+            )->count()->onlyBuckets();
         });
     }
 }
