@@ -31,6 +31,7 @@ return [
         'reverb' => [
             'host' => env('REVERB_HOST', '0.0.0.0'),
             'port' => env('REVERB_PORT', 8080),
+            'tls' => [],
             'scaling' => [
                 'enabled' => env('REVERB_SCALING_ENABLED', false),
                 'channel' => env('REVERB_SCALING_CHANNEL', 'reverb'),
