@@ -36,7 +36,25 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', bool $secure = false, array $tlsOptions = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    {
+        return static::makeServer("{$host}:{$port}", $options, $protocol, $loop);
+    }
+
+    /**
+     * Create a new TLS protected WebSocket server instance.
+     */
+    public static function makeSecurely(string $host = '0.0.0.0', string $port = '8080', array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    {
+        $options['tls']['local_cert'] = $options['tls']['local_cert'] ?? static::ensureCertificateExists($host);
+
+        return static::makeServer("tls://{$host}:{$port}", $options, $protocol, $loop);
+    }
+
+    /**
+     * Create a new server instance.
+     */
+    protected static function makeServer(string $uri, array $options, string $protocol, ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
 
@@ -106,10 +124,10 @@ class Factory
         $certificate = $path."/{$host}.pem";
 
         if (File::missing($certificate) || static::certificateIsInvalid($certificate)) {
-            File::replace($path, static::createCertificate($host));
+            File::put($certificate, static::createCertificate($host));
         }
 
-        return $path;
+        return $certificate;
     }
 
     /**

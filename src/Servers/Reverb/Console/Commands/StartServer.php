@@ -51,14 +51,10 @@ class StartServer extends Command implements SignalableCommandInterface
         $config = $this->laravel['config']['reverb.servers.reverb'];
 
         $loop = Loop::get();
+        $host = $this->option('host') ?? $config['host'];
+        $port = $this->option('port') ?? $config['port'];
 
-        $server = ServerFactory::make(
-            $host = $this->option('host') ?: $config['host'],
-            $port = $this->option('port') ?: $config['port'],
-            $this->option('secure'),
-            $config['tls'],
-            loop: $loop
-        );
+        $server = $this->makeServer($host, $port, $loop, $config);
 
         $this->ensureHorizontalScalability($loop);
         $this->ensureStaleConnectionsAreCleaned($loop);
@@ -68,6 +64,13 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->components->info("Starting server on {$host}:{$port}");
 
         $server->start();
+    }
+
+    protected function makeServer(string $host, int $port, LoopInterface $loop, array $config): Server
+    {
+        return $this->option('secure') || ! empty($config['options']['tls'] ?? [])
+            ? ServerFactory::makeSecurely($host, $port, $config['options'], loop: $loop)
+            : ServerFactory::make($host, $port, $config['options'], loop: $loop);
     }
 
     /**
