@@ -47,8 +47,8 @@ class Messages
             }
 
             $this->pulse->record(
-                key: "reverb_messages:{$id}",
                 type: "reverb_message:{$id}",
+                key: 'received',
                 value: $timestamp,
                 timestamp: $timestamp,
             )->count()->onlyBuckets();
