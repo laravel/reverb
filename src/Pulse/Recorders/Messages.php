@@ -36,15 +36,20 @@ class Messages
      */
     public function record(MessageSent $event): void
     {
-        if (! $this->shouldSample()) {
-            return;
-        }
+        [$timestamp, $id] = [
+            CarbonImmutable::now()->getTimestamp(),
+            $event->connection->app()->id(),
+        ];
 
-        $this->pulse->lazy(function () use ($event) {
+        $this->pulse->lazy(function () use ($timestamp, $id) {
+            if (! $this->shouldSample()) {
+                return;
+            }
+
             $this->pulse->record(
-                type: "reverb_messages:{$event->connection->app()->id()}",
-                key: "reverb_messages:{$event->connection->app()->id()}",
-                value: $timestamp = CarbonImmutable::now()->getTimestamp(),
+                type: "reverb_messages:{$id}",
+                key: "reverb_messages:{$id}",
+                value: $timestamp,
                 timestamp: $timestamp,
             )->count();
         });
