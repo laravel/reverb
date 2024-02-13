@@ -54,7 +54,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $host = $this->option('host') ?? $config['host'];
         $port = $this->option('port') ?? $config['port'];
 
-        $server = $this->makeServer($host, $port, $loop, $config);
+        $server = $this->makeServer($host, $port, $config, $loop);
 
         $this->ensureHorizontalScalability($loop);
         $this->ensureStaleConnectionsAreCleaned($loop);
@@ -66,7 +66,10 @@ class StartServer extends Command implements SignalableCommandInterface
         $server->start();
     }
 
-    protected function makeServer(string $host, int $port, LoopInterface $loop, array $config): Server
+    /**
+     * Make a new server instance.
+     */
+    protected function makeServer(string $host, int $port, array $config, LoopInterface $loop): Server
     {
         return $this->option('secure') || ! empty($config['options']['tls'] ?? [])
             ? ServerFactory::makeSecurely($host, $port, $config['options'], loop: $loop)
