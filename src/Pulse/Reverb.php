@@ -42,11 +42,11 @@ class Reverb extends Card
         );
 
         [$messagesCount, $messagesCountTime, $messagesCountRunAt] = $this->remember(fn () => $this->graph(
-            ["reverb_messages:{$this->appId}"],
+            ["reverb_message:{$this->appId}"],
             'count'
-        ), "reverb_messages_count:{$this->appId}");
+        ), "messages:{$this->appId}");
 
-        $messagesCount = $this->formatReadings($messagesCount, "reverb_messages:{$this->appId}");
+        $messagesCount = $this->formatReadings($messagesCount, "reverb_message:{$this->appId}", 'received');
 
         [$messageRate, $messageRateUnit] = $this->calculateMessageRate($messagesCount);
 
@@ -85,9 +85,9 @@ class Reverb extends Card
     /**
      * Format the given readings for graphing.
      */
-    protected function formatReadings(Collection $readings, string $key): Collection
+    protected function formatReadings(Collection $readings, string $key, ?string $type = null): Collection
     {
-        return $readings->get($key, collect())->get($key, collect());
+        return $readings->get($key, collect())->get($type ?? $key, collect());
     }
 
     /**
