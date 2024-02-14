@@ -29,8 +29,7 @@ class StartServer extends Command implements SignalableCommandInterface
     protected $signature = 'reverb:start
                 {--host= : The IP address the server should bind to}
                 {--port= : The port the server should listen on}
-                {--debug : Indicates whether debug messages should be displayed in the terminal}
-                {--secure : Indicates whether the server should be started with TLS using a self-signed certificate}';
+                {--debug : Indicates whether debug messages should be displayed in the terminal}';
 
     /**
      * The console command description.
@@ -54,7 +53,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $host = $this->option('host') ?? $config['host'];
         $port = $this->option('port') ?? $config['port'];
 
-        $server = $this->makeServer($host, $port, $config, $loop);
+        $server = ServerFactory::make($host, $port, $config['options'], loop: $loop);
 
         $this->ensureHorizontalScalability($loop);
         $this->ensureStaleConnectionsAreCleaned($loop);
@@ -64,16 +63,6 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->components->info("Starting server on {$host}:{$port}");
 
         $server->start();
-    }
-
-    /**
-     * Make a new server instance.
-     */
-    protected function makeServer(string $host, int $port, array $config, LoopInterface $loop): Server
-    {
-        return $this->option('secure') || ! empty($config['options']['tls'] ?? [])
-            ? ServerFactory::makeSecurely($host, $port, $config['options'], loop: $loop)
-            : ServerFactory::make($host, $port, $config['options'], loop: $loop);
     }
 
     /**

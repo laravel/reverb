@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Servers\Reverb;
 
-use Illuminate\Support\Facades\File;
 use InvalidArgumentException;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
@@ -29,7 +28,6 @@ use React\Socket\SocketServer;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
-use Throwable;
 
 class Factory
 {
@@ -38,7 +36,18 @@ class Factory
      */
     public static function make(string $host = '0.0.0.0', string $port = '8080', array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
     {
-        return static::makeServer("{$host}:{$port}", $options, $protocol, $loop);
+        $loop = $loop ?: Loop::get();
+
+        $router = match ($protocol) {
+            'pusher' => static::makePusherServer(),
+            default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
+        };
+
+        $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
+
+        $socket = new SocketServer($uri, $options, $loop);
+
+        return new HttpServer($socket, $router, $loop);
     }
 
     /**
@@ -110,61 +119,5 @@ class Factory
         $routes->add('users_terminate', Route::post('/apps/{appId}/users/{userId}/terminate_connections', new UsersTerminateController));
 
         return $routes;
-    }
-
-    /**
-     * Find or create a TLS certificate for the given host and return the path.
-     */
-    protected static function ensureCertificateExists(string $host)
-    {
-        $path = storage_path('app/reverb');
-
-        File::ensureDirectoryExists($path);
-
-        $certificate = $path."/{$host}.pem";
-
-        if (File::missing($certificate) || static::certificateIsInvalid($certificate)) {
-            File::put($certificate, static::createCertificate($host));
-        }
-
-        return $certificate;
-    }
-
-    /**
-     * Create a new TLS certificate for the given host.
-     */
-    protected static function createCertificate(string $host): string
-    {
-        $privateKey = openssl_pkey_new([
-            'private_key_bits' => 4096,
-            'private_key_type' => OPENSSL_KEYTYPE_RSA,
-        ]);
-        $signingRequest = openssl_csr_new([
-            'commonName' => $host,
-            'countryName' => 'US',
-            'organizationName' => 'Laravel Reverb CA Self Signed Organization',
-            'organizationalUnitName' => 'Developers',
-            'emailAddress' => 'certificate@laravel.reverb',
-        ], $privateKey);
-        $certificate = openssl_csr_sign($signingRequest, null, $privateKey, 365);
-
-        openssl_x509_export($certificate, $exportedCertificate);
-        openssl_pkey_export($privateKey, $exportedPrivateKey);
-
-        return $exportedCertificate.$exportedPrivateKey;
-    }
-
-    /**
-     * Determine if the certificate at the given path is invalid.
-     */
-    public static function certificateIsInvalid(string $path): bool
-    {
-        try {
-            $certificate = openssl_x509_parse(file_get_contents($path));
-        } catch (Throwable) {
-            return true;
-        }
-
-        return time() > $certificate['validTo_time_t'];
     }
 }
