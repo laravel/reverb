@@ -26,19 +26,8 @@ class Server
 
         $this->loop->addPeriodicTimer(30, fn () => gc_collect_cycles());
 
+        // Register __invoke handler for this class to receive new connections...
         $socket->on('connection', $this);
-    }
-
-    /**
-     * Invoke the server.
-     */
-    public function __invoke(ConnectionInterface $connection): void
-    {
-        $connection = new Connection($connection);
-
-        $connection->on('data', function ($data) use ($connection) {
-            $this->handleRequest($data, $connection);
-        });
     }
 
     /**
@@ -47,15 +36,6 @@ class Server
     public function start(): void
     {
         $this->loop->run();
-    }
-
-    /**
-     * Stop the Http server
-     */
-    public function stop(): void
-    {
-        $this->loop->stop();
-        $this->socket->close();
     }
 
     /**
@@ -76,7 +56,7 @@ class Server
         try {
             $this->router->dispatch($request, $connection);
         } catch (Throwable $e) {
-            $this->close($connection, 500, 'Internal Server Error');
+            $this->close($connection, 500, 'Internal server error.');
         }
     }
 
@@ -92,5 +72,27 @@ class Server
         }
 
         return $request ?? null;
+    }
+
+    /**
+     * Stop the Http server
+     */
+    public function stop(): void
+    {
+        $this->loop->stop();
+
+        $this->socket->close();
+    }
+
+    /**
+     * Invoke the server with a new connection instance.
+     */
+    public function __invoke(ConnectionInterface $connection): void
+    {
+        $connection = new Connection($connection);
+
+        $connection->on('data', function ($data) use ($connection) {
+            $this->handleRequest($data, $connection);
+        });
     }
 }

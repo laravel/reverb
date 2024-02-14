@@ -21,7 +21,7 @@ class Router
     use ClosesConnections;
 
     /**
-     * The server negotiator.
+     * The server negotiator instance.
      */
     protected ServerNegotiator $negotiator;
 
@@ -40,13 +40,14 @@ class Router
     {
         $uri = $request->getUri();
         $context = $this->matcher->getContext();
+
         $context->setMethod($request->getMethod());
         $context->setHost($uri->getHost());
 
         try {
             $route = $this->matcher->match($uri->getPath());
         } catch (MethodNotAllowedException $e) {
-            return $this->close($connection, 405, 'Method now allowed', ['Allow' => $e->getAllowedMethods()]);
+            return $this->close($connection, 405, 'Method now allowed.', ['Allow' => $e->getAllowedMethods()]);
         } catch (ResourceNotFoundException $e) {
             return $this->close($connection, 404, 'Not found.');
         }
@@ -59,7 +60,10 @@ class Router
             return $controller($request, $wsConnection, ...Arr::except($route, ['_controller', '_route']));
         }
 
-        $routeParameters = Arr::except($route, ['_controller', '_route']) + ['request' => $request, 'connection' => $connection];
+        $routeParameters = Arr::except($route, [
+            '_controller',
+            '_route'
+        ]) + ['request' => $request, 'connection' => $connection];
 
         $response = $controller(
             ...$this->arguments($controller, $routeParameters)
@@ -69,7 +73,7 @@ class Router
     }
 
     /**
-     * Get the controller callable for the route.
+     * Get the controller callable for the given route.
      *
      * @param  array<string, mixed>  $route
      */
@@ -99,11 +103,11 @@ class Router
     }
 
     /**
-     * Find the arguments for the controller.
+     * Get the arguments for the controller.
      *
      * @return array<int, mixed>
      */
-    public function arguments(callable $controller, array $routeParameters): array
+    protected function arguments(callable $controller, array $routeParameters): array
     {
         $parameters = $this->parameters($controller);
 
@@ -113,11 +117,11 @@ class Router
     }
 
     /**
-     * Find the parameters for the controller.
+     * Get the parameters for the controller.
      *
      * @return array<int, array{ name: string, type: string, position: int }>
      */
-    public function parameters(mixed $controller): array
+    protected function parameters(mixed $controller): array
     {
         $method = match (true) {
             $controller instanceof Closure => new ReflectionFunction($controller),
