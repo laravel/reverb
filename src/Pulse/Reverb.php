@@ -87,7 +87,7 @@ class Reverb extends Card
      */
     protected function formatReadings(Collection $readings, string $key, string $type): Collection
     {
-        return $readings->get($key, collect())->get($type ?? $key, collect());
+        return $readings->get($key, collect())->get($type, collect());
     }
 
     /**
