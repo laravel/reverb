@@ -64,10 +64,11 @@ class RedisPubSubProvider implements PubSubProvider
     {
         $config = Config::get('database.redis.default');
 
-        $host = $config['host'];
-        $port = $config['port'] ?: 6379;
-
-        $query = [];
+        [$host, $port, $query] = [
+            $config['host'],
+            $config['port'] ?: 6379,
+            [],
+        ];
 
         if ($config['password']) {
             $query['password'] = $config['password'];
