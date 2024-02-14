@@ -25,7 +25,7 @@ class CliLogger implements Logger
     }
 
     /**
-     * Log an infomational message.
+     * Log an informational message.
      */
     public function info(string $title, ?string $message = null): void
     {
