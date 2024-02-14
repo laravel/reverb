@@ -27,12 +27,12 @@ class Reverb extends Card
     public function render()
     {
         [$averageConnections, $averageConnectionsTime, $averageConnectionsRunAt] = $this->remember(fn () => $this->graph(
-            ["reverb_connections:{$this->appId}"],
+            ["reverb_connection:{$this->appId}"],
             'avg'
         ), "reverb_connections_average:{$this->appId}");
 
         [$peakConnections, $peakConnectionsTime, $peakConnectionsRunAt] = $this->remember(fn () => $this->graph(
-            ["reverb_connections:{$this->appId}"],
+            ["reverb_connection:{$this->appId}"],
             'max'
         ), "reverb_connections_peak:{$this->appId}");
 
@@ -77,15 +77,15 @@ class Reverb extends Card
     protected function formatConnections(Collection $average, Collection $peak): Collection
     {
         return collect([
-            'average' => $this->formatReadings($average, "reverb_connections:{$this->appId}"),
-            'peak' => $this->formatReadings($peak, "reverb_connections:{$this->appId}"),
+            'average' => $this->formatReadings($average, "reverb_connection:{$this->appId}", 'active'),
+            'peak' => $this->formatReadings($peak, "reverb_connection:{$this->appId}", 'active'),
         ]);
     }
 
     /**
      * Format the given readings for graphing.
      */
-    protected function formatReadings(Collection $readings, string $key, ?string $type = null): Collection
+    protected function formatReadings(Collection $readings, string $key, string $type): Collection
     {
         return $readings->get($key, collect())->get($type ?? $key, collect());
     }
