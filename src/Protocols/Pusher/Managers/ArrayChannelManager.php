@@ -16,14 +16,14 @@ class ArrayChannelManager implements ChannelManagerInterface
     use InteractsWithApplications;
 
     /**
-     * Application store.
+     * The underlying array of applications and their channels.
      *
      * @var array<string, array<string, array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>>>
      */
     protected $applications = [];
 
     /**
-     * The appliation instance.
+     * The application instance.
      *
      * @var \Laravel\Reverb\Application
      */
@@ -72,7 +72,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get all the connections for the given channels.
+     * Get all of the connections for the given channels.
      *
      * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */
@@ -112,7 +112,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get the channels.
+     * Get the channels for the application.
      *
      * @return \Laravel\Reverb\Protocols\Pusher\Channels\Channel|array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>
      */
