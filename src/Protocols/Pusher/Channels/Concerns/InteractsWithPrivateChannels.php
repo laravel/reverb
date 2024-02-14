@@ -19,7 +19,7 @@ trait InteractsWithPrivateChannels
     }
 
     /**
-     * Deteremine whether the given auth token is valid.
+     * Deteremine whether the given authentication token is valid.
      */
     protected function verify(Connection $connection, string $auth, ?string $data = null): bool
     {
