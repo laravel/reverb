@@ -51,35 +51,6 @@ class Factory
     }
 
     /**
-     * Create a new TLS protected WebSocket server instance.
-     */
-    public static function makeSecurely(string $host = '0.0.0.0', string $port = '8080', array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
-    {
-        $options['tls']['local_cert'] = $options['tls']['local_cert'] ?? static::ensureCertificateExists($host);
-
-        return static::makeServer("tls://{$host}:{$port}", $options, $protocol, $loop);
-    }
-
-    /**
-     * Create a new server instance.
-     */
-    protected static function makeServer(string $uri, array $options, string $protocol, ?LoopInterface $loop = null): HttpServer
-    {
-        $loop = $loop ?: Loop::get();
-
-        $router = match ($protocol) {
-            'pusher' => static::makePusherServer(),
-            default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
-        };
-
-        return new HttpServer(
-            new SocketServer("{$host}:{$port}", [], $loop),
-            $router,
-            $loop
-        );
-    }
-
-    /**
      * Create a new WebSocket server for the Pusher protocol.
      */
     public static function makePusherServer(): Router
