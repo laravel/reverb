@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-use function Laravel\Prompts\select;
+use function Laravel\Prompts\confirm;
 
 class InstallCommand extends Command
 {
@@ -36,78 +36,6 @@ class InstallCommand extends Command
         $this->updateBroadcastingDriver();
 
         $this->components->info('Reverb installed successfully.');
-    }
-
-    /**
-     * Publishes the Reverb configuration file.
-     */
-    protected function publishConfiguration(): void
-    {
-        $this->callSilently('vendor:publish', [
-            '--provider' => 'Laravel\Reverb\ReverbServiceProvider',
-            '--tag' => 'reverb-config',
-        ]);
-    }
-
-    /**
-     * Enable broadcasting functionality.
-     */
-    protected function enableBroadcasting(): void
-    {
-        $enable = select('Would you like to enable event broadcasting?', [
-            true => 'Yes',
-            false => 'No',
-        ]);
-
-        if (! $enable) {
-            return;
-        }
-
-        if (version_compare($this->laravel->version(), '11.0', '<')) {
-            $this->enableBroadcastServiceProvider();
-
-            return;
-        }
-
-        $this->callSilently('install:broadcasting');
-    }
-
-    /**
-     * Uncomment the BroadcastServiceProvider in the application configuration.
-     */
-    protected function enableBroadcastServiceProvider(): void
-    {
-        $config = File::get(app()->configPath('app.php'));
-
-        if (Str::contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
-            File::replaceInFile(
-                '// App\Providers\BroadcastServiceProvider::class',
-                'App\Providers\BroadcastServiceProvider::class',
-                app()->configPath('app.php'),
-            );
-        }
-    }
-
-    /**
-     * Update the broadcasting driver.
-     */
-    protected function updateBroadcastingDriver(): void
-    {
-        $enable = select('Would you like to enable the Reverb broadcast driver?', [
-            true => 'Yes',
-            false => 'No',
-        ]);
-
-        if (! $enable || File::missing($env = app()->environmentFile())) {
-            return;
-        }
-
-        File::put(
-            $env,
-            Str::of(File::get($env))->replaceMatches('/(BROADCAST_(?:DRIVER|CONNECTION))=\w*/', function (array $matches) {
-                return $matches[1].'=reverb';
-            })
-        );
     }
 
     /**
@@ -149,6 +77,76 @@ class InstallCommand extends Command
         File::append(
             $env,
             Str::endsWith($contents, PHP_EOL) ? PHP_EOL.$variables.PHP_EOL : PHP_EOL.PHP_EOL.$variables.PHP_EOL,
+        );
+    }
+
+    /**
+     * Publishes the Reverb configuration file.
+     */
+    protected function publishConfiguration(): void
+    {
+        $this->callSilently('vendor:publish', [
+            '--provider' => 'Laravel\Reverb\ReverbServiceProvider',
+            '--tag' => 'reverb-config',
+        ]);
+    }
+
+    /**
+     * Enable the Laravel broadcasting functionality.
+     */
+    protected function enableBroadcasting(): void
+    {
+        if (File::exists(base_path('routes/channels.php'))) {
+            return;
+        }
+
+        $enable = confirm('Would you like to enable event broadcasting?', default: true);
+
+        if (! $enable) {
+            return;
+        }
+
+        if (version_compare($this->laravel->version(), '11.0', '<')) {
+            $this->enableBroadcastServiceProvider();
+
+            return;
+        }
+
+        $this->callSilently('install:broadcasting');
+    }
+
+    /**
+     * Uncomment the BroadcastServiceProvider in the application configuration.
+     */
+    protected function enableBroadcastServiceProvider(): void
+    {
+        $config = File::get(app()->configPath('app.php'));
+
+        if (Str::contains($config, '// App\Providers\BroadcastServiceProvider::class')) {
+            File::replaceInFile(
+                '// App\Providers\BroadcastServiceProvider::class',
+                'App\Providers\BroadcastServiceProvider::class',
+                app()->configPath('app.php'),
+            );
+        }
+    }
+
+    /**
+     * Update the configured broadcasting driver.
+     */
+    protected function updateBroadcastingDriver(): void
+    {
+        $enable = confirm('Would you like to enable the Reverb broadcasting driver?', default: true);
+
+        if (! $enable || File::missing($env = app()->environmentFile())) {
+            return;
+        }
+
+        File::put(
+            $env,
+            Str::of(File::get($env))->replaceMatches('/(BROADCAST_(?:DRIVER|CONNECTION))=\w*/', function (array $matches) {
+                return $matches[1].'=reverb';
+            })
         );
     }
 }
