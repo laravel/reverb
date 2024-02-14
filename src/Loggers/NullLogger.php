@@ -23,17 +23,17 @@ class NullLogger implements Logger
     }
 
     /**
-     * Append a new line to the log.
+     * Log a message sent to the server.
      */
-    public function line(int $lines = 1): void
+    public function message(string $message): void
     {
         //
     }
 
     /**
-     * Log a message sent to the server.
+     * Append a new line to the log.
      */
-    public function message(string $message): void
+    public function line(int $lines = 1): void
     {
         //
     }
