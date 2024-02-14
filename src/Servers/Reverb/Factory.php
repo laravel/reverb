@@ -41,9 +41,11 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
-        $socket = new SocketServer("{$host}:{$port}", [], $loop);
-
-        return new HttpServer($socket, $router, $loop);
+        return new HttpServer(
+            new SocketServer("{$host}:{$port}", [], $loop),
+            $router,
+            $loop
+        );
     }
 
     /**
