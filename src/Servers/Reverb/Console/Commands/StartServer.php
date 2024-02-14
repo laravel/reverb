@@ -150,10 +150,12 @@ class StartServer extends Command implements SignalableCommandInterface
     /**
      * Handle the signals sent to the server.
      */
-    public function handleSignal(int $signal): void
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         $this->components->info('Gracefully terminating connections.');
 
         $this->gracefullyDisconnect();
+
+        return $previousExitCode;
     }
 }
