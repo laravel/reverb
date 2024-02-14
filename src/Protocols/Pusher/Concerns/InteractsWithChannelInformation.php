@@ -10,7 +10,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 trait InteractsWithChannelInformation
 {
     /**
-     * Get the info for the given channels.
+     * Get meta / status information for the given channels.
      */
     protected function infoForChannels(array $channels, string $info): array
     {
@@ -22,7 +22,7 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Get the info for the given channels.
+     * Get meta / status information for the given channel.
      *
      * @param  array<int, string>  $channels
      * @return array<string, array<string, int>>
@@ -30,6 +30,7 @@ trait InteractsWithChannelInformation
     protected function info(string $channel, string $info): array
     {
         $info = explode(',', $info);
+
         $channel = app(ChannelManager::class)->find($channel);
 
         return array_filter(
@@ -39,9 +40,9 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Get the channel information for the given occupied channel.
+     * Get channel information for the given occupied channel.
      */
-    protected function occupiedInfo(Channel $channel, array $info): array
+    private function occupiedInfo(Channel $channel, array $info): array
     {
         $count = count($channel->connections());
 
@@ -54,9 +55,9 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Get the channel information for the given unoccupied channel.
+     * Get channel information for the given unoccupied channel.
      */
-    protected function unoccupiedInfo(array $info): array
+    private function unoccupiedInfo(array $info): array
     {
         return [
             'occupied' => in_array('occupied', $info) ? false : null,
@@ -64,7 +65,7 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Determine if the channel is a presence channel.
+     * Determine if the given channel is a presence channel.
      */
     protected function isPresenceChannel(Channel $channel): bool
     {
@@ -72,7 +73,7 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Determine if the channel is a cache channel.
+     * Determine if the given channel is a cache channel.
      */
     protected function isCacheChannel(Channel $channel): bool
     {
