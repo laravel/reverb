@@ -43,6 +43,7 @@ class Connections
 
         foreach (config('reverb.apps.apps') as $app) {
             $client = app(BroadcastManager::class)->pusher($app);
+
             $connections = $client->get('/connections')->connections;
 
             $this->pulse->lazy(function () use ($app, $connections) {
