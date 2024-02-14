@@ -62,7 +62,7 @@ class Router
 
         $routeParameters = Arr::except($route, [
             '_controller',
-            '_route'
+            '_route',
         ]) + ['request' => $request, 'connection' => $connection];
 
         $response = $controller(
