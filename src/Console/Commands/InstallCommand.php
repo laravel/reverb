@@ -39,7 +39,7 @@ class InstallCommand extends Command
     }
 
     /**
-     * Adds the Reverb configuration to the environment.
+     * Add the Reverb variables to the environment file.
      */
     protected function addEnviromentVariables(): void
     {
@@ -81,7 +81,7 @@ class InstallCommand extends Command
     }
 
     /**
-     * Publishes the Reverb configuration file.
+     * Publish the Reverb configuration file.
      */
     protected function publishConfiguration(): void
     {
@@ -92,7 +92,7 @@ class InstallCommand extends Command
     }
 
     /**
-     * Enable the Laravel broadcasting functionality.
+     * Enable Laravel's broadcasting functionality.
      */
     protected function enableBroadcasting(): void
     {
@@ -116,7 +116,7 @@ class InstallCommand extends Command
     }
 
     /**
-     * Uncomment the BroadcastServiceProvider in the application configuration.
+     * Uncomment the "BroadcastServiceProvider" in the application configuration.
      */
     protected function enableBroadcastServiceProvider(): void
     {
