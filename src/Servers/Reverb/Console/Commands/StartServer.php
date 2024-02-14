@@ -90,20 +90,6 @@ class StartServer extends Command implements SignalableCommandInterface
     }
 
     /**
-     * Schedule Pulse to ingest events if enabled.
-     */
-    protected function ensurePulseEventsAreCollected(LoopInterface $loop, int $interval): void
-    {
-        if (! $this->laravel->bound(\Laravel\Pulse\Pulse::class)) {
-            return;
-        }
-
-        $loop->addPeriodicTimer($interval, function () {
-            $this->laravel->make(\Laravel\Pulse\Pulse::class)->ingest();
-        });
-    }
-
-    /**
      * Check to see whether the restart signal has been sent.
      */
     protected function ensureRestartCommandIsRespected(Server $server, LoopInterface $loop, string $host, string $port): void
@@ -137,6 +123,20 @@ class StartServer extends Command implements SignalableCommandInterface
                         ->connections()
                 )->each->disconnect();
             });
+    }
+
+    /**
+     * Schedule Pulse to ingest events if enabled.
+     */
+    protected function ensurePulseEventsAreCollected(LoopInterface $loop, int $interval): void
+    {
+        if (! $this->laravel->bound(\Laravel\Pulse\Pulse::class)) {
+            return;
+        }
+
+        $loop->addPeriodicTimer($interval, function () {
+            $this->laravel->make(\Laravel\Pulse\Pulse::class)->ingest();
+        });
     }
 
     /**
