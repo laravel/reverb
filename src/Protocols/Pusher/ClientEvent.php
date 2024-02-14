@@ -8,7 +8,7 @@ use Laravel\Reverb\Contracts\Connection;
 class ClientEvent
 {
     /**
-     * Handle a pusher event.
+     * Handle a Pusher client event.
      */
     public static function handle(Connection $connection, array $event): ?ClientEvent
     {
@@ -27,7 +27,7 @@ class ClientEvent
     }
 
     /**
-     * Whisper a message to all connection of the channel.
+     * Whisper a message to all connections on the channel associated with the event.
      */
     public static function whisper(Connection $connection, array $payload): void
     {
