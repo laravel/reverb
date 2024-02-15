@@ -24,7 +24,7 @@ class EventsBatchController extends Controller
 
         $payload = json_decode($this->body, true);
 
-        $validator = $this->validate($payload);
+        $validator = $this->validator($payload);
 
         if ($validator->fails()) {
             return new JsonResponse($validator->errors(), 422);
@@ -74,9 +74,9 @@ class EventsBatchController extends Controller
     }
 
     /**
-     * Validate the incoming request.
+     * Create a validator for the incoming request payload.
      */
-    protected function validate(array $payload): Validator
+    protected function validator(array $payload): Validator
     {
         return ValidatorFacade::make($payload, [
             'batch' => ['required', 'array'],

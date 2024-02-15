@@ -27,18 +27,22 @@ abstract class Controller
     protected ?ChannelManager $channels = null;
 
     /**
-     * The request body
+     * The incoming request's body.
      */
     protected ?string $body;
 
     /**
-     * The request query parameters
+     * The incoming request's query parameters.
      */
     protected array $query = [];
 
+    /**
+     * Verify that the incoming request is valid.
+     */
     public function verify(RequestInterface $request, Connection $connection, $appId): void
     {
         parse_str($request->getUri()->getQuery(), $query);
+
         $this->body = $request->getBody()->getContents();
         $this->query = $query;
 
@@ -51,7 +55,7 @@ abstract class Controller
     }
 
     /**
-     * Set the Reverb application instance.
+     * Set the Reverb application instance for the incoming request's application ID.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -64,12 +68,12 @@ abstract class Controller
         try {
             return $this->application = app(ApplicationProvider::class)->findById($appId);
         } catch (InvalidApplication $e) {
-            throw new HttpException(404, 'No matching application for ID ['.$appId.'] found.');
+            throw new HttpException(404, 'No matching application for ID ['.$appId.'].');
         }
     }
 
     /**
-     * Set the Reverb channel manager instance.
+     * Set the Reverb channel manager instance for the application.
      */
     protected function setChannels(): void
     {
@@ -77,7 +81,7 @@ abstract class Controller
     }
 
     /**
-     * Verify the Pusher signature.
+     * Verify the Pusher authentication signature.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -96,7 +100,7 @@ abstract class Controller
         $signature = implode("\n", [
             $request->getMethod(),
             $request->getUri()->getPath(),
-            $this->formatParams($params),
+            $this->formatQueryParametersForVerification($params),
         ]);
 
         $signature = hash_hmac('sha256', $signature, $this->application->secret());
@@ -109,7 +113,7 @@ abstract class Controller
     /**
      * Format the given parameters into the correct format for signature verification.
      */
-    protected static function formatParams(array $params): string
+    protected static function formatQueryParametersForVerification(array $params): string
     {
         if (! is_array($params)) {
             return $params;
