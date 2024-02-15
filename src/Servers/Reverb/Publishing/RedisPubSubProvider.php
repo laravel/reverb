@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
 use Illuminate\Support\Facades\Config;
-use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
