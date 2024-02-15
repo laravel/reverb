@@ -47,7 +47,7 @@ class Factory
 
         return new HttpServer(
             new SocketServer($uri, $options, $loop),
-            $router, 
+            $router,
             $loop
         );
     }
