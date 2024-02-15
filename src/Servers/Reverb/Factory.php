@@ -45,9 +45,11 @@ class Factory
 
         $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
 
-        $socket = new SocketServer($uri, $options, $loop);
-
-        return new HttpServer($socket, $router, $loop);
+        return new HttpServer(
+            new SocketServer($uri, $options, $loop),
+            $router, 
+            $loop
+        );
     }
 
     /**
