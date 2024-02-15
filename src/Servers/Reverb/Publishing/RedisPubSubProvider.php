@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
@@ -15,6 +16,7 @@ class RedisPubSubProvider implements PubSubProvider
     protected $subscribingClient;
 
     public function __construct(protected RedisClientFactory $clientFactory,
+        protected PubSubIncomingMessageHandler $messageHandler,
         protected string $channel)
     {
     }
@@ -38,12 +40,7 @@ class RedisPubSubProvider implements PubSubProvider
         $this->subscribingClient->subscribe($this->channel);
 
         $this->subscribingClient->on('message', function (string $channel, string $payload) {
-            $event = json_decode($payload, true);
-
-            EventDispatcher::dispatchSynchronously(
-                unserialize($event['application']),
-                $event['payload']
-            );
+            $this->messageHandler->handle($payload);
         });
     }
 
