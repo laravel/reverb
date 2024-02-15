@@ -53,7 +53,7 @@ class Server
 
         try {
             match (Str::startsWith($event['event'], 'pusher:')) {
-                true => $this->pusher->handle(
+                true => $this->handler->handle(
                     $from,
                     $event['event'],
                     $event['data'] ?? [],
