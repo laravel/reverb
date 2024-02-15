@@ -9,7 +9,7 @@ use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
-class Event
+class EventHandler
 {
     /**
      * Create a new Pusher event instance.

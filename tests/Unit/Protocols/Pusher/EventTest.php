@@ -1,12 +1,12 @@
 <?php
 
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-use Laravel\Reverb\Protocols\Pusher\Event as PusherEvent;
+use Laravel\Reverb\Protocols\Pusher\EventHandler as PusherEventHandler;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
-    $this->pusher = new PusherEvent(app(ChannelManager::class));
+    $this->pusher = new PusherEventHandler(app(ChannelManager::class));
 });
 
 it('can send an acknowledgement', function () {
