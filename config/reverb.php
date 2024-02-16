@@ -8,10 +8,9 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the default server used by Reverb to handle
-    | messages received from and when sending messages to connected
-    | clients. You must specify one of the servers listed below.
+    | incoming messages as well as braodcasting message to all your
+    | connected clients. At this time only "reverb" is supported.
     |
-    | Supported: "reverb"
     */
 
     'default' => env('REVERB_SERVER', 'reverb'),
@@ -22,8 +21,9 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may define details for each of the supported Reverb servers.
-    | Each server has its own configuration options which are defined in
+    | Each server has its own configuration options that are defined in
     | the array below. You should ensure all the options are present.
+    |
     */
 
     'servers' => [
@@ -47,9 +47,10 @@ return [
     |--------------------------------------------------------------------------
     | Reverb Applications
     |--------------------------------------------------------------------------
-    | Here you may define how Reverb applications are managed. Should you
-    | wish to use the "config" provider, you should define an array of
-    | apps which Reverb can handle including an id, key and secret.
+    |
+    | Here you may define how Reverb applications are managed. If you choose
+    | to use the "config" provider, you may define an array of apps which
+    | your server will support, including their connection credentials.
     |
     */
 
