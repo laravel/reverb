@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory;
-use Ratchet\Client\WebSocket;
 use React\Async\SimpleFiber;
 use React\EventLoop\Loop;
 use React\Http\Browser;

@@ -34,7 +34,7 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
 
@@ -43,8 +43,10 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
+        $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
+
         return new HttpServer(
-            new SocketServer("{$host}:{$port}", [], $loop),
+            new SocketServer($uri, $options, $loop),
             $router,
             $loop
         );

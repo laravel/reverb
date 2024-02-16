@@ -54,6 +54,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $server = ServerFactory::make(
             $host = $this->option('host') ?: $config['host'],
             $port = $this->option('port') ?: $config['port'],
+            $config['options'] ?? [],
             loop: $loop
         );
 
