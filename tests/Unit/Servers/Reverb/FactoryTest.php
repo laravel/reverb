@@ -6,10 +6,10 @@ use React\Socket\TcpServer;
 
 it('can create a server', function () {
     $server = Factory::make();
-    
+
     $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
     $socketServer = (new ReflectionProperty($socket, 'server'))->getValue($socket);
-    
+
     expect($socketServer)->toBeInstanceOf(TcpServer::class);
 
     $server->stop();
@@ -17,7 +17,7 @@ it('can create a server', function () {
 
 it('can create a server with the given host and port', function () {
     $server = Factory::make('127.0.0.1', '8001');
-    
+
     $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
     $socketServer = (new ReflectionProperty($socket, 'server'))->getValue($socket);
 
@@ -35,7 +35,7 @@ it('can create a tls server using a user provided certificate', function () {
     $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
     $socketServer = (new ReflectionProperty($socket, 'server'))->getValue($socket);
     $context = (new ReflectionProperty($socketServer, 'context'))->getValue($socketServer);
-    
+
     expect($socketServer)->toBeInstanceOf(SecureServer::class);
     expect($context['local_cert'])->toBe('/path/to/cert.pem');
     expect($context['verify_peer'])->toBeFalse();
@@ -49,7 +49,7 @@ it('can create a server using tls on the given host and port', function () {
 
     $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
     $socketServer = (new ReflectionProperty($socket, 'server'))->getValue($socket);
-    
+
     expect($socketServer)->toBeInstanceOf(SecureServer::class);
     expect($socketServer->getAddress())->toBe('tls://127.0.0.1:8002');
 
