@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Certificate;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -54,6 +55,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $server = ServerFactory::make(
             $host = $this->option('host') ?: $config['host'],
             $port = $this->option('port') ?: $config['port'],
+            $config['url'],
             $config['options'] ?? [],
             loop: $loop
         );
