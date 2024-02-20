@@ -19,7 +19,7 @@ class Certificate
      */
     public static function resolve(string $url): ?array
     {
-        $host = parse_url($url, PHP_URL_HOST);
+        $host = parse_url($url, PHP_URL_HOST) ?: $url;
         $certificate = $host.'.crt';
         $key = $host.'.key';
 
