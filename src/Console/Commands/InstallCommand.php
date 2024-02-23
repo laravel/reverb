@@ -32,6 +32,7 @@ class InstallCommand extends Command
     {
         $this->addEnviromentVariables();
         $this->publishConfiguration();
+        $this->updateBroadcastingConfiguration();
         $this->enableBroadcasting();
         $this->updateBroadcastingDriver();
 
@@ -92,6 +93,45 @@ class InstallCommand extends Command
     }
 
     /**
+     * Update the broadcasting.php configuration file.
+     */
+    protected function updateBroadcastingConfiguration(): void
+    {
+        if (! $this->isLaravelTen()) {
+            return;
+        }
+
+        if ($this->laravel->config->has('broadcasting.connections.reverb')) {
+            return;
+        }
+
+        File::replaceInFile(
+            "'connections' => [\n",
+            <<<CONFIG
+            'connections' => [
+
+                    'reverb' => [
+                        'driver' => 'reverb',
+                        'key' => env('REVERB_APP_KEY'),
+                        'secret' => env('REVERB_APP_SECRET'),
+                        'app_id' => env('REVERB_APP_ID'),
+                        'options' => [
+                            'host' => env('REVERB_HOST'),
+                            'port' => env('REVERB_PORT', 443),
+                            'scheme' => env('REVERB_SCHEME', 'https'),
+                            'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
+                        ],
+                        'client_options' => [
+                            // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
+                        ],
+                    ],
+
+            CONFIG,
+            app()->configPath('broadcasting.php')
+        );
+    }
+
+    /**
      * Enable Laravel's broadcasting functionality.
      */
     protected function enableBroadcasting(): void
@@ -106,7 +146,7 @@ class InstallCommand extends Command
             return;
         }
 
-        if (version_compare($this->laravel->version(), '11.0', '<')) {
+        if ($this->isLaravelTen()) {
             $this->enableBroadcastServiceProvider();
 
             return;
@@ -148,5 +188,13 @@ class InstallCommand extends Command
                 return $matches[1].'=reverb';
             })
         );
+    }
+
+    /**
+     * Determine if the application is using Laravel 10.
+     */
+    protected function isLaravelTen(): bool
+    {
+        return version_compare($this->laravel->version(), '11.0', '<');
     }
 }
