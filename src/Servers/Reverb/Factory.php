@@ -35,7 +35,7 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', string $url = null, array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', string $hostname = null, array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
 
@@ -44,8 +44,8 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
-        if(empty($options['tls']) && $url && Certificate::exists($url)) {
-            [$certificate, $key] = Certificate::resolve($url);
+        if(empty($options['tls']) && $hostname && Certificate::exists($hostname)) {
+            [$certificate, $key] = Certificate::resolve($hostname);
 
             $options['tls']['local_cert'] = $certificate;
             $options['tls']['local_pk'] = $key;
