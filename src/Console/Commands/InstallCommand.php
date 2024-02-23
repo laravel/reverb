@@ -107,7 +107,7 @@ class InstallCommand extends Command
 
         File::replaceInFile(
             "'connections' => [\n",
-            <<<CONFIG
+            <<<'CONFIG'
             'connections' => [
 
                     'reverb' => [
