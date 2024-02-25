@@ -44,7 +44,7 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
-        if(empty($options['tls']) && $hostname && Certificate::exists($hostname)) {
+        if (empty($options['tls']) && $hostname && Certificate::exists($hostname)) {
             [$certificate, $key] = Certificate::resolve($hostname);
 
             $options['tls']['local_cert'] = $certificate;
