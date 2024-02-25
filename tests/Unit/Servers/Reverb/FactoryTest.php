@@ -45,7 +45,7 @@ it('can create a tls server using a user provided certificate', function () {
 
 it('can create a server using tls on the given host and port', function () {
     $this->app->config->set('reverb.servers.reverb.options.tls.local_cert', '/path/to/cert.pem');
-    $server = Factory::make('127.0.0.1', '8002', $this->app->config->get('reverb.servers.reverb.options'));
+    $server = Factory::make('127.0.0.1', '8002', options: $this->app->config->get('reverb.servers.reverb.options'));
 
     $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
     $socketServer = (new ReflectionProperty($socket, 'server'))->getValue($socket);

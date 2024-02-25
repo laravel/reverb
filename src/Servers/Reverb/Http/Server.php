@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Http;
 
+use Illuminate\Support\Str;
 use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use OverflowException;
 use Psr\Http\Message\RequestInterface;
@@ -94,5 +95,13 @@ class Server
         $connection->on('data', function ($data) use ($connection) {
             $this->handleRequest($data, $connection);
         });
+    }
+
+    /**
+     * Determine whether the server has TLS support.
+     */
+    public function isSecure(): bool
+    {
+        return Str::startsWith($this->socket->getAddress(), 'tls://');
     }
 }

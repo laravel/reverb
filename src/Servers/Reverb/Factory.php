@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use InvalidArgumentException;
+use Laravel\Reverb\Certificate;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -34,7 +35,7 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', string $hostname = null, array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
 
@@ -42,6 +43,13 @@ class Factory
             'pusher' => static::makePusherServer(),
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
+
+        if (empty($options['tls']) && $hostname && Certificate::exists($hostname)) {
+            [$certificate, $key] = Certificate::resolve($hostname);
+
+            $options['tls']['local_cert'] = $certificate;
+            $options['tls']['local_pk'] = $key;
+        }
 
         $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
 
