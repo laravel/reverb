@@ -5,7 +5,6 @@ namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Application;
-use Laravel\Reverb\Certificate;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
@@ -66,7 +65,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->ensureRestartCommandIsRespected($server, $loop, $host, $port);
         $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
 
-        $this->components->info("Starting ".($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".($hostname ? " ({$hostname})" : ''));
+        $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".($hostname ? " ({$hostname})" : ''));
 
         $server->start();
     }
