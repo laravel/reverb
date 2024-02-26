@@ -65,7 +65,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->ensureRestartCommandIsRespected($server, $loop, $host, $port);
         $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
 
-        $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".($hostname ? " ({$hostname})" : ''));
+        $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
 
         $server->start();
     }
