@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb\Contracts;
 
 use React\EventLoop\LoopInterface;
-use React\Promise\Promise;
+use React\Promise\PromiseInterface;
 
 interface PubSubProvider
 {
@@ -20,7 +20,7 @@ interface PubSubProvider
     /**
      * Publish a payload to the publisher.
      */
-    public function publish(array $payload): Promise;
+    public function publish(array $payload): PromiseInterface;
 
     /**
      * Listen for a specific event.

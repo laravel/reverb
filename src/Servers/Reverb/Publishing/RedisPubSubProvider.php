@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
-use React\Promise\Promise;
+use React\Promise\PromiseInterface;
 use RuntimeException;
 
 class RedisPubSubProvider implements PubSubProvider
@@ -63,7 +63,7 @@ class RedisPubSubProvider implements PubSubProvider
     /**
      * Publish a payload to the publisher.
      */
-    public function publish(array $payload): Promise
+    public function publish(array $payload): PromiseInterface
     {
         $this->ensureConnected();
 
