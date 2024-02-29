@@ -11,7 +11,7 @@ it('can publish an event when enabled', function () {
     app(ServerProviderManager::class)->withPublishing();
     $pubSub = Mockery::mock(PubSubProvider::class);
     $pubSub->shouldReceive('publish')->once()
-        ->with(['application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
+        ->with(['type' => 'message', 'application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
 
     $this->app->instance(PubSubProvider::class, $pubSub);
 
