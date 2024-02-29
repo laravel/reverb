@@ -8,7 +8,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\Pulse\Reverb;
-use Laravel\Reverb\Pulse\Messages;
+use Laravel\Reverb\Pulse\Livewire;
 use Livewire\LivewireManager;
 
 class ReverbServiceProvider extends ServiceProvider
@@ -48,7 +48,8 @@ class ReverbServiceProvider extends ServiceProvider
             });
 
             $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
-                $livewire->component('reverb.messages', Messages::class);
+                $livewire->component('reverb.messages', Livewire\Messages::class);
+                $livewire->component('reverb.connections', Livewire\Connections::class);
             });
         }
 
