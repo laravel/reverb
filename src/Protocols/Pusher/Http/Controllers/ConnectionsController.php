@@ -6,14 +6,13 @@ use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
 use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class ConnectionsController extends Controller
 {
     /**
      * Handle the request.
      */
-    public function __invoke(RequestInterface $request, Connection $connection, string $appId): PromiseInterface|Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): PromiseInterface
     {
         $this->verify($request, $connection, $appId);
 
