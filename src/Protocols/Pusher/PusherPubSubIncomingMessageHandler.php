@@ -18,9 +18,10 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
                 unserialize($event['application']),
                 $event['payload']
             ),
-            'metrics' => MetricsHandler::handle(
+            'metrics' => app(MetricsHandler::class)->publish(
                 unserialize($event['application']),
-                $event['payload']
+                $event['payload']['type'],
+                $event['payload']['options'] ?? []
             ),
             default => null,
         };
