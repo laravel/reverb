@@ -4,9 +4,11 @@ namespace Laravel\Reverb;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Compilers\BladeCompiler;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\Pulse\Reverb;
+use Laravel\Reverb\Pulse\Messages;
 use Livewire\LivewireManager;
 
 class ReverbServiceProvider extends ServiceProvider
@@ -41,8 +43,12 @@ class ReverbServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
 
         if ($this->app->bound(\Laravel\Pulse\Pulse::class)) {
+            $this->callAfterResolving('blade.compiler', function (BladeCompiler $blade) {
+                $blade->anonymousComponentPath(__DIR__.'/../resources/views', 'reverb');
+            });
+
             $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
-                $livewire->component('reverb', Reverb::class);
+                $livewire->component('reverb.messages', Messages::class);
             });
         }
 
