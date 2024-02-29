@@ -13,9 +13,16 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
     {
         $event = json_decode($payload, true);
 
-        EventDispatcher::dispatchSynchronously(
-            unserialize($event['application']),
-            $event['payload']
-        );
+        match ($event['type'] ?? null) {
+            'message' => EventDispatcher::dispatchSynchronously(
+                unserialize($event['application']),
+                $event['payload']
+            ),
+            'metrics' => MetricsHandler::handle(
+                unserialize($event['application']),
+                $event['payload']
+            ),
+            default => null,
+        };
     }
 }

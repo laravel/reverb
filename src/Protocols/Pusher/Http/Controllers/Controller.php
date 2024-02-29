@@ -7,10 +7,17 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
+use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+
+use function React\Promise\Timer\timeout;
 
 abstract class Controller
 {
@@ -126,5 +133,62 @@ abstract class Controller
 
             return "{$key}={$value}";
         })->implode('&');
+    }
+
+    /**
+     * Return the metrics for the given type.
+     */
+    protected function metrics(string $type): PromiseInterface
+    {
+        if (app()->make(ServerProviderManager::class)->driver('reverb')->subscribesToEvents()) {
+            return $this->gatherMetrics($type);
+        }
+
+        return (new Deferred)->resolve(fn () => MetricsHandler::handle($this->application, ['type' => $type]));
+    }
+
+    /**
+     * Gather metrics from all subscribers for the given type.
+     */
+    protected function gatherMetrics(string $type): PromiseInterface
+    {
+        [$metrics, $subscribers, $deferred, $provider] = [[], null, new Deferred, app(PubSubProvider::class)];
+
+        $this->listenForMetrics($provider, $metrics, $subscribers, $deferred);
+        $this->requestMetrics($provider, $type, $subscribers, $deferred);
+
+        return timeout($deferred->promise(), 5)->then(
+            fn ($metrics) => $metrics,
+            function () use (&$metrics) {
+                return $metrics;
+            }
+        );
+    }
+
+    /**
+     * Listen for metrics from subscribers.
+     */
+    protected function listenForMetrics(PubSubProvider $provider, array &$metrics, ?int &$subscribers, Deferred $deferred): void
+    {
+        $provider->on('metrics-retrieved', function ($payload) use (&$subscribers, &$metrics, $deferred) {
+            $metrics[] = $payload;
+            if ($subscribers !== null && count($metrics) === $subscribers) {
+                $deferred->resolve($metrics);
+            }
+        });
+    }
+
+    /**
+     * Request metrics from all subscribers.
+     */
+    protected function requestMetrics(PubSubProvider $provider, string $type, ?int &$subscribers): void
+    {
+        $provider->publish([
+            'type' => 'metrics',
+            'application' => serialize($this->application),
+            'payload' => ['type' => $type],
+        ])->then(function ($total) use (&$subscribers) {
+            $subscribers = $total;
+        });
     }
 }

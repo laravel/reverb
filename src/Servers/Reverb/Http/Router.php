@@ -10,6 +10,7 @@ use Laravel\Reverb\Servers\Reverb\Connection as ReverbConnection;
 use Psr\Http\Message\RequestInterface;
 use Ratchet\RFC6455\Handshake\RequestVerifier;
 use Ratchet\RFC6455\Handshake\ServerNegotiator;
+use React\Promise\PromiseInterface;
 use ReflectionFunction;
 use ReflectionMethod;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -69,7 +70,9 @@ class Router
             ...$this->arguments($controller, $routeParameters)
         );
 
-        return $connection->send($response)->close();
+        return $response instanceof PromiseInterface ?
+            $response->then(fn ($response) => $connection->send($response)->close()) :
+            $connection->send($response)->close();
     }
 
     /**

@@ -25,6 +25,7 @@ class EventDispatcher
         }
 
         app(PubSubProvider::class)->publish([
+            'type' => 'message',
             'application' => serialize($app),
             'payload' => $payload,
         ]);
