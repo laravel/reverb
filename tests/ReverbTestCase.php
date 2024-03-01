@@ -105,6 +105,8 @@ class ReverbTestCase extends TestCase
      */
     public function stopServer(): void
     {
+        app(PubSubProvider::class)->disconnect();
+
         if ($this->server) {
             $this->server->stop();
         }

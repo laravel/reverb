@@ -2,7 +2,9 @@
 
 namespace Laravel\Reverb\Protocols\Pusher;
 
+use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
@@ -13,6 +15,8 @@ use function React\Promise\Timer\timeout;
 
 class MetricsHandler
 {
+    use InteractsWithChannelInformation;
+
     public function __construct(
         protected ChannelManager $channels,
         protected ServerProviderManager $serverProviderManager,
@@ -52,28 +56,58 @@ class MetricsHandler
     {
         return match ($type) {
             'connections' => $this->connections($application),
+            'channels' => $this->channels($application, $options),
+            'channel' => $this->channel($application, $options),
             default => [],
         };
     }
 
     /**
-     * Get the connections for the given application.
-     */
-    public function connections(Application $application): array
-    {
-        return $this->channels->for($application)->connections();
-    }
-
-    /**
      * Return a promise to resolve the given value.
      */
-    public static function promise(mixed $value): PromiseInterface
+    protected function promise(mixed $value): PromiseInterface
     {
         $deferred = new Deferred;
         $promise = $deferred->promise();
         $deferred->resolve($value);
 
         return $promise;
+    }
+
+    /**
+     * Get the connections for the given application.
+     */
+    protected function connections(Application $application): array
+    {
+        return $this->channels->for($application)->connections();
+    }
+
+    /**
+     * Get the channels for the given application.
+     */
+    protected function channels(Application $application, array $options): array
+    {
+        $channels = collect($this->channels->for($application)->all());
+
+        if ($filter = ($options['filter'] ?? false)) {
+            $channels = $channels->filter(fn ($channel) => Str::startsWith($channel->name(), $filter));
+        }
+
+        $channels = $channels->filter(fn ($channel) => count($channel->connections()) > 0);
+
+        return $this->infoForChannels(
+            $application,
+            $channels->all(),
+            $options['info'] ?? ''
+        );
+    }
+
+    /**
+     * Get the channel for the given application.
+     */
+    protected function channel(Application $application, array $options): array
+    {
+        return $this->info($application, $options['channel'], $options['info'] ?? '');
     }
 
     /**
@@ -102,7 +136,7 @@ class MetricsHandler
         $deferred = new Deferred;
 
         $this->pubSubProvider->on('metrics-retrieved', function ($payload) use (&$subscribers, &$metrics, $deferred) {
-            $metrics[] = $payload;
+            $metrics[] = $payload['payload'];
             if ($subscribers !== null && count($metrics) === $subscribers) {
                 $deferred->resolve($metrics);
             }
@@ -128,11 +162,48 @@ class MetricsHandler
     /**
      * Merge the metrics into a single result set.
      */
-    public function merge(array $metrics, string $type): array
+    protected function merge(array $metrics, string $type): array
     {
         return match ($type) {
-            'connections' => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item['payload']), []),
+            'connections' => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
+            'channels' => $this->mergeChannels($metrics),
+            'channel' => $this->mergeChannel($metrics),
             default => [],
         };
+    }
+
+    /**
+     * Merge multiple sets of channel metrics into a single result set.
+     */
+    protected function mergeChannels(array $metrics): array
+    {
+        return collect($metrics)
+            ->reduce(fn ($carry, $item) => $carry->mergeRecursive($item), collect())
+            ->transform(
+                fn ($item) => collect($item)
+                    ->map(fn ($metric) => collect($metric)->sum())
+                    ->all()
+            )
+            ->all();
+    }
+
+    /**
+     * Merge multiple channels into a single set.
+     */
+    protected function mergeChannel(array $metrics): array
+    {
+        return array_reduce($metrics, function ($carry, $item) {
+            foreach ($item as $key => $value) {
+                $carry[$key] = match ($key) {
+                    'occupied' => $carry[$key] ?? false || $value,
+                    'user_count' => $carry[$key] ?? 0 + $value,
+                    'subscription_count' => $carry[$key] ?? 0 + $value,
+                    'cache' => $carry[$key] ?? null ?? $value,
+                    default => $carry[$key] ?? null,
+                };
+            }
+
+            return $carry;
+        }, []);
     }
 }

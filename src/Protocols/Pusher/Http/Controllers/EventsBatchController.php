@@ -43,7 +43,7 @@ class EventsBatchController extends Controller
                 isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null
             );
 
-            return isset($item['info']) ? $this->info($item['channel'], $item['info']) : [];
+            return isset($item['info']) ? $this->info($this->application, $item['channel'], $item['info']) : [];
         });
 
         if ($info->some(fn ($item) => count($item) > 0)) {

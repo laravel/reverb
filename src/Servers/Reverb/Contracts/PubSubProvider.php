@@ -13,6 +13,11 @@ interface PubSubProvider
     public function connect(LoopInterface $loop): void;
 
     /**
+     * Disconnect from the publisher.
+     */
+    public function disconnect(): void;
+
+    /**
      * Subscribe to the publisher.
      */
     public function subscribe(): void;

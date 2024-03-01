@@ -2,39 +2,24 @@
 
 namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
-use Illuminate\Support\Str;
-use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
+use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class ChannelsController extends Controller
 {
-    use InteractsWithChannelInformation;
-
     /**
      * Handle the request.
      */
-    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): PromiseInterface
     {
         $this->verify($request, $connection, $appId);
 
-        $channels = collect($this->channels->all());
-
-        if (isset($this->query['filter_by_prefix'])) {
-            $channels = $channels->filter(fn ($channel) => Str::startsWith($channel->name(), $this->query['filter_by_prefix']));
-        }
-
-        $channels = $channels->filter(fn ($channel) => count($channel->connections()) > 0);
-
-        $channels = $this->infoForChannels(
-            $channels->all(),
-            $this->query['info'] ?? ''
-        );
-
-        return new JsonResponse([
-            'channels' => array_map(fn ($item) => (object) $item, $channels),
-        ]);
+        return app(MetricsHandler::class)->gather($this->application, 'channels', [
+            'filter' => $this->query['filter_by_prefix'] ?? null,
+            'info' => $this->query['info'] ?? null,
+        ])->then(fn ($channels) => new JsonResponse(['channels' => array_map(fn ($item) => (object) $item, $channels)]));
     }
 }

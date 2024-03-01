@@ -33,6 +33,20 @@ class RedisPubSubProvider implements PubSubProvider
     }
 
     /**
+     * Disconnect from the publisher.
+     */
+    public function disconnect(): void
+    {
+        if ($this->subscribingClient) {
+            $this->subscribingClient->close();
+        }
+
+        if ($this->publishingClient) {
+            $this->publishingClient->close();
+        }
+    }
+
+    /**
      * Subscribe to the publisher.
      */
     public function subscribe(): void

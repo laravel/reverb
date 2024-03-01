@@ -47,7 +47,7 @@ class EventsController extends Controller
             return new JsonResponse([
                 'channels' => array_map(
                     fn ($item) => (object) $item,
-                    $this->infoForChannels($channels, $payload['info'])
+                    $this->infoForChannels($this->application, $channels, $payload['info'])
                 ),
             ]);
         }
