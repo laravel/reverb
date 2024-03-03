@@ -50,7 +50,7 @@ class Certificate
      */
     public static function herdPath(): string
     {
-        return implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'], 'Library', 'Application Support', 'Herd', 'config', 'valet', 'Certificates', '']);
+        return implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'] ?? null, 'Library', 'Application Support', 'Herd', 'config', 'valet', 'Certificates', '']);
     }
 
     /**
@@ -58,6 +58,6 @@ class Certificate
      */
     public static function valetPath(): string
     {
-        return implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'], '.config', 'valet', 'Certificates', '']);
+        return implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'] ?? null, '.config', 'valet', 'Certificates', '']);
     }
 }
