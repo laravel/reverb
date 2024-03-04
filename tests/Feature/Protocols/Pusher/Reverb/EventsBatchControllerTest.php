@@ -119,7 +119,7 @@ it('can receive an event batch trigger with multiple events and gather info for 
 
 it('can receive an event batch trigger with multiple events and gather info for some', function () {
     $this->usingRedis();
-    
+
     subscribe('presence-test-channel');
     $response = await($this->signedPostRequest('batch_events', ['batch' => [
         [

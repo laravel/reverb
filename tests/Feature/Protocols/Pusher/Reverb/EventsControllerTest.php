@@ -113,34 +113,34 @@ it('validates invalid data', function ($payload) {
         ],
     ]);
 
-    it('can gather user counts when requested', function () {
-        $this->usingRedis();
+it('can gather user counts when requested', function () {
+    $this->usingRedis();
 
-        subscribe('presence-test-channel-one');
-    
-        $response = await($this->signedPostRequest('events', [
-            'name' => 'NewEvent',
-            'channels' => ['presence-test-channel-one', 'test-channel-two'],
-            'data' => json_encode(['some' => 'data']),
-            'info' => 'user_count',
-        ]));
-    
-        expect($response->getStatusCode())->toBe(200);
-        expect($response->getBody()->getContents())->toBe('{"channels":{"presence-test-channel-one":{"user_count":1},"test-channel-two":{}}}');
-    });
-    
-    it('can gather subscription counts when requested', function () {
-        $this->usingRedis();
+    subscribe('presence-test-channel-one');
 
-        subscribe('test-channel-two');
-    
-        $response = await($this->signedPostRequest('events', [
-            'name' => 'NewEvent',
-            'channels' => ['presence-test-channel-one', 'test-channel-two'],
-            'data' => json_encode(['some' => 'data']),
-            'info' => 'subscription_count',
-        ]));
-    
-        expect($response->getStatusCode())->toBe(200);
-        expect($response->getBody()->getContents())->toBe('{"channels":{"presence-test-channel-one":{},"test-channel-two":{"subscription_count":1}}}');
-    });
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channels' => ['presence-test-channel-one', 'test-channel-two'],
+        'data' => json_encode(['some' => 'data']),
+        'info' => 'user_count',
+    ]));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"presence-test-channel-one":{"user_count":1},"test-channel-two":{}}}');
+});
+
+it('can gather subscription counts when requested', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-two');
+
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channels' => ['presence-test-channel-one', 'test-channel-two'],
+        'data' => json_encode(['some' => 'data']),
+        'info' => 'subscription_count',
+    ]));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"presence-test-channel-one":{},"test-channel-two":{"subscription_count":1}}}');
+});
