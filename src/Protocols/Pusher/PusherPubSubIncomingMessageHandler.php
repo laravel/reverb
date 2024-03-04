@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Protocols\Pusher;
 
+use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 
 class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
@@ -12,17 +13,24 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
     public function handle(string $payload): void
     {
         $event = json_decode($payload, true);
+        $application = unserialize($event['application']);
 
         match ($event['type'] ?? null) {
             'message' => EventDispatcher::dispatchSynchronously(
-                unserialize($event['application']),
+                $application,
                 $event['payload']
             ),
             'metrics' => app(MetricsHandler::class)->publish(
-                unserialize($event['application']),
+                $application,
                 $event['payload']['type'],
                 $event['payload']['options'] ?? []
             ),
+            'terminate' => collect(app(ChannelManager::class)->for($application)->connections())
+                ->each(function ($connection) use ($event) {
+                    if ((string) $connection->data()['user_id'] === $event['payload']['user_id']) {
+                        $connection->disconnect();
+                    }
+                }),
             default => null,
         };
     }

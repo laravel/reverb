@@ -7,17 +7,10 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
-use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
-use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
-use React\Promise\Deferred;
-use React\Promise\PromiseInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
-use function React\Promise\Timer\timeout;
 
 abstract class Controller
 {
