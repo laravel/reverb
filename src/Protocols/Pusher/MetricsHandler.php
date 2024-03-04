@@ -24,8 +24,6 @@ class MetricsHandler
 
     /**
      * The total subscribers gathering metrics.
-     *
-     * @var array
      */
     protected ?int $subscribers = null;
 
