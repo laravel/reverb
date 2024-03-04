@@ -22,6 +22,7 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
             ),
             'metrics' => app(MetricsHandler::class)->publish(
                 $application,
+                $event['key'],
                 $event['payload']['type'],
                 $event['payload']['options'] ?? []
             ),

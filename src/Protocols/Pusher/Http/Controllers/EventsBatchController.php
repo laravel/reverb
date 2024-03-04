@@ -6,10 +6,14 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
+use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+
+use function React\Promise\all;
 
 class EventsBatchController extends Controller
 {
@@ -18,7 +22,7 @@ class EventsBatchController extends Controller
     /**
      * Handle the request.
      */
-    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response|PromiseInterface
     {
         $this->verify($request, $connection, $appId);
 
@@ -32,7 +36,7 @@ class EventsBatchController extends Controller
 
         $items = collect($payload['batch']);
 
-        $info = $items->map(function ($item) {
+        $items = $items->map(function ($item) {
             EventDispatcher::dispatch(
                 $this->application,
                 [
@@ -43,13 +47,19 @@ class EventsBatchController extends Controller
                 isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null
             );
 
-            return isset($item['info']) ? $this->info($this->application, $item['channel'], $item['info']) : [];
+            return isset($item['info']) ?
+                app(MetricsHandler::class)->gather(
+                    $this->application,
+                    'channel',
+                    ['channel' => $item['channel'], 'info' => $item['info']]
+                ) :
+                [];
         });
 
-        if ($info->some(fn ($item) => count($item) > 0)) {
-            return new JsonResponse(
-                ['batch' => $info->map(fn ($item) => (object) $item)->all()]
-            );
+        if ($items->contains(fn ($item) => ! empty($item))) {
+            return all($items)->then(function ($items) {
+                return new JsonResponse(['batch' => array_map(fn ($item) => (object) $item, $items)]);
+            });
         }
 
         return new JsonResponse(['batch' => (object) []]);
