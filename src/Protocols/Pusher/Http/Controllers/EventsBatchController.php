@@ -47,13 +47,11 @@ class EventsBatchController extends Controller
                 isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null
             );
 
-            return isset($item['info']) ?
-                app(MetricsHandler::class)->gather(
-                    $this->application,
-                    'channel',
-                    ['channel' => $item['channel'], 'info' => $item['info']]
-                ) :
-                [];
+            return isset($item['info']) ? app(MetricsHandler::class)->gather(
+                $this->application,
+                'channel',
+                ['channel' => $item['channel'], 'info' => $item['info']]
+            ) : [];
         });
 
         if ($items->contains(fn ($item) => ! empty($item))) {

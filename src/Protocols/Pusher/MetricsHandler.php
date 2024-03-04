@@ -31,8 +31,8 @@ class MetricsHandler
      * Create an instance of the metrics handler.
      */
     public function __construct(
-        protected ChannelManager $channels,
         protected ServerProviderManager $serverProviderManager,
+        protected ChannelManager $channels,
         protected PubSubProvider $pubSubProvider
     ) {
         //
@@ -43,27 +43,9 @@ class MetricsHandler
      */
     public function gather(Application $application, string $type, array $options = []): PromiseInterface
     {
-        if ($this->serverProviderManager->subscribesToEvents()) {
-            return $this->gatherMetrics($application, $type, $options);
-        }
-
-        return $this->promise($this->get($application, $type, $options));
-    }
-
-    /**
-     * Gather metrics from all subscribers for the given type.
-     */
-    protected function gatherMetrics(Application $application, string $type, array $options = []): PromiseInterface
-    {
-        $deferred = $this->listenForMetrics($key = Str::random(10));
-        $this->requestMetrics($application, $key, $type, $options);
-
-        return timeout($deferred->promise(), 5)->then(
-            fn ($metrics) => $metrics,
-            function () {
-                return $this->metrics;
-            }
-        )->then(fn ($metrics) => $this->merge($metrics, $type));
+        return $this->serverProviderManager->subscribesToEvents()
+            ? $this->gatherMetricsFromSubscribers($application, $type, $options)
+            : $this->promise($this->get($application, $type, $options));
     }
 
     /**
@@ -139,9 +121,39 @@ class MetricsHandler
     }
 
     /**
-     * Merge the metrics into a single result set.
+     * Gather metrics from all subscribers for the given type.
      */
-    protected function merge(array $metrics, string $type): array
+    protected function gatherMetricsFromSubscribers(Application $application, string $type, array $options = []): PromiseInterface
+    {
+        $deferred = $this->listenForMetrics($key = Str::random(10));
+
+        $this->requestMetricsFromSubscribers($application, $key, $type, $options);
+
+        return timeout($deferred->promise(), 5)->then(
+            fn ($metrics) => $metrics,
+            fn () => $this->metrics,
+        )->then(fn ($metrics) => $this->mergeSubscriberMetrics($metrics, $type));
+    }
+
+    /**
+     * Request metrics from all subscribers.
+     */
+    protected function requestMetricsFromSubscribers(Application $application, string $key, string $type, ?array $options): void
+    {
+        $this->pubSubProvider->publish([
+            'type' => 'metrics',
+            'key' => $key,
+            'application' => serialize($application),
+            'payload' => ['type' => $type, 'options' => $options],
+        ])->then(function ($total) {
+            $this->subscribers = $total;
+        });
+    }
+
+    /**
+     * Merge the given metrics into a single result set.
+     */
+    protected function mergeSubscriberMetrics(array $metrics, string $type): array
     {
         return match ($type) {
             'connections' => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
@@ -191,21 +203,6 @@ class MetricsHandler
     }
 
     /**
-     * Request metrics from all subscribers.
-     */
-    protected function requestMetrics(Application $application, string $key, string $type, ?array $options): void
-    {
-        $this->pubSubProvider->publish([
-            'type' => 'metrics',
-            'key' => $key,
-            'application' => serialize($application),
-            'payload' => ['type' => $type, 'options' => $options],
-        ])->then(function ($total) {
-            $this->subscribers = $total;
-        });
-    }
-
-    /**
      * Listen for metrics from subscribers.
      */
     protected function listenForMetrics(string $key): Deferred
@@ -241,12 +238,14 @@ class MetricsHandler
     }
 
     /**
-     * Return a promise to resolve the given value.
+     * Create a promise to resolve the given value.
      */
     protected function promise(mixed $value): PromiseInterface
     {
         $deferred = new Deferred;
+
         $promise = $deferred->promise();
+
         $deferred->resolve($value);
 
         return $promise;

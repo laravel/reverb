@@ -13,6 +13,7 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
     public function handle(string $payload): void
     {
         $event = json_decode($payload, true);
+
         $application = unserialize($event['application']);
 
         match ($event['type'] ?? null) {

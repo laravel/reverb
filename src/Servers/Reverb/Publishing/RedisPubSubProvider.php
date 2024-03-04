@@ -37,13 +37,8 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function disconnect(): void
     {
-        if ($this->subscribingClient) {
-            $this->subscribingClient->close();
-        }
-
-        if ($this->publishingClient) {
-            $this->publishingClient->close();
-        }
+        $this->subscribingClient?->close();
+        $this->publishingClient?->close();
     }
 
     /**
@@ -61,7 +56,7 @@ class RedisPubSubProvider implements PubSubProvider
     }
 
     /**
-     * Listen for a specific event.
+     * Listen for a given event.
      */
     public function on(string $event, callable $callback): void
     {

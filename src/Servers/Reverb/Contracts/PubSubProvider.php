@@ -23,12 +23,12 @@ interface PubSubProvider
     public function subscribe(): void;
 
     /**
+     * Listen for a given event.
+     */
+    public function on(string $event, callable $callback): void;
+
+    /**
      * Publish a payload to the publisher.
      */
     public function publish(array $payload): PromiseInterface;
-
-    /**
-     * Listen for a specific event.
-     */
-    public function on(string $event, callable $callback): void;
 }
