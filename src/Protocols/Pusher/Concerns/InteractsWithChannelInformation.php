@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Protocols\Pusher\Concerns;
 
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Concerns\InteractsWithPresenceChannels;
@@ -12,12 +13,12 @@ trait InteractsWithChannelInformation
     /**
      * Get meta / status information for the given channels.
      */
-    protected function infoForChannels(array $channels, string $info): array
+    protected function infoForChannels(Application $application, array $channels, string $info): array
     {
-        return collect($channels)->mapWithKeys(function ($channel) use ($info) {
+        return collect($channels)->mapWithKeys(function ($channel) use ($application, $info) {
             $name = $channel instanceof Channel ? $channel->name() : $channel;
 
-            return [$name => $this->info($name, $info)];
+            return [$name => $this->info($application, $name, $info)];
         })->all();
     }
 
@@ -27,11 +28,11 @@ trait InteractsWithChannelInformation
      * @param  array<int, string>  $channels
      * @return array<string, array<string, int>>
      */
-    protected function info(string $channel, string $info): array
+    protected function info(Application $application, string $channel, string $info): array
     {
         $info = explode(',', $info);
 
-        $channel = app(ChannelManager::class)->find($channel);
+        $channel = app(ChannelManager::class)->for($application)->find($channel);
 
         return array_filter(
             $channel ? $this->occupiedInfo($channel, $info) : $this->unoccupiedInfo($info),

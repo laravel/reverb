@@ -50,3 +50,55 @@ it('only returns occupied channels', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-two":{}}}');
 });
+
+it('can gather all channel information', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('presence-test-channel-two');
+
+    $response = await($this->signedRequest('channels?info=user_count'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":{},"presence-test-channel-two":{"user_count":1}}}');
+});
+
+it('can gather filtered channels', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('presence-test-channel-two');
+
+    $response = await($this->signedRequest('channels?info=user_count'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":{},"presence-test-channel-two":{"user_count":1}}}');
+});
+
+it('gathers empty results if no metrics requested', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('test-channel-two');
+
+    $response = await($this->signedRequest('channels'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":{},"test-channel-two":{}}}');
+});
+
+it('only gathers occupied channels', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('test-channel-two');
+
+    $channels = channels();
+    $connection = Arr::first($channels->connections());
+    $channels->unsubscribeFromAll($connection->connection());
+
+    $response = await($this->signedRequest('channels'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-two":{}}}');
+});

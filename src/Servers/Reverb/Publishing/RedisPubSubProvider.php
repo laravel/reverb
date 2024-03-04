@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
 use RuntimeException;
 
 class RedisPubSubProvider implements PubSubProvider
@@ -14,10 +15,12 @@ class RedisPubSubProvider implements PubSubProvider
 
     protected $subscribingClient;
 
-    public function __construct(protected RedisClientFactory $clientFactory,
+    public function __construct(
+        protected RedisClientFactory $clientFactory,
         protected PubSubIncomingMessageHandler $messageHandler,
-        protected string $channel)
-    {
+        protected string $channel
+    ) {
+        //
     }
 
     /**
@@ -27,6 +30,15 @@ class RedisPubSubProvider implements PubSubProvider
     {
         $this->publishingClient = $this->clientFactory->make($loop, $this->redisUrl());
         $this->subscribingClient = $this->clientFactory->make($loop, $this->redisUrl());
+    }
+
+    /**
+     * Disconnect from the publisher.
+     */
+    public function disconnect(): void
+    {
+        $this->subscribingClient?->close();
+        $this->publishingClient?->close();
     }
 
     /**
@@ -44,13 +56,27 @@ class RedisPubSubProvider implements PubSubProvider
     }
 
     /**
+     * Listen for a given event.
+     */
+    public function on(string $event, callable $callback): void
+    {
+        $this->subscribingClient->on('message', function (string $channel, string $payload) use ($event, $callback) {
+            $payload = json_decode($payload, true);
+
+            if (($payload['type'] ?? null) === $event) {
+                $callback($payload);
+            }
+        });
+    }
+
+    /**
      * Publish a payload to the publisher.
      */
-    public function publish(array $payload): void
+    public function publish(array $payload): PromiseInterface
     {
         $this->ensureConnected();
 
-        $this->publishingClient->publish($this->channel, json_encode($payload));
+        return $this->publishingClient->publish($this->channel, json_encode($payload));
     }
 
     /**

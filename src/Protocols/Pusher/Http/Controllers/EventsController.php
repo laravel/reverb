@@ -7,8 +7,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
+use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +21,7 @@ class EventsController extends Controller
     /**
      * Handle the request.
      */
-    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $appId): Response|PromiseInterface
     {
         $this->verify($request, $connection, $appId);
 
@@ -44,12 +46,9 @@ class EventsController extends Controller
         );
 
         if (isset($payload['info'])) {
-            return new JsonResponse([
-                'channels' => array_map(
-                    fn ($item) => (object) $item,
-                    $this->infoForChannels($channels, $payload['info'])
-                ),
-            ]);
+            return app(MetricsHandler::class)
+                ->gather($this->application, 'channels', ['info' => $payload['info'], 'channels' => $channels])
+                ->then(fn ($channels) => new JsonResponse(['channels' => array_map(fn ($channel) => (object) $channel, $channels)]));
         }
 
         return new JsonResponse((object) []);

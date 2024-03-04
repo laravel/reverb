@@ -30,3 +30,25 @@ it('unsubscribes from all channels and terminates a user', function () {
     expect(collect(channels()->all())->get('presence-test-channel-one')->connections())->toHaveCount(1);
     expect(collect(channels()->all())->get('test-channel-two')->connections())->toHaveCount(1);
 });
+
+it('unsubscribes from all channels across all servers and terminates a user', function () {
+    $this->usingRedis();
+
+    $connection = connect();
+    subscribe('presence-test-channel-one', ['user_id' => '789'], connection: $connection);
+    subscribe('test-channel-two', connection: $connection);
+
+    $connection = connect();
+    subscribe('presence-test-channel-one', ['user_id' => '987'], connection: $connection);
+    subscribe('test-channel-two', connection: $connection);
+
+    expect(collect(channels()->find('presence-test-channel-one')->connections()))->toHaveCount(2);
+    expect(collect(channels()->find('test-channel-two')->connections()))->toHaveCount(2);
+
+    $response = await($this->signedPostRequest('users/987/terminate_connections'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+    expect(collect(channels()->all())->get('presence-test-channel-one')->connections())->toHaveCount(1);
+    expect(collect(channels()->all())->get('test-channel-two')->connections())->toHaveCount(1);
+});
