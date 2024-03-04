@@ -51,16 +51,19 @@ class MetricsHandler
     }
 
     /**
-     * Publish the metrics for the given type.
+     * Gather metrics from all subscribers for the given type.
      */
-    public function publish(Application $application, string $key, string $type, array $options = []): void
+    protected function gatherMetrics(Application $application, string $type, array $options = []): PromiseInterface
     {
-        $this->pubSubProvider->publish([
-            'type' => 'metrics-retrieved',
-            'key' => $key,
-            'application' => serialize($application),
-            'payload' => $this->get($application, $type, $options),
-        ]);
+        $deferred = $this->listenForMetrics($key = Str::random(10));
+        $this->requestMetrics($application, $key, $type, $options);
+
+        return timeout($deferred->promise(), 5)->then(
+            fn ($metrics) => $metrics,
+            function () {
+                return $this->metrics;
+            }
+        )->then(fn ($metrics) => $this->merge($metrics, $type));
     }
 
     /**
@@ -69,32 +72,20 @@ class MetricsHandler
     public function get(Application $application, string $type, array $options): array
     {
         return match ($type) {
-            'connections' => $this->connections($application),
-            'channels' => $this->channels($application, $options),
             'channel' => $this->channel($application, $options),
+            'channels' => $this->channels($application, $options),
             'channel_users' => $this->channelUsers($application, $options),
+            'connections' => $this->connections($application),
             default => [],
         };
     }
 
     /**
-     * Return a promise to resolve the given value.
+     * Get the channel for the given application.
      */
-    protected function promise(mixed $value): PromiseInterface
+    protected function channel(Application $application, array $options): array
     {
-        $deferred = new Deferred;
-        $promise = $deferred->promise();
-        $deferred->resolve($value);
-
-        return $promise;
-    }
-
-    /**
-     * Get the connections for the given application.
-     */
-    protected function connections(Application $application): array
-    {
-        return $this->channels->for($application)->connections();
+        return $this->info($application, $options['channel'], $options['info'] ?? '');
     }
 
     /**
@@ -122,13 +113,8 @@ class MetricsHandler
     }
 
     /**
-     * Get the channel for the given application.
+     * Get the channel users for the given application.
      */
-    protected function channel(Application $application, array $options): array
-    {
-        return $this->info($application, $options['channel'], $options['info'] ?? '');
-    }
-
     protected function channelUsers(Application $application, array $options): array
     {
         $channel = $this->channels->for($application)->find($options['channel']);
@@ -145,19 +131,78 @@ class MetricsHandler
     }
 
     /**
-     * Gather metrics from all subscribers for the given type.
+     * Get the connections for the given application.
      */
-    protected function gatherMetrics(Application $application, string $type, array $options = []): PromiseInterface
+    protected function connections(Application $application): array
     {
-        $deferred = $this->listenForMetrics($key = Str::random(10));
-        $this->requestMetrics($application, $key, $type, $options);
+        return $this->channels->for($application)->connections();
+    }
 
-        return timeout($deferred->promise(), 5)->then(
-            fn ($metrics) => $metrics,
-            function () {
-                return $this->metrics;
-            }
-        )->then(fn ($metrics) => $this->merge($metrics, $type));
+    /**
+     * Merge the metrics into a single result set.
+     */
+    protected function merge(array $metrics, string $type): array
+    {
+        return match ($type) {
+            'connections' => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
+            'channels' => $this->mergeChannels($metrics),
+            'channel' => $this->mergeChannel($metrics),
+            'channel_users' => collect($metrics)->flatten(1)->unique()->all(),
+            default => [],
+        };
+    }
+
+    /**
+     * Merge multiple channel instances into a single set.
+     */
+    protected function mergeChannel(array $metrics): array
+    {
+        return collect($metrics)
+            ->reduce(function ($carry, $item) {
+                collect($item)->each(fn ($value, $key) => $carry->put($key, match ($key) {
+                    'occupied' => $carry->get($key, false) || $value,
+                    'user_count' => $carry->get($key, 0) + $value,
+                    'subscription_count' => $carry->get($key, 0) + $value,
+                    default => $value,
+                }));
+
+                return $carry;
+            }, collect())
+            ->all();
+    }
+
+    /**
+     * Merge multiple sets of channel instances into a single result set.
+     */
+    protected function mergeChannels(array $metrics): array
+    {
+        return collect($metrics)
+            ->reduce(function ($carry, $item) {
+                collect($item)->each(function ($data, $channel) use ($carry) {
+                    $metrics = $carry->get($channel, []);
+                    $metrics[] = $data;
+                    $carry->put($channel, $metrics);
+                });
+
+                return $carry;
+            }, collect())
+            ->map(fn ($metrics) => $this->mergeChannel($metrics))
+            ->all();
+    }
+
+    /**
+     * Request metrics from all subscribers.
+     */
+    protected function requestMetrics(Application $application, string $key, string $type, ?array $options): void
+    {
+        $this->pubSubProvider->publish([
+            'type' => 'metrics',
+            'key' => $key,
+            'application' => serialize($application),
+            'payload' => ['type' => $type, 'options' => $options],
+        ])->then(function ($total) {
+            $this->subscribers = $total;
+        });
     }
 
     /**
@@ -183,69 +228,27 @@ class MetricsHandler
     }
 
     /**
-     * Request metrics from all subscribers.
+     * Publish the metrics for the given type.
      */
-    protected function requestMetrics(Application $application, string $key, string $type, ?array $options): void
+    public function publish(Application $application, string $key, string $type, array $options = []): void
     {
         $this->pubSubProvider->publish([
-            'type' => 'metrics',
+            'type' => 'metrics-retrieved',
             'key' => $key,
             'application' => serialize($application),
-            'payload' => ['type' => $type, 'options' => $options],
-        ])->then(function ($total) {
-            $this->subscribers = $total;
-        });
+            'payload' => $this->get($application, $type, $options),
+        ]);
     }
 
     /**
-     * Merge the metrics into a single result set.
+     * Return a promise to resolve the given value.
      */
-    protected function merge(array $metrics, string $type): array
+    protected function promise(mixed $value): PromiseInterface
     {
-        return match ($type) {
-            'connections' => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
-            'channels' => $this->mergeChannels($metrics),
-            'channel' => $this->mergeChannel($metrics),
-            'channel_users' => collect($metrics)->flatten(1)->unique()->all(),
-            default => [],
-        };
-    }
+        $deferred = new Deferred;
+        $promise = $deferred->promise();
+        $deferred->resolve($value);
 
-    /**
-     * Merge multiple sets of channel metrics into a single result set.
-     */
-    protected function mergeChannels(array $metrics): array
-    {
-        return collect($metrics)
-            ->reduce(function ($carry, $item) {
-                collect($item)->each(function ($data, $channel) use ($carry) {
-                    $metrics = $carry->get($channel, []);
-                    $metrics[] = $data;
-                    $carry->put($channel, $metrics);
-                });
-
-                return $carry;
-            }, collect())
-            ->map(fn ($metrics) => $this->mergeChannel($metrics))
-            ->all();
-    }
-
-    /**
-     * Merge multiple channels into a single set.
-     */
-    protected function mergeChannel(array $metrics): array
-    {
-        return collect($metrics)
-            ->reduce(function ($carry, $item) {
-                collect($item)->each(fn ($value, $key) => $carry->put($key, match ($key) {
-                    'occupied' => $carry->get($key, false) || $value,
-                    'user_count' => $carry->get($key, 0) + $value,
-                    'subscription_count' => $carry->get($key, 0) + $value,
-                    default => $value,
-                }));
-
-                return $carry;
-            }, collect())
-            ->all();
+        return $promise;
     }
 }
