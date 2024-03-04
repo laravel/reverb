@@ -49,7 +49,7 @@ it('returns an error when gathering unoccupied channel provided', function () {
 
 it('gathers the user data', function () {
     $this->usingRedis();
-    
+
     $channel = app(ChannelManager::class)
         ->for(app()->make(ApplicationProvider::class)->findByKey('reverb-key'))
         ->findOrCreate('presence-test-channel');
