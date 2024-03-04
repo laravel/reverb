@@ -17,6 +17,21 @@ class MetricsHandler
 {
     use InteractsWithChannelInformation;
 
+    /**
+     * The metrics being gathered.
+     */
+    protected array $metrics = [];
+
+    /**
+     * The total subscribers gathering metrics.
+     *
+     * @var array
+     */
+    protected ?int $subscribers = null;
+
+    /**
+     * Create an instance of the metrics handler.
+     */
     public function __construct(
         protected ChannelManager $channels,
         protected ServerProviderManager $serverProviderManager,
@@ -136,15 +151,13 @@ class MetricsHandler
      */
     protected function gatherMetrics(Application $application, string $type, array $options = []): PromiseInterface
     {
-        [$metrics, $subscribers, $key] = [[], null, Str::random(10)];
-
-        $deferred = $this->listenForMetrics($metrics, $subscribers, $key);
-        $this->requestMetrics($application, $key, $type, $options, $subscribers);
+        $deferred = $this->listenForMetrics($key = Str::random(10));
+        $this->requestMetrics($application, $key, $type, $options);
 
         return timeout($deferred->promise(), 5)->then(
             fn ($metrics) => $metrics,
-            function () use (&$metrics) {
-                return $metrics;
+            function () {
+                return $this->metrics;
             }
         )->then(fn ($metrics) => $this->merge($metrics, $type));
     }
@@ -152,18 +165,19 @@ class MetricsHandler
     /**
      * Listen for metrics from subscribers.
      */
-    protected function listenForMetrics(array &$metrics, ?int &$subscribers, string $key): Deferred
+    protected function listenForMetrics(string $key): Deferred
     {
         $deferred = new Deferred;
 
-        $this->pubSubProvider->on('metrics-retrieved', function ($payload) use (&$subscribers, &$metrics, $key, $deferred) {
+        $this->pubSubProvider->on('metrics-retrieved', function ($payload) use ($key, $deferred) {
             if ($payload['key'] !== $key) {
                 return;
             }
 
-            $metrics[] = $payload['payload'];
-            if ($subscribers !== null && count($metrics) === $subscribers) {
-                $deferred->resolve($metrics);
+            $this->metrics[] = $payload['payload'];
+
+            if ($this->subscribers !== null && count($this->metrics) === $this->subscribers) {
+                $deferred->resolve($this->metrics);
             }
         });
 
@@ -173,15 +187,15 @@ class MetricsHandler
     /**
      * Request metrics from all subscribers.
      */
-    protected function requestMetrics(Application $application, string $key, string $type, ?array $options, ?int &$subscribers): void
+    protected function requestMetrics(Application $application, string $key, string $type, ?array $options): void
     {
         $this->pubSubProvider->publish([
             'type' => 'metrics',
             'key' => $key,
             'application' => serialize($application),
             'payload' => ['type' => $type, 'options' => $options],
-        ])->then(function ($total) use (&$subscribers) {
-            $subscribers = $total;
+        ])->then(function ($total) {
+            $this->subscribers = $total;
         });
     }
 
