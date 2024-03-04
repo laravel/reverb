@@ -58,6 +58,7 @@ class MetricsHandler
             'connections' => $this->connections($application),
             'channels' => $this->channels($application, $options),
             'channel' => $this->channel($application, $options),
+            'channel_users' => $this->channelUsers($application, $options),
             default => [],
         };
     }
@@ -108,6 +109,21 @@ class MetricsHandler
     protected function channel(Application $application, array $options): array
     {
         return $this->info($application, $options['channel'], $options['info'] ?? '');
+    }
+
+    protected function channelUsers(Application $application, array $options): array
+    {
+        $channel = $this->channels->for($application)->find($options['channel']);
+
+        if (! $channel) {
+            return [];
+        }
+
+        return collect($channel->connections())
+            ->map(fn ($connection) => $connection->data())
+            ->map(fn ($data) => ['id' => $data['user_id']])
+            ->values()
+            ->all();
     }
 
     /**
@@ -168,6 +184,7 @@ class MetricsHandler
             'connections' => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
             'channels' => $this->mergeChannels($metrics),
             'channel' => $this->mergeChannel($metrics),
+            'channel_users' => collect($metrics)->flatten(1)->unique()->all(),
             default => [],
         };
     }
