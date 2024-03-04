@@ -178,12 +178,16 @@ class MetricsHandler
     protected function mergeChannels(array $metrics): array
     {
         return collect($metrics)
-            ->reduce(fn ($carry, $item) => $carry->mergeRecursive($item), collect())
-            ->transform(
-                fn ($item) => collect($item)
-                    ->map(fn ($metric) => collect($metric)->sum())
-                    ->all()
-            )
+            ->reduce(function ($carry, $item) {
+                collect($item)->each(function ($data, $channel) use ($carry) {
+                    $metrics = $carry->get($channel, []);
+                    $metrics[] = $data;
+                    $carry->put($channel, $metrics);
+                });
+
+                return $carry;
+            }, collect())
+            ->map(fn ($metrics) => $this->mergeChannel($metrics))
             ->all();
     }
 
@@ -192,18 +196,17 @@ class MetricsHandler
      */
     protected function mergeChannel(array $metrics): array
     {
-        return array_reduce($metrics, function ($carry, $item) {
-            foreach ($item as $key => $value) {
-                $carry[$key] = match ($key) {
-                    'occupied' => $carry[$key] ?? false || $value,
-                    'user_count' => $carry[$key] ?? 0 + $value,
-                    'subscription_count' => $carry[$key] ?? 0 + $value,
-                    'cache' => $carry[$key] ?? null ?? $value,
-                    default => $carry[$key] ?? null,
-                };
-            }
+        return collect($metrics)
+            ->reduce(function ($carry, $item) {
+                collect($item)->each(fn ($value, $key) => $carry->put($key, match ($key) {
+                    'occupied' => $carry->get($key, false) || $value,
+                    'user_count' => $carry->get($key, 0) + $value,
+                    'subscription_count' => $carry->get($key, 0) + $value,
+                    default => $value,
+                }));
 
-            return $carry;
-        }, []);
+                return $carry;
+            }, collect())
+            ->all();
     }
 }
