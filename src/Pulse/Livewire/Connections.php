@@ -28,13 +28,12 @@ class Connections extends Card
     #[Lazy]
     public function render()
     {
-        $readings = $this->graph(["reverb_connections:{$this->app}"], 'avg')->first()->first()->dd();
-        // [$readings, $time, $runAt] = $this->remember(fn () => [
-        //     $connections = $this->graph(["reverb_connections:{$this->app}"], 'avg'),
-        //     $connections->map->map($this->rate(...)),
-        // ], key: $this->app);
+        [$all, $time, $runAt] = $this->remember(fn () => [
+            $readings = $this->graph(['reverb_connections'], 'max'),
+            $readings->map->map(fn ($values) => $values->map($this->rate(...))),
+        ]);
 
-        [$connections, $connectionsRate] = $readings;
+        [$connections, $connectionsRate] = $all;
 
         if (Request::hasHeader('X-Livewire')) {
             $this->dispatch('reverb-connections-chart-update', connections: $connections, connectionsRate: $connectionsRate);
@@ -43,7 +42,6 @@ class Connections extends Card
         return View::make('reverb::livewire.connections', [
             'connections' => $connections,
             'connectionsRate' => $connectionsRate,
-            'rateUnit' => $this->rateUnit(),
             'time' => $time,
             'runAt' => $runAt,
             'config' => Config::get('pulse.recorders.'.ReverbConnections::class),

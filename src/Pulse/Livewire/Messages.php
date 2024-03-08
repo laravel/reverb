@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Pulse\Livewire;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\HtmlString;
 use Laravel\Pulse\Livewire\Card;
 use Laravel\Pulse\Livewire\Concerns\HasPeriod;
 use Laravel\Pulse\Livewire\Concerns\RemembersQueries;
@@ -18,22 +19,17 @@ class Messages extends Card
         Concerns\HasRate;
 
     /**
-     * The application ID to scope metrics to.
-     */
-    public string $app;
-
-    /**
      * Render the component.
      */
     #[Lazy]
     public function render()
     {
-        [$readings, $time, $runAt] = $this->remember(fn () => [
-            $messages = $this->graph(["reverb_message:{$this->app}"], 'count')->map->first(),
-            $messages->map->map($this->rate(...)),
-        ], key: $this->app);
+        [$all, $time, $runAt] = $this->remember(fn () => [
+            $readings = $this->graph(['reverb_message:sent', 'reverb_message:received'], 'count'),
+            $readings->map->map(fn ($values) => $values->map($this->rate(...))),
+        ]);
 
-        [$messages, $messagesRate] = $readings;
+        [$messages, $messagesRate] = $all;
 
         if (Request::hasHeader('X-Livewire')) {
             $this->dispatch('reverb-messages-chart-update', messages: $messages, messagesRate: $messagesRate);
@@ -42,10 +38,26 @@ class Messages extends Card
         return View::make('reverb::livewire.messages', [
             'messages' => $messages,
             'messagesRate' => $messagesRate,
-            'rateUnit' => $this->rateUnit(),
             'time' => $time,
             'runAt' => $runAt,
             'config' => Config::get('pulse.recorders.'.ReverbMessages::class),
         ]);
+    }
+
+    /**
+     * Define any CSS that should be loaded for the component.
+     *
+     * @return string|\Illuminate\Contracts\Support\Htmlable|array<int, string|\Illuminate\Contracts\Support\Htmlable>|null
+     */
+    protected function css(): HtmlString
+    {
+        return new HtmlString(<<<'HTML'
+        <style>
+        .bg-\[\#ea4009\]{background-color:#ea4009}
+        .bg-\[\#bc81f1\]{background-color:#bc81f1}
+        .bg-\[\#10b981\]{background-color:#10b981}
+        .bg-\[\#78d7b3\]{background-color:#78d7b3}
+        </style>
+        HTML);
     }
 }

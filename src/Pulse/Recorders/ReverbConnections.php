@@ -40,13 +40,9 @@ class ReverbConnections
                 ->get('/connections')
                 ->connections;
 
-            if ($connections === 0) {
-                continue;
-            }
-
             $this->pulse->record(
-                type: "reverb_connections:{$app['app_id']}",
-                key: 'active',
+                type: "reverb_connections",
+                key: $app['app_id'],
                 value: $connections,
                 timestamp: $event->time->getTimestamp(),
             )->avg()->max()->onlyBuckets();

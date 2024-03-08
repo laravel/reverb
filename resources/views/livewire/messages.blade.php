@@ -1,6 +1,6 @@
 <x-pulse::card :cols="$cols" :rows="$rows" :class="$class">
     <x-pulse::card-header
-        name="Reverb Messages ({{ $app }})"
+        name="Reverb Messages"
         title="Time: {{ number_format($time) }}ms; Run at: {{ $runAt }};"
         details="past {{ $this->periodForHumans() }}"
     >
@@ -11,11 +11,19 @@
             <div class="flex flex-wrap gap-4">
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
                     <div class="h-0.5 w-3 rounded-full bg-[#9333ea]"></div>
-                    Total
+                    Sent
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#eab308]"></div>
-                    Per {{ $rateUnit }}
+                    <div class="h-0.5 w-3 rounded-full bg-[#bc81f1]"></div>
+                    Sent per {{ $this->rateUnit }}
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
+                    <div class="h-0.5 w-3 rounded-full bg-[#10b981]"></div>
+                    Received
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
+                    <div class="h-0.5 w-3 rounded-full bg-[#78d7b3]"></div>
+                    Received per {{ $this->rateUnit }}
                 </div>
             </div>
         </x-slot:actions>
@@ -26,17 +34,14 @@
             <x-pulse::no-results />
         @else
             <div class="grid gap-3 mx-px mb-px">
-                    @foreach ($messages as $type => $readings)
-                        <div wire:key="messages:{{ $type }}">
-                            <h3 class="font-bold text-gray-700 dark:text-gray-300">
-                                {{ match ($type) {
-                                    'received' =>  'Received',
-                                    'sent' => 'Sent',
-                                } }}
-                            </h3>
-                            @php
-                                $highest = $readings->flatten()->max();
-                            @endphp
+                @foreach ($messages as $app => $readings)
+                    <div wire:key="messages:{{ $app }}">
+                        <h3 class="font-bold text-gray-700 dark:text-gray-300">
+                            {{ $app }}
+                        </h3>
+                        @php
+                            $highest = $readings->flatten()->max();
+                        @endphp
 
                         <div class="mt-3 relative">
                             <div class="absolute -left-px -top-2 max-w-fit h-4 flex items-center px-1 text-xs leading-none text-white font-bold bg-purple-500 rounded after:[--triangle-size:4px] after:border-l-purple-500 after:absolute after:right-[calc(-1*var(--triangle-size))] after:top-[calc(50%-var(--triangle-size))] after:border-t-[length:var(--triangle-size)] after:border-b-[length:var(--triangle-size)] after:border-l-[length:var(--triangle-size)] after:border-transparent">
@@ -51,9 +56,9 @@
                                 wire:ignore
                                 class="h-14"
                                 x-data="messagesChart({
-                                    type: '{{ $type }}',
+                                    app: '{{ $app }}',
                                     readings: @js($readings),
-                                    readingsPerRate: @js($messagesRate[$type]),
+                                    readingsPerRate: @js($messagesRate[$app]),
                                     sampleRate: {{ $config['sample_rate'] }},
                                 })"
                             >
@@ -82,15 +87,29 @@ Alpine.data('messagesChart', (config) => ({
                             pulseId: 'sent',
                             label: 'Sent',
                             borderColor: '#9333ea',
-                            data: this.scale(config.readings),
+                            data: this.scale(config.readings['reverb_message:sent']),
                             order: 0,
                         },
                         {
-                            pulseId: 'per-rate', // we rely on this ID below
-                            label: 'Per {{ $rateUnit }}',
-                            borderColor: '#eab308',
-                            data: this.scale(config.readingsPerRate),
+                            pulseId: 'received',
+                            label: 'Received',
+                            borderColor: '#ea4009',
+                            data: this.scale(config.readings['reverb_message:received']),
                             order: 1,
+                        },
+                        {
+                            pulseId: 'sent-per-rate',
+                            label: 'Sent per {{ $this->rateUnit }}',
+                            borderColor: '#bc81f1',
+                            data: this.scale(config.readingsPerRate['reverb_message:sent']),
+                            order: 2,
+                        },
+                        {
+                            pulseId: 'received-per-rate',
+                            label: 'Received per {{ $this->rateUnit }}',
+                            borderColor: '#78d7b3',
+                            data: this.scale(config.readingsPerRate['reverb_message:received']),
+                            order: 3,
                         },
                     ],
                 },
@@ -136,7 +155,7 @@ Alpine.data('messagesChart', (config) => ({
                             callbacks: {
                                 beforeBody: (context) => context
                                     .map(item => {
-                                        if (item.dataset.pulseId === 'per-rate') {
+                                        if (item.dataset.pulseId.endsWith('per-rate')) {
                                             return `${item.dataset.label}: ~${item.formattedValue}`
                                         }
 
@@ -156,21 +175,29 @@ Alpine.data('messagesChart', (config) => ({
                 return
             }
 
-            chart.data.labels = this.labels(messages[config.type])
-            chart.options.scales.y.max = this.highest(messages[config.type])
-            chart.data.datasets[0].data = this.scale(messages[config.type])
-            chart.data.datasets[1].data = this.scale(messagesRate[config.type])
+            if (messages[config.app] === undefined && chart) {
+                chart.destroy()
+                chart = undefined
+                return
+            }
+
+            chart.data.labels = this.labels(messages[config.app])
+            chart.options.scales.y.max = this.highest(messages[config.app])
+            chart.data.datasets[0].data = this.scale(messages[config.app]['reverb_message:sent'])
+            chart.data.datasets[1].data = this.scale(messages[config.app]['reverb_message:received'])
+            chart.data.datasets[2].data = this.scale(messagesRate[config.app]['reverb_message:sent'])
+            chart.data.datasets[3].data = this.scale(messagesRate[config.app]['reverb_message:received'])
             chart.update()
         })
     },
     labels(readings) {
-        return Object.keys(readings)
+        return Object.keys(readings['reverb_message:sent'])
     },
     scale(data) {
         return Object.values(data).map(value => value * (1 / config.sampleRate ))
     },
     highest(readings) {
-        return Math.max(...Object.values(readings)) * (1 / config.sampleRate)
+        return Math.max(...Object.values(readings).map(dataset => Math.max(...Object.values(dataset)))) * (1 / config.sampleRate)
     }
 }))
 </script>

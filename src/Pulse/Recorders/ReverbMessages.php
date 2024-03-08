@@ -43,11 +43,11 @@ class ReverbMessages
         }
 
         $this->pulse->record(
-            type: "reverb_message:{$event->connection->app()->id()}",
-            key: match ($event::class) {
+            type: 'reverb_message:'.match ($event::class) {
                 MessageSent::class => 'sent',
                 MessageReceived::class => 'received',
             },
+            key: $event->connection->app()->id(),
             timestamp: CarbonImmutable::now()->getTimestamp(),
         )->onlyBuckets()->count();
     }

@@ -1,6 +1,6 @@
 <x-pulse::card :cols="$cols" :rows="$rows" :class="$class">
     <x-pulse::card-header
-        name="Reverb Connections ({{ $app }})"
+        name="Reverb Connections"
         title="Time: {{ number_format($time) }}ms; Run at: {{ $runAt }};"
         details="past {{ $this->periodForHumans() }}"
     >
@@ -15,7 +15,7 @@
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
                     <div class="h-0.5 w-3 rounded-full bg-[#eab308]"></div>
-                    Per {{ $rateUnit }}
+                    Total Per {{ $this->rateUnit }}
                 </div>
             </div>
         </x-slot:actions>
@@ -26,17 +26,14 @@
             <x-pulse::no-results />
         @else
             <div class="grid gap-3 mx-px mb-px">
-                    @foreach ($connections as $type => $readings)
-                        <div wire:key="connections:{{ $type }}">
-                            <h3 class="font-bold text-gray-700 dark:text-gray-300">
-                                {{ match ($type) {
-                                    'received' =>  'Received',
-                                    'sent' => 'Sent',
-                                } }}
-                            </h3>
-                            @php
-                                $highest = $readings->flatten()->max();
-                            @endphp
+                @foreach ($connections as $app => $readings)
+                    <div wire:key="connections:{{ $app }}">
+                        <h3 class="font-bold text-gray-700 dark:text-gray-300">
+                            {{ $app }}
+                        </h3>
+                        @php
+                            $highest = $readings->flatten()->max();
+                        @endphp
 
                         <div class="mt-3 relative">
                             <div class="absolute -left-px -top-2 max-w-fit h-4 flex items-center px-1 text-xs leading-none text-white font-bold bg-purple-500 rounded after:[--triangle-size:4px] after:border-l-purple-500 after:absolute after:right-[calc(-1*var(--triangle-size))] after:top-[calc(50%-var(--triangle-size))] after:border-t-[length:var(--triangle-size)] after:border-b-[length:var(--triangle-size)] after:border-l-[length:var(--triangle-size)] after:border-transparent">
@@ -51,9 +48,9 @@
                                 wire:ignore
                                 class="h-14"
                                 x-data="connectionsChart({
-                                    type: '{{ $type }}',
+                                    app: '{{ $app }}',
                                     readings: @js($readings),
-                                    readingsPerRate: @js($connectionsRate[$type]),
+                                    readingsPerRate: @js($connectionsRate[$app]),
                                     sampleRate: {{ $config['sample_rate'] }},
                                 })"
                             >
@@ -79,17 +76,17 @@ Alpine.data('connectionsChart', (config) => ({
                     labels: this.labels(config.readings),
                     datasets: [
                         {
-                            pulseId: 'sent',
-                            label: 'Sent',
+                            pulseId: 'total',
+                            label: 'Total',
                             borderColor: '#9333ea',
-                            data: this.scale(config.readings),
+                            data: this.scale(config.readings['reverb_connections']),
                             order: 0,
                         },
                         {
-                            pulseId: 'per-rate', // we rely on this ID below
-                            label: 'Per {{ $rateUnit }}',
-                            borderColor: '#eab308',
-                            data: this.scale(config.readingsPerRate),
+                            pulseId: 'total-per-rate',
+                            label: 'Total per {{ $this->rateUnit }}',
+                            borderColor: '#9333ea',
+                            data: this.scale(config.readingsPerRate['reverb_connections']),
                             order: 1,
                         },
                     ],
@@ -136,7 +133,7 @@ Alpine.data('connectionsChart', (config) => ({
                             callbacks: {
                                 beforeBody: (context) => context
                                     .map(item => {
-                                        if (item.dataset.pulseId === 'per-rate') {
+                                        if (item.dataset.pulseId.endsWith('per-rate')) {
                                             return `${item.dataset.label}: ~${item.formattedValue}`
                                         }
 
@@ -156,23 +153,28 @@ Alpine.data('connectionsChart', (config) => ({
                 return
             }
 
-            chart.data.labels = this.labels(connections[config.type])
-            chart.options.scales.y.max = this.highest(connections[config.type])
-            chart.data.datasets[0].data = this.scale(connections[config.type])
-            chart.data.datasets[1].data = this.scale(connectionsRate[config.type])
+            if (connections[config.app] === undefined && chart) {
+                chart.destroy()
+                chart = undefined
+                return
+            }
+
+            chart.data.labels = this.labels(connections[config.app])
+            chart.options.scales.y.max = this.highest(connections[config.app])
+            chart.data.datasets[0].data = this.scale(connections[config.app]['reverb_connections'])
+            chart.data.datasets[1].data = this.scale(connectionsRate[config.app]['reverb_connections'])
             chart.update()
         })
     },
     labels(readings) {
-        return Object.keys(readings)
+        return Object.keys(readings['reverb_connections'])
     },
     scale(data) {
         return Object.values(data).map(value => value * (1 / config.sampleRate ))
     },
     highest(readings) {
-        return Math.max(...Object.values(readings)) * (1 / config.sampleRate)
+        return Math.max(...Object.values(readings).map(dataset => Math.max(...Object.values(dataset)))) * (1 / config.sampleRate)
     }
 }))
 </script>
 @endscript
-
