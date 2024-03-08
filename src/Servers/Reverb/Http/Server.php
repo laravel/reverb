@@ -70,6 +70,8 @@ class Server
             $request = Request::from($message, $connection);
         } catch (OverflowException $e) {
             $this->close($connection, 413, 'Payload too large.');
+        } catch (Throwable $e) {
+            $this->close($connection, 400, 'Bad request.');
         }
 
         return $request ?? null;
