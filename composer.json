@@ -20,7 +20,6 @@
     ],
     "require": {
         "php": "^8.2",
-        "aws/aws-sdk-php": "^3.241",
         "clue/redis-react": "^2.6",
         "guzzlehttp/psr7": "^2.6",
         "illuminate/console": "^10.47|^11.0",
