@@ -49,7 +49,7 @@ class InstallCommand extends Command
         }
 
         $contents = File::get($env);
-        $appId = random_int(100000, 999999);
+        $appId = random_int(100_000, 999_999);
         $appKey = Str::lower(Str::random(20));
         $appSecret = Str::lower(Str::random(20));
 

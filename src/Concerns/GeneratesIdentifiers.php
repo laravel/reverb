@@ -9,6 +9,6 @@ trait GeneratesIdentifiers
      */
     protected function generateId(): string
     {
-        return sprintf('%d.%d', random_int(1, 1000000000), random_int(1, 1000000000));
+        return sprintf('%d.%d', random_int(1, 1_000_000_000), random_int(1, 1_000_000_000));
     }
 }
