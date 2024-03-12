@@ -26,9 +26,9 @@ trait HasRate
             '24_hours' => CarbonInterval::hour(),
             '7_days' => CarbonInterval::day(),
             default => CarbonInterval::second(),
-        }, fn ($period) => $period->totalSeconds > $this->secondsPerBucket()
-            ? $this->secondsPerBucket() / $period->totalSeconds
-            : $period->totalSeconds / $this->secondsPerBucket());
+        }, fn ($period) => $period->totalSeconds > $this->secondsPerBucket
+            ? $this->secondsPerBucket / $period->totalSeconds
+            : $period->totalSeconds / $this->secondsPerBucket);
     }
 
     /**
