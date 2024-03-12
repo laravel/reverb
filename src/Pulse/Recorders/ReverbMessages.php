@@ -9,7 +9,7 @@ use Laravel\Pulse\Recorders\Concerns\Sampling;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Events\MessageSent;
 
-class Messages
+class ReverbMessages
 {
     use Sampling;
 
@@ -19,34 +19,36 @@ class Messages
      * @var list<class-string>
      */
     public array $listen = [
-        MessageReceived::class,
         MessageSent::class,
+        MessageReceived::class,
     ];
 
     /**
      * Create a new recorder instance.
      */
-    public function __construct(protected Pulse $pulse, protected Repository $config)
-    {
+    public function __construct(
+        protected Pulse $pulse,
+        protected Repository $config
+    ) {
         //
     }
 
     /**
      * Record the message.
      */
-    public function record(MessageSent $event): void
+    public function record(MessageSent|MessageReceived $event): void
     {
         if (! $this->shouldSample()) {
             return;
         }
 
-        $this->pulse->lazy(function () use ($event) {
-            $this->pulse->record(
-                type: "reverb_messages:{$event->connection->app()->id()}",
-                key: "reverb_messages:{$event->connection->app()->id()}",
-                value: $timestamp = CarbonImmutable::now()->getTimestamp(),
-                timestamp: $timestamp,
-            )->count();
-        });
+        $this->pulse->record(
+            type: 'reverb_message:'.match ($event::class) {
+                MessageSent::class => 'sent',
+                MessageReceived::class => 'received',
+            },
+            key: $event->connection->app()->id(),
+            timestamp: CarbonImmutable::now()->getTimestamp(),
+        )->onlyBuckets()->count();
     }
 }
