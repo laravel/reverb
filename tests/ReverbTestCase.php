@@ -53,7 +53,7 @@ class ReverbTestCase extends TestCase
             'capacity' => null,
             'allowed_origins' => ['*'],
             'ping_interval' => 10,
-            'max_message_size' => 1000000,
+            'max_message_size' => 1_000_000,
         ]);
 
         $app['config']->set('reverb.apps.apps.2', [
