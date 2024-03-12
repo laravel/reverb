@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
+use Laravel\Reverb\Events\WebSocketConnected;
+use Laravel\Reverb\Events\WebSocketDisconnect;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
@@ -34,6 +36,8 @@ class Server
             $this->handler->handle($connection, 'pusher:connection_established');
 
             Log::info('Connection Established', $connection->id());
+
+            WebSocketConnected::dispatch($connection);
         } catch (Exception $e) {
             $this->error($connection, $e);
         }
@@ -80,6 +84,8 @@ class Server
             ->unsubscribeFromAll($connection);
 
         $connection->disconnect();
+
+        WebSocketDisconnect::dispatch($connection);
 
         Log::info('Connection Closed', $connection->id());
     }
