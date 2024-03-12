@@ -45,7 +45,7 @@ class ReverbConnections
                 ->connections;
 
             $this->pulse->record(
-                type: "reverb_connections",
+                type: 'reverb_connections',
                 key: $app['app_id'],
                 value: $connections,
                 timestamp: $event->time->getTimestamp(),

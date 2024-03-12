@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Pulse\Livewire\Concerns;
 
 use Carbon\CarbonInterval;
-use Livewire\Attributes\Computed;
 
 trait HasRate
 {
@@ -35,7 +34,7 @@ trait HasRate
      */
     protected function secondsPerBucket(): float
     {
-        return ($this->periodAsInterval()->totalSeconds / $maxDataPoints = 60);
+        return $this->periodAsInterval()->totalSeconds / $maxDataPoints = 60;
     }
 
     /**

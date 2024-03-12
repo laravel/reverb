@@ -14,9 +14,9 @@ use Livewire\Attributes\Lazy;
 
 class Messages extends Card
 {
-    use HasPeriod,
-        RemembersQueries,
-        Concerns\HasRate;
+    use Concerns\HasRate,
+        HasPeriod,
+        RemembersQueries;
 
     /**
      * The graph colors.
