@@ -43,11 +43,7 @@ class ReverbServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
 
         if ($this->app->bound(\Laravel\Pulse\Pulse::class)) {
-            $this->callAfterResolving('blade.compiler', function (BladeCompiler $blade) {
-                $blade->anonymousComponentPath(__DIR__.'/../resources/views', 'reverb');
-            });
-
-            $this->callAfterResolving('livewire', function (LivewireManager $livewire, Application $app) {
+            $this->callAfterResolving('livewire', function (LivewireManager $livewire) {
                 $livewire->component('reverb.messages', Livewire\Messages::class);
                 $livewire->component('reverb.connections', Livewire\Connections::class);
             });
