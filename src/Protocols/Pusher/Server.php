@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Events\WebSocketConnected;
-use Laravel\Reverb\Events\WebSocketDisconnect;
+use Laravel\Reverb\Events\WebSocketDisconnected;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
@@ -85,7 +85,7 @@ class Server
 
         $connection->disconnect();
 
-        WebSocketDisconnect::dispatch($connection);
+        WebSocketDisconnected::dispatch($connection);
 
         Log::info('Connection Closed', $connection->id());
     }
