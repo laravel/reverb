@@ -66,6 +66,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
 
         $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
+        $this->components->warn('Press Ctrl+C to stop the server');
 
         $server->start();
     }
