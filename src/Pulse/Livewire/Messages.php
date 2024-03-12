@@ -19,6 +19,16 @@ class Messages extends Card
         Concerns\HasRate;
 
     /**
+     * The graph colors.
+     */
+    public array $colors = [
+        'received' => '#10b981',
+        'received:per_rate' => '#78d7b3',
+        'sent' => '#9333ea',
+        'sent:per_rate' => '#bc81f1',
+    ];
+
+    /**
      * Render the component.
      */
     #[Lazy]
@@ -51,13 +61,10 @@ class Messages extends Card
      */
     protected function css(): HtmlString
     {
-        return new HtmlString(<<<'HTML'
-        <style>
-        .bg-\[\#ea4009\]{background-color:#ea4009}
-        .bg-\[\#bc81f1\]{background-color:#bc81f1}
-        .bg-\[\#10b981\]{background-color:#10b981}
-        .bg-\[\#78d7b3\]{background-color:#78d7b3}
-        </style>
-        HTML);
+        return new HtmlString(
+            '<style>'.
+            collect($this->colors)->map(fn ($color) => '.bg-\\[\\'.$color.'\\]{background-color:'.$color.'}')->join('').
+            '</style>'
+        );
     }
 }

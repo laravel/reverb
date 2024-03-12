@@ -10,12 +10,12 @@
         <x-slot:actions>
             <div class="flex flex-wrap gap-4">
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#9333ea]"></div>
-                    Total
+                    <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['max'] }}]"></div>
+                    Peak
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#eab308]"></div>
-                    Total Per {{ $this->rateUnit }}
+                    <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['avg'] }}]"></div>
+                    Average
                 </div>
             </div>
         </x-slot:actions>
@@ -50,7 +50,6 @@
                                 x-data="connectionsChart({
                                     app: '{{ $app }}',
                                     readings: @js($readings),
-                                    readingsPerRate: @js($connectionsRate[$app]),
                                     sampleRate: {{ $config['sample_rate'] }},
                                 })"
                             >
@@ -76,17 +75,15 @@ Alpine.data('connectionsChart', (config) => ({
                     labels: this.labels(config.readings),
                     datasets: [
                         {
-                            pulseId: 'total',
-                            label: 'Total',
-                            borderColor: '#9333ea',
-                            data: this.scale(config.readings['reverb_connections']),
+                            label: 'Peak',
+                            borderColor: '{{ $this->colors['max'] }}',
+                            data: this.scale(config.readings['reverb_connections:max']),
                             order: 0,
                         },
                         {
-                            pulseId: 'total-per-rate',
-                            label: 'Total per {{ $this->rateUnit }}',
-                            borderColor: '#9333ea',
-                            data: this.scale(config.readingsPerRate['reverb_connections']),
+                            label: 'Average',
+                            borderColor: '{{ $this->colors['avg'] }}',
+                            data: this.scale(config.readings['reverb_connections:avg']),
                             order: 1,
                         },
                     ],
@@ -132,13 +129,7 @@ Alpine.data('connectionsChart', (config) => ({
                             intersect: false,
                             callbacks: {
                                 beforeBody: (context) => context
-                                    .map(item => {
-                                        if (item.dataset.pulseId.endsWith('per-rate')) {
-                                            return `${item.dataset.label}: ~${item.formattedValue}`
-                                        }
-
-                                        return `${item.dataset.label}: ${config.sampleRate < 1 ? '~' : ''}${item.formattedValue}`
-                                    })
+                                    .map(item => `${item.dataset.label}: ${config.sampleRate < 1 ? '~' : ''}${item.formattedValue}`)
                                     .join(', '),
                                 label: () => null,
                             },
@@ -148,7 +139,7 @@ Alpine.data('connectionsChart', (config) => ({
             }
         )
 
-        Livewire.on('reverb-connections-chart-update', ({ connections, connectionsRate }) => {
+        Livewire.on('reverb-connections-chart-update', ({ connections }) => {
             if (chart === undefined) {
                 return
             }
@@ -161,13 +152,13 @@ Alpine.data('connectionsChart', (config) => ({
 
             chart.data.labels = this.labels(connections[config.app])
             chart.options.scales.y.max = this.highest(connections[config.app])
-            chart.data.datasets[0].data = this.scale(connections[config.app]['reverb_connections'])
-            chart.data.datasets[1].data = this.scale(connectionsRate[config.app]['reverb_connections'])
+            chart.data.datasets[0].data = this.scale(connections[config.app]['reverb_connections:max'])
+            chart.data.datasets[1].data = this.scale(connections[config.app]['reverb_connections:avg'])
             chart.update()
         })
     },
     labels(readings) {
-        return Object.keys(readings['reverb_connections'])
+        return Object.keys(readings['reverb_connections:max'])
     },
     scale(data) {
         return Object.values(data).map(value => value * (1 / config.sampleRate ))

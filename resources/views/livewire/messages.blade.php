@@ -10,19 +10,19 @@
         <x-slot:actions>
             <div class="flex flex-wrap gap-4">
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#9333ea]"></div>
+                    <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['sent'] }}]"></div>
                     Sent
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#bc81f1]"></div>
+                    <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['sent:per_rate'] }}]"></div>
                     Sent per {{ $this->rateUnit }}
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#10b981]"></div>
+                    <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['received'] }}]"></div>
                     Received
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
-                    <div class="h-0.5 w-3 rounded-full bg-[#78d7b3]"></div>
+                    <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['received:per_rate'] }}]"></div>
                     Received per {{ $this->rateUnit }}
                 </div>
             </div>
@@ -86,28 +86,28 @@ Alpine.data('messagesChart', (config) => ({
                         {
                             pulseId: 'sent',
                             label: 'Sent',
-                            borderColor: '#9333ea',
+                            borderColor: '{{ $this->colors['sent'] }}',
                             data: this.scale(config.readings['reverb_message:sent']),
                             order: 0,
                         },
                         {
                             pulseId: 'received',
                             label: 'Received',
-                            borderColor: '#ea4009',
+                            borderColor: '{{ $this->colors['received'] }}',
                             data: this.scale(config.readings['reverb_message:received']),
                             order: 1,
                         },
                         {
                             pulseId: 'sent-per-rate',
                             label: 'Sent per {{ $this->rateUnit }}',
-                            borderColor: '#bc81f1',
+                            borderColor: '{{ $this->colors['sent:per_rate'] }}',
                             data: this.scale(config.readingsPerRate['reverb_message:sent']),
                             order: 2,
                         },
                         {
                             pulseId: 'received-per-rate',
                             label: 'Received per {{ $this->rateUnit }}',
-                            borderColor: '#78d7b3',
+                            borderColor: '{{ $this->colors['received:per_rate'] }}',
                             data: this.scale(config.readingsPerRate['reverb_message:received']),
                             order: 3,
                         },
