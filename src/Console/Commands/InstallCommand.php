@@ -57,7 +57,7 @@ class InstallCommand extends Command
             'REVERB_APP_ID' => "REVERB_APP_ID={$appId}",
             'REVERB_APP_KEY' => "REVERB_APP_KEY={$appKey}",
             'REVERB_APP_SECRET' => "REVERB_APP_SECRET={$appSecret}",
-            'REVERB_HOST' => 'REVERB_HOST="0.0.0.0"',
+            'REVERB_HOST' => 'REVERB_HOST="localhost"',
             'REVERB_PORT' => 'REVERB_PORT=8080',
             'REVERB_SCHEME' => 'REVERB_SCHEME=http',
             'REVERB_NEW_LINE' => null,
