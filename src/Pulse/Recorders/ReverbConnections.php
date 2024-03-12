@@ -35,6 +35,10 @@ class ReverbConnections
      */
     public function record(IsolatedBeat $event): void
     {
+        if ($event->time->second % 15 !== 0) {
+            return;
+        }
+
         foreach ($this->config->get('reverb.apps.apps') as $app) {
             $connections = $this->broadcast->pusher($app)
                 ->get('/connections')

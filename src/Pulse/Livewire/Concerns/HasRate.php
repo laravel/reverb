@@ -12,9 +12,7 @@ trait HasRate
      */
     protected function rate(?float $count): ?float
     {
-        return ! $count
-            ? null
-            : round($count * $this->rateMultiplier, 2);
+        return $count ? round($count * $this->rateMultiplier, 2) : null;
     }
 
     /**
@@ -23,18 +21,23 @@ trait HasRate
     #[Computed]
     protected function rateMultiplier(): float
     {
-        $secondsPerBucket = ($this->periodAsInterval()->totalSeconds / $maxDataPoints = 60);
-
-        $period = match ($this->period) {
+        return with(match ($this->period) {
             '6_hours' => CarbonInterval::minute(),
             '24_hours' => CarbonInterval::hour(),
             '7_days' => CarbonInterval::day(),
             default => CarbonInterval::second(),
-        };
+        }, fn ($period) => $period->totalSeconds > $this->secondsPerBucket()
+            ? $this->secondsPerBucket() / $period->totalSeconds
+            : $period->totalSeconds / $this->secondsPerBucket());
+    }
 
-        return $period->totalSeconds > $secondsPerBucket
-            ? $secondsPerBucket / $period->totalSeconds
-            : $period->totalSeconds / $secondsPerBucket;
+    /**
+     * The seconds per bucket.
+     */
+    #[Computed]
+    protected function secondsPerBucket(): float
+    {
+        return ($this->periodAsInterval()->totalSeconds / $maxDataPoints = 60);
     }
 
     /**
