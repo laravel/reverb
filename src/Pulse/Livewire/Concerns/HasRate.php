@@ -12,13 +12,12 @@ trait HasRate
      */
     protected function rate(?float $count): ?float
     {
-        return $count ? round($count * $this->rateMultiplier, 2) : null;
+        return $count ? round($count * $this->rateMultiplier(), 2) : null;
     }
 
     /**
      * The rate multiplier.
      */
-    #[Computed]
     protected function rateMultiplier(): float
     {
         return with(match ($this->period) {
@@ -34,7 +33,6 @@ trait HasRate
     /**
      * The seconds per bucket.
      */
-    #[Computed]
     protected function secondsPerBucket(): float
     {
         return ($this->periodAsInterval()->totalSeconds / $maxDataPoints = 60);
@@ -43,7 +41,6 @@ trait HasRate
     /**
      * The rate unit.
      */
-    #[Computed]
     protected function rateUnit(): string
     {
         return match ($this->period) {

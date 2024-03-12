@@ -15,7 +15,7 @@
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
                     <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['sent:per_rate'] }}]"></div>
-                    Sent per {{ $this->rateUnit }}
+                    Sent per {{ $this->rateUnit() }}
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
                     <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['received'] }}]"></div>
@@ -23,7 +23,7 @@
                 </div>
                 <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 font-medium">
                     <div class="h-0.5 w-3 rounded-full bg-[{{ $this->colors['received:per_rate'] }}]"></div>
-                    Received per {{ $this->rateUnit }}
+                    Received per {{ $this->rateUnit() }}
                 </div>
             </div>
         </x-slot:actions>
@@ -99,14 +99,14 @@ Alpine.data('messagesChart', (config) => ({
                         },
                         {
                             pulseId: 'sent-per-rate',
-                            label: 'Sent per {{ $this->rateUnit }}',
+                            label: 'Sent per {{ $this->rateUnit() }}',
                             borderColor: '{{ $this->colors['sent:per_rate'] }}',
                             data: this.scale(config.readingsPerRate['reverb_message:sent']),
                             order: 2,
                         },
                         {
                             pulseId: 'received-per-rate',
-                            label: 'Received per {{ $this->rateUnit }}',
+                            label: 'Received per {{ $this->rateUnit() }}',
                             borderColor: '{{ $this->colors['received:per_rate'] }}',
                             data: this.scale(config.readingsPerRate['reverb_message:received']),
                             order: 3,
