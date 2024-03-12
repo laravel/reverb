@@ -7,7 +7,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 trait SerializesChannels
 {
     /**
-     * Prepare the connection instance values for serialization.
+     * Prepare the channel instance values for serialization.
      *
      * @return array<string, mixed>
      */
@@ -19,7 +19,7 @@ trait SerializesChannels
     }
 
     /**
-     * Restore the connection after serialization.
+     * Restore the channel after serialization.
      */
     public function __unserialize(array $values): void
     {

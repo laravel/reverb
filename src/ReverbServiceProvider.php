@@ -4,7 +4,7 @@ namespace Laravel\Reverb;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Compilers\BladeCompiler;
+use Laravel\Reverb\Console\Commands\InstallCommand;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
 use Laravel\Reverb\Pulse\Reverb;
@@ -35,6 +35,8 @@ class ReverbServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
+            $this->commands(InstallCommand::class);
+
             $this->publishes([
                 __DIR__.'/../config/reverb.php' => config_path('reverb.php'),
             ], ['reverb', 'reverb-config']);

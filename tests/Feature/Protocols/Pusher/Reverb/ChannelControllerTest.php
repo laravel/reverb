@@ -48,3 +48,54 @@ it('can return only the requested attributes', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1}');
 });
+
+it('can gather data for a single channel', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('test-channel-one');
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":2}');
+});
+
+it('gathers unoccupied when no connections', function () {
+    $this->usingRedis();
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":false}');
+});
+
+it('can gather cache channel attributes', function () {
+    $this->usingRedis();
+
+    subscribe('cache-test-channel-one');
+    channels()->find('cache-test-channel-one')->broadcast(['some' => 'data']);
+
+    $response = await($this->signedRequest('channels/cache-test-channel-one?info=subscription_count,cache'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1,"cache":{"some":"data"}}');
+});
+
+it('can gather only the requested attributes', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1}');
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=cache'));
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true}');
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=subscription_count,user_count'));
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1}');
+});

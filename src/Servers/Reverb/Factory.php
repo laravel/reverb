@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb;
 
 use InvalidArgumentException;
+use Laravel\Reverb\Certificate;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -16,7 +17,9 @@ use Laravel\Reverb\Protocols\Pusher\Http\Controllers\PusherController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\UsersTerminateController;
 use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelManager;
+use Laravel\Reverb\Protocols\Pusher\PusherPubSubIncomingMessageHandler;
 use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Route;
 use Laravel\Reverb\Servers\Reverb\Http\Router;
 use Laravel\Reverb\Servers\Reverb\Http\Server as HttpServer;
@@ -32,7 +35,7 @@ class Factory
     /**
      * Create a new WebSocket server instance.
      */
-    public static function make(string $host = '0.0.0.0', string $port = '8080', string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
+    public static function make(string $host = '0.0.0.0', string $port = '8080', ?string $hostname = null, array $options = [], string $protocol = 'pusher', ?LoopInterface $loop = null): HttpServer
     {
         $loop = $loop ?: Loop::get();
 
@@ -41,9 +44,20 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
-        $socket = new SocketServer("{$host}:{$port}", [], $loop);
+        if (empty($options['tls']) && $hostname && Certificate::exists($hostname)) {
+            [$certificate, $key] = Certificate::resolve($hostname);
 
-        return new HttpServer($socket, $router, $loop);
+            $options['tls']['local_cert'] = $certificate;
+            $options['tls']['local_pk'] = $key;
+        }
+
+        $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
+
+        return new HttpServer(
+            new SocketServer($uri, $options, $loop),
+            $router,
+            $loop
+        );
     }
 
     /**
@@ -59,6 +73,11 @@ class Factory
         app()->bind(
             ChannelConnectionManager::class,
             fn () => new ArrayChannelConnectionManager
+        );
+
+        app()->singleton(
+            PubSubIncomingMessageHandler::class,
+            fn () => new PusherPubSubIncomingMessageHandler,
         );
 
         return new Router(new UrlMatcher(static::pusherRoutes(), new RequestContext));

@@ -28,11 +28,7 @@ class ChannelConnection
      */
     public function data(?string $key = null): mixed
     {
-        if ($key) {
-            return Arr::get($this->data, $key);
-        }
-
-        return $this->data;
+        return $key ? Arr::get($this->data, $key) : $this->data;
     }
 
     /**
@@ -44,7 +40,7 @@ class ChannelConnection
     }
 
     /**
-     * Call the method on the connection.
+     * Proxy the given method to the underlying connection.
      */
     public function __call(string $method, array $parameters): mixed
     {

@@ -3,8 +3,10 @@
 namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
 use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
 use Psr\Http\Message\RequestInterface;
+use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,7 +17,7 @@ class ChannelUsersController extends Controller
     /**
      * Handle the request.
      */
-    public function __invoke(RequestInterface $request, Connection $connection, string $channel, string $appId): Response
+    public function __invoke(RequestInterface $request, Connection $connection, string $channel, string $appId): Response|PromiseInterface
     {
         $this->verify($request, $connection, $appId);
 
@@ -29,11 +31,8 @@ class ChannelUsersController extends Controller
             return new JsonResponse((object) [], 400);
         }
 
-        $connections = collect($channel->connections())
-            ->map(fn ($connection) => $connection->data())
-            ->map(fn ($data) => ['id' => $data['user_id']])
-            ->values();
-
-        return new JsonResponse(['users' => $connections]);
+        return app(MetricsHandler::class)
+            ->gather($this->application, 'channel_users', ['channel' => $channel->name()])
+            ->then(fn ($connections) => new JsonResponse(['users' => $connections]));
     }
 }

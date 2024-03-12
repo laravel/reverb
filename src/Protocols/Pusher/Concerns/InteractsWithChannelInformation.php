@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Protocols\Pusher\Concerns;
 
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Concerns\InteractsWithPresenceChannels;
@@ -10,27 +11,28 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 trait InteractsWithChannelInformation
 {
     /**
-     * Get the info for the given channels.
+     * Get meta / status information for the given channels.
      */
-    protected function infoForChannels(array $channels, string $info): array
+    protected function infoForChannels(Application $application, array $channels, string $info): array
     {
-        return collect($channels)->mapWithKeys(function ($channel) use ($info) {
+        return collect($channels)->mapWithKeys(function ($channel) use ($application, $info) {
             $name = $channel instanceof Channel ? $channel->name() : $channel;
 
-            return [$name => $this->info($name, $info)];
+            return [$name => $this->info($application, $name, $info)];
         })->all();
     }
 
     /**
-     * Get the info for the given channels.
+     * Get meta / status information for the given channel.
      *
      * @param  array<int, string>  $channels
      * @return array<string, array<string, int>>
      */
-    protected function info(string $channel, string $info): array
+    protected function info(Application $application, string $channel, string $info): array
     {
         $info = explode(',', $info);
-        $channel = app(ChannelManager::class)->find($channel);
+
+        $channel = app(ChannelManager::class)->for($application)->find($channel);
 
         return array_filter(
             $channel ? $this->occupiedInfo($channel, $info) : $this->unoccupiedInfo($info),
@@ -39,9 +41,9 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Get the channel information for the given occupied channel.
+     * Get channel information for the given occupied channel.
      */
-    protected function occupiedInfo(Channel $channel, array $info): array
+    private function occupiedInfo(Channel $channel, array $info): array
     {
         $count = count($channel->connections());
 
@@ -54,9 +56,9 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Get the channel information for the given unoccupied channel.
+     * Get channel information for the given unoccupied channel.
      */
-    protected function unoccupiedInfo(array $info): array
+    private function unoccupiedInfo(array $info): array
     {
         return [
             'occupied' => in_array('occupied', $info) ? false : null,
@@ -64,7 +66,7 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Determine if the channel is a presence channel.
+     * Determine if the given channel is a presence channel.
      */
     protected function isPresenceChannel(Channel $channel): bool
     {
@@ -72,7 +74,7 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Determine if the channel is a cache channel.
+     * Determine if the given channel is a cache channel.
      */
     protected function isCacheChannel(Channel $channel): bool
     {

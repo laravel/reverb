@@ -8,17 +8,20 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 
 class ArrayChannelConnectionManager implements ChannelConnectionManager
 {
+    /**
+     * The channel name.
+     */
     protected string $name;
 
     /**
-     * Connection store.
+     * The underlying connections.
      *
      * @var array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */
     protected $connections = [];
 
     /**
-     * The channel name.
+     * Get a channel connection manager for the given channel name.
      */
     public function for(string $name): ChannelConnectionManager
     {
@@ -44,7 +47,7 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
-     * Find a connection in the set.
+     * Find a connection.
      */
     public function find(Connection $connection): ?ChannelConnection
     {
@@ -52,7 +55,7 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
-     * Find a connection in the set by its ID.
+     * Find a connection by its ID.
      */
     public function findById(string $id): ?ChannelConnection
     {
@@ -60,7 +63,7 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
     }
 
     /**
-     * Get all the connections.
+     * Get all of the connections.
      *
      * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */

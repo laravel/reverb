@@ -25,7 +25,7 @@ class CliLogger implements Logger
     }
 
     /**
-     * Log an infomational message.
+     * Log an informational message.
      */
     public function info(string $title, ?string $message = null): void
     {
@@ -38,14 +38,6 @@ class CliLogger implements Logger
     public function error(string $string): void
     {
         $this->output->error($string);
-    }
-
-    /**
-     * Append a new line to the log.
-     */
-    public function line(int $lines = 1): void
-    {
-        $this->output->newLine($lines);
     }
 
     /**
@@ -68,5 +60,13 @@ class CliLogger implements Logger
         (new Message($this->output))->render(
             $message
         );
+    }
+
+    /**
+     * Append a new line to the log.
+     */
+    public function line(int $lines = 1): void
+    {
+        $this->output->newLine($lines);
     }
 }

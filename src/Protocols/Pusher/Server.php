@@ -8,7 +8,6 @@ use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
-use Laravel\Reverb\Protocols\Pusher\Event as PusherEvent;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 
@@ -17,7 +16,7 @@ class Server
     /**
      * Create a new server instance.
      */
-    public function __construct(protected ChannelManager $channels, protected PusherEvent $pusher)
+    public function __construct(protected ChannelManager $channels, protected EventHandler $handler)
     {
         //
     }
@@ -32,7 +31,7 @@ class Server
 
             $connection->touch();
 
-            $this->pusher->handle($connection, 'pusher:connection_established');
+            $this->handler->handle($connection, 'pusher:connection_established');
 
             Log::info('Connection Established', $connection->id());
         } catch (Exception $e) {
@@ -54,7 +53,7 @@ class Server
 
         try {
             match (Str::startsWith($event['event'], 'pusher:')) {
-                true => $this->pusher->handle(
+                true => $this->handler->handle(
                     $from,
                     $event['event'],
                     $event['data'] ?? [],

@@ -9,7 +9,7 @@ use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
-class Event
+class EventHandler
 {
     /**
      * Create a new Pusher event instance.
@@ -20,7 +20,7 @@ class Event
     }
 
     /**
-     * Handle a Pusher event.
+     * Handle an incoming Pusher event.
      */
     public function handle(Connection $connection, string $event, array $payload = []): void
     {
@@ -65,17 +65,6 @@ class Event
     }
 
     /**
-     * Unsubscribe from the given channel.
-     */
-    public function unsubscribe(Connection $connection, string $channel): void
-    {
-        $channel = $this->channels
-            ->for($connection->app())
-            ->find($channel)
-            ?->unsubscribe($connection);
-    }
-
-    /**
      * Carry out any actions that should be performed after a subscription.
      */
     protected function afterSubscribe(Channel $channel, Connection $connection): void
@@ -86,6 +75,17 @@ class Event
             $channel instanceof CacheChannel => $this->sendCachedPayload($channel, $connection),
             default => null,
         };
+    }
+
+    /**
+     * Unsubscribe from the given channel.
+     */
+    public function unsubscribe(Connection $connection, string $channel): void
+    {
+        $channel = $this->channels
+            ->for($connection->app())
+            ->find($channel)
+            ?->unsubscribe($connection);
     }
 
     /**
@@ -105,7 +105,7 @@ class Event
     }
 
     /**
-     * Respond to a ping.
+     * Respond to a ping on the given connection.
      */
     public function pong(Connection $connection): void
     {
@@ -113,7 +113,7 @@ class Event
     }
 
     /**
-     * Send a ping.
+     * Send a ping to the given connection.
      */
     public function ping(Connection $connection): void
     {

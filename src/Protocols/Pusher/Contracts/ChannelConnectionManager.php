@@ -8,7 +8,7 @@ use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 interface ChannelConnectionManager
 {
     /**
-     * The channel name.
+     * Get a channel connection manager for the given channel name.
      */
     public function for(string $name): ChannelConnectionManager;
 
@@ -23,17 +23,17 @@ interface ChannelConnectionManager
     public function remove(Connection $connection): void;
 
     /**
-     * Find a connection in the set.
+     * Find a connection.
      */
     public function find(Connection $connection): ?ChannelConnection;
 
     /**
-     * Find a connection in the set by its ID.
+     * Find a connection by its ID.
      */
     public function findById(string $id): ?ChannelConnection;
 
     /**
-     * Get all the connections.
+     * Get all of the connections.
      *
      * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */

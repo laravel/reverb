@@ -8,7 +8,7 @@ use Laravel\Reverb\Contracts\Logger;
 class StandardLogger implements Logger
 {
     /**
-     * Log an infomational message
+     * Log an informational message
      */
     public function info(string $title, ?string $message = null): void
     {
@@ -30,14 +30,6 @@ class StandardLogger implements Logger
     }
 
     /**
-     * Append a new line to the log.
-     */
-    public function line(int $lines = 1): void
-    {
-        //
-    }
-
-    /**
      * Log a message sent to the server.
      */
     public function message(string $message): void
@@ -51,5 +43,13 @@ class StandardLogger implements Logger
         $message = json_encode($message, JSON_PRETTY_PRINT);
 
         Log::info($message);
+    }
+
+    /**
+     * Append a new line to the log.
+     */
+    public function line(int $lines = 1): void
+    {
+        //
     }
 }
