@@ -2,12 +2,10 @@
 
 namespace Laravel\Reverb;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Console\Commands\InstallCommand;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
-use Laravel\Reverb\Pulse\Reverb;
 use Laravel\Reverb\Pulse\Livewire;
 use Livewire\LivewireManager;
 

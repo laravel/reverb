@@ -5,7 +5,7 @@
         details="past {{ $this->periodForHumans() }}"
     >
         <x-slot:icon>
-            <x-reverb::icons.megaphone />
+            <x-reverb::icons.reverb />
         </x-slot:icon>
         <x-slot:actions>
             <div class="flex flex-wrap gap-4">
