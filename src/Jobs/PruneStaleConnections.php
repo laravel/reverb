@@ -11,6 +11,11 @@ class PruneStaleConnections
 {
     use Dispatchable;
 
+    protected function getDisconnectString($connection): string
+    {
+        return '{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}';
+    }
+
     /**
      * Execute the job.
      */
@@ -26,13 +31,7 @@ class PruneStaleConnections
                         continue;
                     }
 
-                    $connection->send(json_encode([
-                        'event' => 'pusher:error',
-                        'data' => json_encode([
-                            'code' => 4201,
-                            'message' => 'Pong reply not received in time',
-                        ]),
-                    ]));
+                    $connection->send($this->getDisconnectString($connection));
 
                     $channels
                         ->for($connection->app())
