@@ -66,7 +66,6 @@ class EventsBatchController extends Controller
     /**
      * Get the info for the given channels.
      *
-     * @param  array<int, string>  $channels
      * @return array<string, array<string, int>>
      */
     protected function getInfo(string $channel, string $info): array
