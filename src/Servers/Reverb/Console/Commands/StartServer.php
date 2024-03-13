@@ -147,18 +147,35 @@ class StartServer extends Command implements SignalableCommandInterface
      */
     public function getSubscribedSignals(): array
     {
-        return [SIGINT, SIGTERM];
+        if (! windows_os()) {
+            return [SIGINT, SIGTERM, SIGTSTP];
+        }
+
+        $this->handleSignalWindows();
+
+        return [];
     }
 
     /**
      * Handle the signals sent to the server.
      */
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal = 0, int|false $previousExitCode = 0): int|false
     {
         $this->components->info('Gracefully terminating connections.');
 
         $this->gracefullyDisconnect();
 
         return $previousExitCode;
+    }
+
+    /**
+     * Handle the signals sent to the server on Windows.
+     */
+
+    public function handleSignalWindows(): void
+    {
+        if(function_exists('sapi_windows_set_ctrl_handler')) {
+            sapi_windows_set_ctrl_handler(fn () => exit($this->handleSignal()));
+        }
     }
 }
