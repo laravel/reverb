@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/laravel/reverb/actions"><img src="https://github.com/laravel/reverb/workflows/tests/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/laravel/reverb/actions/workflows/tests.yml"><img src="https://github.com/laravel/reverb/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
     <a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/dt/laravel/reverb" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/v/laravel/reverb" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/laravel/reverb"><img src="https://img.shields.io/packagist/l/laravel/reverb" alt="License"></a>
