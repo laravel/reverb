@@ -25,7 +25,6 @@ trait InteractsWithChannelInformation
     /**
      * Get meta / status information for the given channel.
      *
-     * @param  array<int, string>  $channels
      * @return array<string, array<string, int>>
      */
     protected function info(Application $application, string $channel, string $info): array

@@ -16,7 +16,7 @@ class Log
     /**
      * Proxy method calls to the logger instance.
      *
-     * @param  string  $name
+     * @param  string  $method
      * @param  array  $arguments
      * @return mixed
      */
