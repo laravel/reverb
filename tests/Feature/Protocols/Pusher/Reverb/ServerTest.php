@@ -429,3 +429,31 @@ it('fails to subscribe to presence channel with no auth token', function () {
 
     expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
 });
+
+it('rejects messages over the max allowed size', function () {
+    $connection = connect();
+    
+    $response = send([
+        'event' => 'pusher:subscribe',
+        'data' => [
+            'channel' => 'my-channel',
+            'channel_data' => json_encode([str_repeat('a', 10_100)]),
+        ],
+    ], $connection);
+
+    expect($response)->toBe('Maximum message size exceeded');
+});
+
+it('allows message within the max allowed size', function () {
+    $connection = connect(key: 'reverb-key-2');
+    
+    $response = send([
+        'event' => 'pusher:subscribe',
+        'data' => [
+            'channel' => 'my-channel',
+            'channel_data' => json_encode([str_repeat('a', 20_000)]),
+        ],
+    ], $connection);
+
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"my-channel"}');
+});
