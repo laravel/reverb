@@ -171,10 +171,9 @@ class StartServer extends Command implements SignalableCommandInterface
     /**
      * Handle the signals sent to the server on Windows.
      */
-
     public function handleSignalWindows(): void
     {
-        if(function_exists('sapi_windows_set_ctrl_handler')) {
+        if (function_exists('sapi_windows_set_ctrl_handler')) {
             sapi_windows_set_ctrl_handler(fn () => exit($this->handleSignal()));
         }
     }
