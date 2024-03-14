@@ -44,16 +44,14 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
-        $tls = $options['tls'] ?? [];
-
-        if (empty($tls['local_cert']) && empty($tls['local_pk']) && $hostname && Certificate::exists($hostname)) {
+        if (empty($options['tls']['local_cert']) && empty($options['tls']['local_pk']) && $hostname && Certificate::exists($hostname)) {
             [$certificate, $key] = Certificate::resolve($hostname);
 
             $options['tls']['local_cert'] = $certificate;
             $options['tls']['local_pk'] = $key;
         }
 
-        $uri = empty($tls) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
+        $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
 
         return new HttpServer(
             new SocketServer($uri, $options, $loop),
