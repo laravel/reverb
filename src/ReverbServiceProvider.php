@@ -40,7 +40,6 @@ class ReverbServiceProvider extends ServiceProvider
             ], ['reverb', 'reverb-config']);
         }
 
-
         if ($this->app->bound(\Laravel\Pulse\Pulse::class)) {
             $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
 
