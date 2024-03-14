@@ -56,6 +56,7 @@ class StartServer extends Command implements SignalableCommandInterface
             $host = $this->option('host') ?: $config['host'],
             $port = $this->option('port') ?: $config['port'],
             $hostname = $this->option('hostname') ?: $config['hostname'],
+            $config['max_request_size'] ?? 10_000,
             $config['options'] ?? [],
             loop: $loop
         );

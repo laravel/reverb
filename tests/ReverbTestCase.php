@@ -81,10 +81,10 @@ class ReverbTestCase extends TestCase
     /**
      * Start the WebSocket server.
      */
-    public function startServer(string $host = '0.0.0.0', string $port = '8080'): void
+    public function startServer(string $host = '0.0.0.0', string $port = '8080', int $maxRequestSize = 10_000): void
     {
         $this->resetFiber();
-        $this->server = Factory::make($host, $port, loop: $this->loop);
+        $this->server = Factory::make($host, $port, maxRequestSize: $maxRequestSize, loop: $this->loop);
     }
 
     /**
