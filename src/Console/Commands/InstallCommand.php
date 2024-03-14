@@ -97,10 +97,6 @@ class InstallCommand extends Command
      */
     protected function updateBroadcastingConfiguration(): void
     {
-        if (! $this->isLaravelTen()) {
-            return;
-        }
-
         if ($this->laravel->config->has('broadcasting.connections.reverb')) {
             return;
         }
@@ -136,6 +132,8 @@ class InstallCommand extends Command
      */
     protected function enableBroadcasting(): void
     {
+        $this->enableBroadcastServiceProvider();
+
         if (File::exists(base_path('routes/channels.php'))) {
             return;
         }
@@ -146,13 +144,9 @@ class InstallCommand extends Command
             return;
         }
 
-        if ($this->isLaravelTen()) {
-            $this->enableBroadcastServiceProvider();
-
-            return;
+        if ($this->getApplication()->has('install:broadcasting')) {
+            $this->call('install:broadcasting', ['--no-interaction' => true]);
         }
-
-        $this->callSilently('install:broadcasting');
     }
 
     /**
@@ -188,13 +182,5 @@ class InstallCommand extends Command
                 return $matches[1].'=reverb';
             })
         );
-    }
-
-    /**
-     * Determine if the application is using Laravel 10.
-     */
-    protected function isLaravelTen(): bool
-    {
-        return version_compare($this->laravel->version(), '11.0', '<');
     }
 }
