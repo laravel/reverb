@@ -132,6 +132,8 @@ class InstallCommand extends Command
      */
     protected function enableBroadcasting(): void
     {
+        $this->enableBroadcastServiceProvider();
+
         if (File::exists(base_path('routes/channels.php'))) {
             return;
         }
@@ -142,9 +144,9 @@ class InstallCommand extends Command
             return;
         }
 
-        $this->enableBroadcastServiceProvider();
-
-        $this->callSilently('install:broadcasting');
+        if ($this->getApplication()->has('install:broadcasting')) {
+            $this->call('install:broadcasting', ['--no-interaction' => true]);
+        }
     }
 
     /**
