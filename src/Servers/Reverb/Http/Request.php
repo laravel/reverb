@@ -27,9 +27,19 @@ class Request
         }
 
         if (static::isEndOfMessage($buffer = $connection->buffer())) {
+            $request = Message::parseRequest($buffer);
+
+            if (! $contentLength = $request->getHeader('Content-Length')) {
+                return $request;
+            }
+
+            if ($connection->bufferLength() < $contentLength[0] ?? 0) {
+                return null;
+            }
+
             $connection->clearBuffer();
 
-            return Message::parseRequest($buffer);
+            return $request;
         }
 
         return null;
