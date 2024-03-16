@@ -98,6 +98,8 @@ class Server
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
+
+            Log::error('Message from '.$connection->id().' resulted in a pusher error');
         } else {
             $connection->send(json_encode([
                 'event' => 'pusher:error',
@@ -106,9 +108,10 @@ class Server
                     'message' => 'Invalid message format',
                 ]),
             ]));
+
+            Log::error('Message from '.$connection->id().' resulted in an unknown error');
         }
 
-        Log::error('Message from '.$connection->id().' resulted in '.($exception instanceof PusherException ? 'a pusher error' : 'an unknown error'));
         Log::info($exception->getMessage());
 
         ConnectionError::dispatch($connection, $exception);
