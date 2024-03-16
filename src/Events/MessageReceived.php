@@ -2,8 +2,8 @@
 
 namespace Laravel\Reverb\Events;
 
-use Illuminate\Foundation\Events\Dispatchable;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\Concerns\Dispatchable;
 
 class MessageReceived
 {
