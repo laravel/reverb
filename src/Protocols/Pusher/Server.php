@@ -108,10 +108,10 @@ class Server
             ]));
         }
 
-        ConnectionError::dispatch($connection, $exception);
-
-        Log::error('Message from '.$connection->id().' resulted in an unknown error');
+        Log::error('Message from '.$connection->id().' resulted in '.($exception instanceof PusherException ? 'a pusher error' : 'an unknown error'));
         Log::info($exception->getMessage());
+
+        ConnectionError::dispatch($connection, $exception);
     }
 
     /**
