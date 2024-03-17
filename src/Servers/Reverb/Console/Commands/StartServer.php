@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Events\ServerStarted;
+use Laravel\Reverb\Events\ServerStopped;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
@@ -68,6 +70,8 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
 
         $server->start();
+
+        ServerStarted::dispatch();
     }
 
     /**
@@ -107,6 +111,8 @@ class StartServer extends Command implements SignalableCommandInterface
             $this->gracefullyDisconnect();
 
             $server->stop();
+
+            ServerStopped::dispatch();
 
             $this->components->info("Stopping server on {$host}:{$port}");
         });

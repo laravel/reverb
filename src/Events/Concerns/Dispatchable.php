@@ -7,21 +7,14 @@ use Laravel\Reverb\Loggers\Log;
 trait Dispatchable
 {
     /**
-     * Proxy method calls to the Dispatchable.
+     * Dispatch the event with the given arguments.
      *
-     * @param  string  $method
-     * @param  array  $arguments
      * @return mixed
      */
-    public static function __callStatic($method, $arguments)
+    public static function dispatch()
     {
-        $dispatchable = new class
-        {
-            use \Illuminate\Foundation\Events\Dispatchable;
-        };
-
         try {
-            $dispatchable::$method(...$arguments);
+            return event(new static(...func_get_args()));
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
         }
