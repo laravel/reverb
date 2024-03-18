@@ -19,7 +19,7 @@ class Server
     /**
      * Create a new Http server instance.
      */
-    public function __construct(protected ServerInterface $socket, protected Router $router, protected ?LoopInterface $loop = null)
+    public function __construct(protected ServerInterface $socket, protected Router $router, protected int $maxRequestSize, protected ?LoopInterface $loop = null)
     {
         gc_disable();
 
@@ -67,7 +67,7 @@ class Server
     protected function createRequest(string $message, Connection $connection): ?RequestInterface
     {
         try {
-            $request = Request::from($message, $connection);
+            $request = Request::from($message, $connection, $this->maxRequestSize);
         } catch (OverflowException $e) {
             $this->close($connection, 413, 'Payload too large.');
         } catch (Throwable $e) {

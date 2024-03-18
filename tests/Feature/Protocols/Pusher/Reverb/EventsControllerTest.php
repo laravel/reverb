@@ -144,3 +144,24 @@ it('can gather subscription counts when requested', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"channels":{"presence-test-channel-one":{},"test-channel-two":{"subscription_count":1}}}');
 });
+
+it('cannot trigger an event over the max message size', function () {
+    await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode([str_repeat('a', 10_100)]),
+    ]));
+})->expectExceptionMessage('HTTP status code 413 (Request Entity Too Large)');
+
+it('can trigger an event within the max message size', function () {
+    $this->stopServer();
+    $this->startServer(maxRequestSize: 20_000);
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode([str_repeat('a', 10_100)]),
+    ], appId: '654321'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+});

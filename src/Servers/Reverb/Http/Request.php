@@ -16,27 +16,30 @@ class Request
     const EOM = "\r\n\r\n";
 
     /**
-     * The maximum number of allowed bytes for the request.
-     *
-     * @var int
-     */
-    const MAX_SIZE = 10_000;
-
-    /**
      * Turn the raw message into a Psr7 request.
      */
-    public static function from(string $message, Connection $connection): ?RequestInterface
+    public static function from(string $message, Connection $connection, int $maxRequestSize): ?RequestInterface
     {
         $connection->appendToBuffer($message);
 
-        if ($connection->bufferLength() > static::MAX_SIZE) {
-            throw new OverflowException('Maximum HTTP buffer size of '.static::MAX_SIZE.'exceeded.');
+        if ($connection->bufferLength() > $maxRequestSize) {
+            throw new OverflowException('Maximum HTTP buffer size of '.$maxRequestSize.'exceeded.');
         }
 
         if (static::isEndOfMessage($buffer = $connection->buffer())) {
+            $request = Message::parseRequest($buffer);
+
+            if (! $contentLength = $request->getHeader('Content-Length')) {
+                return $request;
+            }
+
+            if ($connection->bufferLength() < $contentLength[0] ?? 0) {
+                return null;
+            }
+
             $connection->clearBuffer();
 
-            return Message::parseRequest($buffer);
+            return $request;
         }
 
         return null;
