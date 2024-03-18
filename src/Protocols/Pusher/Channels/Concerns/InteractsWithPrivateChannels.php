@@ -21,7 +21,7 @@ trait InteractsWithPrivateChannels
     /**
      * Deteremine whether the given authentication token is valid.
      */
-    protected function verify(Connection $connection, string $auth, ?string $data = null): bool
+    protected function verify(Connection $connection, ?string $auth = null, ?string $data = null): bool
     {
         $signature = "{$connection->id()}:{$this->name()}";
 

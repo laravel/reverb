@@ -1,5 +1,6 @@
 <?php
 
+use Laravel\Reverb\Protocols\Pusher\Channels\PresenceChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\PrivateChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
@@ -53,4 +54,16 @@ it('fails to subscribe if the signature is invalid', function () {
     $this->channelConnectionManager->shouldNotReceive('subscribe');
 
     $channel->subscribe($this->connection, 'invalid-signature');
+})->throws(ConnectionUnauthorized::class);
+
+it('fails to subscribe to a private channel with no auth token', function () {
+    $channel = new PrivateChannel('private-test-channel');
+
+    $channel->subscribe($this->connection, null);
+})->throws(ConnectionUnauthorized::class);
+
+it('fails to subscribe to a presence channel with no auth token', function () {
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $channel->subscribe($this->connection, null);
 })->throws(ConnectionUnauthorized::class);
