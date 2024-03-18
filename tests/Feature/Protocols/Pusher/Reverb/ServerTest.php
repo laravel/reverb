@@ -432,7 +432,7 @@ it('fails to subscribe to presence channel with no auth token', function () {
 
 it('rejects messages over the max allowed size', function () {
     $connection = connect();
-    
+
     $response = send([
         'event' => 'pusher:subscribe',
         'data' => [
@@ -446,7 +446,7 @@ it('rejects messages over the max allowed size', function () {
 
 it('allows message within the max allowed size', function () {
     $connection = connect(key: 'reverb-key-2');
-    
+
     $response = send([
         'event' => 'pusher:subscribe',
         'data' => [
