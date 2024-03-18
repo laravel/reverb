@@ -457,3 +457,16 @@ it('allows message within the max allowed size', function () {
 
     expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"my-channel"}');
 });
+
+it('buffers large requests correctly', function () {
+    $this->stopServer();
+    $this->startServer(maxRequestSize: 200_000);
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode([str_repeat('a', 150_000)]),
+    ], appId: '654321'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+});
