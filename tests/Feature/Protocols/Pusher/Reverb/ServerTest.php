@@ -405,3 +405,27 @@ it('removes a channel when no subscribers remain', function () {
 
     expect(channels()->all())->toHaveCount(0);
 });
+
+it('fails to subscribe to private channel with no auth token', function () {
+    $response = send([
+        'event' => 'pusher:subscribe',
+        'data' => [
+            'channel' => 'private-test-channel',
+            'auth' => null,
+        ],
+    ], connect());
+
+    expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+});
+
+it('fails to subscribe to presence channel with no auth token', function () {
+    $response = send([
+        'event' => 'pusher:subscribe',
+        'data' => [
+            'channel' => 'presence-test-channel',
+            'auth' => null,
+        ],
+    ], connect());
+
+    expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+});
