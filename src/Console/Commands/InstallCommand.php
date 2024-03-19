@@ -30,7 +30,7 @@ class InstallCommand extends Command
      */
     public function handle(): void
     {
-        $this->addEnviromentVariables();
+        $this->addEnvironmentVariables();
         $this->publishConfiguration();
         $this->updateBroadcastingConfiguration();
         $this->enableBroadcasting();
@@ -42,7 +42,7 @@ class InstallCommand extends Command
     /**
      * Add the Reverb variables to the environment file.
      */
-    protected function addEnviromentVariables(): void
+    protected function addEnvironmentVariables(): void
     {
         if (File::missing($env = app()->environmentFile())) {
             return;
