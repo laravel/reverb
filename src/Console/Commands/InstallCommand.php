@@ -6,9 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Laravel\Prompts\confirm;
 
+#[AsCommand(name: 'reverb:install')]
 class InstallCommand extends Command
 {
     /**

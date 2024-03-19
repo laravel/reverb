@@ -5,7 +5,9 @@ namespace Laravel\Reverb\Servers\Reverb\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\InteractsWithTime;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'reverb:restart')]
 class RestartServer extends Command
 {
     use InteractsWithTime;

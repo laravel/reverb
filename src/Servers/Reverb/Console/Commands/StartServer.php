@@ -17,8 +17,10 @@ use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
 use Laravel\Reverb\Servers\Reverb\Http\Server;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 
+#[AsCommand(name: 'reverb:start')]
 class StartServer extends Command implements SignalableCommandInterface
 {
     /**
