@@ -51,12 +51,7 @@ class Factory
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
-        if (empty($options['tls']) && $hostname && Certificate::exists($hostname)) {
-            [$certificate, $key] = Certificate::resolve($hostname);
-
-            $options['tls']['local_cert'] = $certificate;
-            $options['tls']['local_pk'] = $key;
-        }
+        $options['tls'] = static::configureTls($options['tls'] ?? [], $hostname);
 
         $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
 
@@ -108,5 +103,27 @@ class Factory
         $routes->add('users_terminate', Route::post('/apps/{appId}/users/{userId}/terminate_connections', new UsersTerminateController));
 
         return $routes;
+    }
+
+    /**
+     * Configure the TLS context for the server.
+     *
+     * @param  array  $context<string,  mixed>
+     * @return array<string, mixed>
+     */
+    protected static function configureTls(array $context, ?string $hostname): array
+    {
+        $context = array_filter($context, fn ($value) => $value !== null);
+
+        $usesTls = ($context['local_cert'] ?? false) || ($context['local_pk'] ?? false);
+
+        if (! $usesTls && $hostname && Certificate::exists($hostname)) {
+            [$certificate, $key] = Certificate::resolve($hostname);
+
+            $context['local_cert'] = $certificate;
+            $context['local_pk'] = $key;
+        }
+
+        return $context;
     }
 }
