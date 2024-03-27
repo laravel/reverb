@@ -106,6 +106,7 @@ class Factory
     protected static function configureTls(array $context, ?string $hostname): array
     {
         $context = array_filter($context, fn ($value) => $value !== null);
+
         $usesTls = ($context['local_cert'] ?? false) || ($context['local_pk'] ?? false);
 
         if (! $usesTls && $hostname && Certificate::exists($hostname)) {
