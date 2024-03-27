@@ -45,6 +45,7 @@ it('can create a tls server using a user provided certificate', function () {
 
 it('can create a server using tls on the given host and port', function () {
     $this->app->config->set('reverb.servers.reverb.options.tls.local_cert', '/path/to/cert.pem');
+    $this->app->config->set('reverb.servers.reverb.options.tls.verify_peer', false);
     $server = Factory::make('127.0.0.1', '8002', options: $this->app->config->get('reverb.servers.reverb.options'));
 
     $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
@@ -52,6 +53,19 @@ it('can create a server using tls on the given host and port', function () {
 
     expect($socketServer)->toBeInstanceOf(SecureServer::class);
     expect($socketServer->getAddress())->toBe('tls://127.0.0.1:8002');
+
+    $server->stop();
+});
+
+it('can create a server without tls when context values are null', function () {
+    $this->app->config->set('reverb.servers.reverb.options.tls.local_cert', null);
+    $this->app->config->set('reverb.servers.reverb.options.tls.verify_peer', null);
+    $server = Factory::make('127.0.0.1', '8002', options: $this->app->config->get('reverb.servers.reverb.options'));
+
+    $socket = (new ReflectionProperty($server, 'socket'))->getValue($server);
+    $socketServer = (new ReflectionProperty($socket, 'server'))->getValue($socket);
+
+    expect($socketServer)->toBeInstanceOf(TcpServer::class);
 
     $server->stop();
 });
