@@ -13,6 +13,7 @@ use Psr\Http\Message\RequestInterface;
 use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use JsonException;
 
 class EventsController extends Controller
 {
@@ -25,6 +26,10 @@ class EventsController extends Controller
     {
         $this->verify($request, $connection, $appId);
 
+        if (!json_validate($this->body)) {
+            throw new JsonException("Invalid JSON payload");
+        }
+        
         $payload = json_decode($this->body, true);
 
         $validator = $this->validator($payload);
