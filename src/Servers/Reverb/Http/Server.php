@@ -58,6 +58,7 @@ class Server
             $this->router->dispatch($request, $connection);
         } catch (Throwable $e) {
             $this->close($connection, 500, 'Internal server error.');
+            throw $e;
         }
     }
 
