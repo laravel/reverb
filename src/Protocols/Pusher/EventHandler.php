@@ -145,12 +145,12 @@ class EventHandler
     /**
      * Format the payload for the given event.
      */
-    public function formatPayload(string $event, array $data = [], ?string $channel = null, string $prefix = 'pusher:'): string|false
+    public function formatPayload(string $event, array $data = [], ?string $channel = null): string|false
     {
         return json_encode(
             array_filter([
-                'event' => $prefix.$event,
-                'data' => empty($data) ? '{}' : json_encode($data),
+                'event' => 'pusher:'.$event,
+                'data' => empty($data) ? null : json_encode($data),
                 'channel' => $channel,
             ])
         );
@@ -161,6 +161,12 @@ class EventHandler
      */
     public function formatInternalPayload(string $event, array $data = [], $channel = null): string|false
     {
-        return static::formatPayload($event, $data, $channel, 'pusher_internal:');
+        return json_encode(
+            array_filter([
+                'event' => 'pusher_internal:'.$event,
+                'data' => empty($data) ? '{}' : json_encode($data),
+                'channel' => $channel,
+            ])
+        );
     }
 }

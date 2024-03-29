@@ -21,13 +21,13 @@ it('can subscribe to a channel', function () {
     $response = subscribe('test-channel');
 
     expect(channels()->find('test-channel')->connections())->toHaveCount(1);
-    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"test-channel"}');
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","data":"{}","channel":"test-channel"}');
 });
 
 it('can subscribe to a private channel', function () {
     $response = subscribe('private-test-channel');
 
-    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"private-test-channel"}');
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","data":"{}","channel":"private-test-channel"}');
 });
 
 it('can subscribe to a presence channel', function () {
@@ -41,13 +41,13 @@ it('can subscribe to a presence channel', function () {
 it('can subscribe to a cache channel', function () {
     $response = subscribe('cache-test-channel');
 
-    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"cache-test-channel"}');
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","data":"{}","channel":"cache-test-channel"}');
 });
 
 it('can subscribe to a private cache channel', function () {
     $response = subscribe('private-cache-test-channel');
 
-    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"private-cache-test-channel"}');
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","data":"{}","channel":"private-cache-test-channel"}');
 });
 
 it('can subscribe to a presence cache channel', function () {
@@ -141,21 +141,21 @@ it('can receive a cached message when joining a presence cache channel', functio
     $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"presence-cache-test-channel"}');
 });
 
-it('can receive a cach missed message when joining a cache channel with an empty cache', function () {
+it('can receive a cache missed message when joining a cache channel with an empty cache', function () {
     $connection = connect();
     subscribe('cache-test-channel', connection: $connection);
 
     $connection->assertReceived('{"event":"pusher:cache_miss","channel":"cache-test-channel"}');
 });
 
-it('can receive a cach missed message when joining a private cache channel with an empty cache', function () {
+it('can receive a cache missed message when joining a private cache channel with an empty cache', function () {
     $connection = connect();
     subscribe('private-cache-test-channel', connection: $connection);
 
     $connection->assertReceived('{"event":"pusher:cache_miss","channel":"private-cache-test-channel"}');
 });
 
-it('can receive a cach missed message when joining a presence cache channel with an empty cache', function () {
+it('can receive a cache missed message when joining a presence cache channel with an empty cache', function () {
     $connection = connect();
     subscribe('presence-cache-test-channel', connection: $connection);
 
@@ -455,7 +455,7 @@ it('allows message within the max allowed size', function () {
         ],
     ], $connection);
 
-    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","channel":"my-channel"}');
+    expect($response)->toBe('{"event":"pusher_internal:subscription_succeeded","data":"{}","channel":"my-channel"}');
 });
 
 it('buffers large requests correctly', function () {
