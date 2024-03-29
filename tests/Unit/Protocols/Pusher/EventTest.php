@@ -33,6 +33,7 @@ it('can subscribe to a channel', function () {
 
     $this->connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'test-channel',
     ]);
 });

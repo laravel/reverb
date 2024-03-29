@@ -150,7 +150,7 @@ class EventHandler
         return json_encode(
             array_filter([
                 'event' => $prefix.$event,
-                'data' => empty($data) ? null : json_encode($data),
+                'data' => empty($data) ? '{}' : json_encode($data),
                 'channel' => $channel,
             ])
         );
