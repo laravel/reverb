@@ -20,7 +20,7 @@ trait InteractsWithPresenceChannels
         parent::broadcastInternally(
             [
                 'event' => 'pusher_internal:member_added',
-                'data' => $data ? json_decode($data, true) : [],
+                'data' => $data,
                 'channel' => $this->name(),
             ],
             $connection
@@ -42,7 +42,7 @@ trait InteractsWithPresenceChannels
             parent::broadcast(
                 [
                     'event' => 'pusher_internal:member_removed',
-                    'data' => ['user_id' => $userId],
+                    'data' => json_encode(['user_id' => $userId]),
                     'channel' => $this->name(),
                 ],
                 $connection
