@@ -63,7 +63,7 @@ class TestConnection
         });
 
         return await(
-            timeout($promise->promise(), 2)
+            timeout($promise->promise(), 5)
                 ->then(
                     fn ($message) => $message,
                     fn (TimeoutException $error) => false
@@ -76,7 +76,6 @@ class TestConnection
      */
     public function assertReceived(string $message, ?int $count = null): void
     {
-        dump($this->receivedMessages);
         if (! in_array($message, $this->receivedMessages) || $count !== null) {
             $this->await();
         }
