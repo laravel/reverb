@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher\Channels;
 
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Concerns\SerializesChannels;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -101,6 +102,9 @@ class Channel
 
         $message = json_encode($payload);
 
+        Log::info('Broadcasting to', $this->name());
+        Log::message($message);
+
         foreach ($this->connections() as $connection) {
             if ($except->id() === $connection->id()) {
                 continue;
@@ -116,6 +120,9 @@ class Channel
     public function broadcastToAll(array $payload): void
     {
         $message = json_encode($payload);
+
+        Log::info('Broadcasting to', $this->name());
+        Log::message($message);
 
         foreach ($this->connections() as $connection) {
             $connection->send($message);
