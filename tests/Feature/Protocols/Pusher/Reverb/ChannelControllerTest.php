@@ -33,6 +33,16 @@ it('can return cache channel attributes', function () {
     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1,"cache":{"some":"data"}}');
 });
 
+it('can return presence channel attributes', function () {
+    subscribe('presence-test-channel-one', ['id' => 123]);
+    subscribe('presence-test-channel-one', ['id' => 123]);
+
+    $response = await($this->signedRequest('channels/presence-test-channel-one?info=user_count,subscription_count,cache'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"user_count":1}');
+});
+
 it('can return only the requested attributes', function () {
     subscribe('test-channel-one');
 
@@ -80,6 +90,18 @@ it('can gather cache channel attributes', function () {
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1,"cache":{"some":"data"}}');
+});
+
+it('can gather presence channel attributes', function () {
+    $this->usingRedis();
+    
+    subscribe('presence-test-channel-one', ['id' => 123]);
+    subscribe('presence-test-channel-one', ['id' => 123]);
+
+    $response = await($this->signedRequest('channels/presence-test-channel-one?info=user_count,subscription_count,cache'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"user_count":1}');
 });
 
 it('can gather only the requested attributes', function () {

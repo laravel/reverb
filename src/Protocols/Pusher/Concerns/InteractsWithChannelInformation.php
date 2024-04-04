@@ -44,18 +44,11 @@ trait InteractsWithChannelInformation
      */
     private function occupiedInfo(Channel $channel, array $info): array
     {
-        if (in_array('user_count', $info) && $this->isPresenceChannel($channel)) {
-            $count = collect($channel->connections())
-                ->map(fn ($connection) => $connection->data())
-                ->unique('user_id')
-                ->count();
-        } else {
-            $count = count($channel->connections());
-        }
+        $count = count($channel->connections());
 
         return [
             'occupied' => in_array('occupied', $info) ? $count > 0 : null,
-            'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $count : null,
+            'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $this->presenceUserCount($channel) : null,
             'subscription_count' => in_array('subscription_count', $info) && ! $this->isPresenceChannel($channel) ? $count : null,
             'cache' => in_array('cache', $info) && $this->isCacheChannel($channel) ? $channel->cachedPayload() : null,
         ];
@@ -85,5 +78,16 @@ trait InteractsWithChannelInformation
     protected function isCacheChannel(Channel $channel): bool
     {
         return $channel instanceof CacheChannel;
+    }
+
+    /**
+     * Get the count of unique users in the presence channel.
+     */
+    protected function presenceUserCount(Channel $channel): int
+    {
+        return collect($channel->connections())
+            ->map(fn ($connection) => $connection->data())
+            ->unique('user_id')
+            ->count();
     }
 }
