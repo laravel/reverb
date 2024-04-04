@@ -81,7 +81,7 @@ trait InteractsWithChannelInformation
     }
 
     /**
-     * Get the count of unique users subscribed to the presence channel.
+     * Get the number of unique users subscribed to the presence channel.
      */
     protected function userCount(Channel $channel): int
     {
