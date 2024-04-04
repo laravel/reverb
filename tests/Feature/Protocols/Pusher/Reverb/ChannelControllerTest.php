@@ -94,7 +94,7 @@ it('can gather cache channel attributes', function () {
 
 it('can gather presence channel attributes', function () {
     $this->usingRedis();
-    
+
     subscribe('presence-test-channel-one', ['id' => 123]);
     subscribe('presence-test-channel-one', ['id' => 123]);
 
