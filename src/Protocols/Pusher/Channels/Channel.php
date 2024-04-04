@@ -102,7 +102,7 @@ class Channel
 
         $message = json_encode($payload);
 
-        Log::info('Broadcasting to', $this->name());
+        Log::info('Broadcasting To', $this->name());
         Log::message($message);
 
         foreach ($this->connections() as $connection) {
@@ -121,7 +121,7 @@ class Channel
     {
         $message = json_encode($payload);
 
-        Log::info('Broadcasting to', $this->name());
+        Log::info('Broadcasting To', $this->name());
         Log::message($message);
 
         foreach ($this->connections() as $connection) {
