@@ -44,7 +44,14 @@ trait InteractsWithChannelInformation
      */
     private function occupiedInfo(Channel $channel, array $info): array
     {
-        $count = count($channel->connections());
+        if (in_array('user_count', $info) && $this->isPresenceChannel($channel)) {
+            $count = collect($channel->connections())
+                ->map(fn ($connection) => $connection->data())
+                ->unique('user_id')
+                ->count();
+        } else {
+            $count = count($channel->connections());
+        }
 
         return [
             'occupied' => in_array('occupied', $info) ? $count > 0 : null,
