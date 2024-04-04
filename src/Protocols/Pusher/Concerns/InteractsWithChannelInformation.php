@@ -48,7 +48,7 @@ trait InteractsWithChannelInformation
 
         return [
             'occupied' => in_array('occupied', $info) ? $count > 0 : null,
-            'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $count : null,
+            'user_count' => in_array('user_count', $info) && $this->isPresenceChannel($channel) ? $this->userCount($channel) : null,
             'subscription_count' => in_array('subscription_count', $info) && ! $this->isPresenceChannel($channel) ? $count : null,
             'cache' => in_array('cache', $info) && $this->isCacheChannel($channel) ? $channel->cachedPayload() : null,
         ];
@@ -78,5 +78,16 @@ trait InteractsWithChannelInformation
     protected function isCacheChannel(Channel $channel): bool
     {
         return $channel instanceof CacheChannel;
+    }
+
+    /**
+     * Get the number of unique users subscribed to the presence channel.
+     */
+    protected function userCount(Channel $channel): int
+    {
+        return collect($channel->connections())
+            ->map(fn ($connection) => $connection->data())
+            ->unique('user_id')
+            ->count();
     }
 }

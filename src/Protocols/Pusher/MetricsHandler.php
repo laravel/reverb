@@ -107,6 +107,7 @@ class MetricsHandler
 
         return collect($channel->connections())
             ->map(fn ($connection) => $connection->data())
+            ->unique('user_id')
             ->map(fn ($data) => ['id' => $data['user_id']])
             ->values()
             ->all();
