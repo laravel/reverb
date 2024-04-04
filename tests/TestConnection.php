@@ -63,7 +63,7 @@ class TestConnection
         });
 
         return await(
-            timeout($promise->promise(), 5)
+            timeout($promise->promise(), 2)
                 ->then(
                     fn ($message) => $message,
                     fn (TimeoutException $error) => false

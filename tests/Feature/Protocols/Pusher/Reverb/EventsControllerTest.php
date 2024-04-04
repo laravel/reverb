@@ -90,11 +90,12 @@ it('does not fail when ignoring an invalid subscriber', function () {
     $response = await($this->signedPostRequest('events', [
         'name' => 'NewEvent',
         'channels' => ['test-channel-one', 'test-channel-two'],
-        'data' => json_encode(['some' => 'data']),
+        'data' => json_encode(['some' => ['more' => 'data']]),
         'socket_id' => 'invalid-socket-id',
     ]));
 
-    $connection->assertReceived('{"event":"NewEvent","data":"{\"some\":\"data\"}","channel":"test-channel-two"}', 2);
+    $connection->assertReceived('{"event":"NewEvent","data":"{\"some\":\"data\"}","channel":"test-channel-two"}', 1);
+    $connection->assertReceived('{"event":"NewEvent","data":"{\"some\":{\"more\":\"data\"}}","channel":"test-channel-two"}', 1);
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
 });
