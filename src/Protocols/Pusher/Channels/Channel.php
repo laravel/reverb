@@ -65,7 +65,7 @@ class Channel
      */
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
-        $this->connections->add($connection, $data ? json_decode($data, true) : []);
+        $this->connections->add($connection, $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : []);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Servers\Reverb\Http;
 
 use Illuminate\Support\Str;
+use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
 use OverflowException;
 use Psr\Http\Message\RequestInterface;
@@ -57,6 +58,7 @@ class Server
         try {
             $this->router->dispatch($request, $connection);
         } catch (Throwable $e) {
+            Log::error($e->getMessage());
             $this->close($connection, 500, 'Internal server error.');
         }
     }

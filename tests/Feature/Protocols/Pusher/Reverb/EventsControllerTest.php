@@ -1,5 +1,6 @@
 <?php
 
+use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Message\ResponseException;
 
@@ -165,3 +166,9 @@ it('can trigger an event within the max message size', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
 });
+
+it('fails when payload is invalid', function () {
+    $response = await($this->signedPostRequest('events', null));
+
+    expect($response->getStatusCode())->toBe(500);
+})->throws(ResponseException::class, exceptionCode: 500);

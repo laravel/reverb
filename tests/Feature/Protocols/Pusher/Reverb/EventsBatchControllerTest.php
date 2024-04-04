@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Reverb\Tests\ReverbTestCase;
+use React\Http\Message\ResponseException;
 
 use function React\Async\await;
 
@@ -138,3 +139,9 @@ it('can receive an event batch trigger with multiple events and gather info for 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"batch":[{"user_count":1},{}]}');
 });
+
+it('fails when payload is invalid', function () {
+    $response = await($this->signedPostRequest('batch_events', null));
+
+    expect($response->getStatusCode())->toBe(500);
+})->throws(ResponseException::class, exceptionCode: 500);
