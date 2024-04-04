@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Loggers;
 
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
+use Illuminate\Support\Str;
 use Laravel\Reverb\Console\Components\Message;
 use Laravel\Reverb\Contracts\Logger;
 
@@ -58,7 +59,7 @@ class CliLogger implements Logger
         $message = json_encode($message, JSON_PRETTY_PRINT);
 
         (new Message($this->output))->render(
-            $message
+            Str::limit($message, 200)
         );
     }
 

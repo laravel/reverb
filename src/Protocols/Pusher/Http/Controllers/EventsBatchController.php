@@ -26,7 +26,7 @@ class EventsBatchController extends Controller
     {
         $this->verify($request, $connection, $appId);
 
-        $payload = json_decode($this->body, true);
+        $payload = json_decode($this->body, associative: true, flags: JSON_THROW_ON_ERROR);
 
         $validator = $this->validator($payload);
 

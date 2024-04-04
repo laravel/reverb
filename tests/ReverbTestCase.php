@@ -159,7 +159,7 @@ class ReverbTestCase extends TestCase
     /**
      * Send a POST request to the server.
      */
-    public function postReqeust(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function postReqeust(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         return $this->request($path, 'POST', $data, $host, $port, $appId);
     }
@@ -167,7 +167,7 @@ class ReverbTestCase extends TestCase
     /**
      * Send a signed POST request to the server.
      */
-    public function signedPostRequest(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         $hash = md5(json_encode($data));
         $timestamp = time();

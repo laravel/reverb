@@ -49,9 +49,9 @@ class Server
 
         $from->touch();
 
-        $event = json_decode($message, true);
-
         try {
+            $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
+
             match (Str::startsWith($event['event'], 'pusher:')) {
                 true => $this->handler->handle(
                     $from,
