@@ -33,6 +33,7 @@ it('can subscribe to a channel', function () {
 
     $this->connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'test-channel',
     ]);
 });
@@ -63,11 +64,10 @@ it('can correctly format a payload', function () {
         'foo',
         ['bar' => 'baz'],
         'test-channel',
-        'reverb:'
     );
 
     expect($payload)->toBe(json_encode([
-        'event' => 'reverb:foo',
+        'event' => 'pusher:foo',
         'data' => json_encode(['bar' => 'baz']),
         'channel' => 'test-channel',
     ]));
@@ -84,7 +84,6 @@ it('can correctly format an internal payload', function () {
         'foo',
         ['bar' => 'baz'],
         'test-channel',
-        'reverb:'
     );
 
     expect($payload)->toBe(json_encode([
@@ -97,5 +96,6 @@ it('can correctly format an internal payload', function () {
 
     expect($payload)->toBe(json_encode([
         'event' => 'pusher_internal:foo',
+        'data' => '{}',
     ]));
 });

@@ -161,6 +161,12 @@ class EventHandler
      */
     public function formatInternalPayload(string $event, array $data = [], $channel = null): string|false
     {
-        return static::formatPayload($event, $data, $channel, 'pusher_internal:');
+        return json_encode(
+            array_filter([
+                'event' => 'pusher_internal:'.$event,
+                'data' => json_encode((object) $data),
+                'channel' => $channel,
+            ])
+        );
     }
 }

@@ -56,6 +56,7 @@ it('can handle a new message', function () {
 
     $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'test-channel',
     ]);
 });
@@ -108,6 +109,7 @@ it('can subscribe a user to a channel', function () {
 
     $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'test-channel',
     ]);
 });
@@ -125,6 +127,7 @@ it('can subscribe a user to a private channel', function () {
 
     $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'private-test-channel',
     ]);
 });
@@ -165,6 +168,7 @@ it('receives no data when no previous event triggered when joining a cache chann
 
     $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'cache-test-channel',
     ]);
     $connection->assertReceived([
@@ -199,6 +203,7 @@ it('receives last triggered event when joining a cache channel', function () {
 
     $connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
         'channel' => 'cache-test-channel',
     ]);
     $connection->assertReceived(['foo' => 'bar']);
