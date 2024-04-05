@@ -159,7 +159,7 @@ class ReverbTestCase extends TestCase
     /**
      * Send a POST request to the server.
      */
-    public function postReqeust(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function postRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
     {
         return $this->request($path, 'POST', $data, $host, $port, $appId);
     }
@@ -175,7 +175,7 @@ class ReverbTestCase extends TestCase
         $string = "POST\n/apps/{$appId}/{$path}\n$query";
         $signature = hash_hmac('sha256', $string, 'reverb-secret');
 
-        return $this->postReqeust("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
+        return $this->postRequest("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
     }
 
     /**

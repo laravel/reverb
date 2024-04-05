@@ -13,7 +13,7 @@ class FakeConnection extends BaseConnection
     use GeneratesIdentifiers;
 
     /**
-     * Messages reveived by the connection.
+     * Messages received by the connection.
      *
      * @var array<int, string>
      */

@@ -141,21 +141,21 @@ it('can receive a cached message when joining a presence cache channel', functio
     $connection->assertReceived('{"event":"App\\\\Events\\\\TestEvent","data":"{\"foo\":\"bar\"}","channel":"presence-cache-test-channel"}');
 });
 
-it('can receive a cach missed message when joining a cache channel with an empty cache', function () {
+it('can receive a cache missed message when joining a cache channel with an empty cache', function () {
     $connection = connect();
     subscribe('cache-test-channel', connection: $connection);
 
     $connection->assertReceived('{"event":"pusher:cache_miss","channel":"cache-test-channel"}');
 });
 
-it('can receive a cach missed message when joining a private cache channel with an empty cache', function () {
+it('can receive a cache missed message when joining a private cache channel with an empty cache', function () {
     $connection = connect();
     subscribe('private-cache-test-channel', connection: $connection);
 
     $connection->assertReceived('{"event":"pusher:cache_miss","channel":"private-cache-test-channel"}');
 });
 
-it('can receive a cach missed message when joining a presence cache channel with an empty cache', function () {
+it('can receive a cache missed message when joining a presence cache channel with an empty cache', function () {
     $connection = connect();
     subscribe('presence-cache-test-channel', connection: $connection);
 
