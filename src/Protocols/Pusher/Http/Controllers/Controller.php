@@ -22,7 +22,7 @@ abstract class Controller
     protected ?Application $application = null;
 
     /**
-     * Active chnnels for the application.
+     * Active channels for the application.
      */
     protected ?ChannelManager $channels = null;
 
