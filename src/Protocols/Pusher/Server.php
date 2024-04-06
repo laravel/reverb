@@ -52,15 +52,17 @@ class Server
         try {
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
-            match (Str::startsWith($event['event'], 'pusher:')) {
-                true => $this->handler->handle(
-                    $from,
-                    $event['event'],
-                    $event['data'] ?? [],
-                    $event['channel'] ?? null
-                ),
-                default => ClientEvent::handle($from, $event)
-            };
+            if (isset($event['event'])) {
+                match (Str::startsWith($event['event'], 'pusher:')) {
+                    true => $this->handler->handle(
+                        $from,
+                        $event['event'],
+                        $event['data'] ?? [],
+                        $event['channel'] ?? null
+                    ),
+                    default => ClientEvent::handle($from, $event)
+                };
+            }
 
             Log::info('Message Handled', $from->id());
 
