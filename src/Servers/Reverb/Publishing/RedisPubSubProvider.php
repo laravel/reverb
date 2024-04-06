@@ -87,7 +87,7 @@ class RedisPubSubProvider implements PubSubProvider
     {
         $config = Config::get('database.redis.default');
 
-        [$host, $port, $query] = [
+        [$host, $port, $protocol, $query] = [
             $config['host'],
             $config['port'] ?: 6379,
             Arr::get($config, 'scheme') === 'tls' ? 's' : '',
