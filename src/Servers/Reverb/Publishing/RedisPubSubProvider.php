@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
@@ -86,9 +87,10 @@ class RedisPubSubProvider implements PubSubProvider
     {
         $config = Config::get('database.redis.default');
 
-        [$host, $port, $query] = [
+        [$host, $port, $protocol, $query] = [
             $config['host'],
             $config['port'] ?: 6379,
+            Arr::get($config, 'scheme') === 'tls' ? 's' : '',
             [],
         ];
 
@@ -102,7 +104,7 @@ class RedisPubSubProvider implements PubSubProvider
 
         $query = http_build_query($query);
 
-        return "redis://{$host}:{$port}".($query ? "?{$query}" : '');
+        return "redis{$protocol}://{$host}:{$port}".($query ? "?{$query}" : '');
     }
 
     /**
