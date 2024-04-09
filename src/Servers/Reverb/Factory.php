@@ -47,7 +47,7 @@ class Factory
         $loop = $loop ?: Loop::get();
 
         $router = match ($protocol) {
-            'pusher' => static::makePusherServer(),
+            'pusher' => static::makePusherRouter(),
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
@@ -66,7 +66,7 @@ class Factory
     /**
      * Create a new WebSocket server for the Pusher protocol.
      */
-    public static function makePusherServer(): Router
+    public static function makePusherRouter(): Router
     {
         app()->singleton(
             ChannelManager::class,

@@ -106,7 +106,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel.
      */
-    public function channel(string $channel): Channel
+    public function channel(string $channel): Channel|null
     {
         return $this->channels($channel);
     }
@@ -114,7 +114,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the channels for the application.
      *
-     * @return \Laravel\Reverb\Protocols\Pusher\Channels\Channel|array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>
+     * @return \Laravel\Reverb\Protocols\Pusher\Channels\Channel|array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>|null
      */
     public function channels(?string $channel = null): Channel|array|null
     {
