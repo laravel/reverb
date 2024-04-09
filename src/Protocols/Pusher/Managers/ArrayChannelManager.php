@@ -106,7 +106,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * Get the given channel.
      */
-    public function channel(string $channel): Channel|null
+    public function channel(string $channel): ?Channel
     {
         return $this->channels($channel);
     }
