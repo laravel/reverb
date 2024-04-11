@@ -11,6 +11,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionInterface;
 use React\Socket\ServerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class Server
@@ -57,6 +58,8 @@ class Server
 
         try {
             $this->router->dispatch($request, $connection);
+        } catch (HttpException $e) {
+            $this->close($connection, $e->getStatusCode(), $e->getMessage());
         } catch (Throwable $e) {
             Log::error($e->getMessage());
             $this->close($connection, 500, 'Internal server error.');
