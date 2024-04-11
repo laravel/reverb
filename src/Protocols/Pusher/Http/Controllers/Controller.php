@@ -46,12 +46,8 @@ abstract class Controller
         $this->body = $request->getBody()->getContents();
         $this->query = $query;
 
-        try {
-            $this->setApplication($appId);
-            $this->setChannels();
-        } catch (HttpException $e) {
-            $this->close($connection, $e->getStatusCode(), $e->getMessage());
-        }
+        $this->setApplication($appId);
+        $this->setChannels();
     }
 
     /**

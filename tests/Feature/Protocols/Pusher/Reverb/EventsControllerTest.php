@@ -193,3 +193,7 @@ it('fails when payload is invalid', function () {
 
     expect($response->getStatusCode())->toBe(500);
 })->throws(ResponseException::class, exceptionCode: 500);
+
+it('fails when app cannot be found', function () {
+    await($this->signedPostRequest('events', appId: 'invalid-app-id'));
+})->throws(ResponseException::class, exceptionCode: 404);
