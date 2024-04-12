@@ -31,7 +31,7 @@ class PusherController
         $connection->withMaxMessageSize($reverbConnection->app()->maxMessageSize());
 
         $connection->onMessage(
-            fn ($message) => $this->server->message($reverbConnection, (string)$message)
+            fn ($message) => $this->server->message($reverbConnection, (string) $message)
         );
 
         $connection->onClose(
