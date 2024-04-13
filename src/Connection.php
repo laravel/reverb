@@ -4,6 +4,7 @@ namespace Laravel\Reverb;
 
 use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
+use Laravel\Reverb\Events\ConnectionTerminated;
 use Laravel\Reverb\Events\MessageSent;
 
 class Connection extends ConnectionContract
@@ -56,5 +57,7 @@ class Connection extends ConnectionContract
     public function terminate(): void
     {
         $this->connection->close();
+
+        ConnectionTerminated::dispatch($this);
     }
 }
