@@ -31,6 +31,11 @@ interface ChannelManager
     public function find(string $channel): ?Channel;
 
     /**
+     * Check whether the channel exists or not.
+     */
+    public function exists(string $channel): bool;
+
+    /**
      * Find the given channel or create it if it doesn't exist.
      */
     public function findOrCreate(string $channel): Channel;
