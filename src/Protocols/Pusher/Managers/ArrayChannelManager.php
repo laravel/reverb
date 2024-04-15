@@ -56,7 +56,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Determine whether the channel exists.
+     * Determine whether the given channel exists.
      */
     public function exists(string $channel): bool
     {

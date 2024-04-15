@@ -31,7 +31,7 @@ interface ChannelManager
     public function find(string $channel): ?Channel;
 
     /**
-     * Determine whether the channel exists.
+     * Determine whether the given channel exists.
      */
     public function exists(string $channel): bool;
 
