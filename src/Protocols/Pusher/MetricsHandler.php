@@ -130,7 +130,7 @@ class MetricsHandler
 
         $this->requestMetricsFromSubscribers($application, $key, $type, $options);
 
-        return timeout($deferred->promise(), 5)->then(
+        return timeout($deferred->promise(), 10)->then(
             fn ($metrics) => $metrics,
             fn () => $this->metrics,
         )->then(fn ($metrics) => $this->mergeSubscriberMetrics($metrics, $type));
