@@ -55,6 +55,9 @@ class ArrayChannelManager implements ChannelManagerInterface
         return $this->channels($channel);
     }
 
+    /**
+     * Determine whether the channel exists.
+     */
     public function exists(string $channel): bool
     {
         return isset($this->applications[$this->application->id()][$channel]);
