@@ -48,19 +48,19 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Find the given channel
-     */
-    public function find(string $channel): ?Channel
-    {
-        return $this->channels($channel);
-    }
-
-    /**
      * Determine whether the given channel exists.
      */
     public function exists(string $channel): bool
     {
         return isset($this->applications[$this->application->id()][$channel]);
+    }
+
+    /**
+     * Find the given channel
+     */
+    public function find(string $channel): ?Channel
+    {
+        return $this->channels($channel);
     }
 
     /**
