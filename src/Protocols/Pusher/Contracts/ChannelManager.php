@@ -26,14 +26,14 @@ interface ChannelManager
     public function all(): array;
 
     /**
-     * Find the given channel.
-     */
-    public function find(string $channel): ?Channel;
-
-    /**
      * Determine whether the given channel exists.
      */
     public function exists(string $channel): bool;
+
+    /**
+     * Find the given channel.
+     */
+    public function find(string $channel): ?Channel;
 
     /**
      * Find the given channel or create it if it doesn't exist.
