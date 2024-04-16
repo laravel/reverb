@@ -38,6 +38,13 @@ it('can get all channels', function () {
     expect($this->channelManager->all())->toHaveCount(4);
 });
 
+it('can determine whether a channel exists', function () {
+    $this->channelManager->findOrCreate('test-channel-1');
+
+    expect($this->channelManager->exists('test-channel-1'))->toBeTrue();
+    expect($this->channelManager->exists('test-channel-2'))->toBeFalse();
+});
+
 it('can get all connections subscribed to a channel', function () {
     $connections = collect(factory(5))
         ->each(fn ($connection) => $this->channel->subscribe($connection->connection()));

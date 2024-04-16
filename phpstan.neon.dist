@@ -13,3 +13,5 @@ parameters:
     - "#\\(void\\) is used.#"
     - "#Parameter \\$livewire of anonymous function has invalid type#"
     - "#Class Laravel\\\\Pulse\\\\Pulse not found#"
+    - "#Class Laravel\\\\Telescope\\\\Contracts\\\\EntriesRepository not found#"
+    - "#Call to static method store\\(\\) on an unknown class Laravel\\\\Telescope\\\\Telescope#"
