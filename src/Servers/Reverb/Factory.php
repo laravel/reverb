@@ -122,6 +122,7 @@ class Factory
 
             $context['local_cert'] = $certificate;
             $context['local_pk'] = $key;
+            $context['verify_peer'] = false;
         }
 
         return $context;
