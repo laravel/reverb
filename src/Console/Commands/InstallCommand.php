@@ -32,7 +32,8 @@ class InstallCommand extends Command
      */
     public function handle(): void
     {
-        $this->addEnvironmentVariables();
+        $this->addEnvironmentVariables(app()->environmentFile());
+        $this->addEnvironmentVariables('.env.example');
         $this->publishConfiguration();
         $this->updateBroadcastingConfiguration();
         $this->enableBroadcasting();
@@ -44,16 +45,16 @@ class InstallCommand extends Command
     /**
      * Add the Reverb variables to the environment file.
      */
-    protected function addEnvironmentVariables(): void
+    protected function addEnvironmentVariables($env): void
     {
-        if (File::missing($env = app()->environmentFile())) {
+        if (File::missing($env)) {
             return;
         }
 
         $contents = File::get($env);
-        $appId = random_int(100_000, 999_999);
-        $appKey = Str::lower(Str::random(20));
-        $appSecret = Str::lower(Str::random(20));
+        $appId = $env === app()->environmentFile() ? random_int(100_000, 999_999) : '';
+        $appKey = $env === app()->environmentFile() ? Str::lower(Str::random(20)) : '';
+        $appSecret = $env === app()->environmentFile() ? Str::lower(Str::random(20)) : '';
 
         $variables = Arr::where([
             'REVERB_APP_ID' => "REVERB_APP_ID={$appId}",
