@@ -53,7 +53,7 @@ class Factory
 
         $options['tls'] = static::configureTls($options['tls'] ?? [], $hostname);
 
-        $uri = static::usesTls($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
+        $uri = static::usesTls($options['tls']) ? "tls://{$host}:{$port}" : "{$host}:{$port}";
 
         return new HttpServer(
             new SocketServer($uri, $options, $loop),
