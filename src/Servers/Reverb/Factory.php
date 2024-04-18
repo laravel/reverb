@@ -53,7 +53,7 @@ class Factory
 
         $options['tls'] = static::configureTls($options['tls'] ?? [], $hostname);
 
-        $uri = empty($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
+        $uri = static::usesTls($options['tls']) ? "{$host}:{$port}" : "tls://{$host}:{$port}";
 
         return new HttpServer(
             new SocketServer($uri, $options, $loop),
@@ -115,9 +115,7 @@ class Factory
     {
         $context = array_filter($context, fn ($value) => $value !== null);
 
-        $usesTls = ($context['local_cert'] ?? false) || ($context['local_pk'] ?? false);
-
-        if (! $usesTls && $hostname && Certificate::exists($hostname)) {
+        if (! static::usesTls($context) && $hostname && Certificate::exists($hostname)) {
             [$certificate, $key] = Certificate::resolve($hostname);
 
             $context['local_cert'] = $certificate;
@@ -125,5 +123,15 @@ class Factory
         }
 
         return $context;
+    }
+
+    /**
+     * Determine whether the server uses TLS.
+     *
+     * @param  array  $context<string,  mixed>
+     */
+    protected static function usesTls(array $context): bool
+    {
+        return ($context['local_cert'] ?? false) || ($context['local_pk'] ?? false);
     }
 }
