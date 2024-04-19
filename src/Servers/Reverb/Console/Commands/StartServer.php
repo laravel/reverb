@@ -151,7 +151,7 @@ class StartServer extends Command implements SignalableCommandInterface
      */
     protected function ensureTelescopeEntriesAreCollected(LoopInterface $loop, int $interval): void
     {
-        if (! class_exists(\Laravel\Telescope\Telescope::class)) {
+        if (! $this->laravel->bound(\Laravel\Telescope\Contracts\EntriesRepository::class)) {
             return;
         }
 
