@@ -38,7 +38,7 @@ class ReverbServerProvider extends ServerProvider
             $app->make(RedisClientFactory::class),
             $app->make(PubSubIncomingMessageHandler::class),
             $this->config['scaling']['channel'] ?? 'reverb',
-            $this->config['scaling']['cluster_enabled'] ?? false
+            $this->config['scaling']['server'] ?? []
         ));
     }
 
