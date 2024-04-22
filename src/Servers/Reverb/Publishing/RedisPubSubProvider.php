@@ -19,7 +19,8 @@ class RedisPubSubProvider implements PubSubProvider
     public function __construct(
         protected RedisClientFactory $clientFactory,
         protected PubSubIncomingMessageHandler $messageHandler,
-        protected string $channel
+        protected string $channel,
+        protected array $server = []
     ) {
         //
     }
@@ -85,7 +86,7 @@ class RedisPubSubProvider implements PubSubProvider
      */
     protected function redisUrl(): string
     {
-        $config = Config::get('database.redis.default');
+        $config = empty($this->server) ? Config::get('database.redis.default') : $this->server;
 
         [$host, $port, $protocol, $query] = [
             $config['host'],
