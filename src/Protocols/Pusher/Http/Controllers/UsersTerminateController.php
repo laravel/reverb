@@ -5,10 +5,9 @@ namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Response;
 use Psr\Http\Message\RequestInterface;
 use React\Promise\PromiseInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class UsersTerminateController extends Controller
 {
@@ -24,7 +23,7 @@ class UsersTerminateController extends Controller
                 'type' => 'terminate',
                 'application' => serialize($this->application),
                 'payload' => ['user_id' => $userId],
-            ])->then(fn () => new JsonResponse((object) []));
+            ])->then(fn () => new Response((object) []));
         }
 
         $connections = collect($this->channels->connections());
@@ -35,6 +34,6 @@ class UsersTerminateController extends Controller
             }
         });
 
-        return new JsonResponse((object) []);
+        return new Response((object) []);
     }
 }
