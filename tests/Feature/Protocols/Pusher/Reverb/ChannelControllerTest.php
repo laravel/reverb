@@ -59,6 +59,15 @@ it('can return only the requested attributes', function () {
     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1}');
 });
 
+it('can send the content-length header', function () {
+    subscribe('test-channel-one');
+    subscribe('test-channel-one');
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+
+    expect($response->getHeader('Content-Length'))->toBe(['40']);
+});
+
 it('can gather data for a single channel', function () {
     $this->usingRedis();
 
@@ -120,4 +129,15 @@ it('can gather only the requested attributes', function () {
     $response = await($this->signedRequest('channels/test-channel-one?info=subscription_count,user_count'));
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":1}');
+});
+
+it('can send the content-length header when gathering results', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('test-channel-one');
+
+    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+
+    expect($response->getHeader('Content-Length'))->toBe(['40']);
 });

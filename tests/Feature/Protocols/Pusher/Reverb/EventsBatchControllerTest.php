@@ -87,6 +87,18 @@ it('can receive an event batch trigger with multiple events and return info for 
     expect($response->getBody()->getContents())->toBe('{"batch":[{"user_count":1},{}]}');
 });
 
+it('can send the content-length header', function () {
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
+        [
+            'name' => 'NewEvent',
+            'channel' => 'test-channel',
+            'data' => json_encode(['some' => 'data']),
+        ],
+    ]]));
+
+    expect($response->getHeader('Content-Length'))->toBe(['12']);
+});
+
 it('can receive an event batch trigger with multiple events and gather info for each', function () {
     $this->usingRedis();
 
@@ -145,3 +157,17 @@ it('fails when payload is invalid', function () {
 
     expect($response->getStatusCode())->toBe(500);
 })->throws(ResponseException::class, exceptionCode: 500);
+
+it('can send the content-length header when gathering results', function () {
+    $this->usingRedis();
+
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
+        [
+            'name' => 'NewEvent',
+            'channel' => 'test-channel',
+            'data' => json_encode(['some' => 'data']),
+        ],
+    ]]));
+
+    expect($response->getHeader('Content-Length'))->toBe(['12']);
+});

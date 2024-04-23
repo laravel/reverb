@@ -197,3 +197,13 @@ it('fails when payload is invalid', function () {
 it('fails when app cannot be found', function () {
     await($this->signedPostRequest('events', appId: 'invalid-app-id'));
 })->throws(ResponseException::class, exceptionCode: 404);
+
+it('can send the content-length header', function () {
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['some' => 'data']),
+    ]));
+
+    expect($response->getHeader('Content-Length'))->toBe(['2']);
+});
