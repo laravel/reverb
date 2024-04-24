@@ -89,7 +89,7 @@ class RedisPubSubProvider implements PubSubProvider
     {
         $config = empty($this->server) ? Config::get('database.redis.default') : $this->server;
 
-        $parsed = (new ConfigurationUrlParser())->parseConfiguration($config);
+        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
 
         $driver = strtolower($parsed['driver'] ?? '');
 
