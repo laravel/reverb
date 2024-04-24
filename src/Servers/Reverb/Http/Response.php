@@ -12,7 +12,7 @@ class Response extends JsonResponse
     public function __construct(mixed $data = null, int $status = 200, array $headers = [], bool $json = false)
     {
         parent::__construct($data, $status, $headers, $json);
-        
+
         $this->headers->set('Content-Length', strlen($this->content));
     }
 }

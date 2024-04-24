@@ -114,7 +114,7 @@ it('only gathers occupied channels', function () {
 
 it('can send the content-length header when gathering results', function () {
     $this->usingRedis();
-    
+
     subscribe('test-channel-one');
     subscribe('presence-test-channel-two');
 

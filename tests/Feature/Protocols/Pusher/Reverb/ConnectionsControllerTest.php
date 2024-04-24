@@ -63,7 +63,7 @@ it('can gather the correct connection count when subscribed to multiple channels
 
 it('can send the content-length header when gathering results', function () {
     $this->usingRedis();
-    
+
     subscribe('test-channel-one');
     subscribe('presence-test-channel-two');
 

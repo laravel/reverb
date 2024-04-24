@@ -108,7 +108,7 @@ it('gathers the unique user data', function () {
 
 it('can send the content-length header when gathering results', function () {
     $this->usingRedis();
-    
+
     $channel = app(ChannelManager::class)
         ->for(app()->make(ApplicationProvider::class)->findByKey('reverb-key'))
         ->findOrCreate('presence-test-channel');
