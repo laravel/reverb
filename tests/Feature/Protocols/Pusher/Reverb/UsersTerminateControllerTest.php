@@ -29,6 +29,7 @@ it('unsubscribes from all channels and terminates a user', function () {
     expect($response->getBody()->getContents())->toBe('{}');
     expect(collect(channels()->all())->get('presence-test-channel-one')->connections())->toHaveCount(1);
     expect(collect(channels()->all())->get('test-channel-two')->connections())->toHaveCount(1);
+    expect($response->getHeader('Content-Length'))->toBe(['2']);
 });
 
 it('unsubscribes from all channels across all servers and terminates a user', function () {
@@ -51,4 +52,5 @@ it('unsubscribes from all channels across all servers and terminates a user', fu
     expect($response->getBody()->getContents())->toBe('{}');
     expect(collect(channels()->all())->get('presence-test-channel-one')->connections())->toHaveCount(1);
     expect(collect(channels()->all())->get('test-channel-two')->connections())->toHaveCount(1);
+    expect($response->getHeader('Content-Length'))->toBe(['2']);
 });

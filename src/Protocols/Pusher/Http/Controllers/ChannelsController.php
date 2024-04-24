@@ -4,9 +4,9 @@ namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
 use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Response;
 use Psr\Http\Message\RequestInterface;
 use React\Promise\PromiseInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ChannelsController extends Controller
 {
@@ -20,6 +20,6 @@ class ChannelsController extends Controller
         return app(MetricsHandler::class)->gather($this->application, 'channels', [
             'filter' => $this->query['filter_by_prefix'] ?? null,
             'info' => $this->query['info'] ?? null,
-        ])->then(fn ($channels) => new JsonResponse(['channels' => array_map(fn ($item) => (object) $item, $channels)]));
+        ])->then(fn ($channels) => new Response(['channels' => array_map(fn ($item) => (object) $item, $channels)]));
     }
 }
