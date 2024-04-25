@@ -7,8 +7,8 @@ body:
   - type: input
     attributes:
       label: Reverb Version
-      description: Provide the Reverb version that you are using.
-      placeholder: 1.0.0
+      description: Provide the EXACT Reverb beta version that you are using.
+      placeholder: 1.0.0-beta8
     validations:
       required: true
   - type: input
