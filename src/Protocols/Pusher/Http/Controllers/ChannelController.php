@@ -19,7 +19,7 @@ class ChannelController extends Controller
 
         return app(MetricsHandler::class)->gather($this->application, 'channel', [
             'channel' => $channel,
-            'info' => ($info = $this->query['info']) ? $info.',occupied' : 'occupied',
+            'info' => isset($this->query['info']) ? $this->query['info'].',occupied' : 'occupied',
         ])->then(fn ($channel) => new Response((object) $channel));
     }
 }
