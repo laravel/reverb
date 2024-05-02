@@ -13,6 +13,6 @@ class Response extends JsonResponse
     {
         parent::__construct($data, $status, $headers, $json);
 
-        $this->headers->set('Content-Length', strlen($this->content));
+        $this->headers->set('Content-Length', (string) strlen($this->content));
     }
 }
