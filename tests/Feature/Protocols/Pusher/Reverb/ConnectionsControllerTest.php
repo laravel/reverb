@@ -61,13 +61,13 @@ it('can gather the correct connection count when subscribed to multiple channels
     expect($response->getBody()->getContents())->toBe('{"connections":1}');
 });
 
-// it('can send the content-length header when gathering results', function () {
-//     $this->usingRedis();
+it('can send the content-length header when gathering results', function () {
+    $this->usingRedis();
 
-//     subscribe('test-channel-one');
-//     subscribe('presence-test-channel-two');
+    subscribe('test-channel-one');
+    subscribe('presence-test-channel-two');
 
-//     $response = await($this->signedRequest('connections'));
+    $response = await($this->signedRequest('connections'));
 
-//     expect($response->getHeader('Content-Length'))->toBe(['17']);
-// });
+    expect($response->getHeader('Content-Length'))->toBe(['17']);
+});

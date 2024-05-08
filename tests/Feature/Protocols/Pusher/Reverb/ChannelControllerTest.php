@@ -68,17 +68,17 @@ it('can send the content-length header', function () {
     expect($response->getHeader('Content-Length'))->toBe(['40']);
 });
 
-// it('can gather data for a single channel', function () {
-//     $this->usingRedis();
+it('can gather data for a single channel', function () {
+    $this->usingRedis();
 
-//     subscribe('test-channel-one');
-//     subscribe('test-channel-one');
+    subscribe('test-channel-one');
+    subscribe('test-channel-one');
 
-//     $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
+    $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
 
-//     expect($response->getStatusCode())->toBe(200);
-//     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":2}');
-// });
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":2}');
+});
 
 it('gathers unoccupied when no connections', function () {
     $this->usingRedis();
