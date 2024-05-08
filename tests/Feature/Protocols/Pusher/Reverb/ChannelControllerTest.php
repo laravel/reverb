@@ -69,7 +69,6 @@ it('can send the content-length header', function () {
 });
 
 it('can gather data for a single channel', function () {
-    $start = microtime(true);
     $this->usingRedis();
 
     subscribe('test-channel-one');
@@ -77,7 +76,6 @@ it('can gather data for a single channel', function () {
 
     $response = await($this->signedRequest('channels/test-channel-one?info=user_count,subscription_count,cache'));
 
-    dump("Time: %f\n", microtime(true) - $start);
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"occupied":true,"subscription_count":2}');
 });
