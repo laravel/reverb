@@ -62,6 +62,7 @@ class Server
             $this->close($connection, $e->getStatusCode(), $e->getMessage());
         } catch (Throwable $e) {
             Log::error($e->getMessage());
+            dd($e);
             $this->close($connection, 500, 'Internal server error.');
         }
     }

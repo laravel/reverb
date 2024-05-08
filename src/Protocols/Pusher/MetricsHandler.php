@@ -211,6 +211,8 @@ class MetricsHandler
      */
     protected function listenForMetrics(string $key): Deferred
     {
+        dump('Listenting on '.$key);
+        
         $deferred = new Deferred;
 
         $this->pubSubProvider->on('metrics-retrieved', function ($payload) use ($key, $deferred) {
