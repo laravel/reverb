@@ -51,12 +51,11 @@ class RedisPubSubProvider implements PubSubProvider
     {
         $this->ensureConnected();
 
-        $this->subscribingClient->subscribe($this->channel)
-            ->then(function () {
-                $this->subscribingClient->on('message', function (string $channel, string $payload) {
-                    $this->messageHandler->handle($payload);
-                });
-            });
+        $this->subscribingClient->subscribe($this->channel);
+
+        $this->subscribingClient->on('message', function (string $channel, string $payload) {
+            $this->messageHandler->handle($payload);
+        });
     }
 
     /**
@@ -65,6 +64,7 @@ class RedisPubSubProvider implements PubSubProvider
     public function on(string $event, callable $callback): void
     {
         $this->subscribingClient->on('message', function (string $channel, string $payload) use ($event, $callback) {
+            dump($payload);
             $payload = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR);
 
             if (($payload['type'] ?? null) === $event) {

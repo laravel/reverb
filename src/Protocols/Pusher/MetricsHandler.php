@@ -141,12 +141,15 @@ class MetricsHandler
      */
     protected function requestMetricsFromSubscribers(Application $application, string $key, string $type, ?array $options): void
     {
+        dump('Requesting metrics from subscribers using '.$key);
+
         $this->pubSubProvider->publish([
             'type' => 'metrics',
             'key' => $key,
             'application' => serialize($application),
             'payload' => ['type' => $type, 'options' => $options],
         ])->then(function ($total) {
+            dump('Total subscribers: '.$total);
             $this->subscribers = $total;
         });
     }
@@ -211,6 +214,7 @@ class MetricsHandler
         $deferred = new Deferred;
 
         $this->pubSubProvider->on('metrics-retrieved', function ($payload) use ($key, $deferred) {
+            dump('Metrics received for '.$key);
             if ($payload['key'] !== $key) {
                 return;
             }
