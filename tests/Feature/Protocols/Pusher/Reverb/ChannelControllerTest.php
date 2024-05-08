@@ -69,7 +69,6 @@ it('can send the content-length header', function () {
 });
 
 it('can gather data for a single channel', function () {
-    dump('Testing Redis');
     $this->usingRedis();
 
     subscribe('test-channel-one');
