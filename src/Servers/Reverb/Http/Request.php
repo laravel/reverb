@@ -33,7 +33,7 @@ class Request
                 return $request;
             }
 
-            if ($connection->bufferLength() < $contentLength[0] ?? 0) {
+            if ($request->getBody()->getSize() < $contentLength[0] ?? 0) {
                 return null;
             }
 
