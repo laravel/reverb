@@ -13,6 +13,7 @@ use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ChannelUsersController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\ConnectionsController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsBatchController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\EventsController;
+use Laravel\Reverb\Protocols\Pusher\Http\Controllers\HealthCheckController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\PusherController;
 use Laravel\Reverb\Protocols\Pusher\Http\Controllers\UsersTerminateController;
 use Laravel\Reverb\Protocols\Pusher\Managers\ArrayChannelConnectionManager;
@@ -101,6 +102,7 @@ class Factory
         $routes->add('channel', Route::get('/apps/{appId}/channels/{channel}', new ChannelController));
         $routes->add('channel_users', Route::get('/apps/{appId}/channels/{channel}/users', new ChannelUsersController));
         $routes->add('users_terminate', Route::post('/apps/{appId}/users/{userId}/terminate_connections', new UsersTerminateController));
+        $routes->add('health_check', Route::get('/up', new HealthCheckController));
 
         return $routes;
     }
