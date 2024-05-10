@@ -50,7 +50,7 @@ class ReverbConnections
 
                 $this->pulse->record(
                     type: 'reverb_connections',
-                    key: $app['app_id'],
+                    key: $app->id(),
                     value: $connections,
                     timestamp: $event->time->getTimestamp(),
                 )->avg()->max()->onlyBuckets();
