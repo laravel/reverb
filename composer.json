@@ -29,6 +29,7 @@
         "laravel/prompts": "^0.1.15",
         "pusher/pusher-php-server": "^7.2",
         "ratchet/rfc6455": "^0.3.1",
+        "react/async": "^4.2",
         "react/promise-timer": "^1.10",
         "react/socket": "^1.14",
         "symfony/console": "^6.0|^7.0",
@@ -39,7 +40,6 @@
         "pestphp/pest": "^2.0",
         "phpstan/phpstan": "^1.10",
         "ratchet/pawl": "^0.4.1",
-        "react/async": "^4.0",
         "react/http": "^1.9"
     },
     "autoload": {
