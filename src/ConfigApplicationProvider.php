@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
@@ -68,7 +69,7 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['ping_interval'],
             $app['allowed_origins'],
             $app['max_message_size'],
-            $app['options'],
+            Arr::get($app, 'options', []),
         );
     }
 }
