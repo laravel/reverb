@@ -1,17 +1,16 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\ApplicationManager;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Tests\FakeApplicationProvider;
 
-it('retrieves applications from custom provider', function() {
-    $this->app->make(ApplicationManager::class)->extend('fake', fn() => new FakeApplicationProvider);
+it('retrieves applications from custom provider', function () {
+    $this->app->make(ApplicationManager::class)->extend('fake', fn () => new FakeApplicationProvider);
 
     config([
         'reverb.apps.provider' => 'fake',
-        'reverb.apps.apps' => []
+        'reverb.apps.apps' => [],
     ]);
 
     $applicationsProvider = $this->app->make(ApplicationProvider::class);
@@ -31,6 +30,6 @@ it('retrieves applications from custom provider', function() {
                 'port' => 443,
                 'scheme' => 'https',
                 'useTLS' => true,
-            ]
+            ],
         ]);
 });

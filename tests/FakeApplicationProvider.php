@@ -6,8 +6,8 @@ use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 
-class FakeApplicationProvider implements ApplicationProvider  {
-
+class FakeApplicationProvider implements ApplicationProvider
+{
     protected $apps;
 
     public function __construct()
@@ -18,7 +18,7 @@ class FakeApplicationProvider implements ApplicationProvider  {
                 'port' => 443,
                 'scheme' => 'https',
                 'useTLS' => true,
-            ])
+            ]),
         ]);
     }
 
