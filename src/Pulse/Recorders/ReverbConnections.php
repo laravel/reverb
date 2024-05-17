@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Pulse\Recorders;
 
 use Illuminate\Broadcasting\BroadcastManager;
-use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application as Container;
 use Laravel\Pulse\Events\IsolatedBeat;
 use Laravel\Pulse\Pulse;
