@@ -142,6 +142,20 @@ class ReverbTestCase extends TestCase
     }
 
     /**
+     * Send a request to the server without specifying app ID.
+     */
+    public function requestWithoutAppId(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080'): PromiseInterface
+    {
+        return (new Browser($this->loop))
+            ->request(
+                $method,
+                "http://{$host}:{$port}/{$path}",
+                [],
+                ($data) ? json_encode($data) : ''
+            );
+    }
+
+    /**
      * Send a signed request to the server.
      */
     public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface

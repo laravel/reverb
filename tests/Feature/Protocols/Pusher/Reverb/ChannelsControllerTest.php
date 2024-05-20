@@ -51,6 +51,15 @@ it('only returns occupied channels', function () {
     expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-two":{}}}');
 });
 
+it('can send the content-length header', function () {
+    subscribe('test-channel-one');
+    subscribe('presence-test-channel-two');
+
+    $response = await($this->signedRequest('channels?info=user_count'));
+
+    expect($response->getHeader('Content-Length'))->toBe(['81']);
+});
+
 it('can gather all channel information', function () {
     $this->usingRedis();
 
@@ -101,4 +110,15 @@ it('only gathers occupied channels', function () {
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-two":{}}}');
+});
+
+it('can send the content-length header when gathering results', function () {
+    $this->usingRedis();
+
+    subscribe('test-channel-one');
+    subscribe('presence-test-channel-two');
+
+    $response = await($this->signedRequest('channels?info=user_count'));
+
+    expect($response->getHeader('Content-Length'))->toBe(['81']);
 });

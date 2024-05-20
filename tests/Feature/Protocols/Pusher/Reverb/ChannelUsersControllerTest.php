@@ -61,6 +61,19 @@ it('returns an error when gathering unoccupied channel provided', function () {
     await($this->signedRequest('channels/presence-test-channel/users'));
 })->throws(ResponseException::class);
 
+it('can send the content-length header', function () {
+    $channel = app(ChannelManager::class)
+        ->for(app()->make(ApplicationProvider::class)->findByKey('reverb-key'))
+        ->findOrCreate('presence-test-channel');
+    $channel->subscribe($connection = new FakeConnection('test-connection-one'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 1, 'user_info' => ['name' => 'Taylor']])), $data);
+    $channel->subscribe($connection = new FakeConnection('test-connection-two'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 2, 'user_info' => ['name' => 'Joe']])), $data);
+    $channel->subscribe($connection = new FakeConnection('test-connection-three'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 3, 'user_info' => ['name' => 'Jess']])), $data);
+
+    $response = await($this->signedRequest('channels/presence-test-channel/users'));
+
+    expect($response->getHeader('Content-Length'))->toBe(['38']);
+});
+
 it('gathers the user data', function () {
     $this->usingRedis();
 
@@ -91,4 +104,19 @@ it('gathers the unique user data', function () {
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"users":[{"id":2},{"id":3}]}');
+});
+
+it('can send the content-length header when gathering results', function () {
+    $this->usingRedis();
+
+    $channel = app(ChannelManager::class)
+        ->for(app()->make(ApplicationProvider::class)->findByKey('reverb-key'))
+        ->findOrCreate('presence-test-channel');
+    $channel->subscribe($connection = new FakeConnection('test-connection-one'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 1, 'user_info' => ['name' => 'Taylor']])), $data);
+    $channel->subscribe($connection = new FakeConnection('test-connection-two'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 2, 'user_info' => ['name' => 'Joe']])), $data);
+    $channel->subscribe($connection = new FakeConnection('test-connection-three'), validAuth($connection->id(), 'presence-test-channel', $data = json_encode(['user_id' => 3, 'user_info' => ['name' => 'Jess']])), $data);
+
+    $response = await($this->signedRequest('channels/presence-test-channel/users'));
+
+    expect($response->getHeader('Content-Length'))->toBe(['38']);
 });

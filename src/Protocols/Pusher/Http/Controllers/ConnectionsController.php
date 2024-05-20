@@ -4,9 +4,9 @@ namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
 use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\Servers\Reverb\Http\Connection;
+use Laravel\Reverb\Servers\Reverb\Http\Response;
 use Psr\Http\Message\RequestInterface;
 use React\Promise\PromiseInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ConnectionsController extends Controller
 {
@@ -18,6 +18,6 @@ class ConnectionsController extends Controller
         $this->verify($request, $connection, $appId);
 
         return app(MetricsHandler::class)->gather($this->application, 'connections')
-            ->then(fn ($connections) => new JsonResponse(['connections' => count($connections)]));
+            ->then(fn ($connections) => new Response(['connections' => count($connections)]));
     }
 }
