@@ -77,6 +77,11 @@ class Application
         return $this->options;
     }
 
+    /**
+     * Convert the application to an array.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
