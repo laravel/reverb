@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
