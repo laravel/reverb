@@ -8,8 +8,16 @@ use Laravel\Reverb\Contracts\ApplicationProvider;
 
 class FakeApplicationProvider implements ApplicationProvider
 {
+    /**
+     * The applications collection.
+     *
+     * @var \Illuminate\Support\Collection<\Laravel\Reverb\Application>
+     */
     protected $apps;
 
+    /**
+     * Create a new fake provider instance.
+     */
     public function __construct()
     {
         $this->apps = collect([
@@ -22,16 +30,31 @@ class FakeApplicationProvider implements ApplicationProvider
         ]);
     }
 
+    /**
+     * Get all of the configured applications as Application instances.
+     *
+     * @return \Illuminate\Support\Collection<\Laravel\Reverb\Application>
+     */
     public function all(): Collection
     {
         return $this->apps;
     }
 
+    /**
+     * Find an application instance by ID.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
     public function findById(string $id): Application
     {
         return $this->apps->first();
     }
 
+    /**
+     * Find an application instance by key.
+     *
+     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     */
     public function findByKey(string $key): Application
     {
         return $this->apps->first();
