@@ -27,7 +27,7 @@ class Server
 
         $this->loop = $loop ?: Loop::get();
 
-        $this->loop->addPeriodicTimer(30, fn () => gc_collect_cycles());
+        $this->loop->addPeriodicTimer(30, \React\Async\async(fn () => gc_collect_cycles()));
 
         // Register __invoke handler for this class to receive new connections...
         $socket->on('connection', $this);
