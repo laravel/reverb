@@ -14,6 +14,7 @@ class Application
         protected int $pingInterval,
         protected array $allowedOrigins,
         protected int $maxMessageSize,
+        protected array $options = [],
     ) {
         //
     }
@@ -66,5 +67,31 @@ class Application
     public function maxMessageSize(): int
     {
         return $this->maxMessageSize;
+    }
+
+    /**
+     * Get the application options.
+     */
+    public function options(): ?array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Convert the application to an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'app_id' => $this->id,
+            'key' => $this->key,
+            'secret' => $this->secret,
+            'ping_interval' => $this->pingInterval,
+            'allowed_origins' => $this->allowedOrigins,
+            'max_message_size' => $this->maxMessageSize,
+            'options' => $this->options,
+        ];
     }
 }
