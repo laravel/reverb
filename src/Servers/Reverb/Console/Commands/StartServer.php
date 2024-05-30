@@ -20,8 +20,6 @@ use React\EventLoop\LoopInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 
-use function React\Async\async;
-
 #[AsCommand(name: 'reverb:start')]
 class StartServer extends Command implements SignalableCommandInterface
 {
@@ -92,10 +90,10 @@ class StartServer extends Command implements SignalableCommandInterface
      */
     protected function ensureStaleConnectionsAreCleaned(LoopInterface $loop): void
     {
-        $loop->addPeriodicTimer(60, async(function () {
+        $loop->addPeriodicTimer(60, function () {
             PruneStaleConnections::dispatch();
             PingInactiveConnections::dispatch();
-        }));
+        });
     }
 
     /**
@@ -105,7 +103,7 @@ class StartServer extends Command implements SignalableCommandInterface
     {
         $lastRestart = Cache::get('laravel:reverb:restart');
 
-        $loop->addPeriodicTimer(5, async(function () use ($server, $host, $port, $lastRestart) {
+        $loop->addPeriodicTimer(5, function () use ($server, $host, $port, $lastRestart) {
             if ($lastRestart === Cache::get('laravel:reverb:restart')) {
                 return;
             }
@@ -115,7 +113,7 @@ class StartServer extends Command implements SignalableCommandInterface
             $server->stop();
 
             $this->components->info("Stopping server on {$host}:{$port}");
-        }));
+        });
     }
 
     /**
@@ -143,9 +141,9 @@ class StartServer extends Command implements SignalableCommandInterface
             return;
         }
 
-        $loop->addPeriodicTimer($interval, async(function () {
+        $loop->addPeriodicTimer($interval, function () {
             $this->laravel->make(\Laravel\Pulse\Pulse::class)->ingest();
-        }));
+        });
     }
 
     /**
@@ -157,9 +155,9 @@ class StartServer extends Command implements SignalableCommandInterface
             return;
         }
 
-        $loop->addPeriodicTimer($interval, async(function () {
+        $loop->addPeriodicTimer($interval, function () {
             \Laravel\Telescope\Telescope::store($this->laravel->make(\Laravel\Telescope\Contracts\EntriesRepository::class));
-        }));
+        });
     }
 
     /**
