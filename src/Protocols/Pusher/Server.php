@@ -87,7 +87,7 @@ class Server
 
         Log::info('Connection Closed', $connection->id());
 
-        ClientDisconnected::dispatch($connection, $channels);
+        ClientDisconnected::dispatch($connection, $channels->toArray());
     }
 
     /**
