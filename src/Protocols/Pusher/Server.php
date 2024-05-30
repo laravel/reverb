@@ -81,12 +81,14 @@ class Server
         $channels = collect($this->channels->for($connection->app())->all());
 
         $connectionId = $connection->id();
-        /** @var Channel $channel */
+        /** @var Channel|null $channel */
         $channel = $channels->first(function (Channel $channel) use ($connectionId) {
             return isset($channel->connections()[$connectionId]);
         });
 
-        $channelName = $channel->name();
+        if ($channel) {
+            $channelName = $channel->name();
+        }
 
         $this->channels
             ->for($connection->app())
@@ -96,7 +98,9 @@ class Server
 
         Log::info('Connection Closed', $connection->id());
 
-        ClientDisconnected::dispatch($connection, $channelName);
+        if ($channel) {
+            ClientDisconnected::dispatch($connection, $channelName);
+        }
     }
 
     /**
