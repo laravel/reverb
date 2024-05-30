@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\ClientDisconnected;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -75,6 +76,9 @@ class Server
      */
     public function close(Connection $connection): void
     {
+        $channels = collect($this->channels->for($connection->app())->all());
+        $channels = $channels->map(fn($channel) => $channel->name());
+
         $this->channels
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
@@ -82,6 +86,8 @@ class Server
         $connection->disconnect();
 
         Log::info('Connection Closed', $connection->id());
+
+        ClientDisconnected::dispatch($connection, $channels);
     }
 
     /**
@@ -92,7 +98,7 @@ class Server
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
 
-            Log::error('Message from '.$connection->id().' resulted in a pusher error');
+            Log::error('Message from ' . $connection->id() . ' resulted in a pusher error');
             Log::info($exception->getMessage());
 
             return;
@@ -106,7 +112,7 @@ class Server
             ]),
         ]));
 
-        Log::error('Message from '.$connection->id().' resulted in an unknown error');
+        Log::error('Message from ' . $connection->id() . ' resulted in an unknown error');
         Log::info($exception->getMessage());
     }
 
@@ -125,7 +131,7 @@ class Server
 
         $origin = parse_url($connection->origin(), PHP_URL_HOST);
 
-        if (! $origin || ! in_array($origin, $allowedOrigins)) {
+        if (!$origin || !in_array($origin, $allowedOrigins)) {
             throw new InvalidOrigin;
         }
     }
