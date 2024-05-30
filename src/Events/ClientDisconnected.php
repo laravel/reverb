@@ -12,7 +12,7 @@ class ClientDisconnected
     /**
      * Create a new event instance.
      */
-    public function __construct(public Connection $connection, public array $channels)
+    public function __construct(public Connection $connection, public string $channel)
     {
         //
     }

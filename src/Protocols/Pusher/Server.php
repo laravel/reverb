@@ -8,6 +8,7 @@ use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\ClientDisconnected;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
+use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
@@ -76,8 +77,16 @@ class Server
      */
     public function close(Connection $connection): void
     {
+
         $channels = collect($this->channels->for($connection->app())->all());
-        $channels = $channels->map(fn($channel) => $channel->name());
+
+        $connectionId = $connection->id();
+        /** @var Channel $channel */
+        $channel = $channels->first(function (Channel $channel) use ($connectionId) {
+            return isset($channel->connections()[$connectionId]);
+        });
+
+        $channelName = $channel->name();
 
         $this->channels
             ->for($connection->app())
@@ -87,7 +96,7 @@ class Server
 
         Log::info('Connection Closed', $connection->id());
 
-        ClientDisconnected::dispatch($connection, $channels->toArray());
+        ClientDisconnected::dispatch($connection, $channelName);
     }
 
     /**
