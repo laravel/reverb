@@ -89,10 +89,6 @@ class Server
             }
         });
 
-        if ($channel) {
-            $channelName = $channel->name();
-        }
-
         $this->channels
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
