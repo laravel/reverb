@@ -83,7 +83,6 @@ class Server
         $connectionId = $connection->id();
         /** @var Channel|null $channel */
         $channels->each(function (Channel $channel) use ($connectionId, $connection) {
-            // TODO: fyzicky se jendá o channel disconnected, ne o 1 kanál ale může jich být více... opravit
             if (isset($channel->connections()[$connectionId])) {
                 ChannelDisconnected::dispatch($connection, $channel->name());
             }
