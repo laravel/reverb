@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Events;
 use Illuminate\Foundation\Events\Dispatchable;
 use Laravel\Reverb\Contracts\Connection;
 
-class ClientDisconnected
+class ChannelDisconnected
 {
     use Dispatchable;
 

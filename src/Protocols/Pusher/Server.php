@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Events\ClientDisconnected;
+use Laravel\Reverb\Events\ChannelDisconnected;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
@@ -82,8 +82,11 @@ class Server
 
         $connectionId = $connection->id();
         /** @var Channel|null $channel */
-        $channel = $channels->first(function (Channel $channel) use ($connectionId) {
-            return isset($channel->connections()[$connectionId]);
+        $channels->each(function (Channel $channel) use ($connectionId, $connection) {
+            // TODO: fyzicky se jendá o channel disconnected, ne o 1 kanál ale může jich být více... opravit
+            if (isset($channel->connections()[$connectionId])) {
+                ChannelDisconnected::dispatch($connection, $channel->name());
+            }
         });
 
         if ($channel) {
@@ -97,10 +100,6 @@ class Server
         $connection->disconnect();
 
         Log::info('Connection Closed', $connection->id());
-
-        if ($channel) {
-            ClientDisconnected::dispatch($connection, $channelName);
-        }
     }
 
     /**
