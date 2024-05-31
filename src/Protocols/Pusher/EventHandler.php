@@ -89,12 +89,13 @@ class EventHandler
      */
     public function unsubscribe(Connection $connection, string $channel): void
     {
+        PusherUnsubscribe::dispatch($connection, $channel);
+
         $channel = $this->channels
             ->for($connection->app())
             ->find($channel)
             ?->unsubscribe($connection);
 
-        PusherUnsubscribe::dispatch($connection, $channel);
     }
 
     /**
