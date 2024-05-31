@@ -5,6 +5,9 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\PusherConnectionEstablished;
+use Laravel\Reverb\Events\PusherSubscribe;
+use Laravel\Reverb\Events\PusherUnsubscribe;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -35,7 +38,7 @@ class EventHandler
             'unsubscribe' => $this->unsubscribe($connection, $payload['channel']),
             'ping' => $this->pong($connection),
             'pong' => $connection->touch(),
-            default => throw new Exception('Unknown Pusher event: '.$event),
+            default => throw new Exception('Unknown Pusher event: ' . $event),
         };
     }
 
@@ -48,6 +51,8 @@ class EventHandler
             'socket_id' => $connection->id(),
             'activity_timeout' => 30,
         ]);
+
+        PusherConnectionEstablished::dispatch($connection);
     }
 
     /**
@@ -71,6 +76,8 @@ class EventHandler
     {
         $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
 
+        PusherSubscribe::dispatch($connection, $channel->name());
+
         match (true) {
             $channel instanceof CacheChannel => $this->sendCachedPayload($channel, $connection),
             default => null,
@@ -86,6 +93,8 @@ class EventHandler
             ->for($connection->app())
             ->find($channel)
             ?->unsubscribe($connection);
+
+        PusherUnsubscribe::dispatch($connection, $channel);
     }
 
     /**
@@ -149,7 +158,7 @@ class EventHandler
     {
         return json_encode(
             array_filter([
-                'event' => $prefix.$event,
+                'event' => $prefix . $event,
                 'data' => empty($data) ? null : json_encode($data),
                 'channel' => $channel,
             ])
@@ -163,8 +172,8 @@ class EventHandler
     {
         return json_encode(
             array_filter([
-                'event' => 'pusher_internal:'.$event,
-                'data' => json_encode((object) $data),
+                'event' => 'pusher_internal:' . $event,
+                'data' => json_encode((object)$data),
                 'channel' => $channel,
             ])
         );

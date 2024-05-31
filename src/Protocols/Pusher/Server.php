@@ -66,7 +66,7 @@ class Server
 
             Log::info('Message Handled', $from->id());
 
-            MessageReceived::dispatch($from, $message);
+            MessageReceived::dispatch($from, $message); // TODO: move to EventHandler
         } catch (Exception $e) {
             $this->error($from, $e);
         }
@@ -84,6 +84,7 @@ class Server
         /** @var Channel|null $channel */
         $channels->each(function (Channel $channel) use ($connectionId, $connection) {
             if (isset($channel->connections()[$connectionId])) {
+                // TODO: move to EventHandler
                 ChannelDisconnected::dispatch($connection, $channel->name());
             }
         });
