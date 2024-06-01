@@ -84,8 +84,13 @@ class Server
         /** @var Channel|null $channel */
         $channels->each(function (Channel $channel) use ($connectionId, $connection) {
             if (isset($channel->connections()[$connectionId])) {
-                // TODO: move to EventHandler
-                ClientDisconnected::dispatch($connection, $channel->name());
+                $this->handler->handle(
+                    $connection,
+                    'pusher:unsubscribe',
+                    [
+                        'channel' => $channel->name(),
+                    ]
+                );
             }
         });
 
@@ -96,6 +101,8 @@ class Server
         $connection->disconnect();
 
         Log::info('Connection Closed', $connection->id());
+
+        ClientDisconnected::dispatch($connection);
     }
 
     /**
