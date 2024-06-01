@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Events\ChannelDisconnected;
+use Laravel\Reverb\Events\ClientDisconnected;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
@@ -85,7 +85,7 @@ class Server
         $channels->each(function (Channel $channel) use ($connectionId, $connection) {
             if (isset($channel->connections()[$connectionId])) {
                 // TODO: move to EventHandler
-                ChannelDisconnected::dispatch($connection, $channel->name());
+                ClientDisconnected::dispatch($connection, $channel->name());
             }
         });
 
