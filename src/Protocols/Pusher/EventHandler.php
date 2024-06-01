@@ -5,7 +5,7 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
-use Laravel\Reverb\Events\PusherConnectionEstablished;
+use Laravel\Reverb\Events\ClientConnected;
 use Laravel\Reverb\Events\PusherSubscribe;
 use Laravel\Reverb\Events\PusherUnsubscribe;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
@@ -52,7 +52,7 @@ class EventHandler
             'activity_timeout' => 30,
         ]);
 
-        PusherConnectionEstablished::dispatch($connection);
+        ClientConnected::dispatch($connection);
     }
 
     /**
