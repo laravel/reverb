@@ -58,7 +58,8 @@ trait InteractsWithPresenceChannels
     public function data(): array
     {
         $connections = collect($this->connections->all())
-            ->map(fn ($connection) => $connection->data());
+            ->map(fn ($connection) => $connection->data())
+            ->unique('user_id');
 
         if ($connections->contains(fn ($connection) => ! isset($connection['user_id']))) {
             return [
