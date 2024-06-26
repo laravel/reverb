@@ -161,3 +161,35 @@ it('sends notification of an unsubscribe', function () {
         'channel' => 'presence-test-channel',
     ]));
 });
+
+it('ensures the "member_added" event is only fired once', function () {
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+    $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+
+    $this->channelConnectionManager->shouldReceive('all')
+        ->andReturn([$connectionOne, $connectionTwo]);
+
+    $channel->subscribe($connectionOne->connection(), validAuth($connectionOne->id(), 'presence-test-channel', $data = json_encode($connectionOne->data())), $data);
+    $channel->subscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
+
+    $connectionOne->connection()->assertNothingReceived();
+});
+
+it('ensures the "member_removed" event is only fired once', function () {
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+    $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+
+    $this->channelConnectionManager->shouldReceive('find')
+        ->andReturn($connectionOne);
+
+    $this->channelConnectionManager->shouldReceive('all')
+        ->andReturn([$connectionOne, $connectionTwo]);
+
+    $channel->unsubscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
+
+    $connectionOne->connection()->assertNothingReceived();
+});
