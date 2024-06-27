@@ -76,6 +76,7 @@ class ReverbTestCase extends TestCase
 
         app(PubSubProvider::class)->connect($this->loop);
         app(PubSubProvider::class)->subscribe();
+        usleep(100_000);
     }
 
     /**
@@ -106,6 +107,8 @@ class ReverbTestCase extends TestCase
     public function stopServer(): void
     {
         app(PubSubProvider::class)->disconnect();
+
+        usleep(100_000);
 
         if ($this->server) {
             $this->server->stop();
