@@ -470,3 +470,15 @@ it('buffers large requests correctly', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
 });
+
+it('subscription_succeeded event contains unique list of users', function () {
+    $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User']];
+    subscribe('presence-test-channel', data: $data);
+    $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User']];
+    $response = subscribe('presence-test-channel', data: $data);
+
+    expect($response)->toContain('pusher_internal:subscription_succeeded');
+    expect($response)->toContain('"count\":1');
+    expect($response)->toContain('"ids\":[1]');
+    expect($response)->toContain('"hash\":{\"1\":{\"name\":\"Test User\"}}');
+});

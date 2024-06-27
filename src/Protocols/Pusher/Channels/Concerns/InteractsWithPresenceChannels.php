@@ -15,12 +15,20 @@ trait InteractsWithPresenceChannels
     {
         $this->verify($connection, $auth, $data);
 
+        $userData = $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : [];
+
+        if ($this->userIsSubscribed($userData['user_id'] ?? null)) {
+            parent::subscribe($connection, $auth, $data);
+
+            return;
+        }
+
         parent::subscribe($connection, $auth, $data);
 
         parent::broadcastInternally(
             [
                 'event' => 'pusher_internal:member_added',
-                'data' => $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : [],
+                'data' => $userData,
                 'channel' => $this->name(),
             ],
             $connection
@@ -32,24 +40,26 @@ trait InteractsWithPresenceChannels
      */
     public function unsubscribe(Connection $connection): void
     {
-        if (! $subscription = $this->connections->find($connection)) {
-            parent::unsubscribe($connection);
+        $subscription = $this->connections->find($connection);
 
+        parent::unsubscribe($connection);
+
+        if (
+            ! $subscription ||
+            ! $subscription->data('user_id') ||
+            $this->userIsSubscribed($subscription->data('user_id'))
+        ) {
             return;
         }
 
-        if ($userId = $subscription->data('user_id')) {
-            parent::broadcast(
-                [
-                    'event' => 'pusher_internal:member_removed',
-                    'data' => ['user_id' => $userId],
-                    'channel' => $this->name(),
-                ],
-                $connection
-            );
-        }
-
-        parent::unsubscribe($connection);
+        parent::broadcast(
+            [
+                'event' => 'pusher_internal:member_removed',
+                'data' => ['user_id' => $subscription->data('user_id')],
+                'channel' => $this->name(),
+            ],
+            $connection
+        );
     }
 
     /**
@@ -58,7 +68,8 @@ trait InteractsWithPresenceChannels
     public function data(): array
     {
         $connections = collect($this->connections->all())
-            ->map(fn ($connection) => $connection->data());
+            ->map(fn ($connection) => $connection->data())
+            ->unique('user_id');
 
         if ($connections->contains(fn ($connection) => ! isset($connection['user_id']))) {
             return [
@@ -77,5 +88,17 @@ trait InteractsWithPresenceChannels
                 'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
             ],
         ];
+    }
+
+    /**
+     * Determine if the given user is subscribed to the channel.
+     */
+    protected function userIsSubscribed(?string $userId): bool
+    {
+        if (! $userId) {
+            return false;
+        }
+
+        return collect($this->connections->all())->map(fn ($connection) => (string) $connection->data('user_id'))->contains($userId);
     }
 }
