@@ -13,8 +13,7 @@ class Application
         protected string $secret,
         protected int $pingInterval,
         protected array $allowedOrigins,
-        protected int $maxMessageSize,
-        protected array $options = [],
+        protected int $maxMessageSize
     ) {
         //
     }
@@ -70,14 +69,6 @@ class Application
     }
 
     /**
-     * Get the application options.
-     */
-    public function options(): ?array
-    {
-        return $this->options;
-    }
-
-    /**
      * Convert the application to an array.
      *
      * @return array<string, mixed>
@@ -91,7 +82,6 @@ class Application
             'ping_interval' => $this->pingInterval,
             'allowed_origins' => $this->allowedOrigins,
             'max_message_size' => $this->maxMessageSize,
-            'options' => $this->options,
         ];
     }
 }
