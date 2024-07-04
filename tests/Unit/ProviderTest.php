@@ -25,11 +25,5 @@ it('retrieves applications from custom provider', function () {
             'ping_interval' => 60,
             'allowed_origins' => ['*'],
             'max_message_size' => 10_000,
-            'options' => [
-                'host' => 'localhost',
-                'port' => 443,
-                'scheme' => 'https',
-                'useTLS' => true,
-            ],
         ]);
 });
