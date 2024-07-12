@@ -5,7 +5,10 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\ConnectionClosed;
+use Laravel\Reverb\Events\ConnectionError;
 use Laravel\Reverb\Events\MessageReceived;
+use Laravel\Reverb\Events\NewConnection;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
@@ -34,6 +37,8 @@ class Server
             $this->handler->handle($connection, 'pusher:connection_established');
 
             Log::info('Connection Established', $connection->id());
+
+            NewConnection::dispatch($connection);
         } catch (Exception $e) {
             $this->error($connection, $e);
         }
@@ -82,6 +87,8 @@ class Server
         $connection->disconnect();
 
         Log::info('Connection Closed', $connection->id());
+
+        ConnectionClosed::dispatch($connection);
     }
 
     /**
@@ -93,21 +100,21 @@ class Server
             $connection->send(json_encode($exception->payload()));
 
             Log::error('Message from '.$connection->id().' resulted in a pusher error');
-            Log::info($exception->getMessage());
+        } else {
+            $connection->send(json_encode([
+                'event' => 'pusher:error',
+                'data' => json_encode([
+                    'code' => 4200,
+                    'message' => 'Invalid message format',
+                ]),
+            ]));
 
-            return;
+            Log::error('Message from '.$connection->id().' resulted in an unknown error');
         }
 
-        $connection->send(json_encode([
-            'event' => 'pusher:error',
-            'data' => json_encode([
-                'code' => 4200,
-                'message' => 'Invalid message format',
-            ]),
-        ]));
-
-        Log::error('Message from '.$connection->id().' resulted in an unknown error');
         Log::info($exception->getMessage());
+
+        ConnectionError::dispatch($connection, $exception);
     }
 
     /**
