@@ -25,11 +25,6 @@ class FakeConnection extends BaseConnection
     public string $identifier = '19c1c8e8-351b-4eb5-b6d9-6cbfc54a3446';
 
     /**
-     * Connection origin.
-     */
-    public ?string $origin = 'http://localhost';
-
-    /**
      * Connection socket ID.
      *
      * @var string
@@ -45,9 +40,7 @@ class FakeConnection extends BaseConnection
             $this->identifier = $identifier;
         }
 
-        if ($origin) {
-            $this->origin = $origin;
-        }
+        $this->origin = $origin ?? 'http://localhost';
     }
 
     /**
@@ -81,10 +74,10 @@ class FakeConnection extends BaseConnection
     /**
      * Get the origin of the connection.
      */
-    public function origin(): string
-    {
-        return $this->origin;
-    }
+//    public function origin(): string
+//    {
+//        return $this->origin;
+//    }
 
     /**
      * Set the connection last seen at timestamp.
