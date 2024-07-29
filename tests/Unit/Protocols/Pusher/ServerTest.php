@@ -305,7 +305,7 @@ it('it rejects a connection from an invalid origin', function (string $origin, a
     'wildcard' => [
         'http://laravel.com',
         ['*.laravel.com'],
-    ]
+    ],
 ]);
 
 it('accepts a connection from an valid origin', function (string $origin, array $allowedOrigins) {
