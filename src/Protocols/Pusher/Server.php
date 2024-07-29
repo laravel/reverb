@@ -125,8 +125,12 @@ class Server
 
         $origin = parse_url($connection->origin(), PHP_URL_HOST);
 
-        if (! $origin || ! in_array($origin, $allowedOrigins)) {
-            throw new InvalidOrigin;
+        foreach ($allowedOrigins as $allowedOrigin) {
+            if (Str::is($allowedOrigin, $origin)) {
+                return;
+            }
         }
+
+        throw new InvalidOrigin;
     }
 }
