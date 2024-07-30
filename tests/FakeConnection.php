@@ -72,14 +72,6 @@ class FakeConnection extends BaseConnection
     }
 
     /**
-     * Get the origin of the connection.
-     */
-//    public function origin(): string
-//    {
-//        return $this->origin;
-//    }
-
-    /**
      * Set the connection last seen at timestamp.
      */
     public function setLastSeenAt(int $time): FakeConnection
