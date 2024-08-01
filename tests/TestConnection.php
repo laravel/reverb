@@ -52,7 +52,7 @@ class TestConnection
      */
     public function await(): mixed
     {
-        $promise = new Deferred();
+        $promise = new Deferred;
 
         $this->connection->on('message', function ($message) use ($promise) {
             $promise->resolve((string) $message);

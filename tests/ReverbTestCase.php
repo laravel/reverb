@@ -93,7 +93,7 @@ class ReverbTestCase extends TestCase
      */
     protected function resetFiber(): void
     {
-        $fiber = new SimpleFiber();
+        $fiber = new SimpleFiber;
         $fiberRef = new ReflectionObject($fiber);
         $scheduler = $fiberRef->getProperty('scheduler');
         $scheduler->setAccessible(true);

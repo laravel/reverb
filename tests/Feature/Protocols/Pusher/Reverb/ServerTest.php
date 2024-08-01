@@ -312,7 +312,7 @@ it('fails to subscribe to a presence cache channel with invalid auth signature',
 });
 
 it('fails to connect when an invalid application is provided', function () {
-    $promise = new Deferred();
+    $promise = new Deferred;
 
     $connection = await(
         wsConnect('ws://0.0.0.0:8080/app/invalid-key')
@@ -369,7 +369,7 @@ it('cannot connect from an invalid origin', function () {
         wsConnect('ws://0.0.0.0:8080/app/reverb-key-3')
     );
 
-    $promise = new Deferred();
+    $promise = new Deferred;
 
     $connection->on('message', function ($message) use ($promise) {
         $promise->resolve((string) $message);
