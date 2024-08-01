@@ -34,11 +34,13 @@ class FakeConnection extends BaseConnection
     /**
      * Create a new fake connection instance.
      */
-    public function __construct(?string $identifier = null)
+    public function __construct(?string $identifier = null, ?string $origin = null)
     {
         if ($identifier) {
             $this->identifier = $identifier;
         }
+
+        $this->origin = $origin ?? 'http://localhost';
     }
 
     /**
@@ -67,14 +69,6 @@ class FakeConnection extends BaseConnection
     public function app(): Application
     {
         return app()->make(ApplicationProvider::class)->findByKey('reverb-key');
-    }
-
-    /**
-     * Get the origin of the connection.
-     */
-    public function origin(): string
-    {
-        return 'http://localhost';
     }
 
     /**
