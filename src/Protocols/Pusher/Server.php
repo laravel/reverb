@@ -56,7 +56,7 @@ class Server
                 true => $this->handler->handle(
                     $from,
                     $event['event'],
-                    $event['data'] ?? [],
+                    empty($event['data']) ? [] : $event['data'],
                     $event['channel'] ?? null
                 ),
                 default => ClientEvent::handle($from, $event)
