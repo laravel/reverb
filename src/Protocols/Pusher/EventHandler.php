@@ -5,6 +5,8 @@ namespace Laravel\Reverb\Protocols\Pusher;
 use Exception;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\SubscribedToChannel;
+use Laravel\Reverb\Events\UnsubscribedFromChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -69,6 +71,8 @@ class EventHandler
      */
     protected function afterSubscribe(Channel $channel, Connection $connection): void
     {
+        SubscribedToChannel::dispatch($connection, $channel->name());
+
         $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
 
         match (true) {
@@ -82,10 +86,12 @@ class EventHandler
      */
     public function unsubscribe(Connection $connection, string $channel): void
     {
-        $channel = $this->channels
+        $this->channels
             ->for($connection->app())
             ->find($channel)
             ?->unsubscribe($connection);
+
+        UnsubscribedFromChannel::dispatch($connection, $channel);
     }
 
     /**
