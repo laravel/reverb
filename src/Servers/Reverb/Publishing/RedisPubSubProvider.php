@@ -97,10 +97,6 @@ class RedisPubSubProvider implements PubSubProvider
             $parsed['scheme'] = $driver;
         }
 
-        if (in_array($driver, ['tcp', 'tls'])) {
-            $parsed['scheme'] = $driver;
-        }
-
         [$host, $port, $protocol, $query] = [
             $parsed['host'],
             $parsed['port'] ?: 6379,
