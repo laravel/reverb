@@ -7,6 +7,8 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\InteractsWithApplications;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\ChannelCreated;
+use Laravel\Reverb\Events\ChannelRemoved;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager as ChannelManagerInterface;
@@ -76,6 +78,8 @@ class ArrayChannelManager implements ChannelManagerInterface
 
         $this->applications[$this->application->id()][$channel->name()] = $channel;
 
+        ChannelCreated::dispatch($channel);
+
         return $channel;
     }
 
@@ -109,6 +113,8 @@ class ArrayChannelManager implements ChannelManagerInterface
     public function remove(Channel $channel): void
     {
         unset($this->applications[$this->application->id()][$channel->name()]);
+
+        ChannelRemoved::dispatch($channel);
     }
 
     /**
