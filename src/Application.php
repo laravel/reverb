@@ -12,6 +12,7 @@ class Application
         protected string $key,
         protected string $secret,
         protected int $pingInterval,
+        protected int $activityTimeout,
         protected array $allowedOrigins,
         protected int $maxMessageSize,
         protected array $options = [],
@@ -61,6 +62,14 @@ class Application
         return $this->pingInterval;
     }
 
+	/**
+	 * Get the activity timeout in seconds to ping the server.
+	 */
+	public function activityTimeout(): int
+	{
+		return $this->activityTimeout;
+	}
+
     /**
      * Get the maximum message size allowed from the client.
      */
@@ -89,6 +98,7 @@ class Application
             'key' => $this->key,
             'secret' => $this->secret,
             'ping_interval' => $this->pingInterval,
+            'activity_timeout' => $this->activityTimeout,
             'allowed_origins' => $this->allowedOrigins,
             'max_message_size' => $this->maxMessageSize,
             'options' => $this->options,

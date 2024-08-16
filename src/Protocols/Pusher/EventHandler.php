@@ -46,7 +46,7 @@ class EventHandler
     {
         $this->send($connection, 'connection_established', [
             'socket_id' => $connection->id(),
-            'activity_timeout' => $connection->app()->pingInterval(),
+            'activity_timeout' => $connection->app()->activityTimeout(),
         ]);
     }
 
