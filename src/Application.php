@@ -55,7 +55,7 @@ class Application
     }
 
     /**
-     * Get the interval in minutes to ping the client.
+     * Get the interval in seconds to ping the client.
      */
     public function pingInterval(): int
     {
