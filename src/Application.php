@@ -62,13 +62,13 @@ class Application
         return $this->pingInterval;
     }
 
-	/**
-	 * Get the activity timeout in seconds.
-	 */
-	public function activityTimeout(): int
-	{
-		return $this->activityTimeout;
-	}
+    /**
+     * Get the activity timeout in seconds.
+     */
+    public function activityTimeout(): int
+    {
+        return $this->activityTimeout;
+    }
 
     /**
      * Get the maximum message size allowed from the client.
