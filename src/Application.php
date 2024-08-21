@@ -55,7 +55,7 @@ class Application
     }
 
     /**
-     * Get the interval in seconds to ping the client.
+     * Get the client ping interval in seconds.
      */
     public function pingInterval(): int
     {
@@ -63,7 +63,7 @@ class Application
     }
 
 	/**
-	 * Get the activity timeout in seconds to ping the server.
+	 * Get the activity timeout in seconds.
 	 */
 	public function activityTimeout(): int
 	{
