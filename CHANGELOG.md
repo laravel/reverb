@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.2.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.3.0...main)
+
+## [v1.3.0](https://github.com/laravel/reverb/compare/v1.2.0...v1.3.0) - 2024-09-03
+
+* Add an activity timeout configuration option by [@zeke0816](https://github.com/zeke0816) in https://github.com/laravel/reverb/pull/241
 
 ## [v1.2.0](https://github.com/laravel/reverb/compare/v1.1.0...v1.2.0) - 2024-08-16
 
