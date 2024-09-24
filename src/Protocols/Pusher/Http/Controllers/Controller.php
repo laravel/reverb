@@ -48,6 +48,7 @@ abstract class Controller
 
         $this->setApplication($appId);
         $this->setChannels();
+        $this->verifySignature($request);
     }
 
     /**
@@ -91,7 +92,7 @@ abstract class Controller
             $params['body_md5'] = md5($this->body);
         }
 
-        ksort($params);
+        // ksort($params);
 
         $signature = implode("\n", [
             $request->getMethod(),
