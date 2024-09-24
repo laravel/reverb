@@ -76,6 +76,7 @@ class TestConnection
      */
     public function assertReceived(string $message, ?int $count = null): void
     {
+        dump($this->receivedMessages);
         if (! in_array($message, $this->receivedMessages) || $count !== null) {
             $this->await();
         }

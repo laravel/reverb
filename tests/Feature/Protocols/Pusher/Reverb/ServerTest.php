@@ -4,6 +4,7 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
+use Ratchet\RFC6455\Messaging\Frame;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as wsConnect;
@@ -481,4 +482,11 @@ it('subscription_succeeded event contains unique list of users', function () {
     expect($response)->toContain('"count\":1');
     expect($response)->toContain('"ids\":[1]');
     expect($response)->toContain('"hash\":{\"1\":{\"name\":\"Test User\"}}');
+});
+
+it('can handle a ping control frame', function () {
+    $connection = connect();
+    $connection->send(new Frame('', opcode: Frame::OP_PING));
+
+    $connection->assertReceived('pong');
 });
