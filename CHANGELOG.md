@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.3.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.3.1...main)
+
+## [v1.3.1](https://github.com/laravel/reverb/compare/v1.3.0...v1.3.1) - 2024-09-19
+
+* [1.x] Supports `laravel/prompts` v0.2 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/249
 
 ## [v1.3.0](https://github.com/laravel/reverb/compare/v1.2.0...v1.3.0) - 2024-09-03
 
