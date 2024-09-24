@@ -166,13 +166,16 @@ class ReverbTestCase extends TestCase
         $query = Str::contains($path, '?') ? Str::after($path, '?') : '';
         $query = $query ? "{$query}&" : '';
         $query .= "auth_key={$key}&auth_timestamp={$timestamp}&auth_version=1.0";
+        $query = explode('&', $query);
+        sort($query);
+        $query = implode('&', $query);
         $path = Str::before($path, '?');
 
         if ($data) {
             $hash = md5(json_encode($data));
             $query .= "&body_md5={$hash}";
         }
-        
+
         $string = "{$method}\n/apps/{$appId}/{$path}\n$query";
         $signature = hash_hmac('sha256', $string, $secret);
 
