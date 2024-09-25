@@ -25,6 +25,10 @@ class TestConnection
      */
     public $receivedMessages = [];
 
+    public $wasPinged = false;
+
+    public $wasPonged = false;
+
     /**
      * Create a new test connection instance.
      */
@@ -32,6 +36,14 @@ class TestConnection
     {
         $connection->on('message', function ($message) {
             $this->receivedMessages[] = (string) $message;
+        });
+
+        $connection->on('ping', function () {
+            $this->wasPinged = true;
+        });
+
+        $connection->on('pong', function () {
+            $this->wasPonged = true;
         });
 
         $connection->on('close', function ($code, $message) {
@@ -76,7 +88,6 @@ class TestConnection
      */
     public function assertReceived(string $message, ?int $count = null): void
     {
-        dump($this->receivedMessages);
         if (! in_array($message, $this->receivedMessages) || $count !== null) {
             $this->await();
         }
@@ -88,6 +99,26 @@ class TestConnection
         }
 
         expect($this->receivedMessages)->toContain($message);
+    }
+
+    /**
+     * Assert the connection was pinged during the test.
+     */
+    public function assertPinged(): void
+    {
+        $this->await();
+
+        expect($this->wasPinged)->toBeTrue();
+    }
+
+    /**
+     * Assert the connection was ponged during the test.
+     */
+    public function assertPonged(): void
+    {
+        $this->await();
+
+        expect($this->wasPonged)->toBeTrue();
     }
 
     /**

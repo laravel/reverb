@@ -488,5 +488,5 @@ it('can handle a ping control frame', function () {
     $connection = connect();
     $connection->send(new Frame('', opcode: Frame::OP_PING));
 
-    $connection->assertReceived('pong');
+    $connection->assertPonged();
 });

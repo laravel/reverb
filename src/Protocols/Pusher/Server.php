@@ -76,7 +76,6 @@ class Server
     {
         Log::info('Control Frame Received', $from->id());
         Log::message($message);
-
         
         if ($message->getOpcode() === Frame::OP_PING) {
             $from->touch();
