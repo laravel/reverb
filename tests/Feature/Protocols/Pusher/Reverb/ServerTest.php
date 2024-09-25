@@ -486,9 +486,29 @@ it('subscription_succeeded event contains unique list of users', function () {
 
 it('can handle a ping control frame', function () {
     $connection = connect();
+    subscribe('test-channel', connection: $connection);
+    $channels = channels();
+    $managedConnection = Arr::first($channels->connections());
+    $subscribedAt = $managedConnection->lastSeenAt();
+    sleep(1);
     $connection->send(new Frame('', opcode: Frame::OP_PING));
-
+    
     $connection->assertPonged();
+    expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
+});
+
+it('can handle a pong control frame', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+    $channels = channels();
+    $managedConnection = Arr::first($channels->connections());
+    $subscribedAt = $managedConnection->lastSeenAt();
+    sleep(1);
+    $connection->send(new Frame('', opcode: Frame::OP_PONG));
+    
+    $connection->assertNotPinged();
+    $connection->assertNotPonged();
+    expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
 });
 
 it('uses pusher control messages by default', function () {

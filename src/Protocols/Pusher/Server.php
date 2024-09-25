@@ -82,7 +82,7 @@ class Server
 
         $from->setUsesControlFrames();
 
-        if ($message->getOpcode() === Frame::OP_PING) {
+        if (in_array($message->getOpcode(), [Frame::OP_PING, Frame::OP_PONG], strict: true)) {
             $from->touch();
         }
     }
