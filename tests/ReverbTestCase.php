@@ -163,12 +163,15 @@ class ReverbTestCase extends TestCase
     public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456', string $key = 'reverb-key', string $secret = 'reverb-secret'): PromiseInterface
     {
         $timestamp = time();
+
         $query = Str::contains($path, '?') ? Str::after($path, '?') : '';
-        $query = $query ? "{$query}&" : '';
-        $query .= "auth_key={$key}&auth_timestamp={$timestamp}&auth_version=1.0";
+        $auth = "auth_key={$key}&auth_timestamp={$timestamp}&auth_version=1.0";
+        $query = $query ? "{$query}&{$auth}" : $auth;
+
         $query = explode('&', $query);
         sort($query);
         $query = implode('&', $query);
+        
         $path = Str::before($path, '?');
 
         if ($data) {
