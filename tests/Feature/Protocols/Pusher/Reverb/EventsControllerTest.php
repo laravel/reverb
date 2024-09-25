@@ -182,7 +182,7 @@ it('can trigger an event within the max message size', function () {
         'name' => 'NewEvent',
         'channel' => 'test-channel',
         'data' => json_encode([str_repeat('a', 10_100)]),
-    ], appId: '654321'));
+    ], appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
@@ -207,3 +207,13 @@ it('can send the content-length header', function () {
 
     expect($response->getHeader('Content-Length'))->toBe(['2']);
 });
+
+it('fails when using an invalid signature', function () {
+    $response = await($this->postRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['some' => 'data']),
+    ]));
+
+    expect($response->getStatusCode())->toBe(401);
+})->throws(ResponseException::class, exceptionCode: 401);

@@ -48,6 +48,7 @@ abstract class Controller
 
         $this->setApplication($appId);
         $this->setChannels();
+        $this->verifySignature($request);
     }
 
     /**
@@ -100,8 +101,9 @@ abstract class Controller
         ]);
 
         $signature = hash_hmac('sha256', $signature, $this->application->secret());
+        $authSignature = $this->query['auth_signature'] ?? '';
 
-        if ($signature !== $this->query['auth_signature']) {
+        if ($signature !== $authSignature) {
             throw new HttpException(401, 'Authentication signature invalid.');
         }
     }

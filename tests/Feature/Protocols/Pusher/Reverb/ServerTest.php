@@ -465,7 +465,7 @@ it('buffers large requests correctly', function () {
         'name' => 'NewEvent',
         'channel' => 'test-channel',
         'data' => json_encode([str_repeat('a', 150_000)]),
-    ], appId: '654321'));
+    ], appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');

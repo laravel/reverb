@@ -160,16 +160,29 @@ class ReverbTestCase extends TestCase
     /**
      * Send a signed request to the server.
      */
-    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456', string $key = 'reverb-key', string $secret = 'reverb-secret'): PromiseInterface
     {
-        $hash = md5(json_encode($data));
         $timestamp = time();
-        $query = "auth_key=reverb-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
-        $string = "POST\n/apps/{$appId}/{$path}\n$query";
-        $signature = hash_hmac('sha256', $string, 'reverb-secret');
-        $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
 
-        return $this->request("{$path}&auth_signature={$signature}", $method, $data, $host, $port, $appId);
+        $query = Str::contains($path, '?') ? Str::after($path, '?') : '';
+        $auth = "auth_key={$key}&auth_timestamp={$timestamp}&auth_version=1.0";
+        $query = $query ? "{$query}&{$auth}" : $auth;
+
+        $query = explode('&', $query);
+        sort($query);
+        $query = implode('&', $query);
+        
+        $path = Str::before($path, '?');
+
+        if ($data) {
+            $hash = md5(json_encode($data));
+            $query .= "&body_md5={$hash}";
+        }
+
+        $string = "{$method}\n/apps/{$appId}/{$path}\n$query";
+        $signature = hash_hmac('sha256', $string, $secret);
+
+        return $this->request("{$path}?{$query}&auth_signature={$signature}", $method, $data, $host, $port, $appId);
     }
 
     /**
@@ -183,30 +196,8 @@ class ReverbTestCase extends TestCase
     /**
      * Send a signed POST request to the server.
      */
-    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456', $key = 'reverb-key', $secret = 'reverb-secret'): PromiseInterface
     {
-        $hash = md5(json_encode($data));
-        $timestamp = time();
-        $query = "auth_key=reverb-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
-        $string = "POST\n/apps/{$appId}/{$path}\n$query";
-        $signature = hash_hmac('sha256', $string, 'reverb-secret');
-
-        return $this->postRequest("{$path}?{$query}&auth_signature={$signature}", $data, $host, $port, $appId);
-    }
-
-    /**
-     * Send a signed GET request to the server.
-     */
-    public function getWithSignature(string $path, array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
-    {
-        $hash = md5(json_encode($data));
-        $timestamp = time();
-        $query = "auth_key=reverb-key&auth_timestamp={$timestamp}&auth_version=1.0&body_md5={$hash}";
-        $string = "POST\n/apps/{$appId}/{$path}\n$query";
-        $signature = hash_hmac('sha256', $string, 'reverb-secret');
-
-        $path = Str::contains($path, '?') ? "{$path}&{$query}" : "{$path}?{$query}";
-
-        return $this->request("{$path}&auth_signature={$signature}", 'GET', '', $host, $port, $appId);
+        return $this->signedRequest($path, 'POST', $data, $host, $port, $appId, $key, $secret);
     }
 }
