@@ -171,7 +171,7 @@ class ReverbTestCase extends TestCase
         $query = explode('&', $query);
         sort($query);
         $query = implode('&', $query);
-        
+
         $path = Str::before($path, '?');
 
         if ($data) {
