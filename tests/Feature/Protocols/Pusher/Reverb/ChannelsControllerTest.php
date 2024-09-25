@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Tests\ReverbTestCase;
+use React\Http\Message\ResponseException;
 
 use function React\Async\await;
 
@@ -122,3 +123,9 @@ it('can send the content-length header when gathering results', function () {
 
     expect($response->getHeader('Content-Length'))->toBe(['81']);
 });
+
+it('fails when using an invalid signature', function () {
+    $response = await($this->request('channels?info=user_count'));
+
+    expect($response->getStatusCode())->toBe(401);
+})->throws(ResponseException::class, exceptionCode: 401);

@@ -207,3 +207,13 @@ it('can send the content-length header', function () {
 
     expect($response->getHeader('Content-Length'))->toBe(['2']);
 });
+
+it('fails when using an invalid signature', function () {
+    $response = await($this->postRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['some' => 'data']),
+    ]));
+
+    expect($response->getStatusCode())->toBe(401);
+})->throws(ResponseException::class, exceptionCode: 401);

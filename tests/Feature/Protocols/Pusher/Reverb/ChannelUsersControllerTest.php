@@ -13,11 +13,11 @@ uses(ReverbTestCase::class);
 it('returns an error when presence channel not provided', function () {
     subscribe('test-channel');
     await($this->signedRequest('channels/test-channel/users'));
-})->throws(ResponseException::class);
+})->throws(ResponseException::class, exceptionCode: 400);
 
 it('returns an error when unoccupied channel provided', function () {
     await($this->signedRequest('channels/presence-test-channel/users'));
-})->throws(ResponseException::class);
+})->throws(ResponseException::class, exceptionCode: 404);
 
 it('returns the user data', function () {
     $channel = app(ChannelManager::class)
@@ -53,13 +53,13 @@ it('returns an error when gathering a non-existent presence channel', function (
     subscribe('test-channel');
 
     await($this->signedRequest('channels/test-channel/users'));
-})->throws(ResponseException::class);
+})->throws(ResponseException::class, exceptionCode: 400);
 
 it('returns an error when gathering unoccupied channel provided', function () {
     $this->usingRedis();
 
     await($this->signedRequest('channels/presence-test-channel/users'));
-})->throws(ResponseException::class);
+})->throws(ResponseException::class, exceptionCode: 404);
 
 it('can send the content-length header', function () {
     $channel = app(ChannelManager::class)
@@ -120,3 +120,9 @@ it('can send the content-length header when gathering results', function () {
 
     expect($response->getHeader('Content-Length'))->toBe(['38']);
 });
+
+it('fails when using an invalid signature', function () {
+    $response = await($this->request('channels/presence-test-channel/users'));
+
+    expect($response->getStatusCode())->toBe(401);
+})->throws(ResponseException::class, exceptionCode: 401);
