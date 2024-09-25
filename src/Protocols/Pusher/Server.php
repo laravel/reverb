@@ -72,11 +72,16 @@ class Server
         }
     }
 
+    /**
+     * Handle a low-level WebSocket control frame.
+     */
     public function control(Connection $from, FrameInterface $message): void
     {
         Log::info('Control Frame Received', $from->id());
         Log::message($message);
-        
+
+        $from->setUsesControlFrames();
+
         if ($message->getOpcode() === Frame::OP_PING) {
             $from->touch();
         }

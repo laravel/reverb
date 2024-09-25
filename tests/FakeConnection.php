@@ -7,6 +7,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
+use Ratchet\RFC6455\Messaging\Frame;
 
 class FakeConnection extends BaseConnection
 {
@@ -96,6 +97,12 @@ class FakeConnection extends BaseConnection
     {
         $this->messages[] = $message;
     }
+
+    /**
+     * Send a control frame to the connection.
+     */
+    public function control(string $type = Frame::OP_PING): void { }
+
 
     /**
      * Terminate a connection.

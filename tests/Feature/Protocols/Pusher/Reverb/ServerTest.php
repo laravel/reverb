@@ -490,3 +490,30 @@ it('can handle a ping control frame', function () {
 
     $connection->assertPonged();
 });
+
+it('uses pusher control messages by default', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+
+    $channels = channels();
+    Arr::first($channels->connections())->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle($channels);
+
+    $connection->assertReceived('{"event":"pusher:ping"}');
+    $connection->assertNotPinged();
+});
+
+it('uses control frames when the client prefers', function () {
+    $connection = connect();
+    $connection->send(new Frame('', opcode: Frame::OP_PING));
+    subscribe('test-channel', connection: $connection);
+
+    $channels = channels();
+    Arr::first($channels->connections())->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle($channels);
+
+    $connection->assertPinged();
+    $connection->assertNotReceived('{"event":"pusher:ping"}');
+});
