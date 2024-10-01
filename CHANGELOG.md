@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.3.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.0...main)
+
+## [v1.4.0](https://github.com/laravel/reverb/compare/v1.3.1...v1.4.0) - 2024-10-01
+
+* [1.x] Implements API signature verification by [@joedixon](https://github.com/joedixon) in https://github.com/laravel/reverb/pull/252
+* [1.x] Supports Laravel Prompts 0.3 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/255
 
 ## [v1.3.1](https://github.com/laravel/reverb/compare/v1.3.0...v1.3.1) - 2024-09-19
 
