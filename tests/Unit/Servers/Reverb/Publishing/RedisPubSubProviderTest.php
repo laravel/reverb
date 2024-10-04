@@ -2,18 +2,19 @@
 
 use Clue\React\Redis\Client;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
-use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
+use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 use React\EventLoop\LoopInterface;
 
-it('resubscribes to the scaling channel on unsubscribe event', function (){
+it('resubscribes to the scaling channel on unsubscribe event', function () {
 
-    $channel = "reverb";
+    $channel = 'reverb';
     $subscribingClient = Mockery::mock(Client::class);
 
     $subscribingClient->shouldReceive('on')
         ->with('unsubscribe', Mockery::on(function ($callback) use ($channel) {
             $callback($channel);
+
             return true;
         }))->once();
 
@@ -24,7 +25,6 @@ it('resubscribes to the scaling channel on unsubscribe event', function (){
     $subscribingClient->shouldReceive('subscribe')
         ->twice()
         ->with($channel);
-
 
     $clientFactory = Mockery::mock(RedisClientFactory::class);
 
