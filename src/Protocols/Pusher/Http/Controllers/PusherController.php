@@ -8,6 +8,7 @@ use Laravel\Reverb\Exceptions\InvalidApplication;
 use Laravel\Reverb\Protocols\Pusher\Server as PusherServer;
 use Laravel\Reverb\Servers\Reverb\Connection;
 use Psr\Http\Message\RequestInterface;
+use Ratchet\RFC6455\Messaging\FrameInterface;
 
 class PusherController
 {
@@ -32,6 +33,10 @@ class PusherController
 
         $connection->onMessage(
             fn ($message) => $this->server->message($reverbConnection, (string) $message)
+        );
+
+        $connection->onControl(
+            fn (FrameInterface $message) => $this->server->control($reverbConnection, $message)
         );
 
         $connection->onClose(

@@ -4,6 +4,7 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
+use Ratchet\RFC6455\Messaging\Frame;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as wsConnect;
@@ -481,4 +482,58 @@ it('subscription_succeeded event contains unique list of users', function () {
     expect($response)->toContain('"count\":1');
     expect($response)->toContain('"ids\":[1]');
     expect($response)->toContain('"hash\":{\"1\":{\"name\":\"Test User\"}}');
+});
+
+it('can handle a ping control frame', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+    $channels = channels();
+    $managedConnection = Arr::first($channels->connections());
+    $subscribedAt = $managedConnection->lastSeenAt();
+    sleep(1);
+    $connection->send(new Frame('', opcode: Frame::OP_PING));
+    
+    $connection->assertPonged();
+    expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
+});
+
+it('can handle a pong control frame', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+    $channels = channels();
+    $managedConnection = Arr::first($channels->connections());
+    $subscribedAt = $managedConnection->lastSeenAt();
+    sleep(1);
+    $connection->send(new Frame('', opcode: Frame::OP_PONG));
+    
+    $connection->assertNotPinged();
+    $connection->assertNotPonged();
+    expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
+});
+
+it('uses pusher control messages by default', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+
+    $channels = channels();
+    Arr::first($channels->connections())->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle($channels);
+
+    $connection->assertReceived('{"event":"pusher:ping"}');
+    $connection->assertNotPinged();
+});
+
+it('uses control frames when the client prefers', function () {
+    $connection = connect();
+    $connection->send(new Frame('', opcode: Frame::OP_PING));
+    subscribe('test-channel', connection: $connection);
+
+    $channels = channels();
+    Arr::first($channels->connections())->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle($channels);
+
+    $connection->assertPinged();
+    $connection->assertNotReceived('{"event":"pusher:ping"}');
 });

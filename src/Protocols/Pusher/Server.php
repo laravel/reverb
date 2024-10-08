@@ -10,6 +10,8 @@ use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
+use Ratchet\RFC6455\Messaging\Frame;
+use Ratchet\RFC6455\Messaging\FrameInterface;
 
 class Server
 {
@@ -67,6 +69,21 @@ class Server
             MessageReceived::dispatch($from, $message);
         } catch (Exception $e) {
             $this->error($from, $e);
+        }
+    }
+
+    /**
+     * Handle a low-level WebSocket control frame.
+     */
+    public function control(Connection $from, FrameInterface $message): void
+    {
+        Log::info('Control Frame Received', $from->id());
+        Log::message($message);
+
+        $from->setUsesControlFrames();
+
+        if (in_array($message->getOpcode(), [Frame::OP_PING, Frame::OP_PONG], strict: true)) {
+            $from->touch();
         }
     }
 
