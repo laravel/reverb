@@ -18,7 +18,7 @@ abstract class Connection
     protected $hasBeenPinged = false;
 
     /**
-     * Uses control frames.
+     * Indicates if the connection uses control frames.
      */
     protected $usesControlFrames = false;
 
