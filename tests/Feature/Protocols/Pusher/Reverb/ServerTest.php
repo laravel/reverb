@@ -492,7 +492,7 @@ it('can handle a ping control frame', function () {
     $subscribedAt = $managedConnection->lastSeenAt();
     sleep(1);
     $connection->send(new Frame('', opcode: Frame::OP_PING));
-    
+
     $connection->assertPonged();
     expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
 });
@@ -505,7 +505,7 @@ it('can handle a pong control frame', function () {
     $subscribedAt = $managedConnection->lastSeenAt();
     sleep(1);
     $connection->send(new Frame('', opcode: Frame::OP_PONG));
-    
+
     $connection->assertNotPinged();
     $connection->assertNotPonged();
     expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);

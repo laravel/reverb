@@ -101,8 +101,7 @@ class FakeConnection extends BaseConnection
     /**
      * Send a control frame to the connection.
      */
-    public function control(string $type = Frame::OP_PING): void { }
-
+    public function control(string $type = Frame::OP_PING): void {}
 
     /**
      * Terminate a connection.
