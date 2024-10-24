@@ -149,6 +149,14 @@ abstract class Connection
     }
 
     /**
+     * Determine whether the connection uses control frames.
+     */
+    public function usesControlFrames(): bool
+    {
+        return $this->usesControlFrames;
+    }
+
+    /**
      * Mark the connection as using control frames to track activity.
      */
     public function setUsesControlFrames(bool $usesControlFrames = true): Connection
@@ -156,13 +164,5 @@ abstract class Connection
         $this->usesControlFrames = $usesControlFrames;
 
         return $this;
-    }
-
-    /**
-     * Determine whether the connection uses control frames.
-     */
-    public function usesControlFrames(): bool
-    {
-        return $this->usesControlFrames;
     }
 }
