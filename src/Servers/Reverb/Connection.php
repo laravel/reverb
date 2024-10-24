@@ -28,6 +28,13 @@ class Connection extends EventEmitter implements WebSocketConnection
     protected $onMessage;
 
     /**
+     * The control frame handler.
+     *
+     * @var ?callable
+     */
+    protected $onControl;
+
+    /**
      * The connection close handler.
      *
      * @var ?callable
@@ -83,6 +90,10 @@ class Connection extends EventEmitter implements WebSocketConnection
      */
     public function control(FrameInterface $message): void
     {
+        if ($this->onControl) {
+            ($this->onControl)($message);
+        }
+
         match ($message->getOpcode()) {
             Frame::OP_PING => $this->send(new Frame($message->getPayload(), opcode: Frame::OP_PONG)),
             Frame::OP_PONG => fn () => null,
@@ -96,6 +107,14 @@ class Connection extends EventEmitter implements WebSocketConnection
     public function onMessage(callable $callback): void
     {
         $this->onMessage = $callback;
+    }
+
+    /**
+     * Set the control frame handler.
+     */
+    public function onControl(callable $callback): void
+    {
+        $this->onControl = $callback;
     }
 
     /**

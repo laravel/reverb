@@ -117,7 +117,9 @@ class EventHandler
      */
     public function ping(Connection $connection): void
     {
-        static::send($connection, 'ping');
+        $connection->usesControlFrames() 
+            ? $connection->control() 
+            : static::send($connection, 'ping');
 
         $connection->ping();
     }
