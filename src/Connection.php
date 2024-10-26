@@ -3,13 +3,14 @@
 namespace Laravel\Reverb;
 
 use Laravel\Reverb\Concerns\GeneratesIdentifiers;
+use Laravel\Reverb\Concerns\SerializesConnections;
 use Laravel\Reverb\Contracts\Connection as ConnectionContract;
 use Laravel\Reverb\Events\MessageSent;
 use Ratchet\RFC6455\Messaging\Frame;
 
 class Connection extends ConnectionContract
 {
-    use GeneratesIdentifiers;
+    use GeneratesIdentifiers, SerializesConnections;
 
     /**
      * The normalized socket ID.
