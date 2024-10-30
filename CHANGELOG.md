@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.2...main)
+
+## [v1.4.2](https://github.com/laravel/reverb/compare/v1.4.1...v1.4.2) - 2024-10-24
+
+* [1.x] Optionally uses control frames for handling ping and pong by [@joedixon](https://github.com/joedixon) in https://github.com/laravel/reverb/pull/253
 
 ## [v1.4.1](https://github.com/laravel/reverb/compare/v1.4.0...v1.4.1) - 2024-10-04
 
