@@ -14,6 +14,8 @@ use React\Socket\ServerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
+use function React\Promise\set_rejection_handler;
+
 class Server
 {
     use ClosesConnections;
@@ -38,6 +40,17 @@ class Server
      */
     public function start(): void
     {
+        /** Set global promise rejection handler */
+        set_rejection_handler(function (Throwable $e) {
+            Log::error($e->getMessage());
+
+            /** Echo error message */
+            echo "Unhandled exception: {$e->getMessage()}\n Server will stop.\n";
+
+            /** Stop the server */
+            $this->stop();
+        });
+
         $this->loop->run();
     }
 
