@@ -16,10 +16,15 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
 
         $application = unserialize($event['application']);
 
+        $except = isset($event['socket_id']) ?
+            app(ChannelManager::class)->for($application)->connections()[$event['socket_id']] ?? null
+            : null;
+
         match ($event['type'] ?? null) {
             'message' => EventDispatcher::dispatchSynchronously(
                 $application,
-                $event['payload']
+                $event['payload'],
+                $except?->connection()
             ),
             'metrics' => app(MetricsHandler::class)->publish(
                 $application,

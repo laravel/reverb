@@ -28,6 +28,7 @@ class EventDispatcher
             'type' => 'message',
             'application' => serialize($app),
             'payload' => $payload,
+            'socket_id' => $connection?->id(),
         ]);
     }
 
@@ -46,7 +47,6 @@ class EventDispatcher
             }
 
             $payload['channel'] = $channel->name();
-
             $channel->broadcast($payload, $connection);
         }
     }
