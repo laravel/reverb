@@ -15,7 +15,9 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
         $event = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR);
 
         $application = unserialize($event['application']);
-        $except = app(ChannelManager::class)->for($application)->connections()[$event['socket_id']] ?? null;
+        $except = isset($event['socket_id']) ?
+            app(ChannelManager::class)->for($application)->connections()[$event['socket_id']] ?? null
+            : null;
 
         match ($event['type'] ?? null) {
             'message' => EventDispatcher::dispatchSynchronously(
