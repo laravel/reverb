@@ -47,6 +47,7 @@ class EventDispatcher
             }
 
             $payload['channel'] = $channel->name();
+
             $channel->broadcast($payload, $connection);
         }
     }
