@@ -80,7 +80,7 @@ it('can ignore a subscriber', function () {
 
 it('can ignore a subscriber when publishing events over redis', function () {
     $this->usingRedis();
-    
+
     $connection = connect();
     subscribe('test-channel-two', connection: $connection);
     $response = await($this->signedPostRequest('events', [
