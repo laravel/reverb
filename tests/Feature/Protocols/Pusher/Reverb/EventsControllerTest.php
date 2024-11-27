@@ -78,6 +78,29 @@ it('can ignore a subscriber', function () {
     expect($response->getBody()->getContents())->toBe('{}');
 });
 
+it('can ignore a subscriber when publishing events over redis', function () {
+    $this->usingRedis();
+    
+    $connection = connect();
+    subscribe('test-channel-two', connection: $connection);
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channels' => ['test-channel-one', 'test-channel-two'],
+        'data' => json_encode(['some' => 'data']),
+    ]));
+
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channels' => ['test-channel-one', 'test-channel-two'],
+        'data' => json_encode(['some' => 'data']),
+        'socket_id' => $connection->socketId(),
+    ]));
+
+    $connection->assertReceived('{"event":"NewEvent","data":"{\"some\":\"data\"}","channel":"test-channel-two"}', 1);
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+});
+
 it('does not fail when ignoring an invalid subscriber', function () {
     $connection = connect();
     subscribe('test-channel-two', connection: $connection);

@@ -28,6 +28,7 @@ class EventDispatcher
             'type' => 'message',
             'application' => serialize($app),
             'payload' => $payload,
+            'socket_id' => $connection?->id(),
         ]);
     }
 
