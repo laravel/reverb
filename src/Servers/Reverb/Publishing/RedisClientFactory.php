@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
-use Clue\React\Redis\Client;
 use Clue\React\Redis\Factory;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
