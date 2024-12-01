@@ -11,10 +11,8 @@ use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
-use React\Promise\Deferred;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
-use Throwable;
 
 class RedisPubSubProvider implements PubSubProvider
 {
@@ -26,6 +24,10 @@ class RedisPubSubProvider implements PubSubProvider
 
     protected $subscribingClientReconnectionTimer;
 
+    protected $publishingClientReconnectionAttempts = 0;
+
+    protected $subscribingClientReconnectionAttempts = 0;
+
     protected $queuedSubscriptionEvents = [];
 
     protected $queuedPublishEvents = [];
@@ -34,8 +36,7 @@ class RedisPubSubProvider implements PubSubProvider
         protected RedisClientFactory $clientFactory,
         protected PubSubIncomingMessageHandler $messageHandler,
         protected string $channel,
-        protected array $server = [],
-        protected int $reconnectionTimeout = 60
+        protected array $server = []
     ) {
         //
     }
@@ -80,6 +81,11 @@ class RedisPubSubProvider implements PubSubProvider
     protected function reconnectSubscribingClient(LoopInterface $loop)
     {
         $this->subscribingClientReconnectionTimer = $loop->addTimer(1, function () use ($loop) {
+            $this->subscribingClientReconnectionAttempts++;
+            if ($this->reconnectionTimeout() <= $this->subscribingClientReconnectionAttempts) {
+                Log::error('Taking too long bruh');
+                exit;
+            }
             Log::info('Attempting to reconnect Redis subscriber');
             $this->connectSubcribingClient($loop);
         });
@@ -115,6 +121,10 @@ class RedisPubSubProvider implements PubSubProvider
     protected function reconnectPublishingClient(LoopInterface $loop)
     {
         $this->publishingClientReconnectionTimer = $loop->addTimer(1, function () use ($loop) {
+            if ($this->reconnectionTimeout() <= $this->publishingClientReconnectionAttempts) {
+                Log::error('Taking too long bruh');
+                exit;
+            }
             Log::info('Attempting to reconnect Redis publisher');
             $this->connectPublishingClient($loop);
         });
@@ -268,5 +278,10 @@ class RedisPubSubProvider implements PubSubProvider
             $this->publish($event);
         }
         $this->queuedPublishEvents = [];
+    }
+
+    protected function reconnectionTimeout()
+    {
+        return $this->server['timeout'] ?? 60;
     }
 }
