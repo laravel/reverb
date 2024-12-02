@@ -95,7 +95,7 @@ class RedisClient
     /**
      * Disconnect from the Redis server.
      */
-    public function disconnnect(): void
+    public function disconnect(): void
     {
         $this->client?->close();
     }
@@ -125,7 +125,7 @@ class RedisClient
             return new Promise(fn () => new RuntimeException);
         }
 
-        $this->client->publish($this->channel, $payload);
+        return $this->client->publish($this->channel, json_encode($payload));
     }
 
     /**
@@ -135,6 +135,8 @@ class RedisClient
     {
         if (! $this->isConnected($this->client)) {
             $this->queueSubscriptionEvent('on', [$event => $callback]);
+
+            return;
         }
 
         $this->client->on($event, $callback);
