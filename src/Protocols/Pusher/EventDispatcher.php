@@ -24,12 +24,15 @@ class EventDispatcher
             return;
         }
 
-        app(PubSubProvider::class)->publish([
+        $data = [
             'type' => 'message',
             'application' => serialize($app),
             'payload' => $payload,
-            'socket_id' => $connection?->id(),
-        ]);
+        ];
+        if ($connection?->id() !== null) {
+            $data['socket_id'] = $connection?->id();
+        }
+        app(PubSubProvider::class)->publish($data);
     }
 
     /**
