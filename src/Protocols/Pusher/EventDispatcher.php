@@ -29,9 +29,11 @@ class EventDispatcher
             'application' => serialize($app),
             'payload' => $payload,
         ];
+
         if ($connection?->id() !== null) {
             $data['socket_id'] = $connection?->id();
         }
+
         app(PubSubProvider::class)->publish($data);
     }
 
