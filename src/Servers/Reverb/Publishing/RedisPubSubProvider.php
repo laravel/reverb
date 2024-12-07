@@ -33,7 +33,8 @@ class RedisPubSubProvider implements PubSubProvider
             $this->channel,
             'subscriber',
             $this->server,
-            fn () => $this->subscribe());
+            fn () => $this->subscribe()
+        );
         $this->subscribingClient->connect();
 
         $this->publishingClient = new RedisClient(
