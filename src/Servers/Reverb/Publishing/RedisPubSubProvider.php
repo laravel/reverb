@@ -93,6 +93,7 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function publish(array $payload): PromiseInterface
     {
+        dd($payload);
         return $this->publishingClient->publish($payload);
     }
 }
