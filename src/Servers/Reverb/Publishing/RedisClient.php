@@ -28,6 +28,11 @@ class RedisClient
     protected int $clientReconnectionTimer = 0;
 
     /**
+     * Determine if the client should attempt to reconnect when disconnected from the server.
+     */
+    protected bool $shouldReconnect = true;
+
+    /**
      * Subscription events queued during while disconnected from Redis.
      */
     protected $queuedSubscriptionEvents = [];
@@ -63,7 +68,9 @@ class RedisClient
                 $this->client = $client;
                 $this->clientReconnectionTimer = 0;
                 $this->configureClientErrorHandler();
-                $this->onConnect && call_user_func($this->onConnect, $client);
+                if ($this->onConnect) {
+                    call_user_func($this->onConnect, $client);
+                }
 
                 Log::info("Redis connection to [{$this->name}] successful");
             },
@@ -80,6 +87,10 @@ class RedisClient
      */
     public function reconnect(): void
     {
+        if (! $this->shouldReconnect) {
+            return;
+        }
+
         $this->loop->addTimer(1, function () {
             $this->clientReconnectionTimer++;
             if ($this->clientReconnectionTimer >= $this->reconnectionTimeout()) {
@@ -97,6 +108,8 @@ class RedisClient
      */
     public function disconnect(): void
     {
+        $this->shouldReconnect = false;
+
         $this->client?->close();
     }
 
@@ -106,7 +119,7 @@ class RedisClient
     public function subscribe(): void
     {
         if (! $this->isConnected($this->client)) {
-            $this->queueSubscriptionEvent();
+            $this->queueSubscriptionEvent('subscribe', []);
 
             return;
         }
@@ -165,9 +178,9 @@ class RedisClient
     /**
      * Queue the given subscription event.
      */
-    protected function queueSubscriptionEvent(): void
+    protected function queueSubscriptionEvent($event, $payload): void
     {
-        $this->queuedSubscriptionEvents['subscribe'] = true;
+        $this->queuedSubscriptionEvents[$event] = $payload;
     }
 
     /**
@@ -183,7 +196,6 @@ class RedisClient
      */
     protected function processQueuedSubscriptionEvents(): void
     {
-        dump($this->queuedSubscriptionEvents);
         foreach ($this->queuedSubscriptionEvents as $event => $args) {
             match ($event) {
                 'subscribe' => $this->subscribe(),
@@ -200,7 +212,6 @@ class RedisClient
      */
     protected function processQueuedPublishEvents(): void
     {
-        dump($this->queuedPublishEvents);
         foreach ($this->queuedPublishEvents as $event) {
             $this->publish($event);
         }
@@ -248,8 +259,6 @@ class RedisClient
 
     /**
      * Determine the configured reconnection timeout.
-     *
-     * @return void
      */
     protected function reconnectionTimeout(): int
     {
