@@ -27,6 +27,15 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function connect(LoopInterface $loop): void
     {
+        $this->publishingClient = new RedisClient(
+            $loop,
+            $this->clientFactory,
+            $this->channel,
+            'publisher',
+            $this->server
+        );
+        $this->publishingClient->connect();
+
         $this->subscribingClient = new RedisClient(
             $loop,
             $this->clientFactory,
@@ -36,15 +45,6 @@ class RedisPubSubProvider implements PubSubProvider
             fn () => $this->subscribe()
         );
         $this->subscribingClient->connect();
-
-        $this->publishingClient = new RedisClient(
-            $loop,
-            $this->clientFactory,
-            $this->channel,
-            'publisher',
-            $this->server
-        );
-        $this->publishingClient->connect();
     }
 
     /**
