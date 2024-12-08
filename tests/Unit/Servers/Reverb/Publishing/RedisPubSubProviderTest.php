@@ -5,6 +5,7 @@ use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 use React\EventLoop\LoopInterface;
+use React\Promise\Promise;
 
 it('resubscribes to the scaling channel on unsubscribe event', function () {
     $channel = 'reverb';
@@ -21,6 +22,10 @@ it('resubscribes to the scaling channel on unsubscribe event', function () {
         ->with('message', Mockery::any())
         ->zeroOrMoreTimes();
 
+    $subscribingClient->shouldReceive('on')
+        ->with('close', Mockery::any())
+        ->zeroOrMoreTimes();
+
     $subscribingClient->shouldReceive('subscribe')
         ->twice()
         ->with($channel);
@@ -30,17 +35,15 @@ it('resubscribes to the scaling channel on unsubscribe event', function () {
     // The first call to make() will return a publishing client
     $clientFactory->shouldReceive('make')
         ->once()
-        ->andReturn(Mockery::mock(Client::class));
+        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
 
     $clientFactory->shouldReceive('make')
         ->once()
-        ->andReturn($subscribingClient);
+        ->andReturn(new Promise(fn (callable $resolve) => $resolve($subscribingClient)));
 
     $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), $channel);
     $provider->connect(Mockery::mock(LoopInterface::class));
-
-    $provider->subscribe();
-})->skip();
+});
 
 it('can successfully reconnect', function () {})->todo();
 
