@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.3...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.4...main)
+
+## [v1.4.4](https://github.com/laravel/reverb/compare/v1.4.3...v1.4.4) - 2024-12-06
+
+* [1.x] Allow publishing to others only when using Redis by [@larswolff](https://github.com/larswolff) in https://github.com/laravel/reverb/pull/275
+* Herd is available for Windows, this update enables certificate checki… by [@iaidan](https://github.com/iaidan) in https://github.com/laravel/reverb/pull/277
+* Bugfix for PR 275 - omit socket-id if null by [@larswolff](https://github.com/larswolff) in https://github.com/laravel/reverb/pull/280
 
 ## [v1.4.3](https://github.com/laravel/reverb/compare/v1.4.2...v1.4.3) - 2024-10-31
 
