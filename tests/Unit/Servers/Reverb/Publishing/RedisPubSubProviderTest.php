@@ -7,7 +7,6 @@ use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 use React\EventLoop\LoopInterface;
 
 it('resubscribes to the scaling channel on unsubscribe event', function () {
-
     $channel = 'reverb';
     $subscribingClient = Mockery::mock(Client::class);
 
@@ -41,4 +40,18 @@ it('resubscribes to the scaling channel on unsubscribe event', function () {
     $provider->connect(Mockery::mock(LoopInterface::class));
 
     $provider->subscribe();
-});
+})->skip();
+
+it('can successfully reconnect', function () {})->todo();
+
+it('can timeout and fail when unable to reconnect', function () {})->todo();
+
+it('queues subscription events', function () {})->todo();
+
+it('can process queued subscription events', function () {})->todo();
+
+it('queues publish events', function () {})->todo();
+
+it('can process queued publish events', function () {})->todo();
+
+it('does not attempt to reconnect after a controlled disconnection', function () {})->todo();

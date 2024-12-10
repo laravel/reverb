@@ -2,14 +2,10 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\ConfigurationUrlParser;
-use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
-use RuntimeException;
 
 class RedisPubSubProvider implements PubSubProvider
 {
@@ -31,8 +27,24 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function connect(LoopInterface $loop): void
     {
-        $this->publishingClient = $this->clientFactory->make($loop, $this->redisUrl());
-        $this->subscribingClient = $this->clientFactory->make($loop, $this->redisUrl());
+        $this->subscribingClient = new RedisClient(
+            $loop,
+            $this->clientFactory,
+            $this->channel,
+            'subscriber',
+            $this->server,
+            fn () => $this->subscribe()
+        );
+        $this->subscribingClient->connect();
+
+        $this->publishingClient = new RedisClient(
+            $loop,
+            $this->clientFactory,
+            $this->channel,
+            'publisher',
+            $this->server
+        );
+        $this->publishingClient->connect();
     }
 
     /**
@@ -40,8 +52,8 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function disconnect(): void
     {
-        $this->subscribingClient?->close();
-        $this->publishingClient?->close();
+        $this->subscribingClient?->disconnect();
+        $this->publishingClient?->disconnect();
     }
 
     /**
@@ -49,9 +61,7 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function subscribe(): void
     {
-        $this->ensureConnected();
-
-        $this->subscribingClient->subscribe($this->channel);
+        $this->subscribingClient->subscribe();
 
         $this->subscribingClient->on('message', function (string $channel, string $payload) {
             $this->messageHandler->handle($payload);
@@ -79,61 +89,10 @@ class RedisPubSubProvider implements PubSubProvider
     }
 
     /**
-     * Publish a payload to the publisher.
+     * Publish a payload to the publishingClientReconnectionTimer.
      */
     public function publish(array $payload): PromiseInterface
     {
-        $this->ensureConnected();
-
-        return $this->publishingClient->publish($this->channel, json_encode($payload));
-    }
-
-    /**
-     * Get the connection URL for Redis.
-     */
-    protected function redisUrl(): string
-    {
-        $config = empty($this->server) ? Config::get('database.redis.default') : $this->server;
-
-        $parsed = (new ConfigurationUrlParser)->parseConfiguration($config);
-
-        $driver = strtolower($parsed['driver'] ?? '');
-
-        if (in_array($driver, ['tcp', 'tls'])) {
-            $parsed['scheme'] = $driver;
-        }
-
-        [$host, $port, $protocol, $query] = [
-            $parsed['host'],
-            $parsed['port'] ?: 6379,
-            Arr::get($parsed, 'scheme') === 'tls' ? 's' : '',
-            [],
-        ];
-
-        if ($parsed['username'] ?? false) {
-            $query['username'] = $parsed['username'];
-        }
-
-        if ($parsed['password'] ?? false) {
-            $query['password'] = $parsed['password'];
-        }
-
-        if ($parsed['database'] ?? false) {
-            $query['db'] = $parsed['database'];
-        }
-
-        $query = http_build_query($query);
-
-        return "redis{$protocol}://{$host}:{$port}".($query ? "?{$query}" : '');
-    }
-
-    /**
-     * Ensure that a connection to Redis has been established.
-     */
-    protected function ensureConnected(): void
-    {
-        if (! $this->publishingClient) {
-            throw new RuntimeException('Connection to Redis has not been established.');
-        }
+        return $this->publishingClient->publish($payload);
     }
 }
