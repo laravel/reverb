@@ -96,7 +96,7 @@ class RedisClient
             if ($this->clientReconnectionTimer >= $this->reconnectionTimeout()) {
                 Log::error("Failed to reconnect to Redis connection [{$this->name}] within {$this->reconnectionTimeout()} second limit");
 
-                exit;
+                throw new Exception("Failed to reconnect to Redis connection [{$this->name}] within {$this->reconnectionTimeout()} second limit");
             }
             Log::info("Attempting to reconnect Redis connection [{$this->name}]");
             $this->connect();
@@ -170,7 +170,9 @@ class RedisClient
     {
         $this->client->on('close', function () {
             $this->client = null;
-            Log::info("Disconnected fromRedis connection [{$this->name}]");
+
+            Log::info("Disconnected from Redis connection [{$this->name}]");
+
             $this->reconnect();
         });
     }
