@@ -134,7 +134,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     {
         $channels = $this->applications[$this->application->id()] ?? [];
 
-        if ($channel) {
+        if (isset($channel)) {
             return $channels[$channel] ?? null;
         }
 

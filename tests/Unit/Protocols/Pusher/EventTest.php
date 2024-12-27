@@ -38,6 +38,19 @@ it('can subscribe to a channel', function () {
     ]);
 });
 
+it('can subscribe to an empty channel', function () {
+    $this->pusher->handle(
+        $this->connection,
+        'pusher:subscribe',
+        ['channel' => '']
+    );
+
+    $this->connection->assertReceived([
+        'event' => 'pusher_internal:subscription_succeeded',
+        'data' => '{}',
+    ]);
+});
+
 it('can unsubscribe from a channel', function () {
     $this->pusher->handle(
         $this->connection,
