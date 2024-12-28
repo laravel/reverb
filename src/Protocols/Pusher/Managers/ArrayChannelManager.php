@@ -20,16 +20,16 @@ class ArrayChannelManager implements ChannelManagerInterface
     /**
      * The underlying array of applications and their channels.
      *
-     * @var array<string, array<string, array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>>>
+     * @var array<string, array<string, Channel>>
      */
-    protected $applications = [];
+    protected array $applications = [];
 
     /**
      * The application instance.
      *
-     * @var \Laravel\Reverb\Application
+     * @var Application|null
      */
-    protected $application;
+    protected ?Application $application = null;
 
     /**
      * Get the application instance.
@@ -40,9 +40,9 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get all the channels.
+     * Get all channels for the current application.
      *
-     * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>
+     * @return array<string, Channel>
      */
     public function all(): array
     {
@@ -50,7 +50,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Determine whether the given channel exists.
+     * Check if the given channel exists.
      */
     public function exists(string $channel): bool
     {
@@ -58,7 +58,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Find the given channel
+     * Find a specific channel.
      */
     public function find(string $channel): ?Channel
     {
@@ -66,14 +66,18 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Find the given channel or create it if it doesn't exist.
+     * Find or create a channel by name.
      */
     public function findOrCreate(string $channelName): Channel
     {
-        if ($channel = $this->find($channelName)) {
-            return $channel;
-        }
+        return $this->find($channelName) ?? $this->createChannel($channelName);
+    }
 
+    /**
+     * Create a new channel and dispatch an event.
+     */
+    protected function createChannel(string $channelName): Channel
+    {
         $channel = ChannelBroker::create($channelName);
 
         $this->applications[$this->application->id()][$channel->name()] = $channel;
@@ -84,7 +88,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get all of the connections for the given channels.
+     * Get all connections for a specific channel or all channels.
      *
      * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
      */
@@ -92,13 +96,11 @@ class ArrayChannelManager implements ChannelManagerInterface
     {
         $channels = Arr::wrap($this->channels($channel));
 
-        return array_reduce($channels, function ($carry, $channel) {
-            return $carry + $channel->connections();
-        }, []);
+        return array_reduce($channels, fn ($carry, $channel) => $carry + $channel->connections(), []);
     }
 
     /**
-     * Unsubscribe from all channels.
+     * Unsubscribe a connection from all channels.
      */
     public function unsubscribeFromAll(Connection $connection): void
     {
@@ -108,7 +110,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Remove the given channel.
+     * Remove a specific channel and dispatch an event.
      */
     public function remove(Channel $channel): void
     {
@@ -118,38 +120,24 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Get the given channel.
-     */
-    public function channel(string $channel): ?Channel
-    {
-        return $this->channels($channel);
-    }
-
-    /**
-     * Get the channels for the application.
+     * Get a specific channel or all channels for the application.
      *
-     * @return \Laravel\Reverb\Protocols\Pusher\Channels\Channel|array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>|null
+     * @return Channel|array<string, Channel>|null
      */
     public function channels(?string $channel = null): Channel|array|null
     {
         $channels = $this->applications[$this->application->id()] ?? [];
 
-        if (isset($channel)) {
-            return $channels[$channel] ?? null;
-        }
-
-        return $channels;
+        return $channel ? ($channels[$channel] ?? null) : $channels;
     }
 
     /**
-     * Flush the channel manager repository.
+     * Flush all channels for all applications.
      */
     public function flush(): void
     {
         app(ApplicationProvider::class)
             ->all()
-            ->each(function (Application $application) {
-                $this->applications[$application->id()] = [];
-            });
+            ->each(fn (Application $application) => $this->applications[$application->id()] = []);
     }
 }
