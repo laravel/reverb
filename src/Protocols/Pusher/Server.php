@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
@@ -53,6 +54,15 @@ class Server
 
         try {
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
+
+            $validate = Validator::make($event, [
+                'event' => ['required', 'string'],
+                'data' => ['nullable', 'array'],
+                'channel' => ['nullable', 'string'],
+                'data.channel' => ['required', 'string'],
+                'data.auth' => ['nullable', 'string'],
+                'data.channel_data' => ['nullable', 'json'],
+            ])->validate();
 
             match (Str::startsWith($event['event'], 'pusher:')) {
                 true => $this->handler->handle(

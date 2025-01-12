@@ -93,6 +93,165 @@ it('sends an error if something fails', function () {
         ]),
     ]);
 });
+it('sends an error if something fails for event type', function () {
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => [],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data type', function () {
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => 'sfsfsfs',
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data channel type', function () {
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => [],
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => null,
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data auth type', function () {
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => [],
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data channel_data type', function () {
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => '',
+                'channel_data' => [],
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => '',
+                'channel_data' => 'Hello',
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for channel type', function () {
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => [],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
 
 it('can subscribe a user to a channel', function () {
     $this->server->message(
