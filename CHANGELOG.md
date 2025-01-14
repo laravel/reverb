@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.4...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.5...main)
+
+## [v1.4.5](https://github.com/laravel/reverb/compare/v1.4.4...v1.4.5) - 2024-12-27
+
+* [1.x] Fix tests by [@joedixon](https://github.com/joedixon) in https://github.com/laravel/reverb/pull/293
+* [1.x] Check if channel variable isn't null when passed as a filter on channels() method in ArrayChannelManager by [@kirills-morozovs](https://github.com/kirills-morozovs) in https://github.com/laravel/reverb/pull/292
 
 ## [v1.4.4](https://github.com/laravel/reverb/compare/v1.4.3...v1.4.4) - 2024-12-06
 
