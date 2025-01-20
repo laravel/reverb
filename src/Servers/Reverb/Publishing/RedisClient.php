@@ -162,14 +162,6 @@ class RedisClient
     }
 
     /**
-     * Queue the given subscription event.
-     */
-    protected function queueSubscriptionEvent($event, $payload): void
-    {
-        $this->queuedSubscriptionEvents[] = [$event => $payload];
-    }
-
-    /**
      * Queue the given publish event.
      */
     protected function queuePublishEvent(array $payload): void
