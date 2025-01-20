@@ -33,11 +33,6 @@ class RedisClient
     protected bool $shouldReconnect = true;
 
     /**
-     * Subscription events queued during while disconnected from Redis.
-     */
-    protected $queuedSubscriptionEvents = [];
-
-    /**
      * Publish events queued during while disconnected from Redis.
      */
     protected $queuedPublishEvents = [];
@@ -71,6 +66,7 @@ class RedisClient
                 if ($this->onConnect) {
                     call_user_func($this->onConnect, $client);
                 }
+                $this->processQueuedPublishEvents();
 
                 Log::info("Redis connection to [{$this->name}] successful");
             },
@@ -118,12 +114,6 @@ class RedisClient
      */
     public function subscribe(): void
     {
-        if (! $this->isConnected($this->client)) {
-            $this->queueSubscriptionEvent('subscribe', []);
-
-            return;
-        }
-
         $this->client->subscribe($this->channel);
     }
 
@@ -146,12 +136,6 @@ class RedisClient
      */
     public function on(string $event, callable $callback): void
     {
-        if (! $this->isConnected($this->client)) {
-            $this->queueSubscriptionEvent('on', [$event => $callback]);
-
-            return;
-        }
-
         $this->client->on($event, $callback);
     }
 
@@ -182,7 +166,7 @@ class RedisClient
      */
     protected function queueSubscriptionEvent($event, $payload): void
     {
-        $this->queuedSubscriptionEvents[$event] = $payload;
+        $this->queuedSubscriptionEvents[] = [$event => $payload];
     }
 
     /**
@@ -194,22 +178,6 @@ class RedisClient
     }
 
     /**
-     * Process the queued subscription events.
-     */
-    protected function processQueuedSubscriptionEvents(): void
-    {
-        foreach ($this->queuedSubscriptionEvents as $event => $args) {
-            match ($event) {
-                'subscribe' => $this->subscribe(),
-                'on' => $this->on(...$args),
-                default => null
-            };
-
-        }
-        $this->queuedSubscriptionEvents = [];
-    }
-
-    /**
      * Process the queued publish events.
      */
     protected function processQueuedPublishEvents(): void
@@ -217,6 +185,7 @@ class RedisClient
         foreach ($this->queuedPublishEvents as $event) {
             $this->publish($event);
         }
+
         $this->queuedPublishEvents = [];
     }
 
