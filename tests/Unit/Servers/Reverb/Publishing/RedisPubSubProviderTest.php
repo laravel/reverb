@@ -4,7 +4,7 @@ use Clue\React\Redis\Client;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
-use React\EventLoop\Loop;
+use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Promise\Promise;
 
@@ -70,7 +70,7 @@ it('can successfully reconnect', function () {
 
 it('can timeout and fail when unable to reconnect', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
-    $loop = Loop::get();
+    $loop = Factory::create();
 
     // Publisher client
     $clientFactory->shouldReceive('make')
@@ -147,24 +147,14 @@ it('can process queued publish events', function () {
 
 it('does not attempt to reconnect after a controlled disconnection', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
-    $loop = Loop::get();
+    $loop = Factory::create();
 
     // Publisher client
     $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
-
-    // Subscriber client
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
+        ->twice()
+        ->andReturn(new Promise(fn (callable $resolve) => throw new Exception));
 
     $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb');
+    $loop->addTimer(1, fn () => $provider->disconnect());
     $provider->connect($loop);
-
-    $loop->run();
-
-    $provider->disconnect();
-
-    
 });
