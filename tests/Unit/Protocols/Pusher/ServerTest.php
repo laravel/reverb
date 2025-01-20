@@ -331,7 +331,6 @@ it('accepts a connection from an valid origin', function (string $origin, array 
 ]);
 
 it('sends an error if something fails for event type', function () {
-
     $this->server->message(
         $connection = new FakeConnection,
         json_encode([
@@ -349,7 +348,6 @@ it('sends an error if something fails for event type', function () {
 });
 
 it('sends an error if something fails for data type', function () {
-
     $this->server->message(
         $connection = new FakeConnection,
         json_encode([
@@ -368,7 +366,6 @@ it('sends an error if something fails for data type', function () {
 });
 
 it('sends an error if something fails for data channel type', function () {
-
     $this->server->message(
         $connection = new FakeConnection,
         json_encode([
@@ -407,7 +404,6 @@ it('sends an error if something fails for data channel type', function () {
 });
 
 it('sends an error if something fails for data auth type', function () {
-
     $this->server->message(
         $connection = new FakeConnection,
         json_encode([
@@ -429,7 +425,6 @@ it('sends an error if something fails for data auth type', function () {
 });
 
 it('sends an error if something fails for data channel_data type', function () {
-
     $this->server->message(
         $connection = new FakeConnection,
         json_encode([
@@ -472,7 +467,6 @@ it('sends an error if something fails for data channel_data type', function () {
 });
 
 it('sends an error if something fails for channel type', function () {
-
     $this->server->message(
         $connection = new FakeConnection,
         json_encode([

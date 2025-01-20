@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
@@ -24,14 +25,11 @@ class EventHandler
      */
     public function handle(Connection $connection, string $event, array $payload = []): void
     {
-        match (Str::after($event, 'pusher:')) {
+        $event = Str::after($event, 'pusher:');
+
+        match ($event) {
             'connection_established' => $this->acknowledge($connection),
-            'subscribe' => $this->subscribe(
-                $connection,
-                $payload['channel'],
-                $payload['auth'] ?? null,
-                $payload['channel_data'] ?? null
-            ),
+            'subscribe' => $this->subscribe($connection, $payload),
             'unsubscribe' => $this->unsubscribe($connection, $payload['channel']),
             'ping' => $this->pong($connection),
             'pong' => $connection->touch(),
@@ -53,13 +51,19 @@ class EventHandler
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
+    public function subscribe(Connection $connection, array $payload): void
     {
+        $validated = Validator::make($payload, [
+            'channel' => ['required', 'string'],
+            'auth' => ['nullable', 'string'],
+            'channel_data' => ['nullable', 'json'],
+        ])->validate();
+
         $channel = $this->channels
             ->for($connection->app())
-            ->findOrCreate($channel);
+            ->findOrCreate($channel = $validated['channel']);  
 
-        $channel->subscribe($connection, $auth, $data);
+        $channel->subscribe($connection, $validated['auth'] ?? null, $validated['channel_data'] ?? null);
 
         $this->afterSubscribe($channel, $connection);
     }
