@@ -54,7 +54,7 @@ class EventHandler
     public function subscribe(Connection $connection, array $payload): void
     {
         $validated = Validator::make($payload, [
-            'channel' => ['required', 'string'],
+            'channel' => ['nullable', 'string'],
             'auth' => ['nullable', 'string'],
             'channel_data' => ['nullable', 'json'],
         ])->validate();
