@@ -2,6 +2,7 @@
 
 namespace Laravel\Reverb\Protocols\Pusher;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 
@@ -12,6 +13,12 @@ class ClientEvent
      */
     public static function handle(Connection $connection, array $event): ?ClientEvent
     {
+        Validator::make($event, [
+            'event' => ['required', 'string'],
+            'channel' => ['required', 'string'],
+            'data' => ['required', 'array'],
+        ])->validate();
+
         if (! Str::startsWith($event['event'], 'client-')) {
             return null;
         }

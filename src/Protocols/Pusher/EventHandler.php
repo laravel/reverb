@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
@@ -24,7 +25,9 @@ class EventHandler
      */
     public function handle(Connection $connection, string $event, array $payload = []): void
     {
-        match (Str::after($event, 'pusher:')) {
+        $event = Str::after($event, 'pusher:');
+
+        match ($event) {
             'connection_established' => $this->acknowledge($connection),
             'subscribe' => $this->subscribe(
                 $connection,
@@ -55,6 +58,16 @@ class EventHandler
      */
     public function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
     {
+        Validator::make([
+            'channel' => $channel,
+            'auth' => $auth,
+            'channel_data' => $data,
+        ], [
+            'channel' => ['nullable', 'string'],
+            'auth' => ['nullable', 'string'],
+            'channel_data' => ['nullable', 'json'],
+        ])->validate();
+
         $channel = $this->channels
             ->for($connection->app())
             ->findOrCreate($channel);

@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
@@ -12,6 +13,7 @@ use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
+use Throwable;
 
 class Server
 {
@@ -54,12 +56,13 @@ class Server
         try {
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
+            Validator::make($event, ['event' => ['required', 'string']])->validate();
+
             match (Str::startsWith($event['event'], 'pusher:')) {
                 true => $this->handler->handle(
                     $from,
                     $event['event'],
                     empty($event['data']) ? [] : $event['data'],
-                    $event['channel'] ?? null
                 ),
                 default => ClientEvent::handle($from, $event)
             };
@@ -67,7 +70,7 @@ class Server
             Log::info('Message Handled', $from->id());
 
             MessageReceived::dispatch($from, $message);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->error($from, $e);
         }
     }
@@ -104,7 +107,7 @@ class Server
     /**
      * Handle an error.
      */
-    public function error(Connection $connection, Exception $exception): void
+    public function error(Connection $connection, Throwable $exception): void
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
