@@ -29,7 +29,12 @@ class EventHandler
 
         match ($event) {
             'connection_established' => $this->acknowledge($connection),
-            'subscribe' => $this->subscribe($connection, $payload),
+            'subscribe' => $this->subscribe(
+                $connection,
+                $payload['channel'],
+                $payload['auth'] ?? null,
+                $payload['channel_data'] ?? null
+            ),
             'unsubscribe' => $this->unsubscribe($connection, $payload['channel']),
             'ping' => $this->pong($connection),
             'pong' => $connection->touch(),
@@ -51,9 +56,13 @@ class EventHandler
     /**
      * Subscribe to the given channel.
      */
-    public function subscribe(Connection $connection, array $payload): void
+    public function subscribe(Connection $connection, string $channel, ?string $auth = null, ?string $data = null): void
     {
-        $validated = Validator::make($payload, [
+        Validator::make([
+            'channel' => $channel,
+            'auth' => $auth,
+            'channel_data' => $data,
+        ], [
             'channel' => ['nullable', 'string'],
             'auth' => ['nullable', 'string'],
             'channel_data' => ['nullable', 'json'],
@@ -61,9 +70,9 @@ class EventHandler
 
         $channel = $this->channels
             ->for($connection->app())
-            ->findOrCreate($channel = $validated['channel']);  
+            ->findOrCreate($channel);
 
-        $channel->subscribe($connection, $validated['auth'] ?? null, $validated['channel_data'] ?? null);
+        $channel->subscribe($connection, $auth, $data);
 
         $this->afterSubscribe($channel, $connection);
     }
