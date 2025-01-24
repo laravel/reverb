@@ -29,7 +29,7 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.2, 8.3, 8.4]
-        laravel: [10, 11]
+        laravel: [10, 11, 12]
         exclude:
           - laravel: 10
             php: 8.4
@@ -51,8 +51,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-           composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update
-           composer update --prefer-dist --no-interaction --no-progress
+           composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts=^${{ matrix.laravel }}"
 
       - name: Execute tests
         run: vendor/bin/pest
