@@ -35,7 +35,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts=^${{ matrix.laravel }}
+        composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts=^${{ matrix.laravel }}"
 
     - name: Pull Autobahn Docker image
       run: docker pull crossbario/autobahn-testsuite
