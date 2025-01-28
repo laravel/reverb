@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.5...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.6...main)
+
+## [v1.4.6](https://github.com/laravel/reverb/compare/v1.4.5...v1.4.6) - 2025-01-28
+
+* [1.x] Add Message Payload Validation and Improve Channel Data Handling by [@MahdiBagheri71](https://github.com/MahdiBagheri71) in https://github.com/laravel/reverb/pull/303
+* Supports Laravel 12 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/304
 
 ## [v1.4.5](https://github.com/laravel/reverb/compare/v1.4.4...v1.4.5) - 2024-12-27
 
