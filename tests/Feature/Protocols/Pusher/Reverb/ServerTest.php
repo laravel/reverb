@@ -5,6 +5,7 @@ use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use Ratchet\RFC6455\Messaging\Frame;
+use React\Http\Message\ResponseException;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as wsConnect;
@@ -265,7 +266,7 @@ it('can subscribe a connection to multiple channels', function () {
     expect(channels()->all())->toHaveCount(4);
     collect(channels()->all())->each(function ($channel) use ($connection) {
         expect($channel->connections())->toHaveCount(1);
-        expect(collect($channel->connections())->map(fn ($conn) => $conn->id()))->toContain($connection->socketId());
+        expect(collect($channel->connections())->map(fn($conn) => $conn->id()))->toContain($connection->socketId());
     });
 });
 
@@ -471,6 +472,29 @@ it('buffers large requests correctly', function () {
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
 });
+
+it('server listens on a specific path', function () {
+    $this->stopServer();
+    $this->startServer(path: 'ws');
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['data' => 'data']),
+    ], pathPrefix: '/ws', appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+});
+
+it('returns an error when the path prefix is not included in the request', function () {
+    $this->stopServer();
+    $this->startServer(path: 'ws');
+    await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['data' => 'data']),
+    ], appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
+})->throws(ResponseException::class, exceptionCode: 404);
 
 it('subscription_succeeded event contains unique list of users', function () {
     $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User']];

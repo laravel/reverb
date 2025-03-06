@@ -39,6 +39,7 @@ class Factory
     public static function make(
         string $host = '0.0.0.0',
         string $port = '8080',
+        string $path = '',
         ?string $hostname = null,
         int $maxRequestSize = 10_000,
         array $options = [],
@@ -48,7 +49,7 @@ class Factory
         $loop = $loop ?: Loop::get();
 
         $router = match ($protocol) {
-            'pusher' => static::makePusherRouter(),
+            'pusher' => static::makePusherRouter($path),
             default => throw new InvalidArgumentException("Unsupported protocol [{$protocol}]."),
         };
 
@@ -67,7 +68,7 @@ class Factory
     /**
      * Create a new WebSocket server for the Pusher protocol.
      */
-    public static function makePusherRouter(): Router
+    public static function makePusherRouter(string $path): Router
     {
         app()->singleton(
             ChannelManager::class,
@@ -84,13 +85,13 @@ class Factory
             fn () => new PusherPubSubIncomingMessageHandler,
         );
 
-        return new Router(new UrlMatcher(static::pusherRoutes(), new RequestContext));
+        return new Router(new UrlMatcher(static::pusherRoutes($path), new RequestContext));
     }
 
     /**
      * Generate the routes required to handle Pusher requests.
      */
-    protected static function pusherRoutes(): RouteCollection
+    protected static function pusherRoutes(string $path): RouteCollection
     {
         $routes = new RouteCollection;
 
@@ -103,6 +104,8 @@ class Factory
         $routes->add('channel_users', Route::get('/apps/{appId}/channels/{channel}/users', new ChannelUsersController));
         $routes->add('users_terminate', Route::post('/apps/{appId}/users/{userId}/terminate_connections', new UsersTerminateController));
         $routes->add('health_check', Route::get('/up', new HealthCheckController));
+
+        $routes->addPrefix($path);
 
         return $routes;
     }
