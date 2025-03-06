@@ -83,10 +83,10 @@ class ReverbTestCase extends TestCase
     /**
      * Start the WebSocket server.
      */
-    public function startServer(string $host = '0.0.0.0', string $port = '8080', int $maxRequestSize = 10_000): void
+    public function startServer(string $host = '0.0.0.0', string $port = '8080', string $path = '', int $maxRequestSize = 10_000): void
     {
         $this->resetFiber();
-        $this->server = Factory::make($host, $port, maxRequestSize: $maxRequestSize, loop: $this->loop);
+        $this->server = Factory::make($host, $port, $path, maxRequestSize: $maxRequestSize, loop: $this->loop);
     }
 
     /**
@@ -132,12 +132,12 @@ class ReverbTestCase extends TestCase
     /**
      * Send a request to the server.
      */
-    public function request(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function request(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456'): PromiseInterface
     {
         return (new Browser($this->loop))
             ->request(
                 $method,
-                "http://{$host}:{$port}/apps/{$appId}/{$path}",
+                "http://{$host}:{$port}{$pathPrefix}/apps/{$appId}/{$path}",
                 [],
                 ($data) ? json_encode($data) : ''
             );
@@ -160,7 +160,7 @@ class ReverbTestCase extends TestCase
     /**
      * Send a signed request to the server.
      */
-    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $appId = '123456', string $key = 'reverb-key', string $secret = 'reverb-secret'): PromiseInterface
+    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456', string $key = 'reverb-key', string $secret = 'reverb-secret'): PromiseInterface
     {
         $timestamp = time();
 
@@ -179,25 +179,25 @@ class ReverbTestCase extends TestCase
             $query .= "&body_md5={$hash}";
         }
 
-        $string = "{$method}\n/apps/{$appId}/{$path}\n$query";
+        $string = "{$method}\n{$pathPrefix}/apps/{$appId}/{$path}\n$query";
         $signature = hash_hmac('sha256', $string, $secret);
 
-        return $this->request("{$path}?{$query}&auth_signature={$signature}", $method, $data, $host, $port, $appId);
+        return $this->request("{$path}?{$query}&auth_signature={$signature}", $method, $data, $host, $port, $pathPrefix, $appId);
     }
 
     /**
      * Send a POST request to the server.
      */
-    public function postRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456'): PromiseInterface
+    public function postRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456'): PromiseInterface
     {
-        return $this->request($path, 'POST', $data, $host, $port, $appId);
+        return $this->request($path, 'POST', $data, $host, $port, $pathPrefix, $appId);
     }
 
     /**
      * Send a signed POST request to the server.
      */
-    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $appId = '123456', $key = 'reverb-key', $secret = 'reverb-secret'): PromiseInterface
+    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456', $key = 'reverb-key', $secret = 'reverb-secret'): PromiseInterface
     {
-        return $this->signedRequest($path, 'POST', $data, $host, $port, $appId, $key, $secret);
+        return $this->signedRequest($path, 'POST', $data, $host, $port, $pathPrefix, $appId, $key, $secret);
     }
 }

@@ -31,6 +31,7 @@ class StartServer extends Command implements SignalableCommandInterface
     protected $signature = 'reverb:start
                 {--host= : The IP address the server should bind to}
                 {--port= : The port the server should listen on}
+                {--path= : The path the server should prefix to all routes}
                 {--hostname= : The hostname the server is accessible from}
                 {--debug : Indicates whether debug messages should be displayed in the terminal}';
 
@@ -57,6 +58,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $server = ServerFactory::make(
             $host = $this->option('host') ?: $config['host'],
             $port = $this->option('port') ?: $config['port'],
+            $path = $this->option('path') ?: $config['path'] ?? '',
             $hostname = $this->option('hostname') ?: $config['hostname'],
             $config['max_request_size'] ?? 10_000,
             $config['options'] ?? [],
@@ -69,7 +71,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
         $this->ensureTelescopeEntriesAreCollected($loop, $config['telescope_ingest_interval'] ?? 15);
 
-        $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
+        $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}{$path}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
 
         $server->start();
     }
