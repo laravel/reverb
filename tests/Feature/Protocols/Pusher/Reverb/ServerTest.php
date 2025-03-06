@@ -266,7 +266,7 @@ it('can subscribe a connection to multiple channels', function () {
     expect(channels()->all())->toHaveCount(4);
     collect(channels()->all())->each(function ($channel) use ($connection) {
         expect($channel->connections())->toHaveCount(1);
-        expect(collect($channel->connections())->map(fn($conn) => $conn->id()))->toContain($connection->socketId());
+        expect(collect($channel->connections())->map(fn ($conn) => $conn->id()))->toContain($connection->socketId());
     });
 });
 
