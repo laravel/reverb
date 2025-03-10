@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Logger;
+use Laravel\Reverb\Events\ServerStarted;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
@@ -72,7 +73,7 @@ class StartServer extends Command implements SignalableCommandInterface
         $this->ensureTelescopeEntriesAreCollected($loop, $config['telescope_ingest_interval'] ?? 15);
 
         $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}{$path}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
-
+        ServerStarted::dispatch();
         $server->start();
     }
 

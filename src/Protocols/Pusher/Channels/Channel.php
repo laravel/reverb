@@ -3,6 +3,8 @@
 namespace Laravel\Reverb\Protocols\Pusher\Channels;
 
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\PusherSubscribe;
+use Laravel\Reverb\Events\PusherUnsubscribe;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Concerns\SerializesChannels;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
@@ -67,6 +69,7 @@ class Channel
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
         $this->connections->add($connection, $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : []);
+        PusherSubscribe::dispatch($connection, $this->name);
     }
 
     /**
@@ -79,6 +82,7 @@ class Channel
         if ($this->connections->isEmpty()) {
             app(ChannelManager::class)->for($connection->app())->remove($this);
         }
+        PusherUnsubscribe::dispatch($connection, $this->name);
     }
 
     /**
