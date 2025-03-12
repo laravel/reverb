@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.6...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.7...main)
+
+## [v1.4.7](https://github.com/laravel/reverb/compare/v1.4.6...v1.4.7) - 2025-03-06
+
+* [1.x] Adds support for server path prefix by [@adrum](https://github.com/adrum) in https://github.com/laravel/reverb/pull/311
 
 ## [v1.4.6](https://github.com/laravel/reverb/compare/v1.4.5...v1.4.6) - 2025-01-28
 
