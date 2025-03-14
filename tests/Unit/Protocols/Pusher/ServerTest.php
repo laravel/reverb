@@ -483,3 +483,15 @@ it('sends an error if something fails for channel type', function () {
         ]),
     ]);
 });
+
+it('allow receiving client event with empty data', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => 'private-chat.1',
+        ])
+    );
+
+    $connection->assertNothingReceived();
+});
