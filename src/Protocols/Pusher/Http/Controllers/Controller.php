@@ -92,8 +92,6 @@ abstract class Controller
             $params['body_md5'] = md5($this->body);
         }
 
-        ksort($params);
-
         $signature = implode("\n", [
             $request->getMethod(),
             $request->getUri()->getPath(),
