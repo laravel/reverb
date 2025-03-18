@@ -10,24 +10,24 @@ use React\Promise\Promise;
 
 it('resubscribes to the scaling channel on unsubscribe event', function () {
     $channel = 'reverb';
-    $subscribingClient = Mockery::mock(Client::class);
+    $subscriber = Mockery::mock(Client::class);
 
-    $subscribingClient->shouldReceive('on')
+    $subscriber->shouldReceive('on')
         ->with('unsubscribe', Mockery::on(function ($callback) use ($channel) {
             $callback($channel);
 
             return true;
         }))->once();
 
-    $subscribingClient->shouldReceive('on')
+    $subscriber->shouldReceive('on')
         ->with('message', Mockery::any())
         ->zeroOrMoreTimes();
 
-    $subscribingClient->shouldReceive('on')
+    $subscriber->shouldReceive('on')
         ->with('close', Mockery::any())
         ->zeroOrMoreTimes();
 
-    $subscribingClient->shouldReceive('subscribe')
+    $subscriber->shouldReceive('subscribe')
         ->twice()
         ->with($channel);
 
@@ -40,7 +40,7 @@ it('resubscribes to the scaling channel on unsubscribe event', function () {
 
     $clientFactory->shouldReceive('make')
         ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve($subscribingClient)));
+        ->andReturn(new Promise(fn (callable $resolve) => $resolve($subscriber)));
 
     $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), $channel);
     $provider->connect(Mockery::mock(LoopInterface::class));
@@ -99,10 +99,10 @@ it('queues publish events', function () {
     $provider->publish(['event' => 'first test']);
     $provider->publish(['event' => 'second test']);
 
-    $publishingClient = (new ReflectionProperty($provider, 'publishingClient'))->getValue($provider);
-    $queuedPublishEvents = (new ReflectionProperty($publishingClient, 'queuedPublishEvents'))->getValue($publishingClient);
+    $publisher = (new ReflectionProperty($provider, 'publisher'))->getValue($provider);
+    $queuedEvents = (new ReflectionProperty($publisher, 'queuedEvents'))->getValue($publisher);
 
-    expect($queuedPublishEvents)->toBe([['event' => 'first test'], ['event' => 'second test']]);
+    expect($queuedEvents)->toBe([['event' => 'first test'], ['event' => 'second test']]);
 });
 
 it('can process queued publish events', function () {
@@ -130,18 +130,18 @@ it('can process queued publish events', function () {
     $provider->publish(['event' => 'first test']);
     $provider->publish(['event' => 'second test']);
 
-    $publishingClient = (new ReflectionProperty($provider, 'publishingClient'))->getValue($provider);
-    $queuedPublishEvents = (new ReflectionProperty($publishingClient, 'queuedPublishEvents'))->getValue($publishingClient);
+    $publisher = (new ReflectionProperty($provider, 'publisher'))->getValue($provider);
+    $queuedEvents = (new ReflectionProperty($publisher, 'queuedEvents'))->getValue($publisher);
 
-    expect($queuedPublishEvents)->toHaveCount(2);
-    collect($queuedPublishEvents)->each(function ($event) use ($client) {
+    expect($queuedEvents)->toHaveCount(2);
+    collect($queuedEvents)->each(function ($event) use ($client) {
         $client->shouldReceive('publish')
             ->with('reverb', json_encode($event))
             ->once()
             ->andReturn(new Promise(fn () => null));
     });
 
-    $publishingClient->connect($loop);
+    $publisher->connect($loop);
 });
 
 it('does not attempt to reconnect after a controlled disconnection', function () {

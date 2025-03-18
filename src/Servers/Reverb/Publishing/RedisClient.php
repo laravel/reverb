@@ -9,9 +9,6 @@ use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Facades\Config;
 use Laravel\Reverb\Loggers\Log;
 use React\EventLoop\LoopInterface;
-use React\Promise\Promise;
-use React\Promise\PromiseInterface;
-use RuntimeException;
 
 class RedisClient
 {
@@ -23,19 +20,19 @@ class RedisClient
     protected $client;
 
     /**
-     * Number of seconds the elapsed since attempting to reconnect.
+     * The name of the Redis connection.
      */
-    protected int $clientReconnectionTimer = 0;
+    protected string $name = 'redis';
 
     /**
      * Determine if the client should attempt to reconnect when disconnected from the server.
      */
-    protected bool $shouldReconnect = true;
+    protected bool $shouldRetry = true;
 
     /**
-     * Publish events queued during while disconnected from Redis.
+     * Number of seconds the elapsed since attempting to reconnect.
      */
-    protected $queuedPublishEvents = [];
+    protected int $retryTimer = 0;
 
     /**
      * Create a new instance of the Redis client.
@@ -46,7 +43,6 @@ class RedisClient
         protected LoopInterface $loop,
         protected RedisClientFactory $clientFactory,
         protected string $channel,
-        protected string $name,
         protected array $server,
         protected $onConnect = null
     ) {
@@ -59,22 +55,8 @@ class RedisClient
     public function connect(): void
     {
         $this->clientFactory->make($this->loop, $this->redisUrl())->then(
-            function (Client $client) {
-                $this->client = $client;
-                $this->clientReconnectionTimer = 0;
-                $this->configureClientErrorHandler();
-                if ($this->onConnect) {
-                    call_user_func($this->onConnect, $client);
-                }
-                $this->processQueuedPublishEvents();
-
-                Log::info("Redis connection to [{$this->name}] successful");
-            },
-            function (Exception $e) {
-                $this->client = null;
-                Log::error($e->getMessage());
-                $this->reconnect();
-            }
+            fn (Client $client) => $this->onConnection($client),
+            fn (Exception $exception) => $this->onFailedConnection($exception),
         );
     }
 
@@ -83,20 +65,11 @@ class RedisClient
      */
     public function reconnect(): void
     {
-        if (! $this->shouldReconnect) {
+        if (! $this->shouldRetry) {
             return;
         }
 
-        $this->loop->addTimer(1, function () {
-            $this->clientReconnectionTimer++;
-            if ($this->clientReconnectionTimer >= $this->reconnectionTimeout()) {
-                Log::error("Failed to reconnect to Redis connection [{$this->name}] within {$this->reconnectionTimeout()} second limit");
-
-                throw new Exception("Failed to reconnect to Redis connection [{$this->name}] within {$this->reconnectionTimeout()} second limit");
-            }
-            Log::info("Attempting to reconnect Redis connection [{$this->name}]");
-            $this->connect();
-        });
+        $this->loop->addTimer(1, fn () => $this->attemptReconnection());
     }
 
     /**
@@ -104,31 +77,9 @@ class RedisClient
      */
     public function disconnect(): void
     {
-        $this->shouldReconnect = false;
+        $this->shouldRetry = false;
 
         $this->client?->close();
-    }
-
-    /**
-     * Subscribe to the given Redis channel.
-     */
-    public function subscribe(): void
-    {
-        $this->client->subscribe($this->channel);
-    }
-
-    /**
-     * Publish an event to the given channel.
-     */
-    public function publish(array $payload): PromiseInterface
-    {
-        if (! $this->isConnected($this->client)) {
-            $this->queuePublishEvent($payload);
-
-            return new Promise(fn () => new RuntimeException);
-        }
-
-        return $this->client->publish($this->channel, json_encode($payload));
     }
 
     /**
@@ -159,26 +110,6 @@ class RedisClient
 
             $this->reconnect();
         });
-    }
-
-    /**
-     * Queue the given publish event.
-     */
-    protected function queuePublishEvent(array $payload): void
-    {
-        $this->queuedPublishEvents[] = $payload;
-    }
-
-    /**
-     * Process the queued publish events.
-     */
-    protected function processQueuedPublishEvents(): void
-    {
-        foreach ($this->queuedPublishEvents as $event) {
-            $this->publish($event);
-        }
-
-        $this->queuedPublishEvents = [];
     }
 
     /**
@@ -223,8 +154,63 @@ class RedisClient
     /**
      * Determine the configured reconnection timeout.
      */
-    protected function reconnectionTimeout(): int
+    protected function retryTimeout(): int
     {
         return (int) ($this->server['timeout'] ?? 60);
+    }
+
+    /**
+     * Handle a successful connection to the Redis server.
+     */
+    protected function onConnection(Client $client): void
+    {
+        $this->client = $client;
+
+        $this->resetRetryTimer();
+        $this->configureClientErrorHandler();
+
+        if ($this->onConnect) {
+            call_user_func($this->onConnect, $client);
+        }
+
+        Log::info("Redis connection to [{$this->name}] successful");
+    }
+
+    /**
+     * Handle a failed connection to the Redis server.
+     */
+    protected function onFailedConnection(Exception $exception): void
+    {
+        $this->client = null;
+
+        Log::error($exception->getMessage());
+
+        $this->reconnect();
+    }
+
+    /**
+     * Attempt to reconnect to the Redis server until the timeout is reached.
+     */
+    protected function attemptReconnection(): void
+    {
+        $this->retryTimer++;
+
+        if ($this->retryTimer >= $this->retryTimeout()) {
+            Log::error("Failed to reconnect to Redis connection [{$this->name}] within {$this->retryTimeout()} second limit");
+
+            throw new Exception("Failed to reconnect to Redis connection [{$this->name}] within {$this->retryTimeout()} second limit");
+        }
+
+        Log::info("Attempting to reconnect Redis connection [{$this->name}]");
+
+        $this->connect();
+    }
+
+    /**
+     * Reset the retry connection timer.
+     */
+    protected function resetRetryTimer(): void
+    {
+        $this->retryTimer = 0;
     }
 }
