@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.7...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.4.8...main)
+
+## [v1.4.8](https://github.com/laravel/reverb/compare/v1.4.7...v1.4.8) - 2025-03-16
+
+* Allow client event without data by [@v-sulzhin](https://github.com/v-sulzhin) in https://github.com/laravel/reverb/pull/315
 
 ## [v1.4.7](https://github.com/laravel/reverb/compare/v1.4.6...v1.4.7) - 2025-03-06
 
