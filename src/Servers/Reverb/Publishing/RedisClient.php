@@ -107,7 +107,7 @@ class RedisClient
         $this->client->on('close', function () {
             $this->client = null;
 
-            Log::info("Disconnected from Redis connection [{$this->name}]");
+            Log::info('Disconnected from Redis', "<fg=red>{$this->name}</>");
 
             $this->reconnect();
         });
@@ -174,7 +174,7 @@ class RedisClient
             call_user_func($this->onConnect, $client);
         }
 
-        Log::info("Redis connection to [{$this->name}] successful");
+        Log::info("Redis connection established", "<fg=green>{$this->name}</>");
     }
 
     /**
@@ -198,13 +198,13 @@ class RedisClient
 
         if ($this->retryTimer >= $this->retryTimeout()) {
             $exception = RedisConnectionException::failedAfter($this->name, $this->retryTimeout());
-            
+
             Log::error($exception->getMessage());
 
             throw $exception;
         }
 
-        Log::info("Attempting to reconnect Redis connection [{$this->name}]");
+        Log::info('Attempting reconnection to Redis', "<fg=yellow>{$this->name}</>");
 
         $this->connect();
     }
