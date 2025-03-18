@@ -13,6 +13,7 @@ beforeEach(function () {
     $property = (new ReflectionClass(Loop::class))->getProperty('instance');
     $property->setAccessible(true);
     $property->setValue(null);
+    Loop::get();
 });
 
 it('resubscribes to the scaling channel on unsubscribe event', function () {
