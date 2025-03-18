@@ -71,6 +71,7 @@ it('can successfully reconnect', function () {
 
 it('can timeout and fail when unable to reconnect', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
+
     $loop = Loop::get();
 
     // Publisher client
@@ -86,7 +87,12 @@ it('can timeout and fail when unable to reconnect', function () {
     $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
     $provider->connect($loop);
     $loop->run();
-})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.');
+})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.')
+    ->after(function () {
+        $property = (new ReflectionClass(Loop::class))->getProperty('instance');
+        $property->setAccessible(true);
+        $property->setValue(null);
+    });
 
 it('queues publish events', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
