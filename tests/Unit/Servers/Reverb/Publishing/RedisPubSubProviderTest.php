@@ -9,6 +9,12 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Promise\Promise;
 
+beforeEach(function () {
+    $property = (new ReflectionClass(Loop::class))->getProperty('instance');
+    $property->setAccessible(true);
+    $property->setValue(null);
+});
+
 it('resubscribes to the scaling channel on unsubscribe event', function () {
     $channel = 'reverb';
     $subscriber = Mockery::mock(Client::class);
@@ -87,12 +93,7 @@ it('can timeout and fail when unable to reconnect', function () {
     $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
     $provider->connect($loop);
     $loop->run();
-})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.')
-    ->after(function () {
-        $property = (new ReflectionClass(Loop::class))->getProperty('instance');
-        $property->setAccessible(true);
-        $property->setValue(null);
-    });
+})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.');
 
 it('queues publish events', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
