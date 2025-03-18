@@ -114,6 +114,71 @@ class RedisClient
     }
 
     /**
+     * Handle a successful connection to the Redis server.
+     */
+    protected function onConnection(Client $client): void
+    {
+        $this->client = $client;
+
+        $this->resetRetryTimer();
+        $this->configureClientErrorHandler();
+
+        if ($this->onConnect) {
+            call_user_func($this->onConnect, $client);
+        }
+
+        Log::info('Redis connection established', "<fg=green>{$this->name}</>");
+    }
+
+    /**
+     * Handle a failed connection to the Redis server.
+     */
+    protected function onFailedConnection(Exception $exception): void
+    {
+        $this->client = null;
+
+        Log::error($exception->getMessage());
+
+        $this->reconnect();
+    }
+
+    /**
+     * Attempt to reconnect to the Redis server until the timeout is reached.
+     */
+    protected function attemptReconnection(): void
+    {
+        $this->retryTimer++;
+
+        if ($this->retryTimer >= $this->retryTimeout()) {
+            $exception = RedisConnectionException::failedAfter($this->name, $this->retryTimeout());
+
+            Log::error($exception->getMessage());
+
+            throw $exception;
+        }
+
+        Log::info('Attempting reconnection to Redis', "<fg=yellow>{$this->name}</>");
+
+        $this->connect();
+    }
+
+    /**
+     * Determine the configured reconnection timeout.
+     */
+    protected function retryTimeout(): int
+    {
+        return (int) ($this->server['timeout'] ?? 60);
+    }
+
+    /**
+     * Reset the retry connection timer.
+     */
+    protected function resetRetryTimer(): void
+    {
+        $this->retryTimer = 0;
+    }
+
+    /**
      * Get the connection URL for Redis.
      */
     protected function redisUrl(): string
@@ -150,70 +215,5 @@ class RedisClient
         $query = http_build_query($query);
 
         return "redis{$protocol}://{$host}:{$port}".($query ? "?{$query}" : '');
-    }
-
-    /**
-     * Determine the configured reconnection timeout.
-     */
-    protected function retryTimeout(): int
-    {
-        return (int) ($this->server['timeout'] ?? 60);
-    }
-
-    /**
-     * Handle a successful connection to the Redis server.
-     */
-    protected function onConnection(Client $client): void
-    {
-        $this->client = $client;
-
-        $this->resetRetryTimer();
-        $this->configureClientErrorHandler();
-
-        if ($this->onConnect) {
-            call_user_func($this->onConnect, $client);
-        }
-
-        Log::info("Redis connection established", "<fg=green>{$this->name}</>");
-    }
-
-    /**
-     * Handle a failed connection to the Redis server.
-     */
-    protected function onFailedConnection(Exception $exception): void
-    {
-        $this->client = null;
-
-        Log::error($exception->getMessage());
-
-        $this->reconnect();
-    }
-
-    /**
-     * Attempt to reconnect to the Redis server until the timeout is reached.
-     */
-    protected function attemptReconnection(): void
-    {
-        $this->retryTimer++;
-
-        if ($this->retryTimer >= $this->retryTimeout()) {
-            $exception = RedisConnectionException::failedAfter($this->name, $this->retryTimeout());
-
-            Log::error($exception->getMessage());
-
-            throw $exception;
-        }
-
-        Log::info('Attempting reconnection to Redis', "<fg=yellow>{$this->name}</>");
-
-        $this->connect();
-    }
-
-    /**
-     * Reset the retry connection timer.
-     */
-    protected function resetRetryTimer(): void
-    {
-        $this->retryTimer = 0;
     }
 }
