@@ -95,7 +95,7 @@ it('can timeout and fail when unable to reconnect', function () {
     $provider->connect($loop);
     $loop->run();
     $provider->disconnect();
-})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.')->skip();
+})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.');
 
 it('queues publish events', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
