@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Facades\Config;
+use Laravel\Reverb\Exceptions\RedisConnectionException;
 use Laravel\Reverb\Loggers\Log;
 use React\EventLoop\LoopInterface;
 
@@ -196,9 +197,11 @@ class RedisClient
         $this->retryTimer++;
 
         if ($this->retryTimer >= $this->retryTimeout()) {
-            Log::error("Failed to reconnect to Redis connection [{$this->name}] within {$this->retryTimeout()} second limit");
+            $exception = RedisConnectionException::failedAfter($this->name, $this->retryTimeout());
+            
+            Log::error($exception->getMessage());
 
-            throw new Exception("Failed to reconnect to Redis connection [{$this->name}] within {$this->retryTimeout()} second limit");
+            throw $exception;
         }
 
         Log::info("Attempting to reconnect Redis connection [{$this->name}]");

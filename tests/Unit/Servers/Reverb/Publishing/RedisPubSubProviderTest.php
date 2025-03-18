@@ -1,6 +1,7 @@
 <?php
 
 use Clue\React\Redis\Client;
+use Laravel\Reverb\Exceptions\RedisConnectionException;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
@@ -85,7 +86,7 @@ it('can timeout and fail when unable to reconnect', function () {
     $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
     $provider->connect($loop);
     $loop->run();
-})->throws(Exception::class, 'Failed to reconnect to Redis connection [publisher] within 1 second limit')->skip();
+})->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.');
 
 it('queues publish events', function () {
     $clientFactory = Mockery::mock(RedisClientFactory::class);
