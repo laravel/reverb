@@ -40,20 +40,10 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function connect(LoopInterface $loop): void
     {
-        $this->publisher = new RedisPublishClient(
-            $loop,
-            $this->clientFactory,
-            $this->channel,
-            $this->server
-        );
+        $properties = [$loop, $this->clientFactory, $this->channel, $this->server];
 
-        $this->subscriber = new RedisSubscribeClient(
-            $loop,
-            $this->clientFactory,
-            $this->channel,
-            $this->server,
-            fn () => $this->subscribe()
-        );
+        $this->publisher = new RedisPublishClient(...$properties);
+        $this->subscriber = new RedisSubscribeClient(...array_merge($properties, [fn () => $this->subscribe()]));
 
         $this->publisher->connect();
         $this->subscriber->connect();
