@@ -90,4 +90,19 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | WebSocket Rate Limiting
+    |--------------------------------------------------------------------------
+    |
+    | Configure rate limiting for WebSocket messages. This helps prevent
+    | abuse and ensures fair usage of the WebSocket server.
+    |
+    */
+    'rate_limiting' => [
+        'enabled' => env('REVERB_RATE_LIMITING_ENABLED', false),
+        'max_attempts' => env('REVERB_RATE_LIMITING_MAX_ATTEMPTS', 60),
+        'decay_seconds' => env('REVERB_RATE_LIMITING_DECAY_SECONDS', 10),
+        'terminate_on_limit' => env('REVERB_RATE_LIMITING_TERMINATE_ON_LIMIT', true),
+    ],
 ];

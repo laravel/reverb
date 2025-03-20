@@ -33,6 +33,13 @@ class FakeConnection extends BaseConnection
     public $id;
 
     /**
+     * Whether the connection has been terminated.
+     *
+     * @var bool
+     */
+    public $wasTerminated = false;
+
+    /**
      * Create a new fake connection instance.
      */
     public function __construct(?string $identifier = null, ?string $origin = null)
@@ -108,7 +115,7 @@ class FakeConnection extends BaseConnection
      */
     public function terminate(): void
     {
-        //
+        $this->wasTerminated = true;
     }
 
     /**
@@ -141,5 +148,13 @@ class FakeConnection extends BaseConnection
     public function assertHasBeenPinged(): void
     {
         Assert::assertTrue($this->hasBeenPinged);
+    }
+
+    /**
+     * Assert the connection has been terminated.
+     */
+    public function assertHasBeenTerminated(): void
+    {
+        Assert::assertTrue($this->wasTerminated);
     }
 }
