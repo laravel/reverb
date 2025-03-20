@@ -77,7 +77,6 @@ class ReverbTestCase extends TestCase
         app(ServerProviderManager::class)->withPublishing();
 
         app(PubSubProvider::class)->connect($this->loop);
-        app(PubSubProvider::class)->subscribe();
     }
 
     /**
