@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Cache\RateLimiter;
-use Laravel\Reverb\RateLimiting\WebSocketRateLimitManager;
+use Laravel\Reverb\RateLimiting\RateLimitManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\RateLimitExceededException;
 use Laravel\Reverb\Tests\FakeConnection;
 
@@ -9,7 +9,7 @@ beforeEach(function () {
     $this->rateLimiter = Mockery::mock(RateLimiter::class);
     $this->connection = new FakeConnection();
     
-    $this->rateLimitManager = new WebSocketRateLimitManager(
+    $this->rateLimitManager = new RateLimitManager(
         $this->rateLimiter,
         10,
         10
@@ -85,7 +85,7 @@ it('respects custom max attempts', function () {
     ]));
     $customMaxAttempts = 5;
 
-    $rateLimitManager = new WebSocketRateLimitManager(
+    $rateLimitManager = new RateLimitManager(
         $this->rateLimiter,
         $customMaxAttempts,
         10
@@ -113,7 +113,7 @@ it('respects custom decay seconds', function () {
     ]));
     $customDecaySeconds = 30;
 
-    $rateLimitManager = new WebSocketRateLimitManager(
+    $rateLimitManager = new RateLimitManager(
         $this->rateLimiter,
         10,
         $customDecaySeconds

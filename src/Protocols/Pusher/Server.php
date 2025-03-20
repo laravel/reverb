@@ -14,7 +14,7 @@ use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Throwable;
-use Laravel\Reverb\RateLimiting\WebSocketRateLimitManager;
+use Laravel\Reverb\RateLimiting\RateLimitManager;
 use Illuminate\Cache\RateLimiter;
 
 class Server
@@ -22,7 +22,7 @@ class Server
     /**
      * Create a new server instance.
      */
-    public function __construct(protected ChannelManager $channels, protected EventHandler $handler, protected WebSocketRateLimitManager $rateLimitManager) 
+    public function __construct(protected ChannelManager $channels, protected EventHandler $handler, protected RateLimitManager $rateLimitManager) 
     {
         //
     }

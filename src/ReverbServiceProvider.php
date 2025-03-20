@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\Console\Commands\InstallCommand;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
-use Laravel\Reverb\RateLimiting\WebSocketRateLimitManager;
+use Laravel\Reverb\RateLimiting\RateLimitManager;
 use Laravel\Reverb\Pulse\Livewire;
 use Livewire\LivewireManager;
 
@@ -28,11 +28,12 @@ class ReverbServiceProvider extends ServiceProvider
 
         $this->app->make(ServerProviderManager::class)->register();
 
-        $this->app->singleton(WebSocketRateLimitManager::class, function ($app) {
-            return new WebSocketRateLimitManager(
+        $this->app->singleton(RateLimitManager::class, function ($app) {
+            return new RateLimitManager(
                 $app->make(RateLimiter::class),
                 config('reverb.rate_limiting.max_attempts', 10),
-                config('reverb.rate_limiting.decay_seconds', 10)
+                config('reverb.rate_limiting.decay_seconds', 10),
+                config('reverb.rate_limiting.terminate_on_limit', true)
             );
         });
     }

@@ -6,7 +6,7 @@ use Illuminate\Cache\RateLimiter;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\RateLimitExceededException;
 
-class WebSocketRateLimitManager
+class RateLimitManager
 {
     /**
      * Create a new rate limit manager instance.
@@ -14,7 +14,8 @@ class WebSocketRateLimitManager
     public function __construct(
         protected RateLimiter $limiter, 
         protected int $maxAttempts, 
-        protected int $decaySeconds
+        protected int $decaySeconds,
+        protected bool $terminateOnLimit = true
     ) {
         //
     }
@@ -29,6 +30,10 @@ class WebSocketRateLimitManager
         $key = $this->resolveRequestSignature($connection);
 
         if ($this->limiter->tooManyAttempts($key, $this->maxAttempts)) {
+            if ($this->terminateOnLimit) {
+                $connection->terminate();
+            }
+
             throw new RateLimitExceededException();
         }
 
