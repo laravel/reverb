@@ -103,7 +103,8 @@ class Router
      */
     protected function attemptUpgrade(RequestInterface $request, Connection $connection): ReverbConnection
     {
-        $response = $this->negotiator->handshake($request);
+        $response = $this->negotiator->handshake($request)
+            ->withHeader('X-Powered-By', 'Laravel Reverb');
 
         $connection->write(Message::toString($response));
 
