@@ -563,6 +563,6 @@ it('uses control frames when the client prefers', function () {
 
 it('sets the x-powered-by header', function () {
     $connection = connect();
-    
+
     expect($connection->connection->response->getHeader('X-Powered-By')[0])->toBe('Laravel Reverb');
 });
