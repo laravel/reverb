@@ -14,7 +14,6 @@ use function React\Async\await;
 uses(ReverbTestCase::class);
 
 it('can handle connections to different applications', function () {
-    connect();
     connect(key: 'reverb-key-2');
     connect(key: 'reverb-key-3', headers: ['Origin' => 'http://laravel.com']);
 });
@@ -560,4 +559,10 @@ it('uses control frames when the client prefers', function () {
 
     $connection->assertPinged();
     $connection->assertNotReceived('{"event":"pusher:ping"}');
+});
+
+it('sets the x-powered-by header', function () {
+    $connection = connect();
+    
+    expect($connection->connection->response->getHeader('X-Powered-By')[0])->toBe('Laravel Reverb');
 });
