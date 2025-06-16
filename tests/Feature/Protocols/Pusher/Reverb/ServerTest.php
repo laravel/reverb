@@ -71,8 +71,8 @@ it('can notify other subscribers of a presence channel when a new member joins',
     $data = ['user_id' => 3, 'user_info' => ['name' => 'Test User 3']];
     subscribe('presence-test-channel', data: $data);
 
-    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":2,"user_info":{"name":"Test User 2"}},"channel":"presence-test-channel"}');
-    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":3,"user_info":{"name":"Test User 3"}},"channel":"presence-test-channel"}');
+    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":2,\"user_info\":{\"name\":\"Test User 2\"}}","channel":"presence-test-channel"}');
+    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":3,\"user_info\":{\"name\":\"Test User 3\"}}","channel":"presence-test-channel"}');
 });
 
 it('can notify other subscribers of a presence channel when a member leaves', function () {
@@ -88,13 +88,13 @@ it('can notify other subscribers of a presence channel when a member leaves', fu
     $data = ['user_id' => 3, 'user_info' => ['name' => 'Test User 3']];
     subscribe('presence-test-channel', data: $data, connection: $connectionThree);
 
-    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":2,"user_info":{"name":"Test User 2"}},"channel":"presence-test-channel"}');
-    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":3,"user_info":{"name":"Test User 3"}},"channel":"presence-test-channel"}');
+    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":2,\"user_info\":{\"name\":\"Test User 2\"}}","channel":"presence-test-channel"}');
+    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":3,\"user_info\":{\"name\":\"Test User 3\"}}","channel":"presence-test-channel"}');
 
     disconnect($connectionThree);
 
-    $connectionOne->assertReceived('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
-    $connectionTwo->assertReceived('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
+    $connectionOne->assertReceived('{"event":"pusher_internal:member_removed","data":"{\"user_id\":3}","channel":"presence-test-channel"}');
+    $connectionTwo->assertReceived('{"event":"pusher_internal:member_removed","data":"{\"user_id\":3}","channel":"presence-test-channel"}');
 });
 
 it('can receive a cached message when joining a cache channel', function () {
