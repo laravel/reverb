@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.5.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.5.1...main)
+
+## [v1.5.1](https://github.com/laravel/reverb/compare/v1.5.0...v1.5.1) - 2025-06-16
+
+* Update logo by [@iamdavidhill](https://github.com/iamdavidhill) in https://github.com/laravel/reverb/pull/330
+* Fix encoding of data field in presence channel events to match Pusher protocol by [@alinapotupchik](https://github.com/alinapotupchik) in https://github.com/laravel/reverb/pull/337
 
 ## [v1.5.0](https://github.com/laravel/reverb/compare/v1.4.8...v1.5.0) - 2025-03-31
 
