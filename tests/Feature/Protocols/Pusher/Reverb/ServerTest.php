@@ -4,6 +4,8 @@ use Illuminate\Support\Arr;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
+use Ratchet\RFC6455\Messaging\Frame;
+use React\Http\Message\ResponseException;
 use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as wsConnect;
@@ -12,7 +14,6 @@ use function React\Async\await;
 uses(ReverbTestCase::class);
 
 it('can handle connections to different applications', function () {
-    connect();
     connect(key: 'reverb-key-2');
     connect(key: 'reverb-key-3', headers: ['Origin' => 'http://laravel.com']);
 });
@@ -70,8 +71,8 @@ it('can notify other subscribers of a presence channel when a new member joins',
     $data = ['user_id' => 3, 'user_info' => ['name' => 'Test User 3']];
     subscribe('presence-test-channel', data: $data);
 
-    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":2,"user_info":{"name":"Test User 2"}},"channel":"presence-test-channel"}');
-    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":3,"user_info":{"name":"Test User 3"}},"channel":"presence-test-channel"}');
+    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":2,\"user_info\":{\"name\":\"Test User 2\"}}","channel":"presence-test-channel"}');
+    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":3,\"user_info\":{\"name\":\"Test User 3\"}}","channel":"presence-test-channel"}');
 });
 
 it('can notify other subscribers of a presence channel when a member leaves', function () {
@@ -87,13 +88,13 @@ it('can notify other subscribers of a presence channel when a member leaves', fu
     $data = ['user_id' => 3, 'user_info' => ['name' => 'Test User 3']];
     subscribe('presence-test-channel', data: $data, connection: $connectionThree);
 
-    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":2,"user_info":{"name":"Test User 2"}},"channel":"presence-test-channel"}');
-    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":{"user_id":3,"user_info":{"name":"Test User 3"}},"channel":"presence-test-channel"}');
+    $connectionOne->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":2,\"user_info\":{\"name\":\"Test User 2\"}}","channel":"presence-test-channel"}');
+    $connectionTwo->assertReceived('{"event":"pusher_internal:member_added","data":"{\"user_id\":3,\"user_info\":{\"name\":\"Test User 3\"}}","channel":"presence-test-channel"}');
 
     disconnect($connectionThree);
 
-    $connectionOne->assertReceived('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
-    $connectionTwo->assertReceived('{"event":"pusher_internal:member_removed","data":{"user_id":3},"channel":"presence-test-channel"}');
+    $connectionOne->assertReceived('{"event":"pusher_internal:member_removed","data":"{\"user_id\":3}","channel":"presence-test-channel"}');
+    $connectionTwo->assertReceived('{"event":"pusher_internal:member_removed","data":"{\"user_id\":3}","channel":"presence-test-channel"}');
 });
 
 it('can receive a cached message when joining a cache channel', function () {
@@ -312,7 +313,7 @@ it('fails to subscribe to a presence cache channel with invalid auth signature',
 });
 
 it('fails to connect when an invalid application is provided', function () {
-    $promise = new Deferred();
+    $promise = new Deferred;
 
     $connection = await(
         wsConnect('ws://0.0.0.0:8080/app/invalid-key')
@@ -369,7 +370,7 @@ it('cannot connect from an invalid origin', function () {
         wsConnect('ws://0.0.0.0:8080/app/reverb-key-3')
     );
 
-    $promise = new Deferred();
+    $promise = new Deferred;
 
     $connection->on('message', function ($message) use ($promise) {
         $promise->resolve((string) $message);
@@ -465,8 +466,103 @@ it('buffers large requests correctly', function () {
         'name' => 'NewEvent',
         'channel' => 'test-channel',
         'data' => json_encode([str_repeat('a', 150_000)]),
-    ], appId: '654321'));
+    ], appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
+});
+
+it('server listens on a specific path', function () {
+    $this->stopServer();
+    $this->startServer(path: 'ws');
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['data' => 'data']),
+    ], pathPrefix: '/ws', appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+});
+
+it('returns an error when the path prefix is not included in the request', function () {
+    $this->stopServer();
+    $this->startServer(path: 'ws');
+    await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['data' => 'data']),
+    ], appId: '654321', key: 'reverb-key-2', secret: 'reverb-secret-2'));
+})->throws(ResponseException::class, exceptionCode: 404);
+
+it('subscription_succeeded event contains unique list of users', function () {
+    $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User']];
+    subscribe('presence-test-channel', data: $data);
+    $data = ['user_id' => 1, 'user_info' => ['name' => 'Test User']];
+    $response = subscribe('presence-test-channel', data: $data);
+
+    expect($response)->toContain('pusher_internal:subscription_succeeded');
+    expect($response)->toContain('"count\":1');
+    expect($response)->toContain('"ids\":[1]');
+    expect($response)->toContain('"hash\":{\"1\":{\"name\":\"Test User\"}}');
+});
+
+it('can handle a ping control frame', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+    $channels = channels();
+    $managedConnection = Arr::first($channels->connections());
+    $subscribedAt = $managedConnection->lastSeenAt();
+    sleep(1);
+    $connection->send(new Frame('', opcode: Frame::OP_PING));
+
+    $connection->assertPonged();
+    expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
+});
+
+it('can handle a pong control frame', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+    $channels = channels();
+    $managedConnection = Arr::first($channels->connections());
+    $subscribedAt = $managedConnection->lastSeenAt();
+    sleep(1);
+    $connection->send(new Frame('', opcode: Frame::OP_PONG));
+
+    $connection->assertNotPinged();
+    $connection->assertNotPonged();
+    expect($managedConnection->lastSeenAt())->toBeGreaterThan($subscribedAt);
+});
+
+it('uses pusher control messages by default', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+
+    $channels = channels();
+    Arr::first($channels->connections())->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle($channels);
+
+    $connection->assertReceived('{"event":"pusher:ping"}');
+    $connection->assertNotPinged();
+});
+
+it('uses control frames when the client prefers', function () {
+    $connection = connect();
+    $connection->send(new Frame('', opcode: Frame::OP_PING));
+    subscribe('test-channel', connection: $connection);
+
+    $channels = channels();
+    Arr::first($channels->connections())->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle($channels);
+
+    $connection->assertPinged();
+    $connection->assertNotReceived('{"event":"pusher:ping"}');
+});
+
+it('sets the x-powered-by header', function () {
+    $connection = connect();
+
+    expect($connection->connection->response->getHeader('X-Powered-By')[0])->toBe('Laravel Reverb');
 });

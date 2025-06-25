@@ -180,7 +180,7 @@ class InstallCommand extends Command
 
         File::put(
             $env,
-            Str::of(File::get($env))->replaceMatches('/(BROADCAST_(?:DRIVER|CONNECTION))=\w*/', function (array $matches) {
+            Str::of(File::get($env))->replaceMatches('/(BROADCAST_(?:DRIVER|CONNECTION))=.*/', function (array $matches) {
                 return $matches[1].'=reverb';
             })
         );

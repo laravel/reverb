@@ -12,8 +12,10 @@ class Application
         protected string $key,
         protected string $secret,
         protected int $pingInterval,
+        protected int $activityTimeout,
         protected array $allowedOrigins,
         protected int $maxMessageSize,
+        protected array $options = [],
     ) {
         //
     }
@@ -53,11 +55,19 @@ class Application
     }
 
     /**
-     * Get the interval in minutes to ping the client.
+     * Get the client ping interval in seconds.
      */
     public function pingInterval(): int
     {
         return $this->pingInterval;
+    }
+
+    /**
+     * Get the activity timeout in seconds.
+     */
+    public function activityTimeout(): int
+    {
+        return $this->activityTimeout;
     }
 
     /**
@@ -66,5 +76,32 @@ class Application
     public function maxMessageSize(): int
     {
         return $this->maxMessageSize;
+    }
+
+    /**
+     * Get the application options.
+     */
+    public function options(): ?array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Convert the application to an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'app_id' => $this->id,
+            'key' => $this->key,
+            'secret' => $this->secret,
+            'ping_interval' => $this->pingInterval,
+            'activity_timeout' => $this->activityTimeout,
+            'allowed_origins' => $this->allowedOrigins,
+            'max_message_size' => $this->maxMessageSize,
+            'options' => $this->options,
+        ];
     }
 }

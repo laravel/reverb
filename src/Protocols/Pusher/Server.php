@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
@@ -10,6 +11,9 @@ use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
+use Ratchet\RFC6455\Messaging\Frame;
+use Ratchet\RFC6455\Messaging\FrameInterface;
+use Throwable;
 
 class Server
 {
@@ -52,12 +56,13 @@ class Server
         try {
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
+            Validator::make($event, ['event' => ['required', 'string']])->validate();
+
             match (Str::startsWith($event['event'], 'pusher:')) {
                 true => $this->handler->handle(
                     $from,
                     $event['event'],
-                    $event['data'] ?? [],
-                    $event['channel'] ?? null
+                    empty($event['data']) ? [] : $event['data'],
                 ),
                 default => ClientEvent::handle($from, $event)
             };
@@ -65,8 +70,23 @@ class Server
             Log::info('Message Handled', $from->id());
 
             MessageReceived::dispatch($from, $message);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $this->error($from, $e);
+        }
+    }
+
+    /**
+     * Handle a low-level WebSocket control frame.
+     */
+    public function control(Connection $from, FrameInterface $message): void
+    {
+        Log::info('Control Frame Received', $from->id());
+        Log::message($message);
+
+        $from->setUsesControlFrames();
+
+        if (in_array($message->getOpcode(), [Frame::OP_PING, Frame::OP_PONG], strict: true)) {
+            $from->touch();
         }
     }
 
@@ -87,7 +107,7 @@ class Server
     /**
      * Handle an error.
      */
-    public function error(Connection $connection, Exception $exception): void
+    public function error(Connection $connection, Throwable $exception): void
     {
         if ($exception instanceof PusherException) {
             $connection->send(json_encode($exception->payload()));
@@ -125,8 +145,12 @@ class Server
 
         $origin = parse_url($connection->origin(), PHP_URL_HOST);
 
-        if (! $origin || ! in_array($origin, $allowedOrigins)) {
-            throw new InvalidOrigin;
+        foreach ($allowedOrigins as $allowedOrigin) {
+            if (Str::is($allowedOrigin, $origin)) {
+                return;
+            }
         }
+
+        throw new InvalidOrigin;
     }
 }

@@ -7,6 +7,7 @@ use Laravel\Reverb\Application;
 use Laravel\Reverb\Concerns\GeneratesIdentifiers;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Contracts\Connection as BaseConnection;
+use Ratchet\RFC6455\Messaging\Frame;
 
 class FakeConnection extends BaseConnection
 {
@@ -34,11 +35,13 @@ class FakeConnection extends BaseConnection
     /**
      * Create a new fake connection instance.
      */
-    public function __construct(?string $identifier = null)
+    public function __construct(?string $identifier = null, ?string $origin = null)
     {
         if ($identifier) {
             $this->identifier = $identifier;
         }
+
+        $this->origin = $origin ?? 'http://localhost';
     }
 
     /**
@@ -70,14 +73,6 @@ class FakeConnection extends BaseConnection
     }
 
     /**
-     * Get the origin of the connection.
-     */
-    public function origin(): string
-    {
-        return 'http://localhost';
-    }
-
-    /**
      * Set the connection last seen at timestamp.
      */
     public function setLastSeenAt(int $time): FakeConnection
@@ -102,6 +97,11 @@ class FakeConnection extends BaseConnection
     {
         $this->messages[] = $message;
     }
+
+    /**
+     * Send a control frame to the connection.
+     */
+    public function control(string $type = Frame::OP_PING): void {}
 
     /**
      * Terminate a connection.

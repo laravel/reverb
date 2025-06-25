@@ -171,3 +171,15 @@ it('can send the content-length header when gathering results', function () {
 
     expect($response->getHeader('Content-Length'))->toBe(['12']);
 });
+
+it('fails when using an invalid signature', function () {
+    $response = await($this->postRequest('batch_events', ['batch' => [
+        [
+            'name' => 'NewEvent',
+            'channel' => 'test-channel',
+            'data' => json_encode(['some' => 'data']),
+        ],
+    ]]));
+
+    expect($response->getStatusCode())->toBe(401);
+})->throws(ResponseException::class, exceptionCode: 401);

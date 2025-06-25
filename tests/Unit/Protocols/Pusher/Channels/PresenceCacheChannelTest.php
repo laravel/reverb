@@ -7,7 +7,7 @@ use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new FakeConnection();
+    $this->connection = new FakeConnection;
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
@@ -96,7 +96,7 @@ it('sends notification of subscription', function () {
 
     collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
-        'data' => [],
+        'data' => '{}',
         'channel' => 'presence-cache-test-channel',
     ]));
 });
@@ -124,7 +124,7 @@ it('sends notification of subscription with data', function () {
 
     collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
-        'data' => ['name' => 'Joe'],
+        'data' => json_encode(['name' => 'Joe']),
         'channel' => 'presence-cache-test-channel',
     ]));
 });
@@ -157,7 +157,7 @@ it('sends notification of an unsubscribe', function () {
 
     collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_removed',
-        'data' => ['user_id' => 1],
+        'data' => json_encode(['user_id' => 1]),
         'channel' => 'presence-cache-test-channel',
     ]));
 });

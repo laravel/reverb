@@ -25,6 +25,10 @@ class TestConnection
      */
     public $receivedMessages = [];
 
+    public $wasPinged = false;
+
+    public $wasPonged = false;
+
     /**
      * Create a new test connection instance.
      */
@@ -32,6 +36,14 @@ class TestConnection
     {
         $connection->on('message', function ($message) {
             $this->receivedMessages[] = (string) $message;
+        });
+
+        $connection->on('ping', function () {
+            $this->wasPinged = true;
+        });
+
+        $connection->on('pong', function () {
+            $this->wasPonged = true;
         });
 
         $connection->on('close', function ($code, $message) {
@@ -52,7 +64,7 @@ class TestConnection
      */
     public function await(): mixed
     {
-        $promise = new Deferred();
+        $promise = new Deferred;
 
         $this->connection->on('message', function ($message) use ($promise) {
             $promise->resolve((string) $message);
@@ -87,6 +99,58 @@ class TestConnection
         }
 
         expect($this->receivedMessages)->toContain($message);
+    }
+
+    /**
+     * Assert that the connection did not receiv the given message.
+     */
+    public function assertNotReceived(string $message): void
+    {
+        if (! in_array($message, $this->receivedMessages)) {
+            $this->await();
+        }
+
+        expect($this->receivedMessages)->not->toContain($message);
+    }
+
+    /**
+     * Assert the connection was pinged during the test.
+     */
+    public function assertPinged(): void
+    {
+        $this->await();
+
+        expect($this->wasPinged)->toBeTrue();
+    }
+
+    /**
+     * Assert the connection was not pinged during the test.
+     */
+    public function assertNotPinged(): void
+    {
+        $this->await();
+
+        expect($this->wasPinged)->toBeFalse();
+    }
+
+    /**
+     * Assert the connection was ponged during the test.
+     */
+    public function assertPonged(): void
+    {
+        $this->await();
+
+        expect($this->wasPonged)->toBeTrue();
+    }
+
+    /**
+     * Assert the connection was not ponged during the test.
+     */
+    public function assertNotPonged(): void
+    {
+        $this->await();
+
+        expect($this->wasPonged)->toBeFalse();
     }
 
     /**

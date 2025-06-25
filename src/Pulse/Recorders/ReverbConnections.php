@@ -3,10 +3,12 @@
 namespace Laravel\Reverb\Pulse\Recorders;
 
 use Illuminate\Broadcasting\BroadcastManager;
-use Illuminate\Config\Repository;
+use Illuminate\Contracts\Foundation\Application as Container;
 use Laravel\Pulse\Events\IsolatedBeat;
 use Laravel\Pulse\Pulse;
 use Laravel\Pulse\Recorders\Concerns\Sampling;
+use Laravel\Reverb\Application;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 
 class ReverbConnections
 {
@@ -25,7 +27,7 @@ class ReverbConnections
     public function __construct(
         protected Pulse $pulse,
         protected BroadcastManager $broadcast,
-        protected Repository $config,
+        protected Container $app,
     ) {
         //
     }
@@ -39,17 +41,18 @@ class ReverbConnections
             return;
         }
 
-        foreach ($this->config->get('reverb.apps.apps') as $app) {
-            $connections = $this->broadcast->pusher($app)
-                ->get('/connections')
-                ->connections;
+        $this->app->make(ApplicationProvider::class)->all()
+            ->each(function (Application $app) use ($event) {
+                $connections = $this->broadcast->pusher($app->toArray())
+                    ->get('/connections')
+                    ->connections;
 
-            $this->pulse->record(
-                type: 'reverb_connections',
-                key: $app['app_id'],
-                value: $connections,
-                timestamp: $event->time->getTimestamp(),
-            )->avg()->max()->onlyBuckets();
-        }
+                $this->pulse->record(
+                    type: 'reverb_connections',
+                    key: $app->id(),
+                    value: $connections,
+                    timestamp: $event->time->getTimestamp(),
+                )->avg()->max()->onlyBuckets();
+            });
     }
 }

@@ -7,7 +7,7 @@ use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->connection = new FakeConnection();
+    $this->connection = new FakeConnection;
     $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
@@ -96,7 +96,7 @@ it('sends notification of subscription', function () {
 
     collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
-        'data' => [],
+        'data' => '{}',
         'channel' => 'presence-test-channel',
     ]));
 });
@@ -124,7 +124,7 @@ it('sends notification of subscription with data', function () {
 
     collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_added',
-        'data' => ['name' => 'Joe'],
+        'data' => json_encode(['name' => 'Joe']),
         'channel' => 'presence-test-channel',
     ]));
 });
@@ -157,7 +157,39 @@ it('sends notification of an unsubscribe', function () {
 
     collect($connections)->each(fn ($connection) => $connection->assertReceived([
         'event' => 'pusher_internal:member_removed',
-        'data' => ['user_id' => 1],
+        'data' => json_encode(['user_id' => 1]),
         'channel' => 'presence-test-channel',
     ]));
+});
+
+it('ensures the "member_added" event is only fired once', function () {
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+    $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+
+    $this->channelConnectionManager->shouldReceive('all')
+        ->andReturn([$connectionOne, $connectionTwo]);
+
+    $channel->subscribe($connectionOne->connection(), validAuth($connectionOne->id(), 'presence-test-channel', $data = json_encode($connectionOne->data())), $data);
+    $channel->subscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
+
+    $connectionOne->connection()->assertNothingReceived();
+});
+
+it('ensures the "member_removed" event is only fired once', function () {
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+    $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+
+    $this->channelConnectionManager->shouldReceive('find')
+        ->andReturn($connectionOne);
+
+    $this->channelConnectionManager->shouldReceive('all')
+        ->andReturn([$connectionOne, $connectionTwo]);
+
+    $channel->unsubscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
+
+    $connectionOne->connection()->assertNothingReceived();
 });

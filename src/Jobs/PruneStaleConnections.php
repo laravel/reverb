@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Jobs;
 
 use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Events\ConnectionPruned;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
@@ -41,6 +42,8 @@ class PruneStaleConnections
                     $connection->disconnect();
 
                     Log::info('Connection Pruned', $connection->id());
+
+                    ConnectionPruned::dispatch($connection);
                 }
             });
     }

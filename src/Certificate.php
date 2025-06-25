@@ -50,6 +50,10 @@ class Certificate
      */
     public static function herdPath(): string
     {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return implode(DIRECTORY_SEPARATOR, [getenv('USERPROFILE') ?: $_SERVER['HOME'] ?? '', '.config', 'herd', 'config', 'valet', 'Certificates', '']);
+        }
+
         return implode(DIRECTORY_SEPARATOR, [$_SERVER['HOME'] ?? '', 'Library', 'Application Support', 'Herd', 'config', 'valet', 'Certificates', '']);
     }
 

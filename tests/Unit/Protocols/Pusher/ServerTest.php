@@ -282,9 +282,9 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
         ->with($connection);
 });
 
-it('it rejects a connection from an invalid origin', function () {
-    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
-    $this->server->open($connection = new FakeConnection);
+it('it rejects a connection from an invalid origin', function (string $origin, array $allowedOrigins) {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', $allowedOrigins);
+    $this->server->open($connection = new FakeConnection(origin: $origin));
 
     $connection->assertReceived([
         'event' => 'pusher:error',
@@ -293,11 +293,24 @@ it('it rejects a connection from an invalid origin', function () {
             'message' => 'Origin not allowed',
         ]),
     ]);
-});
+})->with([
+    'localhost' => [
+        'http://localhost',
+        ['laravel.com'],
+    ],
+    'subdomain' => [
+        'http://sub.laravel.com',
+        ['laravel.com'],
+    ],
+    'wildcard' => [
+        'http://laravel.com',
+        ['*.laravel.com'],
+    ],
+]);
 
-it('accepts a connection from an valid origin', function () {
-    $this->app['config']->set('reverb.apps.0.allowed_origins', ['localhost']);
-    $this->server->open($connection = new FakeConnection);
+it('accepts a connection from an valid origin', function (string $origin, array $allowedOrigins) {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', $allowedOrigins);
+    $this->server->open($connection = new FakeConnection(origin: $origin));
 
     $connection->assertReceived([
         'event' => 'pusher:connection_established',
@@ -306,4 +319,179 @@ it('accepts a connection from an valid origin', function () {
             'activity_timeout' => 30,
         ]),
     ]);
+})->with([
+    'localhost' => [
+        'http://localhost',
+        ['localhost'],
+    ],
+    'wildcard' => [
+        'http://sub.localhost',
+        ['localhost', '*.localhost'],
+    ],
+]);
+
+it('sends an error if something fails for event type', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => [],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data type', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => 'sfsfsfs',
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data channel type', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => [],
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => null,
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data auth type', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => [],
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for data channel_data type', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => '',
+                'channel_data' => [],
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'presence-test-channel',
+                'auth' => '',
+                'channel_data' => 'Hello',
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('sends an error if something fails for channel type', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => [],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4200,
+            'message' => 'Invalid message format',
+        ]),
+    ]);
+});
+
+it('allow receiving client event with empty data', function () {
+    $this->server->message(
+        $connection = new FakeConnection,
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => 'private-chat.1',
+        ])
+    );
+
+    $connection->assertNothingReceived();
 });

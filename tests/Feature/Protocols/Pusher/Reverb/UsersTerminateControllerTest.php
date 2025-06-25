@@ -9,7 +9,7 @@ uses(ReverbTestCase::class);
 
 it('returns an error when connection cannot be found', function () {
     await($this->signedPostRequest('channels/users/not-a-user/terminate_connections'));
-})->throws(ResponseException::class);
+})->throws(ResponseException::class, exceptionCode: 404);
 
 it('unsubscribes from all channels and terminates a user', function () {
     $connection = connect();
@@ -54,3 +54,9 @@ it('unsubscribes from all channels across all servers and terminates a user', fu
     expect(collect(channels()->all())->get('test-channel-two')->connections())->toHaveCount(1);
     expect($response->getHeader('Content-Length'))->toBe(['2']);
 });
+
+it('fails when using an invalid signature', function () {
+    $response = await($this->postRequest('users/987/terminate_connections'));
+
+    expect($response->getStatusCode())->toBe(401);
+})->throws(ResponseException::class, exceptionCode: 401);

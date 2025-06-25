@@ -66,8 +66,10 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['key'],
             $app['secret'],
             $app['ping_interval'],
+            $app['activity_timeout'] ?? 30,
             $app['allowed_origins'],
             $app['max_message_size'],
+            $app['options'] ?? [],
         );
     }
 }

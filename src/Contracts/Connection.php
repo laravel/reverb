@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Contracts;
 
 use Laravel\Reverb\Application;
+use Ratchet\RFC6455\Messaging\Frame;
 
 abstract class Connection
 {
@@ -15,6 +16,11 @@ abstract class Connection
      * Stores the ping state of the connection.
      */
     protected $hasBeenPinged = false;
+
+    /**
+     * Indicates if the connection uses control frames.
+     */
+    protected $usesControlFrames = false;
 
     /**
      * Create a new connection instance.
@@ -38,6 +44,11 @@ abstract class Connection
      * Send a message to the connection.
      */
     abstract public function send(string $message): void;
+
+    /**
+     * Send a control frame to the connection.
+     */
+    abstract public function control(string $type = Frame::OP_PING): void;
 
     /**
      * Terminate a connection.
@@ -135,5 +146,23 @@ abstract class Connection
     public function isStale(): bool
     {
         return $this->isInactive() && $this->hasBeenPinged;
+    }
+
+    /**
+     * Determine whether the connection uses control frames.
+     */
+    public function usesControlFrames(): bool
+    {
+        return $this->usesControlFrames;
+    }
+
+    /**
+     * Mark the connection as using control frames to track activity.
+     */
+    public function setUsesControlFrames(bool $usesControlFrames = true): Connection
+    {
+        $this->usesControlFrames = $usesControlFrames;
+
+        return $this;
     }
 }
