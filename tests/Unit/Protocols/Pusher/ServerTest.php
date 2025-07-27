@@ -330,6 +330,29 @@ it('accepts a connection from an valid origin', function (string $origin, array 
     ],
 ]);
 
+it('it rejects a connection when the app is over the connection limit', function () {
+    $this->app['config']->set('reverb.apps.apps.0.max_connections', 1);
+    $this->server->open($connection = new FakeConnection);
+    $this->server->message(
+        $connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'my-channel',
+            ],
+        ])
+    );
+    $this->server->open($connectionTwo = new FakeConnection);
+
+    $connectionTwo->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4004,
+            'message' => 'Application is over connection quota',
+        ]),
+    ]);
+});
+
 it('sends an error if something fails for event type', function () {
     $this->server->message(
         $connection = new FakeConnection,

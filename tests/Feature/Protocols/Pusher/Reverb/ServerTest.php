@@ -387,6 +387,22 @@ it('can connect from a valid origin', function () {
     connect();
 });
 
+it('cannot connect when over the max connection limit', function () {
+    subscribe('test-channel', connection: connect(key: 'reverb-key-2'));
+
+    $connection = await(wsConnect('ws://0.0.0.0:8080/app/reverb-key-2'));
+
+    $promise = new Deferred;
+
+    $connection->on('message', function ($message) use ($promise) {
+        $promise->resolve((string) $message);
+    });
+    
+    $message = await($promise->promise());
+
+    expect($message)->toBe('{"event":"pusher:error","data":"{\"code\":4004,\"message\":\"Application is over connection quota\"}"}');
+});
+
 it('limits the size of messages', function () {
     $connection = connect(key: 'reverb-key-3', headers: ['Origin' => 'http://laravel.com']);
     send(['This message is waaaaaay longer than the 1 byte limit'], $connection);

@@ -69,6 +69,7 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['activity_timeout'] ?? 30,
             $app['allowed_origins'],
             $app['max_message_size'],
+            $app['max_connections'] ?? null,
             $app['options'] ?? [],
         );
     }

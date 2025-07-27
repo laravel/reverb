@@ -21,7 +21,7 @@ class FakeApplicationProvider implements ApplicationProvider
     public function __construct()
     {
         $this->apps = collect([
-            new Application('id', 'key', 'secret', 60, 30, ['*'], 10_000, [
+            new Application('id', 'key', 'secret', 60, 30, ['*'], 10_000, options: [
                 'host' => 'localhost',
                 'port' => 443,
                 'scheme' => 'https',
