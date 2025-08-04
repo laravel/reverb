@@ -3,6 +3,8 @@
 namespace Laravel\Reverb\Protocols\Pusher\Channels\Concerns;
 
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Events\PresenceChannelSubscribe;
+use Laravel\Reverb\Events\PresenceChannelUnsubscribe;
 
 trait InteractsWithPresenceChannels
 {
@@ -24,6 +26,8 @@ trait InteractsWithPresenceChannels
         }
 
         parent::subscribe($connection, $auth, $data);
+
+        PresenceChannelSubscribe::dispatch($this->name(),$connection);
 
         parent::broadcastInternally(
             [
@@ -52,6 +56,8 @@ trait InteractsWithPresenceChannels
             return;
         }
 
+        PresenceChannelUnsubscribe::dispatch($this->name(), $connection);
+        
         parent::broadcast(
             [
                 'event' => 'pusher_internal:member_removed',

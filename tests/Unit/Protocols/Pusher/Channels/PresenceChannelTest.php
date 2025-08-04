@@ -5,6 +5,9 @@ use Laravel\Reverb\Protocols\Pusher\Channels\PresenceChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
+use Illuminate\Support\Facades\Event;
+use Laravel\Reverb\Events\PresenceChannelSubscribe;
+use Laravel\Reverb\Events\PresenceChannelUnsubscribe;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
@@ -80,6 +83,58 @@ it('can return data stored on the connection', function () {
             ],
         ],
     ]);
+});
+
+
+it('dispatches PresenceChannelSubscribe event on first subscription', function () {
+    Event::fake([PresenceChannelSubscribe::class]);
+
+    $channel = new PresenceChannel('presence-test-channel');
+    $data = json_encode(['user_id' => 1, 'user_info' => ['name' => 'Joe']]);
+
+    $this->channelConnectionManager->shouldReceive('add')
+        ->once()
+        ->with($this->connection, ['user_id' => 1, 'user_info' => ['name' => 'Joe']]);
+
+    $this->channelConnectionManager->shouldReceive('all')
+        ->andReturn([]);
+
+    $channel->subscribe(
+        $this->connection,
+        validAuth($this->connection->id(), 'presence-test-channel', $data),
+        $data
+    );
+
+    Event::assertDispatched(PresenceChannelSubscribe::class, function ($event) {
+        return $event->channel === 'presence-test-channel' &&
+               $event->connection === $this->connection;
+    });
+});
+
+it('dispatches PresenceChannelUnsubscribe event when last connection of user is removed', function () {
+    Event::fake([PresenceChannelUnsubscribe::class]);
+
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $this->channelConnectionManager->shouldReceive('find')
+        ->andReturn(new ChannelConnection($this->connection, [
+            'user_id' => 1,
+            'user_info' => ['name' => 'Joe'],
+        ]));
+
+    $this->channelConnectionManager->shouldReceive('all')
+        ->andReturn([]);
+
+    $this->channelConnectionManager->shouldReceive('remove')
+        ->once()
+        ->with($this->connection);
+
+    $channel->unsubscribe($this->connection);
+
+    Event::assertDispatched(PresenceChannelUnsubscribe::class, function ($event) {
+        return $event->channel === 'presence-test-channel' &&
+               $event->connection === $this->connection;
+    });
 });
 
 it('sends notification of subscription', function () {
