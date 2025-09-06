@@ -72,7 +72,7 @@ class Application
     }
 
     /**
-     * Get the maximum connection allowed for the application.
+     * Get the maximum connections allowed for the application.
      */
     public function maxConnections(): ?int
     {
