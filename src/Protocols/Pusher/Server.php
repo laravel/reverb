@@ -133,6 +133,22 @@ class Server
     }
 
     /**
+     * Ensure the server is within the connection limit.
+     */
+    protected function ensureWithinConnectionLimit(Connection $connection): void
+    {
+        if (! $connection->app()->hasMaxConnectionLimit()) {
+            return;
+        }
+
+        $connections = $this->channels->for($connection->app())->connections();
+
+        if (count($connections) >= $connection->app()->maxConnections()) {
+            throw new ConnectionLimitExceeded;
+        }
+    }
+
+    /**
      * Verify the origin of the connection.
      *
      * @throws \Laravel\Reverb\Exceptions\InvalidOrigin
@@ -154,21 +170,5 @@ class Server
         }
 
         throw new InvalidOrigin;
-    }
-
-    /**
-     * Ensure the server is within the connection limit.
-     */
-    protected function ensureWithinConnectionLimit(Connection $connection): void
-    {
-        if (! $connection->app()->hasMaxConnectionLimit()) {
-            return;
-        }
-
-        $connections = $this->channels->for($connection->app())->connections();
-
-        if (count($connections) >= $connection->app()->maxConnections()) {
-            throw new ConnectionLimitExceeded;
-        }
     }
 }
