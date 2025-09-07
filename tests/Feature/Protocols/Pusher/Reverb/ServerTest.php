@@ -397,7 +397,7 @@ it('cannot connect when over the max connection limit', function () {
     $connection->on('message', function ($message) use ($promise) {
         $promise->resolve((string) $message);
     });
-    
+
     $message = await($promise->promise());
 
     expect($message)->toBe('{"event":"pusher:error","data":"{\"code\":4004,\"message\":\"Application is over connection quota\"}"}');
