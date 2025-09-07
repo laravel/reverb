@@ -15,6 +15,7 @@ class Application
         protected int $activityTimeout,
         protected array $allowedOrigins,
         protected int $maxMessageSize,
+        protected ?int $maxConnections = null,
         protected array $options = [],
     ) {
         //
@@ -68,6 +69,22 @@ class Application
     public function activityTimeout(): int
     {
         return $this->activityTimeout;
+    }
+
+    /**
+     * Get the maximum connections allowed for the application.
+     */
+    public function maxConnections(): ?int
+    {
+        return $this->maxConnections;
+    }
+
+    /**
+     * Determine if the application has a maximum connection limit.
+     */
+    public function hasMaxConnectionLimit(): bool
+    {
+        return $this->maxConnections !== null;
     }
 
     /**

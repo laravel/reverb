@@ -9,6 +9,7 @@ use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Events\MessageReceived;
 use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Ratchet\RFC6455\Messaging\Frame;
@@ -31,6 +32,7 @@ class Server
     public function open(Connection $connection): void
     {
         try {
+            $this->ensureWithinConnectionLimit($connection);
             $this->verifyOrigin($connection);
 
             $connection->touch();
@@ -128,6 +130,22 @@ class Server
 
         Log::error('Message from '.$connection->id().' resulted in an unknown error');
         Log::info($exception->getMessage());
+    }
+
+    /**
+     * Ensure the server is within the connection limit.
+     */
+    protected function ensureWithinConnectionLimit(Connection $connection): void
+    {
+        if (! $connection->app()->hasMaxConnectionLimit()) {
+            return;
+        }
+
+        $connections = $this->channels->for($connection->app())->connections();
+
+        if (count($connections) >= $connection->app()->maxConnections()) {
+            throw new ConnectionLimitExceeded;
+        }
     }
 
     /**
