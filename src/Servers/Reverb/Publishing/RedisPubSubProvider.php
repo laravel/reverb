@@ -68,12 +68,6 @@ class RedisPubSubProvider implements PubSubProvider
         $this->subscriber->on('message', function (string $channel, string $payload) {
             $this->messageHandler->handle($payload);
         });
-
-        $this->subscriber->on('unsubscribe', function (string $channel) {
-            if ($this->channel === $channel) {
-                $this->subscriber->subscribe($channel);
-            }
-        });
     }
 
     /**
