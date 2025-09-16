@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.5.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.0...main)
+
+## [v1.6.0](https://github.com/laravel/reverb/compare/v1.5.1...v1.6.0) - 2025-09-07
+
+* [1.x] Adds optional application level connection limits by [@joedixon](https://github.com/joedixon) in https://github.com/laravel/reverb/pull/347
+* Remove re-subscription logic in scaling mode by [@ashiquzzaman33](https://github.com/ashiquzzaman33) in https://github.com/laravel/reverb/pull/346
 
 ## [v1.5.1](https://github.com/laravel/reverb/compare/v1.5.0...v1.5.1) - 2025-06-16
 
