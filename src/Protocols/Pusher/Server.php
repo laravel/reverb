@@ -58,6 +58,10 @@ class Server
         try {
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
+            if (Str::isJson($event['data'] ?? null)) {
+                $event['data'] = json_decode($event['data'], associative: true, flags: JSON_THROW_ON_ERROR);
+            }
+
             Validator::make($event, ['event' => ['required', 'string']])->validate();
 
             match (Str::startsWith($event['event'], 'pusher:')) {
