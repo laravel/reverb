@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.1...main)
+
+## [v1.6.1](https://github.com/laravel/reverb/compare/v1.6.0...v1.6.1) - 2025-11-11
+
+* Decode the client event data if it is a valid json string by [@vunguyen-it](https://github.com/vunguyen-it) in https://github.com/laravel/reverb/pull/352
 
 ## [v1.6.0](https://github.com/laravel/reverb/compare/v1.5.1...v1.6.0) - 2025-09-07
 
