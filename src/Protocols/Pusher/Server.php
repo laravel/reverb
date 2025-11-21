@@ -15,13 +15,15 @@ use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Throwable;
+use Laravel\Reverb\RateLimiting\RateLimitManager;
+use Illuminate\Cache\RateLimiter;
 
 class Server
 {
     /**
      * Create a new server instance.
      */
-    public function __construct(protected ChannelManager $channels, protected EventHandler $handler)
+    public function __construct(protected ChannelManager $channels, protected EventHandler $handler, protected RateLimitManager $rateLimitManager) 
     {
         //
     }
@@ -56,6 +58,8 @@ class Server
         $from->touch();
 
         try {
+            $this->rateLimiter($from);
+
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
             if (Str::isJson($event['data'] ?? null)) {
@@ -79,6 +83,20 @@ class Server
         } catch (Throwable $e) {
             $this->error($from, $e);
         }
+    }
+
+    /**
+     * Rate limit the incoming message.
+     * 
+     * @throws \Laravel\Reverb\Protocols\Pusher\Exceptions\RateLimitExceededException
+     */
+    protected function rateLimiter(Connection $from): void
+    {
+        if (!config('reverb.rate_limiting.enabled')) {
+            return;
+        }
+
+        $this->rateLimitManager->handle($from);
     }
 
     /**
