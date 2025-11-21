@@ -35,8 +35,8 @@
         "symfony/http-foundation": "^6.3|^7.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
-        "pestphp/pest": "^2.0|^3.0",
+        "orchestra/testbench": "^8.36|^9.15|^10.8",
+        "pestphp/pest": "^2.0|^3.0|^4.0",
         "phpstan/phpstan": "^1.10",
         "ratchet/pawl": "^0.4.1",
         "react/async": "^4.2",

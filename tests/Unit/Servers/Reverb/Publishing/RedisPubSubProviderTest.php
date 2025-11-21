@@ -12,7 +12,11 @@ use React\Promise\Promise;
 afterAll(function () {
     $loop = (new ReflectionClass(Loop::class));
     $property = $loop->getProperty('instance');
-    $property->setAccessible(true);
+
+    if (PHP_VERSION_ID < 80100) {
+        $property->setAccessible(true);
+    }
+
     $property->setValue($loop, null);
 });
 
