@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.2...main)
+
+## [v1.6.2](https://github.com/laravel/reverb/compare/v1.6.1...v1.6.2) - 2025-11-21
+
+* [1.x] PHP 8.5 Compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/353
 
 ## [v1.6.1](https://github.com/laravel/reverb/compare/v1.6.0...v1.6.1) - 2025-11-11
 
