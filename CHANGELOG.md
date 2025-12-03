@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.2...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.3...main)
+
+## [v1.6.3](https://github.com/laravel/reverb/compare/v1.6.2...v1.6.3) - 2025-11-28
+
+* Add reload command by [@barryvdh](https://github.com/barryvdh) in https://github.com/laravel/reverb/pull/355
 
 ## [v1.6.2](https://github.com/laravel/reverb/compare/v1.6.1...v1.6.2) - 2025-11-21
 
