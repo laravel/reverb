@@ -126,13 +126,24 @@ class MetricsHandler
      */
     protected function gatherMetricsFromSubscribers(Application $application, string $type, array $options = []): PromiseInterface
     {
-        $deferred = $this->listenForMetrics($key = Str::random(10));
+        $this->metrics = [];
+        $this->subscribers = null;
+
+        [$deferred, $listener] = $this->listenForMetrics($key = Str::random(10));
 
         $this->requestMetricsFromSubscribers($application, $key, $type, $options);
 
         return timeout($deferred->promise(), 10)->then(
-            fn ($metrics) => $metrics,
-            fn () => $this->metrics,
+            function ($metrics) use ($listener) {
+                $this->pubSubProvider->off('metrics-retrieved', $listener);
+
+                return $metrics;
+            },
+            function () use ($listener) {
+                $this->pubSubProvider->off('metrics-retrieved', $listener);
+
+                return $this->metrics;
+            },
         )->then(fn ($metrics) => $this->mergeSubscriberMetrics($metrics, $type));
     }
 
@@ -205,12 +216,14 @@ class MetricsHandler
 
     /**
      * Listen for metrics from subscribers.
+     *
+     * @return array{Deferred, callable}
      */
-    protected function listenForMetrics(string $key): Deferred
+    protected function listenForMetrics(string $key): array
     {
         $deferred = new Deferred;
 
-        $this->pubSubProvider->on('metrics-retrieved', function ($payload) use ($key, $deferred) {
+        $listener = function ($payload) use ($key, $deferred) {
             if ($payload['key'] !== $key) {
                 return;
             }
@@ -220,9 +233,11 @@ class MetricsHandler
             if ($this->subscribers !== null && count($this->metrics) === $this->subscribers) {
                 $deferred->resolve($this->metrics);
             }
-        });
+        };
 
-        return $deferred;
+        $this->pubSubProvider->on('metrics-retrieved', $listener);
+
+        return [$deferred, $listener];
     }
 
     /**

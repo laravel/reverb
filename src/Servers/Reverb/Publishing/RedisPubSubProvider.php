@@ -24,6 +24,13 @@ class RedisPubSubProvider implements PubSubProvider
     protected $subscriber;
 
     /**
+     * Map of callback object IDs to their wrapper functions.
+     *
+     * @var array<string, callable>
+     */
+    protected $listenerMap = [];
+
+    /**
      * Instantiate a new instance of the provider.
      */
     public function __construct(
@@ -75,13 +82,35 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function on(string $event, callable $callback): void
     {
-        $this->subscriber->on('message', function (string $channel, string $payload) use ($event, $callback) {
+        $wrapper = function (string $channel, string $payload) use ($event, $callback) {
             $payload = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR);
 
             if (($payload['type'] ?? null) === $event) {
                 $callback($payload);
             }
-        });
+        };
+
+        $key = $event.':'.spl_object_id($callback);
+        $this->listenerMap[$key] = $wrapper;
+
+        $this->subscriber->on('message', $wrapper);
+    }
+
+    /**
+     * Remove a listener for a given event.
+     */
+    public function off(string $event, callable $callback): void
+    {
+        $key = $event.':'.spl_object_id($callback);
+
+        if (! isset($this->listenerMap[$key])) {
+            return;
+        }
+
+        $wrapper = $this->listenerMap[$key];
+        unset($this->listenerMap[$key]);
+
+        $this->subscriber->removeListener('message', $wrapper);
     }
 
     /**
