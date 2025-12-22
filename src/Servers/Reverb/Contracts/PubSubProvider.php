@@ -28,6 +28,11 @@ interface PubSubProvider
     public function on(string $event, callable $callback): void;
 
     /**
+     * Remove a listener for a given event.
+     */
+    public function off(string $event, callable $callback): void;
+
+    /**
      * Publish a payload to the publisher.
      */
     public function publish(array $payload): PromiseInterface;
