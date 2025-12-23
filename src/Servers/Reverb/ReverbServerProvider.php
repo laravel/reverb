@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Servers\Reverb;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Foundation\Application;
+use Laravel\Reverb\Concerns\InteractsWithEvents;
 use Laravel\Reverb\Contracts\ServerProvider;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\RestartServer;
 use Laravel\Reverb\Servers\Reverb\Console\Commands\StartServer;
@@ -14,6 +15,8 @@ use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
 
 class ReverbServerProvider extends ServerProvider
 {
+    use InteractsWithEvents;
+    
     /**
      * Indicates whether the Reverb server should publish events.
      *
