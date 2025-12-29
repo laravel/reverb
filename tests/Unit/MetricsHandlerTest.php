@@ -26,19 +26,19 @@ it('removes the listener after metrics are gathered successfully', function () {
     $app = app(ApplicationProvider::class)->findByKey('reverb-key');
     app(ServerProviderManager::class)->withPublishing();
 
-    $registeredListener = null;
-    $offCalled = false;
-    $offCalledWithSameListener = false;
+    $stopListeningCalled = false;
+    $stopListeningKey = null;
+    $registeredEvent = null;
 
     $pubSub = Mockery::mock(PubSubProvider::class);
 
     $pubSub->shouldReceive('on')
         ->once()
-        ->with('metrics-retrieved', Mockery::on(function ($listener) use (&$registeredListener) {
+        ->with(Mockery::on(fn ($event) => str_starts_with($event, 'metrics-retrieved-')), Mockery::type('callable'))
+        ->andReturnUsing(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
             $registeredListener = $listener;
-
-            return true;
-        }));
+            $registeredEvent = $event;
+        });
 
     $pubSub->shouldReceive('publish')
         ->once()
@@ -60,12 +60,12 @@ it('removes the listener after metrics are gathered successfully', function () {
             return $deferred->promise();
         });
 
-    $pubSub->shouldReceive('off')
-        ->with('metrics-retrieved', Mockery::on(function ($listener) use (&$registeredListener, &$offCalled, &$offCalledWithSameListener) {
-            $offCalled = true;
-            $offCalledWithSameListener = ($listener === $registeredListener);
+    $pubSub->shouldReceive('stopListeningForMetrics')
+        ->with(Mockery::on(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
+            $stopListeningCalled = true;
+            $stopListeningKey = $key;
 
-            return true;
+            return $registeredEvent === "metrics-retrieved-{$key}";
         }));
 
     $this->app->instance(PubSubProvider::class, $pubSub);
@@ -85,6 +85,6 @@ it('removes the listener after metrics are gathered successfully', function () {
     Loop::addTimer(0.1, fn () => Loop::stop());
     Loop::run();
 
-    expect($offCalled)->toBeTrue();
-    expect($offCalledWithSameListener)->toBeTrue();
+    expect($stopListeningCalled)->toBeTrue();
+    expect($registeredEvent)->toBe("metrics-retrieved-{$stopListeningKey}");
 });

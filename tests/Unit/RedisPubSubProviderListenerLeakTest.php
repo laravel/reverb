@@ -3,37 +3,12 @@
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisPubSubProvider;
+use Laravel\Reverb\Servers\Reverb\Publishing\RedisSubscribeClient;
 
 /**
  * @see https://github.com/laravel/reverb/issues/331
  */
-it('removes listeners from the subscriber when off() is called', function () {
-    $subscriberListenerCount = 0;
-
-    $mockSubscriber = new class($subscriberListenerCount) {
-        private int $listenerCount;
-
-        public function __construct(int &$count)
-        {
-            $this->listenerCount = &$count;
-        }
-
-        public function on(string $event, callable $callback): void
-        {
-            $this->listenerCount++;
-        }
-
-        public function removeListener(string $event, callable $callback): void
-        {
-            $this->listenerCount--;
-        }
-
-        public function getListenerCount(): int
-        {
-            return $this->listenerCount;
-        }
-    };
-
+it('removes all listeners for an event when stopListeningForMetrics() is called', function () {
     $provider = new RedisPubSubProvider(
         Mockery::mock(RedisClientFactory::class),
         Mockery::mock(PubSubIncomingMessageHandler::class),
@@ -41,16 +16,23 @@ it('removes listeners from the subscriber when off() is called', function () {
         []
     );
 
-    $reflection = new ReflectionClass($provider);
-    $property = $reflection->getProperty('subscriber');
-    $property->setAccessible(true);
-    $property->setValue($provider, $mockSubscriber);
+    $subscriber = Mockery::mock(RedisSubscribeClient::class);
+    $subscriber->shouldReceive('on')->times(100);
+    $subscriber->shouldReceive('removeListener')->times(100);
 
+    $reflection = new ReflectionClass($provider);
+    $subscriberProperty = $reflection->getProperty('subscriber');
+    $subscriberProperty->setAccessible(true);
+    $subscriberProperty->setValue($provider, $subscriber);
+
+    $keys = [];
     for ($i = 0; $i < 100; $i++) {
-        $callback = function ($payload) {};
-        $provider->on('metrics-retrieved', $callback);
-        $provider->off('metrics-retrieved', $callback);
+        $key = "key-{$i}";
+        $keys[] = $key;
+        $provider->on("metrics-retrieved-{$key}", function ($payload) {});
     }
 
-    expect($mockSubscriber->getListenerCount())->toBe(0);
+    foreach ($keys as $key) {
+        $provider->stopListeningForMetrics($key);
+    }
 });

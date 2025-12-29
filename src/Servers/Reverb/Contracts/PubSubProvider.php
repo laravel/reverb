@@ -28,9 +28,9 @@ interface PubSubProvider
     public function on(string $event, callable $callback): void;
 
     /**
-     * Remove a listener for a given event.
+     * Stop listening for metrics with the given key.
      */
-    public function off(string $event, callable $callback): void;
+    public function stopListeningForMetrics(string $key): void;
 
     /**
      * Publish a payload to the publisher.

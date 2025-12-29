@@ -24,11 +24,11 @@ class RedisPubSubProvider implements PubSubProvider
     protected $subscriber;
 
     /**
-     * Map of callback object IDs to their wrapper functions.
+     * Map of event names to their wrapper callbacks.
      *
-     * @var array<string, callable>
+     * @var array<string, array<callable>>
      */
-    protected $listenerMap = [];
+    protected $eventListeners = [];
 
     /**
      * Instantiate a new instance of the provider.
@@ -90,27 +90,27 @@ class RedisPubSubProvider implements PubSubProvider
             }
         };
 
-        $key = $event.':'.spl_object_id($callback);
-        $this->listenerMap[$key] = $wrapper;
+        $this->eventListeners[$event][] = $wrapper;
 
         $this->subscriber->on('message', $wrapper);
     }
 
     /**
-     * Remove a listener for a given event.
+     * Stop listening for metrics with the given key.
      */
-    public function off(string $event, callable $callback): void
+    public function stopListeningForMetrics(string $key): void
     {
-        $key = $event.':'.spl_object_id($callback);
+        $event = "metrics-retrieved-{$key}";
 
-        if (! isset($this->listenerMap[$key])) {
+        if (! isset($this->eventListeners[$event])) {
             return;
         }
 
-        $wrapper = $this->listenerMap[$key];
-        unset($this->listenerMap[$key]);
+        foreach ($this->eventListeners[$event] as $wrapper) {
+            $this->subscriber->removeListener('message', $wrapper);
+        }
 
-        $this->subscriber->removeListener('message', $wrapper);
+        unset($this->eventListeners[$event]);
     }
 
     /**
