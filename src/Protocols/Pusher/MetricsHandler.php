@@ -138,7 +138,7 @@ class MetricsHandler
 
         return timeout($deferred->promise(), 10)->then(
             fn ($metrics) => $metrics,
-            fn () => $this->metrics[$metric->key()] ?? [],
+            fn () => $this->metrics[$metric->key()]?->resolve() ?? [],
         )->then(
             fn ($metrics) => $this->mergeSubscriberMetrics($metrics, $metric->type())
         )->finally(

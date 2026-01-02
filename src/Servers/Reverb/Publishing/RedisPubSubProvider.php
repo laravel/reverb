@@ -24,13 +24,6 @@ class RedisPubSubProvider implements PubSubProvider
     protected $subscriber;
 
     /**
-     * Map of event names to their wrapper callbacks.
-     *
-     * @var array<string, array<callable>>
-     */
-    protected $eventListeners = [];
-
-    /**
      * Instantiate a new instance of the provider.
      */
     public function __construct(
