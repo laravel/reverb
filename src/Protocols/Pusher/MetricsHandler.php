@@ -142,7 +142,7 @@ class MetricsHandler
         )->then(
             fn ($metrics) => $this->mergeSubscriberMetrics($metrics, $metric->type())
         )->finally(
-            fn () => $this->stopListening($metric->key())
+            fn () => $this->stopListening($metric)
         );
     }
 
@@ -246,10 +246,10 @@ class MetricsHandler
     /**
      * Stop listening for the given metric.
      */
-    protected function stopListening(string $key): void
+    protected function stopListening(PendingMetric $metric): void
     {
-        unset($this->metrics[$key]);
-        $this->pubSubProvider->stopListening($key);
+        unset($this->metrics[$metric->key()]);
+        $this->pubSubProvider->stopListening($metric->key());
     }
 
     /**
