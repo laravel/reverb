@@ -224,8 +224,6 @@ class MetricsHandler
 
             if ($pending->resolvable()) {
                 $deferred->resolve($pending->resolve());
-
-                unset($this->metrics[$pending->key()]);
             }
         });
 
