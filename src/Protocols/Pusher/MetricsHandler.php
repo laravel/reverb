@@ -248,7 +248,7 @@ class MetricsHandler
      */
     protected function stopListening(string $key): void
     {
-        // unset($this->metrics[$key]);
+        unset($this->metrics[$key]);
         $this->pubSubProvider->stopListening($key);
     }
 

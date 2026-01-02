@@ -83,7 +83,7 @@ it('removes the listener after metrics are gathered successfully', function () {
     $gatherMethod->setAccessible(true);
 
     $gatherMethod->invoke($handler, $metric);
-    
+
     expect($reflection->getProperty('metrics')->getValue($handler))->toHaveKey('test');
 
     Loop::addTimer(0.1, fn () => Loop::stop());
