@@ -3,6 +3,8 @@
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
+use Laravel\Reverb\Protocols\Pusher\MetricType;
+use Laravel\Reverb\Protocols\Pusher\PendingMetric;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\Loop;
@@ -25,6 +27,7 @@ afterEach(function () {
 it('removes the listener after metrics are gathered successfully', function () {
     $app = app(ApplicationProvider::class)->findByKey('reverb-key');
     app(ServerProviderManager::class)->withPublishing();
+    $metric = new PendingMetric('test', $app, MetricType::CONNECTIONS);
 
     $stopListeningCalled = false;
     $stopListeningKey = null;
@@ -34,7 +37,7 @@ it('removes the listener after metrics are gathered successfully', function () {
 
     $pubSub->shouldReceive('on')
         ->once()
-        ->with(Mockery::on(fn ($event) => str_starts_with($event, 'metrics-retrieved-')), Mockery::type('callable'))
+        ->with(Mockery::on(fn ($event) => str_starts_with($event, 'test')), Mockery::type('callable'))
         ->andReturnUsing(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
             $registeredListener = $listener;
             $registeredEvent = $event;
@@ -43,12 +46,11 @@ it('removes the listener after metrics are gathered successfully', function () {
     $pubSub->shouldReceive('publish')
         ->once()
         ->andReturnUsing(function ($payload) use (&$registeredListener) {
-            $key = $payload['key'];
 
-            Loop::addTimer(0.001, function () use (&$registeredListener, $key) {
+            Loop::addTimer(0.001, function () use (&$registeredListener) {
                 if ($registeredListener) {
                     $registeredListener([
-                        'key' => $key,
+                        'key' => 'test',
                         'payload' => ['connections' => []],
                     ]);
                 }
@@ -60,12 +62,12 @@ it('removes the listener after metrics are gathered successfully', function () {
             return $deferred->promise();
         });
 
-    $pubSub->shouldReceive('stopListeningForMetrics')
+    $pubSub->shouldReceive('stopListening')
         ->with(Mockery::on(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
             $stopListeningCalled = true;
             $stopListeningKey = $key;
 
-            return $registeredEvent === "metrics-retrieved-{$key}";
+            return $registeredEvent === $key;
         }));
 
     $this->app->instance(PubSubProvider::class, $pubSub);
@@ -80,11 +82,14 @@ it('removes the listener after metrics are gathered successfully', function () {
     $gatherMethod = $reflection->getMethod('gatherMetricsFromSubscribers');
     $gatherMethod->setAccessible(true);
 
-    $gatherMethod->invoke($handler, $app, 'connections', []);
+    $gatherMethod->invoke($handler, $metric);
+    
+    expect($reflection->getProperty('metrics')->getValue($handler))->toHaveKey('test');
 
     Loop::addTimer(0.1, fn () => Loop::stop());
     Loop::run();
 
     expect($stopListeningCalled)->toBeTrue();
-    expect($registeredEvent)->toBe("metrics-retrieved-{$stopListeningKey}");
-})->skip();
+    expect($registeredEvent)->toBe($stopListeningKey);
+    expect($reflection->getProperty('metrics')->getValue($handler))->not->toHaveKey('test');
+});
