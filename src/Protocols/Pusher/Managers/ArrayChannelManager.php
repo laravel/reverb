@@ -112,17 +112,7 @@ class ArrayChannelManager implements ChannelManagerInterface
      */
     public function remove(Channel $channel): void
     {
-        $appId = $this->application->id();
-        $channelName = $channel->name();
-
-        // Rebuild nested array without this channel to ensure memory is properly freed
-        if (isset($this->applications[$appId])) {
-            $this->applications[$appId] = array_filter(
-                $this->applications[$appId],
-                fn ($k) => $k !== $channelName,
-                ARRAY_FILTER_USE_KEY
-            );
-        }
+        unset($this->applications[$this->application->id()][$channel->name()]);
 
         ChannelRemoved::dispatch($channel);
     }

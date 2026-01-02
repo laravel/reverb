@@ -43,12 +43,7 @@ class ArrayChannelConnectionManager implements ChannelConnectionManager
      */
     public function remove(Connection $connection): void
     {
-        // Rebuild array without this key to ensure memory is properly freed
-        $this->connections = array_filter(
-            $this->connections,
-            fn ($k) => $k !== $connection->id(),
-            ARRAY_FILTER_USE_KEY
-        );
+        unset($this->connections[$connection->id()]);
     }
 
     /**
