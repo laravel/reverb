@@ -23,9 +23,21 @@ interface PubSubProvider
     public function subscribe(): void;
 
     /**
-     * Listen for a given event.
+     * Listen for the given event.
      */
     public function on(string $event, callable $callback): void;
+
+    /**
+     * Listen for the given event.
+     *
+     * @alias on
+     */
+    public function listen(string $event, callable $callback): void;
+
+    /**
+     * Stop listening for the given event.
+     */
+    public function stopListening(string $event): void;
 
     /**
      * Publish a payload to the publisher.

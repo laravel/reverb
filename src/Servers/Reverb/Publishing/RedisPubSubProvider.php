@@ -75,13 +75,25 @@ class RedisPubSubProvider implements PubSubProvider
      */
     public function on(string $event, callable $callback): void
     {
-        $this->subscriber->on('message', function (string $channel, string $payload) use ($event, $callback) {
-            $payload = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR);
+        $this->messageHandler->listen($event, $callback);
+    }
 
-            if (($payload['type'] ?? null) === $event) {
-                $callback($payload);
-            }
-        });
+    /**
+     * Listen for the given event.
+     *
+     * @alias on
+     */
+    public function listen(string $event, callable $callback): void
+    {
+        $this->on($event, $callback);
+    }
+
+    /**
+     * Stop listening for the given event..
+     */
+    public function stopListening(string $event): void
+    {
+        $this->messageHandler->stopListening($event);
     }
 
     /**
