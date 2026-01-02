@@ -92,14 +92,6 @@ class RedisClient
     }
 
     /**
-     * Remove a listener for a given event.
-     */
-    public function removeListener(string $event, callable $callback): void
-    {
-        $this->client?->removeListener($event, $callback);
-    }
-
-    /**
      * Determine if the client is currently connected to the server.
      */
     public function isConnected(): bool
