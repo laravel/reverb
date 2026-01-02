@@ -9,7 +9,7 @@ class PendingMetric
     /**
      * The number of subscribers for the metric.
      */
-    protected int $subscribers = 0;
+    protected ?int $subscribers = null;
 
     /**
      * The data for the metric.
@@ -89,7 +89,7 @@ class PendingMetric
      */
     public function resolvable(): bool
     {
-        return count($this->data) === $this->subscribers;
+        return $this->subscribers !== null && count($this->data) === $this->subscribers;
     }
 
     /**
