@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Protocols\Pusher;
 
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\MetricType;
 use Laravel\Reverb\Protocols\Pusher\PendingMetric;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 
@@ -33,7 +34,9 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
                 $except?->connection()
             ),
             'metrics' => app(MetricsHandler::class)->publish(
-                unserialize($event['payload'], ['allowed_classes' => [PendingMetric::class]])
+                unserialize($event['payload'], ['allowed_classes' => [
+                    Application::class, PendingMetric::class, MetricType::class
+                ]])
             ),
             'terminate' => collect(app(ChannelManager::class)->for($application)->connections())
                 ->each(function ($connection) use ($event) {
