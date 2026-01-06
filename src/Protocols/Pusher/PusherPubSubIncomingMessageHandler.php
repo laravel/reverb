@@ -20,7 +20,7 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
 
         $this->processEventListeners($event);
 
-        $application = unserialize($event['application'] ?? null, ['allowed_classes' => Application::class]);
+        $application = unserialize($event['application'] ?? null, ['allowed_classes' => [Application::class]]);
 
         $except = isset($event['socket_id']) ?
             app(ChannelManager::class)->for($application)->connections()[$event['socket_id']] ?? null
@@ -33,7 +33,7 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
                 $except?->connection()
             ),
             'metrics' => app(MetricsHandler::class)->publish(
-                unserialize($event['payload'], ['allowed_classes' => PendingMetric::class])
+                unserialize($event['payload'], ['allowed_classes' => [PendingMetric::class]])
             ),
             'terminate' => collect(app(ChannelManager::class)->for($application)->connections())
                 ->each(function ($connection) use ($event) {
