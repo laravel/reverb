@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.6.3...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.7.0...main)
+
+## [v1.7.0](https://github.com/laravel/reverb/compare/v1.6.3...v1.7.0) - 2026-01-06
+
+* [1.x] Fixes memory leak by [@joedixon](https://github.com/joedixon) in https://github.com/laravel/reverb/pull/359
+* Add allowed classes by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/reverb/pull/360
 
 ## [v1.6.3](https://github.com/laravel/reverb/compare/v1.6.2...v1.6.3) - 2025-11-28
 
