@@ -57,10 +57,7 @@
             "providers": [
                 "Laravel\\Reverb\\ApplicationManagerServiceProvider",
                 "Laravel\\Reverb\\ReverbServiceProvider"
-            ],
-            "aliases": {
-                "Output": "Laravel\\Reverb\\Output"
-            }
+            ]
         }
     },
     "config": {
