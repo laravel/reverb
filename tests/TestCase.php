@@ -17,18 +17,16 @@ class TestCase extends TestbenchTestCase
     /**
      * Setup the test environment.
      */
-    protected function setUp(): void
+    protected function defineEnvironment($app): void
     {
-        parent::setUp();
+        $app->instance(Logger::class, new NullLogger);
 
-        $this->app->instance(Logger::class, new NullLogger);
-
-        app()->singleton(
+        $app->singleton(
             ChannelManager::class,
             fn () => new ArrayChannelManager
         );
 
-        app()->bind(
+        $app->bind(
             ChannelConnectionManager::class,
             fn () => new ArrayChannelConnectionManager
         );
