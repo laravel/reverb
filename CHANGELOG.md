@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.7.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.7.1...main)
+
+## [v1.7.1](https://github.com/laravel/reverb/compare/v1.7.0...v1.7.1) - 2026-02-04
+
+* Supports Laravel 13 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/364
+* Remove `Output` aliases from Laravel Reverb configuration by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/363
 
 ## [v1.7.0](https://github.com/laravel/reverb/compare/v1.6.3...v1.7.0) - 2026-01-06
 
