@@ -14,49 +14,54 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3, 8.4]
-        laravel: [10, 11, 12]
-        include:
-          - laravel: 12
-            php: 8.5
+        php: [8.2, 8.3, 8.4, 8.5]
+        laravel: [10, 11, 12, 13]
         exclude:
-          - laravel: 10
-            php: 8.4
+          - php: 8.5
+            laravel: 10
+          - php: 8.5
+            laravel: 11
+          - php: 8.4
+            laravel: 10
+          - php: 8.2
+            laravel: 13
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php }}
-        extensions: dom, curl, libxml, mbstring, zip
-        ini-values: error_reporting=E_ALL
-        tools: composer:v2
-        coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
 
-    - name: Install dependencies
-      run: |
-        composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts=^${{ matrix.laravel }}"
+      - name: Install dependencies
+        run: |
+          composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts=^${{ matrix.laravel }}"
 
-    - name: Pull Autobahn Docker image
-      run: docker pull crossbario/autobahn-testsuite
+      - name: Pull Autobahn Docker image
+        run: docker pull crossbario/autobahn-testsuite
 
-    - name: Start WebSocket server
-      working-directory: tests/Specification
-      run: php spec-server.php &
+      - name: Start WebSocket server
+        working-directory: tests/Specification
+        run: php spec-server.php &
 
-    - name: Run specification tests
-      working-directory: tests/Specification
-      run: |
-        docker run --rm \
-          -v $PWD:/mnt/autobahn \
-          -v $PWD/reports:/mnt/autobahn/reports \
-          --add-host host.docker.internal:host-gateway \
-          crossbario/autobahn-testsuite \
-          wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
+      - name: Run specification tests
+        working-directory: tests/Specification
+        run: |
+          docker run --rm \
+            -v $PWD:/mnt/autobahn \
+            -v $PWD/reports:/mnt/autobahn/reports \
+            --add-host host.docker.internal:host-gateway \
+            crossbario/autobahn-testsuite \
+            wstest -m fuzzingclient -s /mnt/autobahn/client-spec.json
 
-    - name: Analyze test results
-      working-directory: tests/Specification
-      run: php spec-analyze.php
+      - name: Analyze test results
+        working-directory: tests/Specification
+        run: php spec-analyze.php
