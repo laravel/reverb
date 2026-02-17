@@ -62,8 +62,8 @@ class ClientEvent
             // Regenerate the event payload to broadcast, ensuring we only include the expected fields and the authenticated user_id if available.
             $rebroadcastEvent = [
                 'event' => $event['event'],
-                'data' => $event['data'] ?? null,
                 'channel' => $event['channel'],
+                'data' => $event['data'] ?? null,
             ];
 
             if ($userId = $channelConnection->data('user_id')) {

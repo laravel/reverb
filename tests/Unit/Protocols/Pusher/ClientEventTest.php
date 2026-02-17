@@ -27,16 +27,16 @@ it('can forward a client message', function () {
     ClientEvent::handle(
         $connectionOne->connection(), [
             'event' => 'client-test-message',
-            'data' => ['foo' => 'bar'],
             'channel' => 'private-test-channel',
+            'data' => ['foo' => 'bar'],
         ]
     );
 
     $connectionOne->connection()->assertNothingReceived();
     $connectionTwo->connection()->assertReceived([
         'event' => 'client-test-message',
-        'data' => ['foo' => 'bar'],
         'channel' => 'private-test-channel',
+        'data' => ['foo' => 'bar'],
         'user_id' => '1',
     ]);
 });
@@ -55,8 +55,8 @@ it('can forward an unauthenticated client message on public channel', function (
     ClientEvent::handle(
         $connections[0]->connection(), [
             'event' => 'client-test-message',
-            'data' => ['foo' => 'bar'],
             'channel' => 'test-channel',
+            'data' => ['foo' => 'bar'],
         ]
     );
 
@@ -66,8 +66,8 @@ it('can forward an unauthenticated client message on public channel', function (
         } else {
             $connection->connection()->assertReceived([
                 'event' => 'client-test-message',
+                'channel' => 'test-channel',
                 'data' => ['foo' => 'bar'],
-                'channel' => 'test-channel'
             ]);
         }
 
@@ -88,8 +88,8 @@ it('does not forward unauthenticated client message when in member mode', functi
     ClientEvent::handle(
         $connectionOne->connection(), [
             'event' => 'client-test-message',
-            'data' => ['foo' => 'bar'],
             'channel' => 'private-test-channel',
+            'data' => ['foo' => 'bar'],
         ]
     );
 
@@ -118,8 +118,8 @@ it('does not forward client message when disabled', function () {
     ClientEvent::handle(
         $connectionOne->connection(), [
             'event' => 'client-test-message',
-            'data' => ['foo' => 'bar'],
             'channel' => 'private-test-channel',
+            'data' => ['foo' => 'bar'],
         ]
     );
 
