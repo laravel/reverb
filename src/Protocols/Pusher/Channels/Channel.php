@@ -48,7 +48,7 @@ class Channel
     /**
      * Find a connection.
      */
-    public function find(Connection $connection): ?Connection
+    public function find(Connection $connection): ?ChannelConnection
     {
         return $this->connections->find($connection);
     }
@@ -56,7 +56,7 @@ class Channel
     /**
      * Find a connection by its ID.
      */
-    public function findById(string $id): ?Connection
+    public function findById(string $id): ?ChannelConnection
     {
         return $this->connections->findById($id);
     }
