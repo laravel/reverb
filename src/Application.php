@@ -16,7 +16,7 @@ class Application
         protected array $allowedOrigins,
         protected int $maxMessageSize,
         protected ?int $maxConnections = null,
-        protected string $clientEventsMode = 'member',
+        protected string $acceptClientEventsFrom = 'members',
         protected array $options = [],
     ) {
         //
@@ -97,11 +97,11 @@ class Application
     }
 
     /**
-     * Get the client events mode for the application - either "authenticated", "member", or "disabled".
+     * Get who client events are accepted from for the application - either "all", "members", or "none".
      */
-    public function clientEventsMode(): string
+    public function acceptClientEventsFrom(): string
     {
-        return $this->clientEventsMode;
+        return $this->acceptClientEventsFrom;
     }
 
     /**

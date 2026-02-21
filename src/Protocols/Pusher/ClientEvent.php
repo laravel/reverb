@@ -29,9 +29,9 @@ class ClientEvent
         }
 
 
-        $clientEventMode = $connection->app()->clientEventsMode();
+        $acceptClientEventsFrom = $connection->app()->acceptClientEventsFrom();
 
-        if (! in_array($clientEventMode, ['unauthenticated', 'member'])) {
+        if (! in_array($acceptClientEventsFrom, ['all', 'members'])) {
             // Client events are disabled, so we should reject the event...
             $connection->send(json_encode([
                 'event' => 'pusher:error',
@@ -46,7 +46,7 @@ class ClientEvent
 
         $rebroadcastEvent = $event;
 
-        if ($clientEventMode == 'member') {
+        if ($acceptClientEventsFrom == 'members') {
             $channel = app(ChannelManager::class)->find($event['channel']);
 
             $channelConnection = $channel?->find($connection);

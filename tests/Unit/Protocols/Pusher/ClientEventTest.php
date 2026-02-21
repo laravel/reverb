@@ -74,7 +74,7 @@ it('can forward an unauthenticated client message on public channel', function (
     }
 });
 
-it('does not forward unauthenticated client message when in member mode', function () {
+it('does not forward unauthenticated client message when in members mode', function () {
     channels()->findOrCreate('private-test-channel');
 
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
@@ -103,8 +103,8 @@ it('does not forward unauthenticated client message when in member mode', functi
     $connectionTwo->connection()->assertNothingReceived();
 });
 
-it('does not forward client message when disabled', function () {
-    $this->app['config']->set('reverb.apps.apps.0.client_events_mode', 'disabled');
+it('does not forward client message when set to none', function () {
+    $this->app['config']->set('reverb.apps.apps.0.accept_client_events_from', 'none');
     channels()->findOrCreate('private-test-channel');
 
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
@@ -134,8 +134,8 @@ it('does not forward client message when disabled', function () {
 });
 
 
-it('forwards a client message for unauthenticated client when in unauthenticated mode', function () {
-    $this->app['config']->set('reverb.apps.apps.0.client_events_mode', 'unauthenticated');
+it('forwards a client message for unauthenticated client when set to all', function () {
+    $this->app['config']->set('reverb.apps.apps.0.accept_client_events_from', 'all');
     $connection = new FakeConnection;
     channels()->findOrCreate('test-channel');
 

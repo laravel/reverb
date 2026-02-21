@@ -70,8 +70,8 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['allowed_origins'],
             $app['max_message_size'],
             $app['max_connections'] ?? null,
-            // If no mode is set, default to "unauthenticated" mode which is the original behavior of allowing anyone to whisper.
-            $app['client_events_mode'] ?? 'unauthenticated',
+            // If no setting is provided, default to allowing all client events...
+            $app['accept_client_events_from'] ?? 'all',
             $app['options'] ?? [],
         );
     }
