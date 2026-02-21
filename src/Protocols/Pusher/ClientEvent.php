@@ -30,8 +30,9 @@ class ClientEvent
 
 
         $clientEventMode = $connection->app()->clientEventsMode();
-        if (!in_array($clientEventMode, ['unauthenticated', 'member'])) {
-            // Client events are disabled, so we should reject the event.
+
+        if (! in_array($clientEventMode, ['unauthenticated', 'member'])) {
+            // Client events are disabled, so we should reject the event...
             $connection->send(json_encode([
                 'event' => 'pusher:error',
                 'data' => json_encode([
@@ -39,16 +40,18 @@ class ClientEvent
                     'message' => 'The app does not have client messaging enabled.',
                 ]),
             ]));
+
             return;
         }
 
         $rebroadcastEvent = $event;
-        if ($clientEventMode == 'member') {
 
+        if ($clientEventMode == 'member') {
             $channel = app(ChannelManager::class)->find($event['channel']);
+
             $channelConnection = $channel?->find($connection);
 
-            if (!$channelConnection) {
+            if (! $channelConnection) {
                 $connection->send(json_encode([
                     'event' => 'pusher:error',
                     'data' => json_encode([
@@ -56,10 +59,11 @@ class ClientEvent
                         'message' => 'The client is not a member of the specified channel.',
                     ]),
                 ]));
+
                 return;
             }
 
-            // Regenerate the event payload to broadcast, ensuring we only include the expected fields and the authenticated user_id if available.
+            // Regenerate event payload, ensuring we only include the expected fields and the authenticated user_id...
             $rebroadcastEvent = [
                 'event' => $event['event'],
                 'channel' => $event['channel'],
@@ -67,7 +71,7 @@ class ClientEvent
             ];
 
             if ($userId = $channelConnection->data('user_id')) {
-                // Because public channels allow unauthenticated users, we may not have a user ID.
+                // Because public channels allow unauthenticated users, we may not have a user ID...
                 $rebroadcastEvent['user_id'] = $userId;
             }
         }
