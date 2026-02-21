@@ -133,7 +133,6 @@ it('does not forward client message when set to none', function () {
     $connectionTwo->connection()->assertNothingReceived();
 });
 
-
 it('forwards a client message for unauthenticated client when set to all', function () {
     $this->app['config']->set('reverb.apps.apps.0.accept_client_events_from', 'all');
     $connection = new FakeConnection;

@@ -523,6 +523,5 @@ it('allow receiving client event with empty data', function () {
         ])
     );
 
-
     $connection->connection()->assertNothingReceived();
 });

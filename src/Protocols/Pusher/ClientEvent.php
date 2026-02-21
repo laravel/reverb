@@ -28,7 +28,6 @@ class ClientEvent
             return;
         }
 
-
         $acceptClientEventsFrom = $connection->app()->acceptClientEventsFrom();
 
         if (! in_array($acceptClientEventsFrom, ['all', 'members'])) {
