@@ -16,6 +16,7 @@ class Application
         protected array $allowedOrigins,
         protected int $maxMessageSize,
         protected ?int $maxConnections = null,
+        protected string $acceptClientEventsFrom = 'members',
         protected array $options = [],
     ) {
         //
@@ -93,6 +94,14 @@ class Application
     public function maxMessageSize(): int
     {
         return $this->maxMessageSize;
+    }
+
+    /**
+     * Get who client events are accepted from for the application - either "all", "members", or "none".
+     */
+    public function acceptClientEventsFrom(): string
+    {
+        return $this->acceptClientEventsFrom;
     }
 
     /**

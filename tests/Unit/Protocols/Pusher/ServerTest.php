@@ -508,13 +508,21 @@ it('sends an error if something fails for channel type', function () {
 });
 
 it('allow receiving client event with empty data', function () {
+    // Channel and app must exist for the server to process the message
+    $channel = channels()->findOrCreate('private-chat.1');
+
+    $connection = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+    $channel->subscribe($connection->connection(),
+        validAuth($connection->id(), 'private-chat.1', $data = json_encode($connection->data())), $data);
+
     $this->server->message(
-        $connection = new FakeConnection,
+        $connection->connection(),
         json_encode([
             'event' => 'client-start-typing',
             'channel' => 'private-chat.1',
         ])
     );
 
-    $connection->assertNothingReceived();
+
+    $connection->connection()->assertNothingReceived();
 });
