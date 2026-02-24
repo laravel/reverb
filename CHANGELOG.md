@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.7.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.8.0...main)
+
+## [v1.8.0](https://github.com/laravel/reverb/compare/v1.7.1...v1.8.0) - 2026-02-21
+
+* Restrict client whisper events to channel members by [@joshuadwire](https://github.com/joshuadwire) in https://github.com/laravel/reverb/pull/365
 
 ## [v1.7.1](https://github.com/laravel/reverb/compare/v1.7.0...v1.7.1) - 2026-02-04
 
