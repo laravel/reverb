@@ -11,6 +11,7 @@ use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
+use Laravel\Reverb\Protocols\Pusher\Exceptions\MessageRateLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
@@ -56,6 +57,10 @@ class Server
         $from->touch();
 
         try {
+            $this->ensureWithinMessageRateLimit($from);
+
+            $from->recordMessage();
+
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
             if (Str::isJson($event['data'] ?? null)) {
@@ -149,6 +154,20 @@ class Server
 
         if (count($connections) >= $connection->app()->maxConnections()) {
             throw new ConnectionLimitExceeded;
+        }
+    }
+
+    /**
+     * Ensure the connection is within the message rate limit.
+     */
+    protected function ensureWithinMessageRateLimit(Connection $connection): void
+    {
+        if (! $connection->app()->hasRateLimit()) {
+            return;
+        }
+
+        if ($connection->messageCount() >= $connection->app()->rateLimit()) {
+            throw new MessageRateLimitExceeded;
         }
     }
 

@@ -353,6 +353,59 @@ it('it rejects a connection when the app is over the connection limit', function
     ]);
 });
 
+it('rejects a message when the connection exceeds the rate limit', function () {
+    $this->app['config']->set('reverb.apps.apps.0.rate_limit', 3);
+    $this->server->open($connection = new FakeConnection);
+
+    for ($i = 0; $i < 3; $i++) {
+        $this->server->message(
+            $connection,
+            json_encode([
+                'event' => 'pusher:subscribe',
+                'data' => [
+                    'channel' => 'test-channel-'.$i,
+                ],
+            ])
+        );
+    }
+
+    $this->server->message(
+        $connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => [
+                'channel' => 'test-channel-overflow',
+            ],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4005,
+            'message' => 'Rate limit exceeded',
+        ]),
+    ]);
+});
+
+it('allows messages when no rate limit is configured', function () {
+    $this->server->open($connection = new FakeConnection);
+
+    for ($i = 0; $i < 10; $i++) {
+        $this->server->message(
+            $connection,
+            json_encode([
+                'event' => 'pusher:subscribe',
+                'data' => [
+                    'channel' => 'test-channel-'.$i,
+                ],
+            ])
+        );
+    }
+
+    $connection->assertReceivedCount(11);
+});
+
 it('sends an error if something fails for event type', function () {
     $this->server->message(
         $connection = new FakeConnection,

@@ -23,6 +23,13 @@ abstract class Connection
     protected $usesControlFrames = false;
 
     /**
+     * The timestamps of recent messages for rate limiting.
+     *
+     * @var array<int, int>
+     */
+    protected array $messageTimestamps = [];
+
+    /**
      * Create a new connection instance.
      */
     public function __construct(protected WebSocketConnection $connection, protected Application $application, protected ?string $origin)
@@ -164,5 +171,27 @@ abstract class Connection
         $this->usesControlFrames = $usesControlFrames;
 
         return $this;
+    }
+
+    /**
+     * Record a message timestamp for rate limiting.
+     */
+    public function recordMessage(): void
+    {
+        $this->messageTimestamps[] = time();
+    }
+
+    /**
+     * Get the number of messages sent within the given number of seconds.
+     */
+    public function messageCount(int $seconds = 1): int
+    {
+        $threshold = time() - $seconds;
+
+        $this->messageTimestamps = array_values(
+            array_filter($this->messageTimestamps, fn (int $timestamp) => $timestamp >= $threshold)
+        );
+
+        return count($this->messageTimestamps);
     }
 }

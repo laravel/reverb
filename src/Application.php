@@ -16,6 +16,7 @@ class Application
         protected array $allowedOrigins,
         protected int $maxMessageSize,
         protected ?int $maxConnections = null,
+        protected ?int $rateLimit = null,
         protected string $acceptClientEventsFrom = 'members',
         protected array $options = [],
     ) {
@@ -86,6 +87,22 @@ class Application
     public function hasMaxConnectionLimit(): bool
     {
         return $this->maxConnections !== null;
+    }
+
+    /**
+     * Get the maximum number of messages allowed per second.
+     */
+    public function rateLimit(): ?int
+    {
+        return $this->rateLimit;
+    }
+
+    /**
+     * Determine if the application has a message rate limit.
+     */
+    public function hasRateLimit(): bool
+    {
+        return $this->rateLimit !== null;
     }
 
     /**
