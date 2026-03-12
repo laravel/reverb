@@ -1,0 +1,20 @@
+<?php
+
+namespace Laravel\Reverb\Protocols\Pusher\Exceptions;
+
+class MessageRateLimitExceeded extends PusherException
+{
+    /**
+     * The error code associated with the exception.
+     *
+     * @var int
+     */
+    protected $code = 4005;
+
+    /**
+     * The error message associated with the exception.
+     *
+     * @var string
+     */
+    protected $message = 'Rate limit exceeded';
+}

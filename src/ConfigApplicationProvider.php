@@ -70,6 +70,7 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['allowed_origins'],
             $app['max_message_size'],
             $app['max_connections'] ?? null,
+            $app['rate_limit'] ?? null,
             // If no setting is provided, default to allowing all client events...
             $app['accept_client_events_from'] ?? 'all',
             $app['options'] ?? [],
