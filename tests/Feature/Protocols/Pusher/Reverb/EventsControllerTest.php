@@ -240,3 +240,39 @@ it('fails when using an invalid signature', function () {
 
     expect($response->getStatusCode())->toBe(401);
 })->throws(ResponseException::class, exceptionCode: 401);
+
+it('can verify signature when using a custom server path', function () {
+    $this->stopServer();
+    $this->startServer(path: '/ws');
+    config()->set('reverb.servers.reverb.path', '/ws');
+
+    $appId = '654321';
+    $key = 'reverb-key-2';
+    $secret = 'reverb-secret-2';
+    $data = ['name' => 'NewEvent', 'channel' => 'test-channel', 'data' => json_encode(['some' => 'data'])];
+    $body = json_encode($data);
+    $timestamp = time();
+
+    // Build the signature WITHOUT the path prefix, as the Pusher PHP client does
+    $query = "auth_key={$key}&auth_timestamp={$timestamp}&auth_version=1.0";
+    $params = explode('&', $query);
+    sort($params);
+    $query = implode('&', $params);
+    $query .= '&body_md5='.md5($body);
+
+    $string = "POST\n/apps/{$appId}/events\n{$query}";
+    $signature = hash_hmac('sha256', $string, $secret);
+
+    // Send the request TO the prefixed URL
+    $response = await(
+        (new \React\Http\Browser($this->loop))->request(
+            'POST',
+            "http://0.0.0.0:8080/ws/apps/{$appId}/events?{$query}&auth_signature={$signature}",
+            [],
+            $body,
+        )
+    );
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{}');
+});

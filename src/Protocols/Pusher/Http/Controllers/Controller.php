@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher\Http\Controllers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Exceptions\InvalidApplication;
@@ -94,9 +95,15 @@ abstract class Controller
 
         ksort($params);
 
+        $path = $request->getUri()->getPath();
+
+        if ($prefix = config('reverb.servers.reverb.path')) {
+            $path = '/'.ltrim(Str::after($path, rtrim($prefix, '/')), '/');
+        }
+
         $signature = implode("\n", [
             $request->getMethod(),
-            $request->getUri()->getPath(),
+            $path,
             $this->formatQueryParametersForVerification($params),
         ]);
 
