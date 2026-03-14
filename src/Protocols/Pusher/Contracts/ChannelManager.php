@@ -5,6 +5,7 @@ namespace Laravel\Reverb\Protocols\Pusher\Contracts;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
+use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 
 interface ChannelManager
 {
@@ -21,7 +22,7 @@ interface ChannelManager
     /**
      * Get all the channels.
      *
-     * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\Channel>
+     * @return array<string, Channel>
      */
     public function all(): array;
 
@@ -43,7 +44,7 @@ interface ChannelManager
     /**
      * Get all the connections for the given channels.
      *
-     * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
+     * @return array<string, ChannelConnection>
      */
     public function connections(?string $channel = null): array;
 

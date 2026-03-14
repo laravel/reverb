@@ -12,14 +12,14 @@ class RedisPubSubProvider implements PubSubProvider
     /**
      * The Redis publisher client.
      *
-     * @var \Laravel\Reverb\Servers\Reverb\Publishing\RedisPublishClient
+     * @var RedisPublishClient
      */
     protected $publisher;
 
     /**
      * The Redis subscriber client.
      *
-     * @var \Laravel\Reverb\Servers\Reverb\Publishing\RedisSubscribeClient
+     * @var RedisSubscribeClient
      */
     protected $subscriber;
 

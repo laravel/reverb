@@ -38,7 +38,7 @@ class Channel
     /**
      * Get all connections for the channel.
      *
-     * @return array<string, \Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection>
+     * @return array<string, ChannelConnection>
      */
     public function connections(): array
     {

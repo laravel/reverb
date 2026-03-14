@@ -5,13 +5,14 @@ namespace Laravel\Reverb\Tests;
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\ApplicationProvider;
+use Laravel\Reverb\Exceptions\InvalidApplication;
 
 class FakeApplicationProvider implements ApplicationProvider
 {
     /**
      * The applications collection.
      *
-     * @var \Illuminate\Support\Collection<\Laravel\Reverb\Application>
+     * @var Collection<Application>
      */
     protected $apps;
 
@@ -33,7 +34,7 @@ class FakeApplicationProvider implements ApplicationProvider
     /**
      * Get all of the configured applications as Application instances.
      *
-     * @return \Illuminate\Support\Collection<\Laravel\Reverb\Application>
+     * @return Collection<Application>
      */
     public function all(): Collection
     {
@@ -43,7 +44,7 @@ class FakeApplicationProvider implements ApplicationProvider
     /**
      * Find an application instance by ID.
      *
-     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     * @throws InvalidApplication
      */
     public function findById(string $id): Application
     {
@@ -53,7 +54,7 @@ class FakeApplicationProvider implements ApplicationProvider
     /**
      * Find an application instance by key.
      *
-     * @throws \Laravel\Reverb\Exceptions\InvalidApplication
+     * @throws InvalidApplication
      */
     public function findByKey(string $key): Application
     {

@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Reverb\Tests\ReverbTestCase;
+use React\Http\Browser;
 use React\Http\Message\ResponseException;
 
 use function React\Async\await;
@@ -265,7 +266,7 @@ it('can verify signature when using a custom server path', function () {
 
     // Send the request TO the prefixed URL
     $response = await(
-        (new \React\Http\Browser($this->loop))->request(
+        (new Browser($this->loop))->request(
             'POST',
             "http://0.0.0.0:8080/ws/apps/{$appId}/events?{$query}&auth_signature={$signature}",
             [],

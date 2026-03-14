@@ -9,7 +9,7 @@ class Log
     /**
      * The logger instance.
      *
-     * @var \Laravel\Reverb\Contracts\Logger
+     * @var Logger
      */
     protected static $logger;
 

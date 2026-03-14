@@ -2,6 +2,8 @@
 
 namespace Laravel\Reverb\Tests;
 
+use Illuminate\Foundation\Application;
+use Illuminate\Support\ServiceProvider;
 use Laravel\Reverb\ApplicationManagerServiceProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
@@ -35,8 +37,8 @@ class TestCase extends TestbenchTestCase
     /**
      * Get package providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
+     * @param  Application  $app
+     * @return array<int, class-string<ServiceProvider>>
      */
     protected function getPackageProviders($app)
     {

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Collection;
 use Laravel\Reverb\Application;
+use Laravel\Reverb\Connection;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Managers\Connections;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
@@ -16,7 +17,7 @@ uses(TestCase::class)->in(__DIR__.'/Unit');
 /**
  * Create a defined number of connections.
  *
- * @return array<int, \Laravel\Reverb\Connection|string>
+ * @return array<int, Connection|string>
  */
 function factory(int $count = 1, array $data = [], bool $serializable = false): array
 {

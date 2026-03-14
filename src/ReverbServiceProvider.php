@@ -3,6 +3,7 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Pulse\Pulse;
 use Laravel\Reverb\Console\Commands\InstallCommand;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
@@ -44,7 +45,7 @@ class ReverbServiceProvider extends ServiceProvider
             }
         }
 
-        if ($this->app->bound(\Laravel\Pulse\Pulse::class)) {
+        if ($this->app->bound(Pulse::class)) {
             $this->loadViewsFrom(__DIR__.'/../resources/views', 'reverb');
 
             $this->callAfterResolving('livewire', function (LivewireManager $livewire) {
