@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.8.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.8.1...main)
+
+## [v1.8.1](https://github.com/laravel/reverb/compare/v1.8.0...v1.8.1) - 2026-03-14
+
+* [1.x] Fix auth signature verification when using a custom server path by [@hamedelasma](https://github.com/hamedelasma) in https://github.com/laravel/reverb/pull/368
 
 ## [v1.8.0](https://github.com/laravel/reverb/compare/v1.7.1...v1.8.0) - 2026-02-21
 
