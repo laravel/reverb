@@ -11,6 +11,7 @@ use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
+use Laravel\Reverb\Protocols\Pusher\Exceptions\MessageRateLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
@@ -18,6 +19,13 @@ use Throwable;
 
 class Server
 {
+    /**
+     * Message timestamps per connection for rate limiting.
+     *
+     * @var array<string, list<float>>
+     */
+    protected array $messageTimestamps = [];
+
     /**
      * Create a new server instance.
      */
@@ -56,6 +64,8 @@ class Server
         $from->touch();
 
         try {
+            $this->ensureWithinMessageRateLimit($from);
+
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
             if (Str::isJson($event['data'] ?? null)) {
@@ -105,6 +115,8 @@ class Server
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
 
+        unset($this->messageTimestamps[$connection->identifier()]);
+
         $connection->disconnect();
 
         Log::info('Connection Closed', $connection->id());
@@ -150,6 +162,38 @@ class Server
         if (count($connections) >= $connection->app()->maxConnections()) {
             throw new ConnectionLimitExceeded;
         }
+    }
+
+    /**
+     * Ensure the connection is within the message rate limit.
+     *
+     * @throws \Laravel\Reverb\Protocols\Pusher\Exceptions\MessageRateLimitExceeded
+     */
+    protected function ensureWithinMessageRateLimit(Connection $connection): void
+    {
+        $maxRate = $connection->app()->maxMessageRate();
+
+        if ($maxRate === null) {
+            return;
+        }
+
+        $id = $connection->identifier();
+        $now = microtime(true);
+        $windowStart = $now - 1.0;
+
+        // Remove timestamps outside the 1-second window.
+        $this->messageTimestamps[$id] = array_values(
+            array_filter(
+                $this->messageTimestamps[$id] ?? [],
+                fn (float $timestamp) => $timestamp > $windowStart
+            )
+        );
+
+        if (count($this->messageTimestamps[$id]) >= $maxRate) {
+            throw new MessageRateLimitExceeded;
+        }
+
+        $this->messageTimestamps[$id][] = $now;
     }
 
     /**

@@ -17,6 +17,7 @@ class Application
         protected int $maxMessageSize,
         protected ?int $maxConnections = null,
         protected string $acceptClientEventsFrom = 'members',
+        protected ?int $maxMessageRate = null,
         protected array $options = [],
     ) {
         //
@@ -105,6 +106,14 @@ class Application
     }
 
     /**
+     * Get the maximum number of messages allowed per second per connection.
+     */
+    public function maxMessageRate(): ?int
+    {
+        return $this->maxMessageRate;
+    }
+
+    /**
      * Get the application options.
      */
     public function options(): ?array
@@ -127,6 +136,7 @@ class Application
             'activity_timeout' => $this->activityTimeout,
             'allowed_origins' => $this->allowedOrigins,
             'max_message_size' => $this->maxMessageSize,
+            'max_message_rate' => $this->maxMessageRate,
             'options' => $this->options,
         ];
     }
