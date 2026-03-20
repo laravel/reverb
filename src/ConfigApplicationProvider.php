@@ -72,6 +72,7 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['max_connections'] ?? null,
             // If no setting is provided, default to allowing all client events...
             $app['accept_client_events_from'] ?? 'all',
+            $app['rate_limiting'] ?? null,
             $app['options'] ?? [],
         );
     }

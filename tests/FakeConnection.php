@@ -21,6 +21,11 @@ class FakeConnection extends BaseConnection
     public $messages = [];
 
     /**
+     * Whether the connection has been terminated.
+     */
+    public bool $wasTerminated = false;
+
+    /**
      * Connection identifier.
      */
     public string $identifier = '19c1c8e8-351b-4eb5-b6d9-6cbfc54a3446';
@@ -108,7 +113,7 @@ class FakeConnection extends BaseConnection
      */
     public function terminate(): void
     {
-        //
+        $this->wasTerminated = true;
     }
 
     /**
@@ -141,5 +146,13 @@ class FakeConnection extends BaseConnection
     public function assertHasBeenPinged(): void
     {
         Assert::assertTrue($this->hasBeenPinged);
+    }
+
+    /**
+     * Assert the connection has been terminated.
+     */
+    public function assertHasBeenTerminated(): void
+    {
+        Assert::assertTrue($this->wasTerminated);
     }
 }

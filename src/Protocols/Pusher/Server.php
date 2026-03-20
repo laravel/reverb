@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
@@ -12,6 +13,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
+use Laravel\Reverb\Protocols\Pusher\Exceptions\RateLimitExceeded;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Throwable;
@@ -56,6 +58,8 @@ class Server
         $from->touch();
 
         try {
+            $this->ensureWithinRateLimit($from);
+
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
             if (Str::isJson($event['data'] ?? null)) {
@@ -150,6 +154,32 @@ class Server
         if (count($connections) >= $connection->app()->maxConnections()) {
             throw new ConnectionLimitExceeded;
         }
+    }
+
+    /**
+     * Ensure the connection is within the message rate limit.
+     */
+    protected function ensureWithinRateLimit(Connection $connection): void
+    {
+        if (! $connection->app()->usesRateLimiting()) {
+            return;
+        }
+
+        $config = $connection->app()->rateLimiting();
+
+        $limiter = new RateLimiter(app('cache')->store('array'));
+
+        $key = 'reverb:message:'.$connection->id();
+
+        if ($limiter->tooManyAttempts($key, $config['max_attempts'])) {
+            if ($config['terminate_on_limit'] ?? false) {
+                $connection->terminate();
+            }
+
+            throw new RateLimitExceeded;
+        }
+
+        $limiter->increment($key, $config['decay_seconds'] ?? 1);
     }
 
     /**

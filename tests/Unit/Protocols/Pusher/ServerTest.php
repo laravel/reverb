@@ -507,6 +507,98 @@ it('sends an error if something fails for channel type', function () {
     ]);
 });
 
+it('rejects a message when the rate limit is exceeded', function () {
+    $this->app['config']->set('reverb.apps.apps.0.rate_limiting', [
+        'enabled' => true,
+        'max_attempts' => 3,
+        'decay_seconds' => 1,
+        'terminate_on_limit' => false,
+    ]);
+
+    $this->server->open($connection = new FakeConnection);
+
+    for ($i = 0; $i < 3; $i++) {
+        $this->server->message(
+            $connection,
+            json_encode([
+                'event' => 'pusher:subscribe',
+                'data' => ['channel' => 'test-channel-'.$i],
+            ])
+        );
+    }
+
+    $this->server->message(
+        $connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => ['channel' => 'test-channel-overflow'],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4301,
+            'message' => 'Rate limit exceeded',
+        ]),
+    ]);
+
+    expect($connection->wasTerminated)->toBeFalse();
+});
+
+it('terminates the connection when rate limit is exceeded and configured to terminate', function () {
+    $this->app['config']->set('reverb.apps.apps.0.rate_limiting', [
+        'enabled' => true,
+        'max_attempts' => 1,
+        'decay_seconds' => 1,
+        'terminate_on_limit' => true,
+    ]);
+
+    $this->server->open($connection = new FakeConnection);
+
+    $this->server->message(
+        $connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => ['channel' => 'test-channel'],
+        ])
+    );
+
+    $this->server->message(
+        $connection,
+        json_encode([
+            'event' => 'pusher:subscribe',
+            'data' => ['channel' => 'test-channel-2'],
+        ])
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4301,
+            'message' => 'Rate limit exceeded',
+        ]),
+    ]);
+
+    expect($connection->wasTerminated)->toBeTrue();
+});
+
+it('allows unlimited messages when no rate limit is configured', function () {
+    $this->server->open($connection = new FakeConnection);
+
+    for ($i = 0; $i < 10; $i++) {
+        $this->server->message(
+            $connection,
+            json_encode([
+                'event' => 'pusher:subscribe',
+                'data' => ['channel' => 'test-channel-'.$i],
+            ])
+        );
+    }
+
+    $connection->assertReceivedCount(11);
+});
+
 it('allow receiving client event with empty data', function () {
     // Channel and app must exist for the server to process the message
     $channel = channels()->findOrCreate('private-chat.1');

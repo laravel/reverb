@@ -17,6 +17,7 @@ class Application
         protected int $maxMessageSize,
         protected ?int $maxConnections = null,
         protected string $acceptClientEventsFrom = 'members',
+        protected ?array $rateLimiting = null,
         protected array $options = [],
     ) {
         //
@@ -102,6 +103,22 @@ class Application
     public function acceptClientEventsFrom(): string
     {
         return $this->acceptClientEventsFrom;
+    }
+
+    /**
+     * Get the rate limiting configuration for the application.
+     */
+    public function rateLimiting(): ?array
+    {
+        return $this->rateLimiting;
+    }
+
+    /**
+     * Determine if the application has rate limiting enabled.
+     */
+    public function usesRateLimiting(): bool
+    {
+        return ($this->rateLimiting['enabled'] ?? false) === true;
     }
 
     /**
