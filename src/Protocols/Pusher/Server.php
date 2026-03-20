@@ -168,6 +168,7 @@ class Server
         $config = $connection->app()->rateLimiting();
 
         $limiter = new RateLimiter(app('cache')->store('array'));
+
         $key = 'reverb:message:'.$connection->id();
 
         if ($limiter->tooManyAttempts($key, $config['max_attempts'])) {
