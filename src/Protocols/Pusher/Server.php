@@ -3,7 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Exception;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
@@ -167,9 +167,10 @@ class Server
 
         $config = $connection->app()->rateLimiting();
 
+        $limiter = new RateLimiter(app('cache')->store('array'));
         $key = 'reverb:message:'.$connection->id();
 
-        if (RateLimiter::tooManyAttempts($key, $config['max_attempts'])) {
+        if ($limiter->tooManyAttempts($key, $config['max_attempts'])) {
             if ($config['terminate_on_limit'] ?? false) {
                 $connection->terminate();
             }
@@ -177,7 +178,7 @@ class Server
             throw new RateLimitExceeded;
         }
 
-        RateLimiter::increment($key, $config['decay_seconds'] ?? 1);
+        $limiter->increment($key, $config['decay_seconds'] ?? 1);
     }
 
     /**
