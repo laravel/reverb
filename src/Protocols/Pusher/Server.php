@@ -58,7 +58,7 @@ class Server
         $from->touch();
 
         try {
-            $this->ensureWithinMessageRateLimit($from);
+            $this->ensureWithinRateLimit($from);
 
             $event = json_decode($message, associative: true, flags: JSON_THROW_ON_ERROR);
 
@@ -159,7 +159,7 @@ class Server
     /**
      * Ensure the connection is within the message rate limit.
      */
-    protected function ensureWithinMessageRateLimit(Connection $connection): void
+    protected function ensureWithinRateLimit(Connection $connection): void
     {
         if (! $connection->app()->usesRateLimiting()) {
             return;
