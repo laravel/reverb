@@ -93,12 +93,8 @@ class ArrayChannelManager implements ChannelManagerInterface
     {
         $channels = Arr::wrap($this->channels($channel));
 
-        // Avoid array_reduce + `+`: the `+` operator always returns a new
-        // array, forcing zend_array_dup of the accumulator on every step
-        // (O(N²) over total connections). `+=` mutates in place when the
-        // hash table is uniquely owned, dropping the dominant CPU cost on
-        // the WebSocket pubsub hot path under load.
         $result = [];
+
         foreach ($channels as $ch) {
             $result += $ch->connections();
         }
