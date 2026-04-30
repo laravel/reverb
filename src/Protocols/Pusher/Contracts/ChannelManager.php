@@ -49,6 +49,11 @@ interface ChannelManager
     public function connections(?string $channel = null): array;
 
     /**
+     * Find a single connection by its socket id.
+     */
+    public function findConnection(string $socketId): ?ChannelConnection;
+
+    /**
      * Unsubscribe from all channels.
      */
     public function unsubscribeFromAll(Connection $connection): void;

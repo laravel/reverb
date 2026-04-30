@@ -93,9 +93,31 @@ class ArrayChannelManager implements ChannelManagerInterface
     {
         $channels = Arr::wrap($this->channels($channel));
 
-        return array_reduce($channels, function ($carry, $channel) {
-            return $carry + $channel->connections();
-        }, []);
+        // Avoid array_reduce + `+`: the `+` operator always returns a new
+        // array, forcing zend_array_dup of the accumulator on every step
+        // (O(N²) over total connections). `+=` mutates in place when the
+        // hash table is uniquely owned, dropping the dominant CPU cost on
+        // the WebSocket pubsub hot path under load.
+        $result = [];
+        foreach ($channels as $ch) {
+            $result += $ch->connections();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Find a single connection by socket id without flattening every channel.
+     */
+    public function findConnection(string $socketId): ?ChannelConnection
+    {
+        foreach ($this->channels() as $channel) {
+            if ($connection = $channel->connections()[$socketId] ?? null) {
+                return $connection;
+            }
+        }
+
+        return null;
     }
 
     /**
