@@ -103,7 +103,7 @@ class ArrayChannelManager implements ChannelManagerInterface
     }
 
     /**
-     * Find a single connection by socket id without flattening every channel.
+     * Find a single connection by socket ID.
      */
     public function findConnection(string $socketId): ?ChannelConnection
     {
