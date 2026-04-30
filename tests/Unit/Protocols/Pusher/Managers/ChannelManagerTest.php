@@ -76,6 +76,29 @@ it('can get the data for a connection subscribed to a channel', function () {
     });
 });
 
+it('can find a connection by socket id without flattening every channel', function () {
+    $connections = collect(factory(3));
+
+    $channelOne = $this->channelManager->findOrCreate('test-channel-0');
+    $channelTwo = $this->channelManager->findOrCreate('test-channel-1');
+
+    $connections->each(function ($connection) use ($channelOne, $channelTwo) {
+        $channelOne->subscribe($connection->connection());
+        $channelTwo->subscribe($connection->connection());
+    });
+
+    $target = $connections->first()->connection();
+
+    $found = $this->channelManager->findConnection($target->id());
+
+    expect($found)->not->toBeNull();
+    expect($found->id())->toBe($target->id());
+});
+
+it('returns null from findConnection when the socket id is unknown', function () {
+    expect($this->channelManager->findConnection('does-not-exist'))->toBeNull();
+});
+
 it('can get all connections for all channels', function () {
     $connections = factory(12);
 

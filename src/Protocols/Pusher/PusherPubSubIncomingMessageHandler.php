@@ -22,7 +22,7 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
         $application = unserialize($event['application'] ?? null, ['allowed_classes' => [Application::class]]);
 
         $except = isset($event['socket_id']) ?
-            app(ChannelManager::class)->for($application)->connections()[$event['socket_id']] ?? null
+            app(ChannelManager::class)->for($application)->findConnection($event['socket_id'])
             : null;
 
         match ($event['type'] ?? null) {

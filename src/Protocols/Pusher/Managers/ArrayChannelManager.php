@@ -93,9 +93,27 @@ class ArrayChannelManager implements ChannelManagerInterface
     {
         $channels = Arr::wrap($this->channels($channel));
 
-        return array_reduce($channels, function ($carry, $channel) {
-            return $carry + $channel->connections();
-        }, []);
+        $result = [];
+
+        foreach ($channels as $ch) {
+            $result += $ch->connections();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Find a single connection by socket ID.
+     */
+    public function findConnection(string $socketId): ?ChannelConnection
+    {
+        foreach ($this->channels() as $channel) {
+            if ($connection = $channel->connections()[$socketId] ?? null) {
+                return $connection;
+            }
+        }
+
+        return null;
     }
 
     /**
