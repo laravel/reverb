@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.10.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.10.1...main)
+
+## [v1.10.1](https://github.com/laravel/reverb/compare/v1.10.0...v1.10.1) - 2026-04-30
+
+* [1.x] perf(pusher): drop O(N²) connections() merge from pubsub hot path by [@agustinprod](https://github.com/agustinprod) in https://github.com/laravel/reverb/pull/379
 
 ## [v1.10.0](https://github.com/laravel/reverb/compare/v1.9.0...v1.10.0) - 2026-03-29
 
