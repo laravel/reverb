@@ -1,6 +1,10 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.10.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.10.2...main)
+
+## [v1.10.2](https://github.com/laravel/reverb/compare/v1.10.1...v1.10.2) - 2026-05-10
+
+* Use timing-safe comparison for Pusher HTTP API signature check by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/381
 
 ## [v1.10.1](https://github.com/laravel/reverb/compare/v1.10.0...v1.10.1) - 2026-04-30
 
