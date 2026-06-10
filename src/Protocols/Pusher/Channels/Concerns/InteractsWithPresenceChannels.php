@@ -3,6 +3,8 @@
 namespace Laravel\Reverb\Protocols\Pusher\Channels\Concerns;
 
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\ServerProviderManager;
 
 trait InteractsWithPresenceChannels
 {
@@ -25,14 +27,17 @@ trait InteractsWithPresenceChannels
 
         parent::subscribe($connection, $auth, $data);
 
-        parent::broadcastInternally(
-            [
-                'event' => 'pusher_internal:member_added',
-                'data' => json_encode((object) $userData),
-                'channel' => $this->name(),
-            ],
-            $connection
-        );
+        $payload = [
+            'event' => 'pusher_internal:member_added',
+            'data' => json_encode((object) $userData),
+            'channel' => $this->name(),
+        ];
+
+        if ($this->scalingEnabled()) {
+            EventDispatcher::dispatch($connection->app(), $payload, $connection);
+        } else {
+            parent::broadcastInternally($payload, $connection);
+        }
     }
 
     /**
@@ -52,14 +57,17 @@ trait InteractsWithPresenceChannels
             return;
         }
 
-        parent::broadcast(
-            [
-                'event' => 'pusher_internal:member_removed',
-                'data' => json_encode(['user_id' => $subscription->data('user_id')]),
-                'channel' => $this->name(),
-            ],
-            $connection
-        );
+        $payload = [
+            'event' => 'pusher_internal:member_removed',
+            'data' => json_encode(['user_id' => $subscription->data('user_id')]),
+            'channel' => $this->name(),
+        ];
+
+        if ($this->scalingEnabled()) {
+            EventDispatcher::dispatch($connection->app(), $payload, $connection);
+        } else {
+            parent::broadcast($payload, $connection);
+        }
     }
 
     /**
@@ -85,7 +93,7 @@ trait InteractsWithPresenceChannels
             'presence' => [
                 'count' => $connections->count() ?? 0,
                 'ids' => $connections->map(fn ($connection) => $connection['user_id'])->values()->all(),
-                'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
+                'hash' => $connections->keyBy('user_id')->map(fn ($connection) => $connection['user_info'] ?? [])->toArray(),
             ],
         ];
     }
@@ -100,5 +108,13 @@ trait InteractsWithPresenceChannels
         }
 
         return collect($this->connections->all())->map(fn ($connection) => (string) $connection->data('user_id'))->contains($userId);
+    }
+
+    /**
+     * Determine if Redis scaling is enabled.
+     */
+    protected function scalingEnabled(): bool
+    {
+        return app(ServerProviderManager::class)->subscribesToEvents();
     }
 }

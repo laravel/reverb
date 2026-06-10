@@ -62,6 +62,7 @@ class MetricsHandler
             MetricType::CHANNELS => $this->channels($metric),
             MetricType::CHANNEL_USERS => $this->channelUsers($metric),
             MetricType::CONNECTIONS => $this->connections($metric),
+            MetricType::PRESENCE_DATA => $this->presenceData($metric),
             default => [],
         };
     }
@@ -118,6 +119,26 @@ class MetricsHandler
     }
 
     /**
+     * Get the presence data for the given application and channel.
+     */
+    protected function presenceData(PendingMetric $metric): array
+    {
+        $channel = $this->channels->for($metric->application())->find($metric->option('channel'));
+
+        if (! $channel) {
+            return [
+                'presence' => [
+                    'count' => 0,
+                    'ids' => [],
+                    'hash' => [],
+                ],
+            ];
+        }
+
+        return $channel->data();
+    }
+
+    /**
      * Get the connections for the given application.
      */
     protected function connections(PendingMetric $metric): array
@@ -168,7 +189,8 @@ class MetricsHandler
             MetricType::CONNECTIONS => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
             MetricType::CHANNELS => $this->mergeChannels($metrics),
             MetricType::CHANNEL => $this->mergeChannel($metrics),
-            MetricType::CHANNEL_USERS => collect($metrics)->flatten(1)->unique()->all(),
+            MetricType::CHANNEL_USERS => collect($metrics)->flatten(1)->unique('id')->values()->all(),
+            MetricType::PRESENCE_DATA => $this->mergePresenceData($metrics),
             default => [],
         };
     }
@@ -209,6 +231,35 @@ class MetricsHandler
             }, collect())
             ->map(fn ($metrics) => $this->mergeChannel($metrics))
             ->all();
+    }
+
+    /**
+     * Merge multiple presence data sets into a single result set.
+     */
+    protected function mergePresenceData(array $metrics): array
+    {
+        $members = collect($metrics)
+            ->map(fn ($data) => $data['presence'] ?? [])
+            ->reduce(function ($carry, $presence) {
+                $ids = $presence['ids'] ?? [];
+                $hash = $presence['hash'] ?? [];
+
+                foreach ($ids as $id) {
+                    if (! $carry->has($id)) {
+                        $carry->put($id, $hash[$id] ?? []);
+                    }
+                }
+
+                return $carry;
+            }, collect());
+
+        return [
+            'presence' => [
+                'count' => $members->count(),
+                'ids' => $members->keys()->values()->all(),
+                'hash' => $members->all(),
+            ],
+        ];
     }
 
     /**
