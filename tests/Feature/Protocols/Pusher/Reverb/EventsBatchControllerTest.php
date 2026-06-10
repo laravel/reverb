@@ -1,5 +1,7 @@
 <?php
 
+use Laravel\Reverb\ServerProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Message\ResponseException;
 
@@ -99,6 +101,23 @@ it('can send the content-length header', function () {
     expect($response->getHeader('Content-Length'))->toBe(['12']);
 });
 
+it('does not fail when ignoring a local subscriber in a batch event', function () {
+    $connection = connect();
+    subscribe('test-channel-two', connection: $connection);
+
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [
+        [
+            'name' => 'NewEvent',
+            'channel' => 'test-channel-two',
+            'data' => json_encode(['some' => 'data']),
+            'socket_id' => $connection->socketId(),
+        ],
+    ]]));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"batch":{}}');
+});
+
 it('can receive an event batch trigger with multiple events and gather info for each', function () {
     $this->usingRedis();
 
@@ -150,6 +169,33 @@ it('can receive an event batch trigger with multiple events and gather info for 
 
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{"batch":[{"user_count":1},{}]}');
+});
+
+it('publishes the originating socket id for a batch event over redis even when the connection is not local', function () {
+    $published = null;
+
+    $provider = Mockery::mock(PubSubProvider::class)->shouldIgnoreMissing();
+    $provider->shouldReceive('publish')
+        ->once()
+        ->with(Mockery::on(function ($payload) use (&$published) {
+            $published = $payload;
+
+            return true;
+        }));
+
+    $this->app->instance(PubSubProvider::class, $provider);
+    app(ServerProviderManager::class)->withPublishing();
+
+    $response = await($this->signedPostRequest('batch_events', ['batch' => [[
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['some' => 'data']),
+        'socket_id' => '1234.5678',
+    ]]]));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($published)->not->toBeNull();
+    expect($published['socket_id'] ?? null)->toBe('1234.5678');
 });
 
 it('fails when payload is invalid', function () {

@@ -14,7 +14,7 @@ class EventDispatcher
     /**
      * Dispatch a message to a channel.
      */
-    public static function dispatch(Application $app, array $payload, ?Connection $connection = null): void
+    public static function dispatch(Application $app, array $payload, ?Connection $connection = null, ?string $socketId = null): void
     {
         $server = app(ServerProviderManager::class);
 
@@ -30,8 +30,10 @@ class EventDispatcher
             'payload' => $payload,
         ];
 
-        if ($connection?->id() !== null) {
-            $data['socket_id'] = $connection?->id();
+        $socketId ??= $connection?->id();
+
+        if ($socketId !== null) {
+            $data['socket_id'] = $socketId;
         }
 
         app(PubSubProvider::class)->publish($data);

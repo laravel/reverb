@@ -1,5 +1,7 @@
 <?php
 
+use Laravel\Reverb\ServerProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use React\Http\Browser;
 use React\Http\Message\ResponseException;
@@ -100,6 +102,33 @@ it('can ignore a subscriber when publishing events over redis', function () {
     $connection->assertReceived('{"event":"NewEvent","data":"{\"some\":\"data\"}","channel":"test-channel-two"}', 1);
     expect($response->getStatusCode())->toBe(200);
     expect($response->getBody()->getContents())->toBe('{}');
+});
+
+it('publishes the originating socket id over redis even when the connection is not local', function () {
+    $published = null;
+
+    $provider = Mockery::mock(PubSubProvider::class)->shouldIgnoreMissing();
+    $provider->shouldReceive('publish')
+        ->once()
+        ->with(Mockery::on(function ($payload) use (&$published) {
+            $published = $payload;
+
+            return true;
+        }));
+
+    $this->app->instance(PubSubProvider::class, $provider);
+    app(ServerProviderManager::class)->withPublishing();
+
+    $response = await($this->signedPostRequest('events', [
+        'name' => 'NewEvent',
+        'channel' => 'test-channel',
+        'data' => json_encode(['some' => 'data']),
+        'socket_id' => '1234.5678', // not connected to this server
+    ]));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($published)->not->toBeNull();
+    expect($published['socket_id'] ?? null)->toBe('1234.5678');
 });
 
 it('does not fail when ignoring an invalid subscriber', function () {

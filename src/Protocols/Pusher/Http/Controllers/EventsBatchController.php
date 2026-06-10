@@ -36,6 +36,8 @@ class EventsBatchController extends Controller
         $items = collect($payload['batch']);
 
         $items = $items->map(function ($item) {
+            $except = isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null;
+
             EventDispatcher::dispatch(
                 $this->application,
                 [
@@ -43,7 +45,8 @@ class EventsBatchController extends Controller
                     'channel' => $item['channel'],
                     'data' => $item['data'],
                 ],
-                isset($item['socket_id']) ? ($this->channels->connections()[$item['socket_id']] ?? null) : null
+                $except ? $except->connection() : null,
+                $item['socket_id'] ?? null,
             );
 
             return isset($item['info']) ? app(MetricsHandler::class)->gather(
