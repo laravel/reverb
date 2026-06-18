@@ -4,7 +4,6 @@ namespace Laravel\Reverb;
 
 class Reverb
 {
-
     /**
      * Helper method to register the Reverb development server Artisan command when running in a local environment.
      * Should be called from the `boot` method of an application service provider.
