@@ -8,7 +8,9 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
+use Laravel\Reverb\Protocols\Pusher\Channels\Concerns\InteractsWithPresenceChannels;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\ServerProviderManager;
 
 class EventHandler
 {
@@ -82,12 +84,26 @@ class EventHandler
      */
     protected function afterSubscribe(Channel $channel, Connection $connection): void
     {
-        $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
+        if ($this->isPresenceChannel($channel) && app(ServerProviderManager::class)->subscribesToEvents()) {
+            app(MetricsHandler::class)
+                ->gather($connection->app(), 'presence_data', ['channel' => $channel->name()])
+                ->then(fn ($data) => $this->sendInternally($connection, 'subscription_succeeded', $data, $channel->name()));
+        } else {
+            $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
+        }
 
         match (true) {
             $channel instanceof CacheChannel => $this->sendCachedPayload($channel, $connection),
             default => null,
         };
+    }
+
+    /**
+     * Determine if the given channel is a presence channel.
+     */
+    protected function isPresenceChannel(Channel $channel): bool
+    {
+        return in_array(InteractsWithPresenceChannels::class, class_uses($channel));
     }
 
     /**
