@@ -33,9 +33,9 @@ class EventsController extends Controller
         }
 
         $channels = Arr::wrap($payload['channels'] ?? $payload['channel'] ?? []);
-        if ($except = $payload['socket_id'] ?? null) {
-            $except = $this->channels->connections()[$except] ?? null;
-        }
+        
+        $socketId = $payload['socket_id'] ?? null;
+        $exceptConnection = $socketId ? ($this->channels->connections()[$socketId] ?? null) : null;
 
         EventDispatcher::dispatch(
             $this->application,
@@ -44,8 +44,8 @@ class EventsController extends Controller
                 'channels' => $channels,
                 'data' => $payload['data'],
             ],
-            $except ? $except->connection() : null,
-            $payload['socket_id'] ?? null,
+            $exceptConnection ? $exceptConnection->connection() : null,
+            $socketId
         );
 
         if (isset($payload['info'])) {

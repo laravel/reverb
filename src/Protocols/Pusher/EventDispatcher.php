@@ -30,7 +30,7 @@ class EventDispatcher
             'payload' => $payload,
         ];
 
-        $socketId ??= $connection?->id();
+        $socketId = $socketId ?? $connection?->id();
 
         if ($socketId !== null) {
             $data['socket_id'] = $socketId;
