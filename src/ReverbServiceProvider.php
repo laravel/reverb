@@ -26,6 +26,8 @@ class ReverbServiceProvider extends ServiceProvider
         $this->app->singleton(ServerProviderManager::class);
 
         $this->app->make(ServerProviderManager::class)->register();
+
+        Reverb::registerDevCommands();
     }
 
     /**
