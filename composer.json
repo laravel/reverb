@@ -35,6 +35,7 @@
         "symfony/http-foundation": "^6.3|^7.0|^8.0"
     },
     "require-dev": {
+        "laravel/doctor": "^0.1",
         "orchestra/testbench": "^8.36|^9.15|^10.8|^11.0",
         "pestphp/pest": "^2.0|^3.0|^4.0",
         "phpstan/phpstan": "^1.10",
