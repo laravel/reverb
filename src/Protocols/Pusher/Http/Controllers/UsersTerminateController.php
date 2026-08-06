@@ -29,7 +29,7 @@ class UsersTerminateController extends Controller
         $connections = collect($this->channels->connections());
 
         $connections->each(function ($connection) use ($userId) {
-            if ((string) $connection->data()['user_id'] === $userId) {
+            if ((string) $connection->data('user_id') === $userId) {
                 $connection->disconnect();
             }
         });

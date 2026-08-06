@@ -38,7 +38,7 @@ class PusherPubSubIncomingMessageHandler implements PubSubIncomingMessageHandler
             ),
             'terminate' => collect(app(ChannelManager::class)->for($application)->connections())
                 ->each(function ($connection) use ($event) {
-                    if ((string) $connection->data()['user_id'] === $event['payload']['user_id']) {
+                    if ((string) $connection->data('user_id') === $event['payload']['user_id']) {
                         $connection->disconnect();
                     }
                 }),
