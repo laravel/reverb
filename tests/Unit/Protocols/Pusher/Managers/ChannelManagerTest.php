@@ -128,3 +128,31 @@ it('can get all connections for all channels', function () {
     expect($channelTwo->connections())->toHaveCount(8);
     expect($channelThree->connections())->toHaveCount(12);
 });
+
+it('prefers a connection which knows its subscriber over an anonymous one', function () {
+    $anonymous = $this->channelManager->findOrCreate('anonymous-channel');
+    $identified = $this->channelManager->findOrCreate('identified-channel');
+
+    // The anonymous channel is created and subscribed to first, so it is the
+    // one a merge keyed on the connection identifier would otherwise keep.
+    $anonymous->subscribe($this->connection);
+    $identified->subscribe($this->connection, data: json_encode(['user_id' => '1']));
+
+    $connections = $this->channelManager->connections();
+
+    expect($connections)->toHaveCount(1)
+        ->and($connections[$this->connection->id()]->data('user_id'))->toBe('1');
+});
+
+it('keeps the subscriber when the identified channel is subscribed to first', function () {
+    $identified = $this->channelManager->findOrCreate('identified-channel');
+    $anonymous = $this->channelManager->findOrCreate('anonymous-channel');
+
+    $identified->subscribe($this->connection, data: json_encode(['user_id' => '1']));
+    $anonymous->subscribe($this->connection);
+
+    $connections = $this->channelManager->connections();
+
+    expect($connections)->toHaveCount(1)
+        ->and($connections[$this->connection->id()]->data('user_id'))->toBe('1');
+});

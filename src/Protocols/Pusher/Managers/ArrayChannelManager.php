@@ -96,7 +96,12 @@ class ArrayChannelManager implements ChannelManagerInterface
         $result = [];
 
         foreach ($channels as $ch) {
-            $result += $ch->connections();
+            foreach ($ch->connections() as $identifier => $connection) {
+                // Prefer connections with user data when a socket has multiple channel subscriptions...
+                if (! isset($result[$identifier]) || ($result[$identifier]->data('user_id') === null && $connection->data('user_id') !== null)) {
+                    $result[$identifier] = $connection;
+                }
+            }
         }
 
         return $result;
