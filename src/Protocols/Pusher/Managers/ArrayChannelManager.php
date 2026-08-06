@@ -96,7 +96,19 @@ class ArrayChannelManager implements ChannelManagerInterface
         $result = [];
 
         foreach ($channels as $ch) {
-            $result += $ch->connections();
+            foreach ($ch->connections() as $identifier => $connection) {
+                // A connection is stored per channel, so a socket subscribed to
+                // several channels appears once for each of them. Only presence
+                // channels (and private channels given signed channel data)
+                // carry the subscriber's identity, so prefer a wrapper that has
+                // one: without this the first channel iterated wins, and if that
+                // is an anonymous public channel the socket cannot be matched by
+                // user ID even though another of its wrappers knows exactly who
+                // it belongs to.
+                if (! isset($result[$identifier]) || ($result[$identifier]->data('user_id') === null && $connection->data('user_id') !== null)) {
+                    $result[$identifier] = $connection;
+                }
+            }
         }
 
         return $result;
