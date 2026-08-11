@@ -1,6 +1,11 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.11.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.11.1...main)
+
+## [v1.11.1](https://github.com/laravel/reverb/compare/v1.11.0...v1.11.1) - 2026-08-06
+
+* Bump actions/checkout from 7.0.0 to 7.0.1 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/reverb/pull/396
+* Prefer an identified connection when flattening channel connections by [@phuclh](https://github.com/phuclh) in https://github.com/laravel/reverb/pull/399
 
 ## [v1.11.0](https://github.com/laravel/reverb/compare/v1.10.2...v1.11.0) - 2026-06-25
 
