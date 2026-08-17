@@ -66,6 +66,12 @@ class Router
             return $controller($request, $wsConnection, ...Arr::except($route, ['_controller', '_route']));
         }
 
+        if ($this->requiresWebSocketUpgrade($controller)) {
+            $this->close($connection, 426, 'Upgrade required.', ['Upgrade' => 'websocket']);
+
+            return null;
+        }
+
         $routeParameters = Arr::except($route, [
             '_controller',
             '_route',
@@ -95,7 +101,21 @@ class Router
      */
     protected function isWebSocketRequest(RequestInterface $request): bool
     {
-        return $request->getHeader('Upgrade')[0] ?? null === 'websocket';
+        return ($request->getHeader('Upgrade')[0] ?? null) === 'websocket';
+    }
+
+    /**
+     * Determine whether the controller requires an upgraded WebSocket connection.
+     */
+    protected function requiresWebSocketUpgrade(callable $controller): bool
+    {
+        foreach ($this->parameters($controller) as $parameter) {
+            if ($parameter['type'] === ReverbConnection::class) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
