@@ -61,6 +61,13 @@ it('can send the content-length header', function () {
     expect($response->getHeader('Content-Length'))->toBe(['81']);
 });
 
+it('returns an object when no channels are occupied', function () {
+    $response = await($this->signedRequest('channels'));
+
+    expect($response->getStatusCode())->toBe(200);
+    expect($response->getBody()->getContents())->toBe('{"channels":{}}');
+});
+
 it('can gather all channel information', function () {
     $this->usingRedis();
 

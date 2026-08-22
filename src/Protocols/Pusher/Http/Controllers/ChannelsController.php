@@ -20,6 +20,6 @@ class ChannelsController extends Controller
         return app(MetricsHandler::class)->gather($this->application, 'channels', [
             'filter' => $this->query['filter_by_prefix'] ?? null,
             'info' => $this->query['info'] ?? null,
-        ])->then(fn ($channels) => new Response(['channels' => array_map(fn ($item) => (object) $item, $channels)]));
+        ])->then(fn ($channels) => new Response(['channels' => (object) array_map(fn ($item) => (object) $item, $channels)]));
     }
 }
