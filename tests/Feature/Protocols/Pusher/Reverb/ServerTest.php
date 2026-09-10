@@ -5,6 +5,7 @@ use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use Ratchet\RFC6455\Messaging\Frame;
+use React\Http\Browser;
 use React\Http\Message\ResponseException;
 use React\Promise\Deferred;
 
@@ -582,3 +583,25 @@ it('sets the x-powered-by header', function () {
 
     expect($connection->connection->response->getHeader('X-Powered-By')[0])->toBe('Laravel Reverb');
 });
+
+it('rejects a handshake with an invalid websocket key', function () {
+    await(
+        (new Browser($this->loop))->withTimeout(5)->request('GET', 'http://0.0.0.0:8080/app/reverb-key', [
+            'Connection' => 'Upgrade',
+            'Upgrade' => 'websocket',
+            'Sec-WebSocket-Key' => 'invalid-key',
+            'Sec-WebSocket-Version' => '13',
+        ])
+    );
+})->throws(ResponseException::class, exceptionCode: 400);
+
+it('rejects a handshake requesting an unsupported websocket version', function () {
+    await(
+        (new Browser($this->loop))->withTimeout(5)->request('GET', 'http://0.0.0.0:8080/app/reverb-key', [
+            'Connection' => 'Upgrade',
+            'Upgrade' => 'websocket',
+            'Sec-WebSocket-Key' => 'dGhlIHNhbXBsZSBub25jZQ==',
+            'Sec-WebSocket-Version' => '8',
+        ])
+    );
+})->throws(ResponseException::class, exceptionCode: 426);
