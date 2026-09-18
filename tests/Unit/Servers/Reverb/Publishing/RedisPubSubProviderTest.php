@@ -75,9 +75,6 @@ it('queues publish events', function () {
 it('can process queued publish events', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
 
-    // Clue\React\Redis\Client's entire API is forwarded through __call(),
-    // which Double can't intercept (no fixed signature to match against),
-    // so it's faked here directly rather than doubled.
     $client = new class implements Client
     {
         use EventEmitterTrait;
