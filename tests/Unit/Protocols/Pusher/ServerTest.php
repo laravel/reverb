@@ -31,7 +31,7 @@ it('can handle a disconnection', function () {
 
     $server->close(new FakeConnection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll');
+    $channelManager->received('unsubscribeFromAll');
 });
 
 it('can handle a new message', function () {
@@ -228,9 +228,7 @@ it('unsubscribes a user from a channel on disconnection', function () {
 
     $server->close($connection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll')
-        ->once()
-        ->with($connection);
+    $channelManager->received('unsubscribeFromAll')->times(1)->with($connection);
 });
 
 it('unsubscribes a user from a private channel on disconnection', function () {
@@ -251,9 +249,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 
     $server->close($connection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll')
-        ->once()
-        ->with($connection);
+    $channelManager->received('unsubscribeFromAll')->times(1)->with($connection);
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
@@ -274,9 +270,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
 
     $server->close($connection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll')
-        ->once()
-        ->with($connection);
+    $channelManager->received('unsubscribeFromAll')->times(1)->with($connection);
 });
 
 it('it rejects a connection from an invalid origin', function (string $origin, array $allowedOrigins) {
