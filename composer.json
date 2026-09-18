@@ -40,7 +40,8 @@
         "phpstan/phpstan": "^1.10",
         "ratchet/pawl": "^0.4.1",
         "react/async": "^4.2",
-        "react/http": "^1.9"
+        "react/http": "^1.9",
+        "jasonmccreary/double": "~0.10"
     },
     "autoload": {
         "psr-4": {
