@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Clue\React\Redis\Client;
 use Laravel\Reverb\Exceptions\RedisConnectionException;
@@ -25,7 +26,7 @@ it('can successfully reconnect', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
     $loop = Double::for(LoopInterface::class);
 
-    $loop->expects('addTimer')->with(1, Mockery::any());
+    $loop->expects('addTimer')->with(1, Argument::any());
 
     // Publisher client
     $clientFactory->expects('make')->returns(new Promise(fn () => throw new Exception));
@@ -80,7 +81,7 @@ it('can process queued publish events', function () {
 
     $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve($client)));
 
-    $client->expects('on')->with('close', Mockery::any());
+    $client->expects('on')->with('close', Argument::any());
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect($loop = Double::for(LoopInterface::class));

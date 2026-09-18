@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -36,7 +37,7 @@ it('removes the listener after metrics are gathered successfully', function () {
 
     $pubSub = Double::for(PubSubProvider::class);
 
-    $pubSub->expects('on')->with(Mockery::on(fn ($event) => str_starts_with($event, 'test')), Mockery::type('callable'))->resolves(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
+    $pubSub->expects('on')->with(Argument::satisfies(fn ($event) => str_starts_with($event, 'test')), Argument::type('callable'))->resolves(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
             $registeredListener = $listener;
             $registeredEvent = $event;
         });
@@ -58,7 +59,7 @@ it('removes the listener after metrics are gathered successfully', function () {
             return $deferred->promise();
         });
 
-    $pubSub->allows('stopListening')->with(Mockery::on(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
+    $pubSub->allows('stopListening')->with(Argument::satisfies(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
             $stopListeningCalled = true;
             $stopListeningKey = $key;
 
