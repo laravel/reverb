@@ -1,10 +1,13 @@
 <?php
 
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\Channels\PresenceChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\ServerProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
@@ -71,7 +74,7 @@ it('can return data stored on the connection', function () {
 });
 
 it('sends notification of subscription', function () {
-    $channel = new PresenceChannel('presence-test-channel');
+    $channel = channels()->findOrCreate('presence-test-channel');
 
     $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
@@ -87,7 +90,7 @@ it('sends notification of subscription', function () {
 });
 
 it('sends notification of subscription with data', function () {
-    $channel = new PresenceChannel('presence-test-channel');
+    $channel = channels()->findOrCreate('presence-test-channel');
     $data = json_encode(['name' => 'Joe']);
 
     $this->channelConnectionManager->expects('add')->with($this->connection, ['name' => 'Joe']);
@@ -112,7 +115,7 @@ it('sends notification of subscription with data', function () {
 });
 
 it('sends notification of an unsubscribe', function () {
-    $channel = new PresenceChannel('presence-test-channel');
+    $channel = channels()->findOrCreate('presence-test-channel');
     $data = json_encode(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
 
     $channel->subscribe(
@@ -141,7 +144,7 @@ it('sends notification of an unsubscribe', function () {
 });
 
 it('ensures the "member_added" event is only fired once', function () {
-    $channel = new PresenceChannel('presence-test-channel');
+    $channel = channels()->findOrCreate('presence-test-channel');
 
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
@@ -155,7 +158,7 @@ it('ensures the "member_added" event is only fired once', function () {
 });
 
 it('ensures the "member_removed" event is only fired once', function () {
-    $channel = new PresenceChannel('presence-test-channel');
+    $channel = channels()->findOrCreate('presence-test-channel');
 
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
@@ -167,4 +170,32 @@ it('ensures the "member_removed" event is only fired once', function () {
     $channel->unsubscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
 
     $connectionOne->connection()->assertNothingReceived();
+});
+
+it('can publish presence member events when scaling', function () {
+    $channel = channels()->findOrCreate('presence-test-channel');
+    $published = [];
+
+    $provider = Double::for(PubSubProvider::class);
+    $provider->expects('publish')->with(Argument::satisfies(function ($payload) use (&$published) {
+        $published[] = $payload;
+
+        return true;
+    }));
+
+    $this->app->instance(PubSubProvider::class, $provider);
+    app(ServerProviderManager::class)->withPublishing();
+
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
+
+    $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-test-channel'));
+
+    expect($published)->toHaveCount(1);
+    expect($published[0]['type'])->toBe('message');
+    expect($published[0]['socket_id'])->toBe($this->connection->id());
+    expect($published[0]['payload'])->toBe([
+        'event' => 'pusher_internal:member_added',
+        'data' => '{}',
+        'channel' => 'presence-test-channel',
+    ]);
 });

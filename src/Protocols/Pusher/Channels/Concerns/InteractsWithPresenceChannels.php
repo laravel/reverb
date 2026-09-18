@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher\Channels\Concerns;
 
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 
 trait InteractsWithPresenceChannels
 {
@@ -25,7 +26,8 @@ trait InteractsWithPresenceChannels
 
         parent::subscribe($connection, $auth, $data);
 
-        parent::broadcastInternally(
+        EventDispatcher::dispatch(
+            $connection->app(),
             [
                 'event' => 'pusher_internal:member_added',
                 'data' => json_encode((object) $userData),
@@ -52,7 +54,8 @@ trait InteractsWithPresenceChannels
             return;
         }
 
-        parent::broadcast(
+        EventDispatcher::dispatch(
+            $connection->app(),
             [
                 'event' => 'pusher_internal:member_removed',
                 'data' => json_encode(['user_id' => $subscription->data('user_id')]),
