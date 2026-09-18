@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Clue\React\Redis\Client;
 use Laravel\Reverb\Exceptions\RedisConnectionException;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
@@ -21,8 +22,8 @@ afterAll(function () {
 });
 
 it('can successfully reconnect', function () {
-    $clientFactory = Mockery::mock(RedisClientFactory::class);
-    $loop = Mockery::mock(LoopInterface::class);
+    $clientFactory = Double::for(RedisClientFactory::class);
+    $loop = Double::for(LoopInterface::class);
 
     $loop->shouldReceive('addTimer')
         ->once()
@@ -38,12 +39,12 @@ it('can successfully reconnect', function () {
         ->once()
         ->andReturn(new Promise(fn (callable $resolve) => $resolve));
 
-    $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb');
+    $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect($loop);
 });
 
 it('can timeout and fail when unable to reconnect', function () {
-    $clientFactory = Mockery::mock(RedisClientFactory::class);
+    $clientFactory = Double::for(RedisClientFactory::class);
 
     $loop = Loop::get();
 
@@ -57,21 +58,21 @@ it('can timeout and fail when unable to reconnect', function () {
         ->once()
         ->andReturn(new Promise(fn (callable $resolve) => $resolve));
 
-    $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
+    $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
     $provider->connect($loop);
     $loop->run();
     $provider->disconnect();
 })->throws(RedisConnectionException::class, 'Failed to connect to Redis connection [publisher] after retrying for 1s.');
 
 it('queues publish events', function () {
-    $clientFactory = Mockery::mock(RedisClientFactory::class);
+    $clientFactory = Double::for(RedisClientFactory::class);
 
     $clientFactory->shouldReceive('make')
         ->twice()
         ->andReturn(new Promise(fn (callable $resolve) => $resolve));
 
-    $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb');
-    $provider->connect(Mockery::mock(LoopInterface::class));
+    $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
+    $provider->connect(Double::for(LoopInterface::class));
     $provider->publish(['event' => 'first test']);
     $provider->publish(['event' => 'second test']);
 
@@ -82,8 +83,8 @@ it('queues publish events', function () {
 });
 
 it('can process queued publish events', function () {
-    $clientFactory = Mockery::mock(RedisClientFactory::class);
-    $client = Mockery::mock(Client::class);
+    $clientFactory = Double::for(RedisClientFactory::class);
+    $client = Double::for(Client::class);
 
     $clientFactory->shouldReceive('make')
         ->once()
@@ -101,8 +102,8 @@ it('can process queued publish events', function () {
         ->with('close', Mockery::any())
         ->once();
 
-    $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb');
-    $provider->connect($loop = Mockery::mock(LoopInterface::class));
+    $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
+    $provider->connect($loop = Double::for(LoopInterface::class));
     $provider->publish(['event' => 'first test']);
     $provider->publish(['event' => 'second test']);
 
@@ -121,7 +122,7 @@ it('can process queued publish events', function () {
 });
 
 it('does not attempt to reconnect after a controlled disconnection', function () {
-    $clientFactory = Mockery::mock(RedisClientFactory::class);
+    $clientFactory = Double::for(RedisClientFactory::class);
     $loop = Loop::get();
 
     // Publisher client
@@ -129,7 +130,7 @@ it('does not attempt to reconnect after a controlled disconnection', function ()
         ->twice()
         ->andReturn(new Promise(fn (callable $resolve) => throw new Exception));
 
-    $provider = new RedisPubSubProvider($clientFactory, Mockery::mock(PubSubIncomingMessageHandler::class), 'reverb');
+    $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $loop->addTimer(1, fn () => $provider->disconnect());
     $provider->connect($loop);
 });

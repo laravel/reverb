@@ -1,11 +1,12 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
 beforeEach(function () {
-    $this->channelManager = Mockery::spy(ChannelManager::class);
+    $this->channelManager = Double::for(ChannelManager::class);
     $this->channelManager->shouldReceive('for')
         ->andReturn($this->channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);

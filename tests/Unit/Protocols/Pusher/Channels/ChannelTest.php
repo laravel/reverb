@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -7,7 +8,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
-    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
+    $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
@@ -34,7 +35,7 @@ it('can unsubscribe a connection from a channel', function () {
 });
 
 it('removes a channel when no subscribers remain', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
+    $channelManager = Double::for(ChannelManager::class);
     $this->app->instance(ChannelManager::class, $channelManager);
 
     $channel = new Channel('test-channel');

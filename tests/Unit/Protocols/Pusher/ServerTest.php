@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Server;
 use Laravel\Reverb\Tests\FakeConnection;
@@ -23,7 +24,7 @@ it('can handle a connection', function () {
 });
 
 it('can handle a disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
+    $channelManager = Double::for(ChannelManager::class);
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
@@ -211,7 +212,7 @@ it('receives last triggered event when joining a cache channel', function () {
 });
 
 it('unsubscribes a user from a channel on disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
+    $channelManager = Double::for(ChannelManager::class);
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
@@ -235,7 +236,7 @@ it('unsubscribes a user from a channel on disconnection', function () {
 });
 
 it('unsubscribes a user from a private channel on disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
+    $channelManager = Double::for(ChannelManager::class);
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
@@ -259,7 +260,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
+    $channelManager = Double::for(ChannelManager::class);
     $channelManager->shouldReceive('for')
         ->andReturn($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);

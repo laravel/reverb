@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\PresenceChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\PrivateChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
@@ -8,7 +9,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
-    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
+    $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
     $this->channelConnectionManager->shouldReceive('for')
         ->andReturn($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);

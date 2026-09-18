@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
@@ -33,7 +34,7 @@ it('removes the listener after metrics are gathered successfully', function () {
     $stopListeningKey = null;
     $registeredEvent = null;
 
-    $pubSub = Mockery::mock(PubSubProvider::class);
+    $pubSub = Double::for(PubSubProvider::class);
 
     $pubSub->shouldReceive('on')
         ->once()

@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\ReverbTestCase;
@@ -174,7 +175,7 @@ it('can receive an event batch trigger with multiple events and gather info for 
 it('publishes the originating socket id for a batch event over redis even when the connection is not local', function () {
     $published = null;
 
-    $provider = Mockery::mock(PubSubProvider::class)->shouldIgnoreMissing();
+    $provider = Double::for(PubSubProvider::class);
     $provider->shouldReceive('publish')
         ->once()
         ->with(Mockery::on(function ($payload) use (&$published) {
