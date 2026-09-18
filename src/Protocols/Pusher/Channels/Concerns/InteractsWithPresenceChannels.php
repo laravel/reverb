@@ -4,6 +4,8 @@ namespace Laravel\Reverb\Protocols\Pusher\Channels\Concerns;
 
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
+use Laravel\Reverb\ServerProviderManager;
 
 trait InteractsWithPresenceChannels
 {
@@ -46,19 +48,37 @@ trait InteractsWithPresenceChannels
 
         parent::unsubscribe($connection);
 
-        if (
-            ! $subscription ||
-            ! $subscription->data('user_id') ||
-            $this->userIsSubscribed($subscription->data('user_id'))
-        ) {
+        $userId = $subscription?->data('user_id');
+
+        if (! $userId || $this->userIsSubscribed($userId)) {
             return;
         }
 
+        if (app(ServerProviderManager::class)->subscribesToEvents()) {
+            app(MetricsHandler::class)
+                ->gather($connection->app(), 'presence_data', ['channel' => $this->name()])
+                ->then(function (array $data) use ($connection, $userId) {
+                    if (! in_array($userId, $data['presence']['ids'] ?? [])) {
+                        $this->broadcastMemberRemoved($connection, $userId);
+                    }
+                });
+
+            return;
+        }
+
+        $this->broadcastMemberRemoved($connection, $userId);
+    }
+
+    /**
+     * Notify the channel the given user has been removed.
+     */
+    protected function broadcastMemberRemoved(Connection $connection, int|string $userId): void
+    {
         EventDispatcher::dispatch(
             $connection->app(),
             [
                 'event' => 'pusher_internal:member_removed',
-                'data' => json_encode(['user_id' => $subscription->data('user_id')]),
+                'data' => json_encode(['user_id' => $userId]),
                 'channel' => $this->name(),
             ],
             $connection

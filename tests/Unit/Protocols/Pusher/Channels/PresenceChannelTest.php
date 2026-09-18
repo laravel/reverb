@@ -6,9 +6,12 @@ use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\Channels\PresenceChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\FakeConnection;
+
+use function React\Promise\resolve;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
@@ -210,6 +213,71 @@ it('can publish presence member events when scaling', function () {
     expect($published[0]['payload'])->toBe([
         'event' => 'pusher_internal:member_added',
         'data' => '{}',
+        'channel' => 'presence-test-channel',
+    ]);
+});
+
+it('does not send member_removed when the user is connected elsewhere', function () {
+    $channel = channels()->findOrCreate('presence-test-channel');
+
+    $provider = Double::for(PubSubProvider::class);
+    $this->app->instance(PubSubProvider::class, $provider);
+    app(ServerProviderManager::class)->withPublishing();
+
+    $metrics = Double::for(MetricsHandler::class);
+    $metrics->expects('gather')->returns(resolve(['presence' => [
+        'count' => 1,
+        'ids' => [1],
+        'hash' => [1 => ['name' => 'Joe']],
+    ]]));
+    $this->app->instance(MetricsHandler::class, $metrics);
+
+    $connection = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+
+    $this->channelConnectionManager->expects('find')->returns($connection);
+    $this->channelConnectionManager->expects('remove');
+    $this->channelConnectionManager->expects('all')->returns([]);
+
+    $channel->unsubscribe($connection->connection());
+
+    $provider->received('publish')->never();
+    $connection->connection()->assertNothingReceived();
+});
+
+it('sends member_removed when the last connection for the user leaves', function () {
+    $channel = channels()->findOrCreate('presence-test-channel');
+    $published = [];
+
+    $provider = Double::for(PubSubProvider::class);
+    $provider->expects('publish')->with(Argument::satisfies(function ($payload) use (&$published) {
+        $published[] = $payload;
+
+        return true;
+    }));
+
+    $this->app->instance(PubSubProvider::class, $provider);
+    app(ServerProviderManager::class)->withPublishing();
+
+    $metrics = Double::for(MetricsHandler::class);
+    $metrics->expects('gather')->returns(resolve(['presence' => [
+        'count' => 1,
+        'ids' => [2],
+        'hash' => [2 => ['name' => 'Jane']],
+    ]]));
+    $this->app->instance(MetricsHandler::class, $metrics);
+
+    $connection = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
+
+    $this->channelConnectionManager->expects('find')->returns($connection);
+    $this->channelConnectionManager->expects('remove');
+    $this->channelConnectionManager->expects('all')->returns([]);
+
+    $channel->unsubscribe($connection->connection());
+
+    expect($published)->toHaveCount(1);
+    expect($published[0]['payload'])->toBe([
+        'event' => 'pusher_internal:member_removed',
+        'data' => json_encode(['user_id' => 1]),
         'channel' => 'presence-test-channel',
     ]);
 });
