@@ -382,6 +382,19 @@ it('can publish and subscribe to presence member events', function () {
     $connection->assertReceived('{"event":"pusher_internal:member_removed","data":"{\\"user_id\\":2}","channel":"presence-test-channel"}', 1);
 });
 
+it('includes existing members in subscription_succeeded when scaling', function () {
+    $this->usingRedis();
+
+    subscribe('presence-test-channel', data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+
+    $response = subscribe('presence-test-channel', data: ['user_id' => 2, 'user_info' => ['name' => 'Test User 2']]);
+
+    expect($response)->toContain('pusher_internal:subscription_succeeded');
+    expect($response)->toContain('"count\\":2');
+    expect($response)->toContain('"ids\\":[1,2]');
+    expect($response)->toContain('"hash\\":{\\"1\\":{\\"name\\":\\"Test User 1\\"},\\"2\\":{\\"name\\":\\"Test User 2\\"}}');
+});
+
 it('does not cache internal events on a presence cache channel when scaling', function () {
     $this->usingRedis();
 

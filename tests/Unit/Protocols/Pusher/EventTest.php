@@ -1,8 +1,14 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\EventHandler as PusherEventHandler;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
+use Laravel\Reverb\ServerProviderManager;
+use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\FakeConnection;
+
+use function React\Promise\reject;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
@@ -48,6 +54,33 @@ it('can subscribe to an empty channel', function () {
     $this->connection->assertReceived([
         'event' => 'pusher_internal:subscription_succeeded',
         'data' => '{}',
+    ]);
+});
+
+it('falls back to local members when the gather fails', function () {
+    $this->app->instance(PubSubProvider::class, Double::for(PubSubProvider::class));
+    app(ServerProviderManager::class)->withPublishing();
+
+    $metrics = Double::for(MetricsHandler::class);
+    $metrics->expects('gather')->returns(reject(new Exception('Unable to gather metrics.')));
+    $this->app->instance(MetricsHandler::class, $metrics);
+
+    $data = json_encode(['user_id' => 1, 'user_info' => ['name' => 'Joe']]);
+
+    $this->pusher->handle(
+        $this->connection,
+        'pusher:subscribe',
+        [
+            'channel' => 'presence-test-channel',
+            'auth' => validAuth($this->connection->id(), 'presence-test-channel', $data),
+            'channel_data' => $data,
+        ]
+    );
+
+    $this->connection->assertReceived([
+        'event' => 'pusher_internal:subscription_succeeded',
+        'data' => json_encode(['presence' => ['count' => 1, 'ids' => [1], 'hash' => [1 => ['name' => 'Joe']]]]),
+        'channel' => 'presence-test-channel',
     ]);
 });
 

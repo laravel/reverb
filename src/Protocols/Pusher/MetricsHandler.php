@@ -62,6 +62,7 @@ class MetricsHandler
             MetricType::CHANNELS => $this->channels($metric),
             MetricType::CHANNEL_USERS => $this->channelUsers($metric),
             MetricType::CONNECTIONS => $this->connections($metric),
+            MetricType::PRESENCE_DATA => $this->presenceData($metric),
             default => [],
         };
     }
@@ -118,6 +119,14 @@ class MetricsHandler
     }
 
     /**
+     * Get the presence data for the given channel.
+     */
+    protected function presenceData(PendingMetric $metric): array
+    {
+        return $this->channels->for($metric->application())->find($metric->option('channel'))?->data() ?? [];
+    }
+
+    /**
      * Get the connections for the given application.
      */
     protected function connections(PendingMetric $metric): array
@@ -169,6 +178,7 @@ class MetricsHandler
             MetricType::CHANNELS => $this->mergeChannels($metrics),
             MetricType::CHANNEL => $this->mergeChannel($metrics),
             MetricType::CHANNEL_USERS => collect($metrics)->flatten(1)->unique()->all(),
+            MetricType::PRESENCE_DATA => $this->mergePresenceData($metrics),
             default => [],
         };
     }
@@ -209,6 +219,26 @@ class MetricsHandler
             }, collect())
             ->map(fn ($metrics) => $this->mergeChannel($metrics))
             ->all();
+    }
+
+    /**
+     * Merge multiple sets of presence data into a single result set.
+     */
+    protected function mergePresenceData(array $metrics): array
+    {
+        $presence = collect($metrics)->map(fn ($item) => $item['presence'] ?? []);
+
+        $ids = $presence->flatMap(fn ($item) => $item['ids'] ?? [])->unique()->values()->all();
+
+        return [
+            'presence' => [
+                'count' => count($ids),
+                'ids' => $ids,
+                'hash' => collect($presence->reduce(fn ($carry, $item) => $carry + ($item['hash'] ?? []), []))
+                    ->map(fn ($info) => $info ?: (object) [])
+                    ->all(),
+            ],
+        ];
     }
 
     /**
