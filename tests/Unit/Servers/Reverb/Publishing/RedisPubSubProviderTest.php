@@ -1,8 +1,8 @@
 <?php
 
+use Clue\React\Redis\Client;
 use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
-use Clue\React\Redis\Client;
 use Laravel\Reverb\Exceptions\RedisConnectionException;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;
@@ -75,11 +75,12 @@ it('can process queued publish events', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
     $client = Double::for(Client::class);
 
-    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
-
-    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
-
-    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve($client)));
+    // Publisher client, then subscriber client, then publisher client again
+    $clientFactory->expects('make')->times(3)->returns(
+        new Promise(fn (callable $resolve) => $resolve),
+        new Promise(fn (callable $resolve) => $resolve),
+        new Promise(fn (callable $resolve) => $resolve($client)),
+    );
 
     $client->expects('on')->with('close', Argument::any());
 
