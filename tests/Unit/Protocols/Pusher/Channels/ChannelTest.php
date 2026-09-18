@@ -9,7 +9,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
@@ -48,8 +48,6 @@ it('removes a channel when no subscribers remain', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelConnectionManager->allows('add');
-
     $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
@@ -59,8 +57,6 @@ it('can broadcast to all connections of a channel', function () {
 
 it('does not broadcast to the connection sending the message', function () {
     $channel = new Channel('test-channel');
-
-    $this->channelConnectionManager->allows('add');
 
     $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 

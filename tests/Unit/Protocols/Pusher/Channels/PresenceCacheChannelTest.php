@@ -10,7 +10,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
@@ -75,7 +75,7 @@ it('sends notification of subscription', function () {
 
     $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
-    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-cache-test-channel'));
 
@@ -92,7 +92,7 @@ it('sends notification of subscription with data', function () {
 
     $this->channelConnectionManager->expects('add')->with($this->connection, ['name' => 'Joe']);
 
-    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->subscribe(
         $this->connection,
@@ -125,9 +125,9 @@ it('sends notification of an unsubscribe', function () {
         $data
     );
 
-    $this->channelConnectionManager->allows('find')->returns(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
+    $this->channelConnectionManager->expects('find')->returns(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
 
-    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->times(2)->returns($connections = factory(3));
 
     $this->channelConnectionManager->expects('remove')->with($this->connection);
 

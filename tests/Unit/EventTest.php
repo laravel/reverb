@@ -20,7 +20,7 @@ it('can publish an event when enabled', function () {
 
 it('can broadcast an event directly when publishing disabled', function () {
     $channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $channelConnectionManager->allows('for')->returns($channelConnectionManager);
+    $channelConnectionManager->expects('for')->returns($channelConnectionManager);
     $channelConnectionManager->expects('all')->returns([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
@@ -32,7 +32,7 @@ it('can broadcast an event directly when publishing disabled', function () {
 
 it('can broadcast an event for multiple channels', function () {
     $channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $channelConnectionManager->allows('for')->returns($channelConnectionManager);
+    $channelConnectionManager->expects('for')->times(2)->returns($channelConnectionManager);
     $channelConnectionManager->expects('all')->times(2)->returns([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);

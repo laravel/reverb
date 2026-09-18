@@ -9,7 +9,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
@@ -31,8 +31,6 @@ it('can unsubscribe a connection from a channel', function () {
 
 it('can broadcast to all connections of a channel', function () {
     $channel = new PrivateCacheChannel('test-channel');
-
-    $this->channelConnectionManager->allows('add');
 
     $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 

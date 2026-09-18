@@ -9,7 +9,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 

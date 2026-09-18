@@ -59,7 +59,7 @@ it('removes the listener after metrics are gathered successfully', function () {
             return $deferred->promise();
         });
 
-    $pubSub->allows('stopListening')->with(Argument::satisfies(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
+    $pubSub->expects('stopListening')->with(Argument::satisfies(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
             $stopListeningCalled = true;
             $stopListeningKey = $key;
 

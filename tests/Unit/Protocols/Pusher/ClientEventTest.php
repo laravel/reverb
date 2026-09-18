@@ -8,7 +8,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
 
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
@@ -19,8 +19,8 @@ it('can forward a client message', function () {
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '2']))->first();
 
-    $this->channelConnectionManager->allows('find')->returns($connectionOne);
-    $this->channelConnectionManager->allows('all')->returns([$connectionOne, $connectionTwo]);
+    $this->channelConnectionManager->expects('find')->returns($connectionOne);
+    $this->channelConnectionManager->expects('all')->returns([$connectionOne, $connectionTwo]);
 
     ClientEvent::handle(
         $connectionOne->connection(), [
@@ -74,8 +74,7 @@ it('does not forward unauthenticated client message when in members mode', funct
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '2']))->first();
 
-    $this->channelConnectionManager->allows('find')->returns(null);
-    $this->channelConnectionManager->allows('all')->returns([$connectionTwo]);
+    $this->channelConnectionManager->expects('find')->returns(null);
 
     ClientEvent::handle(
         $connectionOne->connection(), [
@@ -101,9 +100,6 @@ it('does not forward client message when set to none', function () {
 
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '2']))->first();
-
-    $this->channelConnectionManager->allows('find')->returns($connectionOne);
-    $this->channelConnectionManager->allows('all')->returns([$connectionOne, $connectionTwo]);
 
     ClientEvent::handle(
         $connectionOne->connection(), [
@@ -150,7 +146,7 @@ it('does not forward a message to itself', function () {
     channels()->findOrCreate('test-channel');
 
     $this->channelConnectionManager->expects('all')->returns([$connection]);
-    $this->channelConnectionManager->allows('find')->returns($connection);
+    $this->channelConnectionManager->expects('find')->returns($connection);
 
     ClientEvent::handle(
         $connection->connection(), [

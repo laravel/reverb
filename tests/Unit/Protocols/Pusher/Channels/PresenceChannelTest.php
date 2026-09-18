@@ -10,7 +10,7 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
@@ -75,7 +75,7 @@ it('sends notification of subscription', function () {
 
     $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
-    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-test-channel'));
 
@@ -92,7 +92,7 @@ it('sends notification of subscription with data', function () {
 
     $this->channelConnectionManager->expects('add')->with($this->connection, ['name' => 'Joe']);
 
-    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->subscribe(
         $this->connection,
@@ -125,9 +125,9 @@ it('sends notification of an unsubscribe', function () {
         $data
     );
 
-    $this->channelConnectionManager->allows('find')->returns(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
+    $this->channelConnectionManager->expects('find')->returns(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
 
-    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->times(2)->returns($connections = factory(3));
 
     $this->channelConnectionManager->expects('remove')->with($this->connection);
 
@@ -146,7 +146,7 @@ it('ensures the "member_added" event is only fired once', function () {
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
 
-    $this->channelConnectionManager->allows('all')->returns([$connectionOne, $connectionTwo]);
+    $this->channelConnectionManager->expects('all')->times(2)->returns([$connectionOne, $connectionTwo]);
 
     $channel->subscribe($connectionOne->connection(), validAuth($connectionOne->id(), 'presence-test-channel', $data = json_encode($connectionOne->data())), $data);
     $channel->subscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
@@ -160,9 +160,9 @@ it('ensures the "member_removed" event is only fired once', function () {
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 1]))->first();
 
-    $this->channelConnectionManager->allows('find')->returns($connectionOne);
+    $this->channelConnectionManager->expects('find')->returns($connectionOne);
 
-    $this->channelConnectionManager->allows('all')->returns([$connectionOne, $connectionTwo]);
+    $this->channelConnectionManager->expects('all')->returns([$connectionOne, $connectionTwo]);
 
     $channel->unsubscribe($connectionTwo->connection(), validAuth($connectionTwo->id(), 'presence-test-channel', $data = json_encode($connectionTwo->data())), $data);
 

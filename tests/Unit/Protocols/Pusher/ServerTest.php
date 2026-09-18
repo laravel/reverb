@@ -25,7 +25,7 @@ it('can handle a connection', function () {
 
 it('can handle a disconnection', function () {
     $channelManager = Double::for(ChannelManager::class);
-    $channelManager->allows('for')->returns($channelManager);
+    $channelManager->expects('for')->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
@@ -212,7 +212,7 @@ it('receives last triggered event when joining a cache channel', function () {
 
 it('unsubscribes a user from a channel on disconnection', function () {
     $channelManager = Double::for(ChannelManager::class);
-    $channelManager->allows('for')->returns($channelManager);
+    $channelManager->expects('for')->times(2)->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
@@ -233,7 +233,7 @@ it('unsubscribes a user from a channel on disconnection', function () {
 
 it('unsubscribes a user from a private channel on disconnection', function () {
     $channelManager = Double::for(ChannelManager::class);
-    $channelManager->allows('for')->returns($channelManager);
+    $channelManager->expects('for')->times(2)->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
@@ -254,7 +254,7 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
     $channelManager = Double::for(ChannelManager::class);
-    $channelManager->allows('for')->returns($channelManager);
+    $channelManager->expects('for')->times(2)->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 

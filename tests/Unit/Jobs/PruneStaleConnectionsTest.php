@@ -7,7 +7,7 @@ use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
 beforeEach(function () {
     $this->channelManager = Double::for(ChannelManager::class);
-    $this->channelManager->allows('for')->returns($this->channelManager);
+    $this->channelManager->expects('for')->times(6)->returns($this->channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $this->channelManager);
 });
 
