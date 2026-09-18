@@ -28,11 +28,11 @@ it('can successfully reconnect', function () {
 
     $loop->expects('addTimer')->with(1, Argument::any());
 
-    // Publisher client
-    $clientFactory->expects('make')->returns(new Promise(fn () => throw new Exception));
-
-    // Subscriber client
-    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
+    // Publisher client, then subscriber client
+    $clientFactory->expects('make')->times(2)->returns(
+        new Promise(fn () => throw new Exception),
+        new Promise(fn (callable $resolve) => $resolve),
+    );
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect($loop);
@@ -43,11 +43,11 @@ it('can timeout and fail when unable to reconnect', function () {
 
     $loop = Loop::get();
 
-    // Publisher client
-    $clientFactory->expects('make')->returns(new Promise(fn () => throw new Exception));
-
-    // Subscriber client
-    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
+    // Publisher client, then subscriber client
+    $clientFactory->expects('make')->times(2)->returns(
+        new Promise(fn () => throw new Exception),
+        new Promise(fn (callable $resolve) => $resolve),
+    );
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
     $provider->connect($loop);

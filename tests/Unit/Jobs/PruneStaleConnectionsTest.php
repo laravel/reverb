@@ -16,14 +16,17 @@ it('cleans up stale connections', function () {
     $channel = ChannelBroker::create('test-channel');
 
     $this->channelManager->expects('connections')->returns($connections);
+    $this->channelManager->allows('unsubscribeFromAll');
 
     collect($connections)->each(function ($connection) use ($channel) {
         $channel->subscribe($connection->connection());
         $connection->setLastSeenAt(time() - 60 * 10);
         $connection->setHasBeenPinged();
-
-        $this->channelManager->expects('unsubscribeFromAll')->with($connection->connection());
     });
 
     (new PruneStaleConnections)->handle($this->channelManager);
+
+    collect($connections)->each(
+        fn ($connection) => $this->channelManager->received('unsubscribeFromAll')->with($connection->connection())
+    );
 });
