@@ -36,17 +36,12 @@ it('removes the listener after metrics are gathered successfully', function () {
 
     $pubSub = Double::for(PubSubProvider::class);
 
-    $pubSub->shouldReceive('on')
-        ->once()
-        ->with(Mockery::on(fn ($event) => str_starts_with($event, 'test')), Mockery::type('callable'))
-        ->andReturnUsing(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
+    $pubSub->expects('on')->with(Mockery::on(fn ($event) => str_starts_with($event, 'test')), Mockery::type('callable'))->resolves(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
             $registeredListener = $listener;
             $registeredEvent = $event;
         });
 
-    $pubSub->shouldReceive('publish')
-        ->once()
-        ->andReturnUsing(function ($payload) use (&$registeredListener) {
+    $pubSub->expects('publish')->resolves(function ($payload) use (&$registeredListener) {
 
             Loop::addTimer(0.001, function () use (&$registeredListener) {
                 if ($registeredListener) {
@@ -63,8 +58,7 @@ it('removes the listener after metrics are gathered successfully', function () {
             return $deferred->promise();
         });
 
-    $pubSub->shouldReceive('stopListening')
-        ->with(Mockery::on(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
+    $pubSub->allows('stopListening')->with(Mockery::on(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
             $stopListeningCalled = true;
             $stopListeningKey = $key;
 

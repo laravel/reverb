@@ -11,8 +11,7 @@ it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('reverb-key');
     app(ServerProviderManager::class)->withPublishing();
     $pubSub = Double::for(PubSubProvider::class);
-    $pubSub->shouldReceive('publish')->once()
-        ->with(['type' => 'message', 'application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
+    $pubSub->expects('publish')->with(['type' => 'message', 'application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
 
     $this->app->instance(PubSubProvider::class, $pubSub);
 
@@ -21,10 +20,8 @@ it('can publish an event when enabled', function () {
 
 it('can broadcast an event directly when publishing disabled', function () {
     $channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $channelConnectionManager->shouldReceive('for')
-        ->andReturn($channelConnectionManager);
-    $channelConnectionManager->shouldReceive('all')->once()
-        ->andReturn([]);
+    $channelConnectionManager->allows('for')->returns($channelConnectionManager);
+    $channelConnectionManager->expects('all')->returns([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 
@@ -35,10 +32,8 @@ it('can broadcast an event directly when publishing disabled', function () {
 
 it('can broadcast an event for multiple channels', function () {
     $channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $channelConnectionManager->shouldReceive('for')
-        ->andReturn($channelConnectionManager);
-    $channelConnectionManager->shouldReceive('all')->twice()
-        ->andReturn([]);
+    $channelConnectionManager->allows('for')->returns($channelConnectionManager);
+    $channelConnectionManager->expects('all')->times(2)->returns([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 

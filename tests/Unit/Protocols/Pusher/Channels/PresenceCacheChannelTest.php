@@ -10,19 +10,16 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->shouldReceive('for')
-        ->andReturn($this->channelConnectionManager);
+    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('can subscribe a connection to a channel', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once($this->connection, []);
+    $this->channelConnectionManager->expects('add');
 
-    $this->channelConnectionManager->shouldReceive('connections')
-        ->andReturn([]);
+    $this->channelConnectionManager->allows('connections')->returns([]);
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-cache-test-channel'));
 });
@@ -30,9 +27,7 @@ it('can subscribe a connection to a channel', function () {
 it('can unsubscribe a connection from a channel', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('remove')
-        ->once()
-        ->with($this->connection);
+    $this->channelConnectionManager->expects('remove')->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 });
@@ -40,11 +35,9 @@ it('can unsubscribe a connection from a channel', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('subscribe');
+    $this->channelConnectionManager->allows('subscribe');
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
 
@@ -54,7 +47,7 @@ it('can broadcast to all connections of a channel', function () {
 it('fails to subscribe if the signature is invalid', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
-    $this->channelConnectionManager->shouldNotReceive('subscribe');
+    $this->channelConnectionManager->expects('subscribe')->never();
 
     $channel->subscribe($this->connection, 'invalid-signature');
 })->throws(ConnectionUnauthorized::class);
@@ -67,9 +60,7 @@ it('can return data stored on the connection', function () {
         collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => 2]))->first(),
     ];
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections);
+    $this->channelConnectionManager->expects('all')->returns($connections);
 
     expect($channel->data($this->connection->app()))->toBe([
         'presence' => [
@@ -86,12 +77,9 @@ it('can return data stored on the connection', function () {
 it('sends notification of subscription', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-cache-test-channel'));
 
@@ -106,12 +94,9 @@ it('sends notification of subscription with data', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
     $data = json_encode(['name' => 'Joe']);
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, ['name' => 'Joe']);
+    $this->channelConnectionManager->expects('add')->with($this->connection, ['name' => 'Joe']);
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
 
     $channel->subscribe(
         $this->connection,
@@ -144,15 +129,11 @@ it('sends notification of an unsubscribe', function () {
         $data
     );
 
-    $this->channelConnectionManager->shouldReceive('find')
-        ->andReturn(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
+    $this->channelConnectionManager->allows('find')->returns(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->allows('all')->returns($connections = factory(3));
 
-    $this->channelConnectionManager->shouldReceive('remove')
-        ->once()
-        ->with($this->connection);
+    $this->channelConnectionManager->expects('remove')->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 
@@ -166,9 +147,7 @@ it('sends notification of an unsubscribe', function () {
 it('receives no data when no previous event triggered', function () {
     $channel = new PresenceCacheChannel('presence-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-cache-test-channel'));
 

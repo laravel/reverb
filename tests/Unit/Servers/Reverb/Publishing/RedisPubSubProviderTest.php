@@ -25,19 +25,13 @@ it('can successfully reconnect', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
     $loop = Double::for(LoopInterface::class);
 
-    $loop->shouldReceive('addTimer')
-        ->once()
-        ->with(1, Mockery::any());
+    $loop->expects('addTimer')->with(1, Mockery::any());
 
     // Publisher client
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn () => throw new Exception));
+    $clientFactory->expects('make')->returns(new Promise(fn () => throw new Exception));
 
     // Subscriber client
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
+    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect($loop);
@@ -49,14 +43,10 @@ it('can timeout and fail when unable to reconnect', function () {
     $loop = Loop::get();
 
     // Publisher client
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn () => throw new Exception));
+    $clientFactory->expects('make')->returns(new Promise(fn () => throw new Exception));
 
     // Subscriber client
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
+    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb', ['host' => 'localhost', 'port' => 6379, 'timeout' => 1]);
     $provider->connect($loop);
@@ -67,9 +57,7 @@ it('can timeout and fail when unable to reconnect', function () {
 it('queues publish events', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
 
-    $clientFactory->shouldReceive('make')
-        ->twice()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
+    $clientFactory->expects('make')->times(2)->returns(new Promise(fn (callable $resolve) => $resolve));
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect(Double::for(LoopInterface::class));
@@ -86,21 +74,13 @@ it('can process queued publish events', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
     $client = Double::for(Client::class);
 
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
+    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
 
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve));
+    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve));
 
-    $clientFactory->shouldReceive('make')
-        ->once()
-        ->andReturn(new Promise(fn (callable $resolve) => $resolve($client)));
+    $clientFactory->expects('make')->returns(new Promise(fn (callable $resolve) => $resolve($client)));
 
-    $client->shouldReceive('on')
-        ->with('close', Mockery::any())
-        ->once();
+    $client->expects('on')->with('close', Mockery::any());
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect($loop = Double::for(LoopInterface::class));
@@ -112,10 +92,7 @@ it('can process queued publish events', function () {
 
     expect($queuedEvents)->toHaveCount(2);
     collect($queuedEvents)->each(function ($event) use ($client) {
-        $client->shouldReceive('publish')
-            ->with('reverb', json_encode($event))
-            ->once()
-            ->andReturn(new Promise(fn () => null));
+        $client->expects('publish')->with('reverb', json_encode($event))->returns(new Promise(fn () => null));
     });
 
     $publisher->connect($loop);
@@ -126,9 +103,7 @@ it('does not attempt to reconnect after a controlled disconnection', function ()
     $loop = Loop::get();
 
     // Publisher client
-    $clientFactory->shouldReceive('make')
-        ->twice()
-        ->andReturn(new Promise(fn (callable $resolve) => throw new Exception));
+    $clientFactory->expects('make')->times(2)->returns(new Promise(fn (callable $resolve) => throw new Exception));
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $loop->addTimer(1, fn () => $provider->disconnect());

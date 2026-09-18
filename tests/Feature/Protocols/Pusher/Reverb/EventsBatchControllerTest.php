@@ -176,9 +176,7 @@ it('publishes the originating socket id for a batch event over redis even when t
     $published = null;
 
     $provider = Double::for(PubSubProvider::class);
-    $provider->shouldReceive('publish')
-        ->once()
-        ->with(Mockery::on(function ($payload) use (&$published) {
+    $provider->expects('publish')->with(Mockery::on(function ($payload) use (&$published) {
             $published = $payload;
 
             return true;

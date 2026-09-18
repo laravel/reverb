@@ -9,17 +9,14 @@ use Laravel\Reverb\Tests\FakeConnection;
 beforeEach(function () {
     $this->connection = new FakeConnection;
     $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
-    $this->channelConnectionManager->shouldReceive('for')
-        ->andReturn($this->channelConnectionManager);
+    $this->channelConnectionManager->allows('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('can subscribe a connection to a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
     $channel->subscribe($this->connection);
 });
@@ -27,9 +24,7 @@ it('can subscribe a connection to a channel', function () {
 it('can unsubscribe a connection from a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('remove')
-        ->once()
-        ->with($this->connection);
+    $this->channelConnectionManager->expects('remove')->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 });
@@ -40,21 +35,11 @@ it('removes a channel when no subscribers remain', function () {
 
     $channel = new Channel('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
-    $this->channelConnectionManager->shouldReceive('remove')
-        ->once()
-        ->with($this->connection);
-    $this->channelConnectionManager->shouldReceive('isEmpty')
-        ->once()
-        ->andReturn(true);
-    $channelManager->shouldReceive('for')
-        ->once()
-        ->andReturn($channelManager);
-    $channelManager->shouldReceive('remove')
-        ->once()
-        ->with($channel);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
+    $this->channelConnectionManager->expects('remove')->with($this->connection);
+    $this->channelConnectionManager->expects('isEmpty')->returns(true);
+    $channelManager->expects('for')->returns($channelManager);
+    $channelManager->expects('remove')->with($channel);
 
     $channel->subscribe($this->connection);
     $channel->unsubscribe($this->connection);
@@ -63,11 +48,9 @@ it('removes a channel when no subscribers remain', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add');
+    $this->channelConnectionManager->allows('add');
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
 
@@ -77,11 +60,9 @@ it('can broadcast to all connections of a channel', function () {
 it('does not broadcast to the connection sending the message', function () {
     $channel = new Channel('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add');
+    $this->channelConnectionManager->allows('add');
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar'], collect($connections)->first()->connection());
 

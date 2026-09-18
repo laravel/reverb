@@ -109,9 +109,7 @@ it('publishes the originating socket id over redis even when the connection is n
     $published = null;
 
     $provider = Double::for(PubSubProvider::class);
-    $provider->shouldReceive('publish')
-        ->once()
-        ->with(Mockery::on(function ($payload) use (&$published) {
+    $provider->expects('publish')->with(Mockery::on(function ($payload) use (&$published) {
             $published = $payload;
 
             return true;
