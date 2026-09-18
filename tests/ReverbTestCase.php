@@ -14,6 +14,7 @@ use React\Promise\PromiseInterface;
 use ReflectionObject;
 
 use function React\Async\await;
+use function React\Promise\Timer\sleep;
 
 class ReverbTestCase extends TestCase
 {
@@ -79,6 +80,9 @@ class ReverbTestCase extends TestCase
         app(ServerProviderManager::class)->withPublishing();
 
         app(PubSubProvider::class)->connect($this->loop);
+
+        // Wait for the Redis subscription...
+        await(sleep(0.1));
     }
 
     /**
