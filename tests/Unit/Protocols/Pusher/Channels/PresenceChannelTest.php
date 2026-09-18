@@ -73,6 +73,20 @@ it('can return data stored on the connection', function () {
     ]);
 });
 
+it('can return data for a connection without user info', function () {
+    $channel = new PresenceChannel('presence-test-channel');
+
+    $connections = [
+        collect(factory(data: ['user_id' => 1]))->first(),
+    ];
+
+    $this->channelConnectionManager->expects('all')->returns($connections);
+
+    expect(json_encode($channel->data($this->connection->app())))->toBe(
+        '{"presence":{"count":1,"ids":[1],"hash":{"1":{}}}}'
+    );
+});
+
 it('sends notification of subscription', function () {
     $channel = channels()->findOrCreate('presence-test-channel');
 

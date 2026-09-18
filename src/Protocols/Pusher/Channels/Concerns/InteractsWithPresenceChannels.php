@@ -88,7 +88,7 @@ trait InteractsWithPresenceChannels
             'presence' => [
                 'count' => $connections->count() ?? 0,
                 'ids' => $connections->map(fn ($connection) => $connection['user_id'])->values()->all(),
-                'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
+                'hash' => $connections->pluck('user_info', 'user_id')->map(fn ($info) => $info ?? (object) [])->all(),
             ],
         ];
     }
