@@ -1,6 +1,7 @@
 <?php
 
 use Clue\React\Redis\Client;
+use Evenement\EventEmitterTrait;
 use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
 use Laravel\Reverb\Exceptions\RedisConnectionException;
@@ -73,7 +74,38 @@ it('queues publish events', function () {
 
 it('can process queued publish events', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
-    $client = Double::for(Client::class);
+
+    // Clue\React\Redis\Client's entire API is forwarded through __call(),
+    // which Double can't intercept (no fixed signature to match against),
+    // so it's faked here directly rather than doubled.
+    $client = new class implements Client
+    {
+        use EventEmitterTrait;
+
+        /**
+         * Commands invoked on the client via __call(), in order.
+         *
+         * @var array<int, array{0: string, 1: array}>
+         */
+        public array $calls = [];
+
+        public function __call($name, $args)
+        {
+            $this->calls[] = [$name, $args];
+
+            return new Promise(fn () => null);
+        }
+
+        public function end()
+        {
+            $this->close();
+        }
+
+        public function close()
+        {
+            $this->emit('close');
+        }
+    };
 
     // Publisher client, then subscriber client, then publisher client again
     $clientFactory->expects('make')->times(3)->returns(
@@ -81,8 +113,6 @@ it('can process queued publish events', function () {
         new Promise(fn (callable $resolve) => $resolve),
         new Promise(fn (callable $resolve) => $resolve($client)),
     );
-
-    $client->expects('on')->with('close', Argument::any());
 
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $provider->connect($loop = Double::for(LoopInterface::class));
@@ -93,11 +123,13 @@ it('can process queued publish events', function () {
     $queuedEvents = (new ReflectionProperty($publisher, 'queuedEvents'))->getValue($publisher);
 
     expect($queuedEvents)->toHaveCount(2);
-    collect($queuedEvents)->each(function ($event) use ($client) {
-        $client->expects('publish')->with('reverb', json_encode($event))->returns(new Promise(fn () => null));
-    });
 
     $publisher->connect($loop);
+
+    expect($client->listeners('close'))->toHaveCount(1);
+    expect($client->calls)->toBe(
+        collect($queuedEvents)->map(fn ($event) => ['publish', ['reverb', json_encode($event)]])->all()
+    );
 });
 
 it('does not attempt to reconnect after a controlled disconnection', function () {
