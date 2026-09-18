@@ -2,8 +2,8 @@
 
 use Clue\React\Redis\Client;
 use Evenement\EventEmitterTrait;
-use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\Reverb\Exceptions\RedisConnectionException;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Publishing\RedisClientFactory;

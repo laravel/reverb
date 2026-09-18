@@ -1,7 +1,7 @@
 <?php
 
-use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\ReverbTestCase;
@@ -178,10 +178,10 @@ it('publishes the originating socket id for a batch event over redis even when t
 
     $provider = Double::for(PubSubProvider::class);
     $provider->expects('publish')->with(Argument::satisfies(function ($payload) use (&$published) {
-            $published = $payload;
+        $published = $payload;
 
-            return true;
-        }));
+        return true;
+    }));
 
     $this->app->instance(PubSubProvider::class, $provider);
     app(ServerProviderManager::class)->withPublishing();

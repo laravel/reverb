@@ -1,7 +1,7 @@
 <?php
 
-use JMac\Testing\Matching\Argument;
 use JMac\Testing\Double;
+use JMac\Testing\Matching\Argument;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
@@ -38,33 +38,33 @@ it('removes the listener after metrics are gathered successfully', function () {
     $pubSub = Double::for(PubSubProvider::class);
 
     $pubSub->expects('on')->with(Argument::satisfies(fn ($event) => str_starts_with($event, 'test')), Argument::type('callable'))->resolves(function ($event, $listener) use (&$registeredListener, &$registeredEvent) {
-            $registeredListener = $listener;
-            $registeredEvent = $event;
-        });
+        $registeredListener = $listener;
+        $registeredEvent = $event;
+    });
 
     $pubSub->expects('publish')->resolves(function ($payload) use (&$registeredListener) {
 
-            Loop::addTimer(0.001, function () use (&$registeredListener) {
-                if ($registeredListener) {
-                    $registeredListener([
-                        'key' => 'test',
-                        'payload' => ['connections' => []],
-                    ]);
-                }
-            });
-
-            $deferred = new Deferred;
-            $deferred->resolve(1);
-
-            return $deferred->promise();
+        Loop::addTimer(0.001, function () use (&$registeredListener) {
+            if ($registeredListener) {
+                $registeredListener([
+                    'key' => 'test',
+                    'payload' => ['connections' => []],
+                ]);
+            }
         });
 
-    $pubSub->expects('stopListening')->with(Argument::satisfies(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
-            $stopListeningCalled = true;
-            $stopListeningKey = $key;
+        $deferred = new Deferred;
+        $deferred->resolve(1);
 
-            return $registeredEvent === $key;
-        }));
+        return $deferred->promise();
+    });
+
+    $pubSub->expects('stopListening')->with(Argument::satisfies(function ($key) use (&$stopListeningCalled, &$stopListeningKey, &$registeredEvent) {
+        $stopListeningCalled = true;
+        $stopListeningKey = $key;
+
+        return $registeredEvent === $key;
+    }));
 
     $this->app->instance(PubSubProvider::class, $pubSub);
 
