@@ -4,6 +4,7 @@ namespace Laravel\Reverb\Tests;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use JMac\Testing\Integrations\PHPUnit\VerifiesDoubles;
 use Laravel\Reverb\ApplicationManagerServiceProvider;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
@@ -16,6 +17,8 @@ use Orchestra\Testbench\TestCase as TestbenchTestCase;
 
 class TestCase extends TestbenchTestCase
 {
+    use VerifiesDoubles;
+
     /**
      * Setup the test environment.
      */

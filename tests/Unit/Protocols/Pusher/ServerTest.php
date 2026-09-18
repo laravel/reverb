@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Server;
 use Laravel\Reverb\Tests\FakeConnection;
@@ -23,15 +24,14 @@ it('can handle a connection', function () {
 });
 
 it('can handle a disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
-    $channelManager->shouldReceive('for')
-        ->andReturn($channelManager);
+    $channelManager = Double::for(ChannelManager::class);
+    $channelManager->expects('for')->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
     $server->close(new FakeConnection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll');
+    $channelManager->received('unsubscribeFromAll');
 });
 
 it('can handle a new message', function () {
@@ -211,9 +211,8 @@ it('receives last triggered event when joining a cache channel', function () {
 });
 
 it('unsubscribes a user from a channel on disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
-    $channelManager->shouldReceive('for')
-        ->andReturn($channelManager);
+    $channelManager = Double::for(ChannelManager::class);
+    $channelManager->expects('for')->times(2)->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
@@ -229,15 +228,12 @@ it('unsubscribes a user from a channel on disconnection', function () {
 
     $server->close($connection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll')
-        ->once()
-        ->with($connection);
+    $channelManager->received('unsubscribeFromAll')->times(1)->with($connection);
 });
 
 it('unsubscribes a user from a private channel on disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
-    $channelManager->shouldReceive('for')
-        ->andReturn($channelManager);
+    $channelManager = Double::for(ChannelManager::class);
+    $channelManager->expects('for')->times(2)->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
@@ -253,15 +249,12 @@ it('unsubscribes a user from a private channel on disconnection', function () {
 
     $server->close($connection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll')
-        ->once()
-        ->with($connection);
+    $channelManager->received('unsubscribeFromAll')->times(1)->with($connection);
 });
 
 it('unsubscribes a user from a presence channel on disconnection', function () {
-    $channelManager = Mockery::spy(ChannelManager::class);
-    $channelManager->shouldReceive('for')
-        ->andReturn($channelManager);
+    $channelManager = Double::for(ChannelManager::class);
+    $channelManager->expects('for')->times(2)->returns($channelManager);
     $this->app->singleton(ChannelManager::class, fn () => $channelManager);
     $server = $this->app->make(Server::class);
 
@@ -277,9 +270,7 @@ it('unsubscribes a user from a presence channel on disconnection', function () {
 
     $server->close($connection);
 
-    $channelManager->shouldHaveReceived('unsubscribeFromAll')
-        ->once()
-        ->with($connection);
+    $channelManager->received('unsubscribeFromAll')->times(1)->with($connection);
 });
 
 it('it rejects a connection from an invalid origin', function (string $origin, array $allowedOrigins) {

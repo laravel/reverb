@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\PrivateCacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
@@ -7,18 +8,15 @@ use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
-    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
-    $this->channelConnectionManager->shouldReceive('for')
-        ->andReturn($this->channelConnectionManager);
+    $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('can subscribe a connection to a channel', function () {
     $channel = new PrivateCacheChannel('private-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-cache-test-channel'));
 });
@@ -26,9 +24,7 @@ it('can subscribe a connection to a channel', function () {
 it('can unsubscribe a connection from a channel', function () {
     $channel = new PrivateCacheChannel('private-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('remove')
-        ->once()
-        ->with($this->connection);
+    $this->channelConnectionManager->expects('remove')->with($this->connection);
 
     $channel->unsubscribe($this->connection);
 });
@@ -36,11 +32,7 @@ it('can unsubscribe a connection from a channel', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new PrivateCacheChannel('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add');
-
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
 
@@ -50,7 +42,7 @@ it('can broadcast to all connections of a channel', function () {
 it('fails to subscribe if the signature is invalid', function () {
     $channel = new PrivateCacheChannel('presence-test-channel');
 
-    $this->channelConnectionManager->shouldNotReceive('subscribe');
+    $this->channelConnectionManager->expects('add')->never();
 
     $channel->subscribe($this->connection, 'invalid-signature');
 })->throws(ConnectionUnauthorized::class);
@@ -58,9 +50,7 @@ it('fails to subscribe if the signature is invalid', function () {
 it('receives no data when no previous event triggered', function () {
     $channel = new PrivateCacheChannel('private-cache-test-channel');
 
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'private-cache-test-channel'));
 

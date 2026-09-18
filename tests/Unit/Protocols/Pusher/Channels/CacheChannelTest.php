@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
@@ -7,17 +8,14 @@ use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->connection = new FakeConnection;
-    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
-    $this->channelConnectionManager->shouldReceive('for')
-        ->andReturn($this->channelConnectionManager);
+    $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
 
 it('receives no data when no previous event triggered', function () {
     $channel = ChannelBroker::create('cache-test-channel');
-    $this->channelConnectionManager->shouldReceive('add')
-        ->once()
-        ->with($this->connection, []);
+    $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
     $channel->subscribe($this->connection);
 

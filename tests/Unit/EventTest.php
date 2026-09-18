@@ -1,5 +1,6 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
@@ -9,9 +10,8 @@ use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 it('can publish an event when enabled', function () {
     $app = app(ApplicationProvider::class)->findByKey('reverb-key');
     app(ServerProviderManager::class)->withPublishing();
-    $pubSub = Mockery::mock(PubSubProvider::class);
-    $pubSub->shouldReceive('publish')->once()
-        ->with(['type' => 'message', 'application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
+    $pubSub = Double::for(PubSubProvider::class);
+    $pubSub->expects('publish')->with(['type' => 'message', 'application' => serialize($app), 'payload' => ['channel' => 'test-channel']]);
 
     $this->app->instance(PubSubProvider::class, $pubSub);
 
@@ -19,11 +19,9 @@ it('can publish an event when enabled', function () {
 });
 
 it('can broadcast an event directly when publishing disabled', function () {
-    $channelConnectionManager = Mockery::mock(ChannelConnectionManager::class);
-    $channelConnectionManager->shouldReceive('for')
-        ->andReturn($channelConnectionManager);
-    $channelConnectionManager->shouldReceive('all')->once()
-        ->andReturn([]);
+    $channelConnectionManager = Double::for(ChannelConnectionManager::class);
+    $channelConnectionManager->expects('for')->returns($channelConnectionManager);
+    $channelConnectionManager->expects('all')->returns([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 
@@ -33,11 +31,9 @@ it('can broadcast an event directly when publishing disabled', function () {
 });
 
 it('can broadcast an event for multiple channels', function () {
-    $channelConnectionManager = Mockery::mock(ChannelConnectionManager::class);
-    $channelConnectionManager->shouldReceive('for')
-        ->andReturn($channelConnectionManager);
-    $channelConnectionManager->shouldReceive('all')->twice()
-        ->andReturn([]);
+    $channelConnectionManager = Double::for(ChannelConnectionManager::class);
+    $channelConnectionManager->expects('for')->times(2)->returns($channelConnectionManager);
+    $channelConnectionManager->expects('all')->times(2)->returns([]);
 
     $this->app->instance(ChannelConnectionManager::class, $channelConnectionManager);
 

@@ -1,5 +1,7 @@
 <?php
 
+use JMac\Testing\Matching\Argument;
+use JMac\Testing\Double;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Tests\ReverbTestCase;
@@ -107,10 +109,8 @@ it('can ignore a subscriber when publishing events over redis', function () {
 it('publishes the originating socket id over redis even when the connection is not local', function () {
     $published = null;
 
-    $provider = Mockery::mock(PubSubProvider::class)->shouldIgnoreMissing();
-    $provider->shouldReceive('publish')
-        ->once()
-        ->with(Mockery::on(function ($payload) use (&$published) {
+    $provider = Double::for(PubSubProvider::class);
+    $provider->expects('publish')->with(Argument::satisfies(function ($payload) use (&$published) {
             $published = $payload;
 
             return true;

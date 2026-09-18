@@ -1,14 +1,14 @@
 <?php
 
+use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\ClientEvent;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
-    $this->channelConnectionManager = Mockery::spy(ChannelConnectionManager::class);
-    $this->channelConnectionManager->shouldReceive('for')
-        ->andReturn($this->channelConnectionManager);
+    $this->channelConnectionManager = Double::for(ChannelConnectionManager::class);
+    $this->channelConnectionManager->expects('for')->returns($this->channelConnectionManager);
 
     $this->app->instance(ChannelConnectionManager::class, $this->channelConnectionManager);
 });
@@ -19,10 +19,8 @@ it('can forward a client message', function () {
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '2']))->first();
 
-    $this->channelConnectionManager->shouldReceive('find')
-        ->andReturn($connectionOne);
-    $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn([$connectionOne, $connectionTwo]);
+    $this->channelConnectionManager->expects('find')->returns($connectionOne);
+    $this->channelConnectionManager->expects('all')->returns([$connectionOne, $connectionTwo]);
 
     ClientEvent::handle(
         $connectionOne->connection(), [
@@ -44,13 +42,9 @@ it('can forward a client message', function () {
 it('can forward an unauthenticated client message on public channel', function () {
     channels()->findOrCreate('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections = factory(3));
+    $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
-    $this->channelConnectionManager->shouldReceive('find')
-        ->once()
-        ->andReturn($connections[0]);
+    $this->channelConnectionManager->expects('find')->returns($connections[0]);
 
     ClientEvent::handle(
         $connections[0]->connection(), [
@@ -80,10 +74,7 @@ it('does not forward unauthenticated client message when in members mode', funct
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '2']))->first();
 
-    $this->channelConnectionManager->shouldReceive('find')
-        ->andReturn(null);
-    $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn([$connectionTwo]);
+    $this->channelConnectionManager->expects('find')->returns(null);
 
     ClientEvent::handle(
         $connectionOne->connection(), [
@@ -110,11 +101,6 @@ it('does not forward client message when set to none', function () {
     $connectionOne = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '1']))->first();
     $connectionTwo = collect(factory(data: ['user_info' => ['name' => 'Joe'], 'user_id' => '2']))->first();
 
-    $this->channelConnectionManager->shouldReceive('find')
-        ->andReturn($connectionOne);
-    $this->channelConnectionManager->shouldReceive('all')
-        ->andReturn([$connectionOne, $connectionTwo]);
-
     ClientEvent::handle(
         $connectionOne->connection(), [
             'event' => 'client-test-message',
@@ -138,9 +124,7 @@ it('forwards a client message for unauthenticated client when set to all', funct
     $connection = new FakeConnection;
     channels()->findOrCreate('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn($connections = factory());
+    $this->channelConnectionManager->expects('all')->returns($connections = factory());
 
     ClientEvent::handle(
         $connection, [
@@ -161,11 +145,8 @@ it('does not forward a message to itself', function () {
     $connection = new ChannelConnection(new FakeConnection);
     channels()->findOrCreate('test-channel');
 
-    $this->channelConnectionManager->shouldReceive('all')
-        ->once()
-        ->andReturn([$connection]);
-    $this->channelConnectionManager->shouldReceive('find')
-        ->andReturn($connection);
+    $this->channelConnectionManager->expects('all')->returns([$connection]);
+    $this->channelConnectionManager->expects('find')->returns($connection);
 
     ClientEvent::handle(
         $connection->connection(), [
@@ -183,7 +164,7 @@ it('fails on unsupported message', function () {
 
     $connection = new FakeConnection;
 
-    $this->channelConnectionManager->shouldNotReceive('hydratedConnections');
+    $this->channelConnectionManager->expects('all')->never();
 
     ClientEvent::handle(
         $connection, [
