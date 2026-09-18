@@ -44,7 +44,7 @@ it('can broadcast to all connections of a channel', function () {
 it('fails to subscribe if the signature is invalid', function () {
     $channel = new PrivateCacheChannel('presence-test-channel');
 
-    $this->channelConnectionManager->expects('subscribe')->never();
+    $this->channelConnectionManager->expects('add')->never();
 
     $channel->subscribe($this->connection, 'invalid-signature');
 })->throws(ConnectionUnauthorized::class);

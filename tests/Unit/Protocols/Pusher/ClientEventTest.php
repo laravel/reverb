@@ -168,7 +168,7 @@ it('fails on unsupported message', function () {
 
     $connection = new FakeConnection;
 
-    $this->channelConnectionManager->expects('hydratedConnections')->never();
+    $this->channelConnectionManager->expects('all')->never();
 
     ClientEvent::handle(
         $connection, [

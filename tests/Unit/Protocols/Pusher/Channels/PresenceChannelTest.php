@@ -19,8 +19,6 @@ it('can subscribe a connection to a channel', function () {
 
     $this->channelConnectionManager->expects('add');
 
-    $this->channelConnectionManager->allows('connections')->returns([]);
-
     $channel->subscribe($this->connection, validAuth($this->connection->id(), 'presence-test-channel'));
 });
 
@@ -35,8 +33,6 @@ it('can unsubscribe a connection from a channel', function () {
 it('can broadcast to all connections of a channel', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
-    $this->channelConnectionManager->allows('subscribe');
-
     $this->channelConnectionManager->expects('all')->returns($connections = factory(3));
 
     $channel->broadcast(['foo' => 'bar']);
@@ -47,7 +43,7 @@ it('can broadcast to all connections of a channel', function () {
 it('fails to subscribe if the signature is invalid', function () {
     $channel = new PresenceChannel('presence-test-channel');
 
-    $this->channelConnectionManager->expects('subscribe')->never();
+    $this->channelConnectionManager->expects('add')->never();
 
     $channel->subscribe($this->connection, 'invalid-signature');
 })->throws(ConnectionUnauthorized::class);
