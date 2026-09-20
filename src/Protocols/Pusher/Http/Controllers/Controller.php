@@ -38,6 +38,11 @@ abstract class Controller
     protected array $query = [];
 
     /**
+     * The number of seconds either side of the current time a request signature remains valid.
+     */
+    protected const SIGNATURE_TOLERANCE = 600;
+
+    /**
      * Verify that the incoming request is valid.
      */
     public function verify(RequestInterface $request, Connection $connection, $appId): void
@@ -113,6 +118,8 @@ abstract class Controller
         if (! is_string($authSignature) || ! hash_equals($signature, $authSignature)) {
             throw new HttpException(401, 'Authentication signature invalid.');
         }
+
+        $this->verifySignatureTimestamp();
     }
 
     /**
@@ -131,5 +138,19 @@ abstract class Controller
 
             return "{$key}={$value}";
         })->implode('&');
+    }
+
+    /**
+     * Verify that the request signature has not expired.
+     *
+     * @throws HttpException
+     */
+    protected function verifySignatureTimestamp(): void
+    {
+        $timestamp = $this->query['auth_timestamp'] ?? null;
+
+        if (! is_numeric($timestamp) || abs(time() - (int) $timestamp) > static::SIGNATURE_TOLERANCE) {
+            throw new HttpException(401, 'Authentication signature invalid.');
+        }
     }
 }

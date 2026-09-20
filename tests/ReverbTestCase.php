@@ -161,9 +161,9 @@ class ReverbTestCase extends TestCase
     /**
      * Send a signed request to the server.
      */
-    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456', string $key = 'reverb-key', string $secret = 'reverb-secret'): PromiseInterface
+    public function signedRequest(string $path, string $method = 'GET', mixed $data = '', string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456', string $key = 'reverb-key', string $secret = 'reverb-secret', ?int $timestamp = null): PromiseInterface
     {
-        $timestamp = time();
+        $timestamp ??= time();
 
         $query = Str::contains($path, '?') ? Str::after($path, '?') : '';
         $auth = "auth_key={$key}&auth_timestamp={$timestamp}&auth_version=1.0";
@@ -197,8 +197,8 @@ class ReverbTestCase extends TestCase
     /**
      * Send a signed POST request to the server.
      */
-    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456', $key = 'reverb-key', $secret = 'reverb-secret'): PromiseInterface
+    public function signedPostRequest(string $path, ?array $data = [], string $host = '0.0.0.0', string $port = '8080', string $pathPrefix = '', string $appId = '123456', $key = 'reverb-key', $secret = 'reverb-secret', ?int $timestamp = null): PromiseInterface
     {
-        return $this->signedRequest($path, 'POST', $data, $host, $port, $pathPrefix, $appId, $key, $secret);
+        return $this->signedRequest($path, 'POST', $data, $host, $port, $pathPrefix, $appId, $key, $secret, $timestamp);
     }
 }

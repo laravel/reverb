@@ -18,6 +18,13 @@ it('can return all channel information', function () {
     expect($response->getBody()->getContents())->toBe('{"channels":{"test-channel-one":{},"presence-test-channel-two":{"user_count":1}}}');
 });
 
+it('rejects request signatures outside the timestamp tolerance', function (int $timestamp) {
+    await($this->signedRequest('channels', timestamp: $timestamp));
+})->with([
+    'expired' => fn () => time() - 3600,
+    'future' => fn () => time() + 3600,
+])->throws(ResponseException::class, exceptionCode: 401);
+
 it('can return filtered channels', function () {
     subscribe('test-channel-one');
     subscribe('presence-test-channel-two');
