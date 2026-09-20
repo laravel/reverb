@@ -63,6 +63,7 @@ class MetricsHandler
             MetricType::CHANNEL_USERS => $this->channelUsers($metric),
             MetricType::CONNECTIONS => $this->connections($metric),
             MetricType::PRESENCE_DATA => $this->presenceData($metric),
+            MetricType::PRESENCE_CONNECTIONS => $this->presenceConnections($metric),
             default => [],
         };
     }
@@ -127,6 +128,24 @@ class MetricsHandler
     }
 
     /**
+     * Get the given user's connections to the given presence channel.
+     */
+    protected function presenceConnections(PendingMetric $metric): array
+    {
+        $channel = $this->channels->for($metric->application())->find($metric->option('channel'));
+
+        if (! $channel) {
+            return [];
+        }
+
+        return collect($channel->connections())
+            ->filter(fn ($connection) => (string) $connection->data('user_id') === (string) $metric->option('user_id'))
+            ->map(fn ($connection) => ['id' => $connection->id(), 'subscribed_at' => $connection->subscribedAt()])
+            ->values()
+            ->all();
+    }
+
+    /**
      * Get the connections for the given application.
      */
     protected function connections(PendingMetric $metric): array
@@ -179,6 +198,7 @@ class MetricsHandler
             MetricType::CHANNEL => $this->mergeChannel($metrics),
             MetricType::CHANNEL_USERS => collect($metrics)->flatten(1)->unique()->all(),
             MetricType::PRESENCE_DATA => $this->mergePresenceData($metrics),
+            MetricType::PRESENCE_CONNECTIONS => collect($metrics)->flatten(1)->all(),
             default => [],
         };
     }

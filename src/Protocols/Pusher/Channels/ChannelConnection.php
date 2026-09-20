@@ -8,11 +8,16 @@ use Laravel\Reverb\Contracts\Connection;
 class ChannelConnection
 {
     /**
+     * The time at which the connection subscribed to the channel.
+     */
+    protected float $subscribedAt;
+
+    /**
      * Create a new channel connection instance.
      */
     public function __construct(protected Connection $connection, protected array $data = [])
     {
-        //
+        $this->subscribedAt = microtime(true);
     }
 
     /**
@@ -29,6 +34,14 @@ class ChannelConnection
     public function data(?string $key = null): mixed
     {
         return $key ? Arr::get($this->data, $key) : $this->data;
+    }
+
+    /**
+     * Get the time at which the connection subscribed to the channel.
+     */
+    public function subscribedAt(): float
+    {
+        return $this->subscribedAt;
     }
 
     /**

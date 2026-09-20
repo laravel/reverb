@@ -62,7 +62,7 @@ it('falls back to local members when the gather fails', function () {
     app(ServerProviderManager::class)->withPublishing();
 
     $metrics = Double::for(MetricsHandler::class);
-    $metrics->expects('gather')->returns(reject(new Exception('Unable to gather metrics.')));
+    $metrics->expects('gather')->times(2)->returns(reject(new Exception('Unable to gather metrics.')));
     $this->app->instance(MetricsHandler::class, $metrics);
 
     $data = json_encode(['user_id' => 1, 'user_info' => ['name' => 'Joe']]);

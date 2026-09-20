@@ -6,6 +6,7 @@ use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
 use Laravel\Reverb\ServerProviderManager;
+use React\Promise\PromiseInterface;
 
 trait InteractsWithPresenceChannels
 {
@@ -20,7 +21,9 @@ trait InteractsWithPresenceChannels
 
         $userData = $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : [];
 
-        if ($this->userIsSubscribed($userData['user_id'] ?? null)) {
+        $userId = $userData['user_id'] ?? null;
+
+        if ($this->userIsSubscribed($userId)) {
             parent::subscribe($connection, $auth, $data);
 
             return;
@@ -28,6 +31,26 @@ trait InteractsWithPresenceChannels
 
         parent::subscribe($connection, $auth, $data);
 
+        if ($userId && app(ServerProviderManager::class)->subscribesToEvents()) {
+            $this->userConnections($connection, $userId)->then(function (array $connections) use ($connection, $userData) {
+                if ($this->hasEarlierConnection($connections, $connection)) {
+                    return;
+                }
+
+                $this->broadcastMemberAdded($connection, $userData);
+            });
+
+            return;
+        }
+
+        $this->broadcastMemberAdded($connection, $userData);
+    }
+
+    /**
+     * Notify the channel the given user has been added.
+     */
+    protected function broadcastMemberAdded(Connection $connection, array $userData): void
+    {
         EventDispatcher::dispatch(
             $connection->app(),
             [
@@ -55,13 +78,11 @@ trait InteractsWithPresenceChannels
         }
 
         if (app(ServerProviderManager::class)->subscribesToEvents()) {
-            app(MetricsHandler::class)
-                ->gather($connection->app(), 'presence_data', ['channel' => $this->name()])
-                ->then(function (array $data) use ($connection, $userId) {
-                    if (! in_array($userId, $data['presence']['ids'] ?? [])) {
-                        $this->broadcastMemberRemoved($connection, $userId);
-                    }
-                });
+            $this->userConnections($connection, $userId)->then(function (array $connections) use ($connection, $userId) {
+                if ($connections === []) {
+                    $this->broadcastMemberRemoved($connection, $userId);
+                }
+            });
 
             return;
         }
@@ -83,6 +104,28 @@ trait InteractsWithPresenceChannels
             ],
             $connection
         );
+    }
+
+    /**
+     * Get the given user's connections to the channel across all servers.
+     */
+    protected function userConnections(Connection $connection, int|string $userId): PromiseInterface
+    {
+        return app(MetricsHandler::class)->gather(
+            $connection->app(),
+            'presence_connections',
+            ['channel' => $this->name(), 'user_id' => $userId]
+        )->catch(fn () => []);
+    }
+
+    /**
+     * Determine if the user has an earlier connection than the one given on any server.
+     */
+    protected function hasEarlierConnection(array $connections, Connection $connection): bool
+    {
+        $earliest = collect($connections)->sortBy([['subscribed_at', 'asc'], ['id', 'asc']])->first();
+
+        return isset($earliest['id']) && $earliest['id'] !== $connection->id();
     }
 
     /**
