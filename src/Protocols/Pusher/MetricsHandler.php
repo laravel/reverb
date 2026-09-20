@@ -196,7 +196,7 @@ class MetricsHandler
             MetricType::CONNECTIONS => array_reduce($metrics, fn ($carry, $item) => array_merge($carry, $item), []),
             MetricType::CHANNELS => $this->mergeChannels($metrics),
             MetricType::CHANNEL => $this->mergeChannel($metrics),
-            MetricType::CHANNEL_USERS => collect($metrics)->flatten(1)->unique()->all(),
+            MetricType::CHANNEL_USERS => collect($metrics)->flatten(1)->unique()->values()->all(),
             MetricType::PRESENCE_DATA => $this->mergePresenceData($metrics),
             MetricType::PRESENCE_CONNECTIONS => collect($metrics)->flatten(1)->all(),
             default => [],

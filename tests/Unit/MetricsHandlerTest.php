@@ -247,3 +247,21 @@ it('merges presence connections from all subscribers', function () {
         ['id' => 'socket-three', 'subscribed_at' => 101.0],
     ]);
 });
+
+it('merges channel users from all subscribers into a list', function () {
+    $handler = new MetricsHandler(
+        app(ServerProviderManager::class),
+        app(ChannelManager::class),
+        Double::for(PubSubProvider::class)
+    );
+
+    $mergeMethod = (new ReflectionClass($handler))->getMethod('mergeSubscriberMetrics');
+    $mergeMethod->setAccessible(true);
+
+    $merged = $mergeMethod->invoke($handler, [
+        [['id' => 1], ['id' => 2]],
+        [['id' => 2], ['id' => 3]],
+    ], MetricType::CHANNEL_USERS);
+
+    expect($merged)->toBe([['id' => 1], ['id' => 2], ['id' => 3]]);
+});
