@@ -1,6 +1,12 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.11.1...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.12.0...main)
+
+## [v1.12.0](https://github.com/laravel/reverb/compare/v1.11.1...v1.12.0) - 2026-09-22
+
+* Close the connection when the WebSocket handshake fails by [@boutetnico](https://github.com/boutetnico) in https://github.com/laravel/reverb/pull/406
+* Mockery to Double Converter by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/reverb/pull/407
+* Fix presence channels when scaling enabled by [@clnt](https://github.com/clnt) in https://github.com/laravel/reverb/pull/408
 
 ## [v1.11.1](https://github.com/laravel/reverb/compare/v1.11.0...v1.11.1) - 2026-08-06
 
