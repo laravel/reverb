@@ -8,4 +8,6 @@ enum MetricType: string
     case CHANNEL = 'channel';
     case CHANNELS = 'channels';
     case CHANNEL_USERS = 'channel_users';
+    case PRESENCE_DATA = 'presence_data';
+    case PRESENCE_CONNECTIONS = 'presence_connections';
 }

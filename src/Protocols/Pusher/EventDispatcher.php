@@ -3,6 +3,7 @@
 namespace Laravel\Reverb\Protocols\Pusher;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Laravel\Reverb\Application;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
@@ -55,7 +56,9 @@ class EventDispatcher
 
             $payload['channel'] = $channel->name();
 
-            $channel->broadcast($payload, $connection);
+            Str::startsWith($payload['event'] ?? '', 'pusher_internal:')
+                ? $channel->broadcastInternally($payload, $connection)
+                : $channel->broadcast($payload, $connection);
         }
     }
 }

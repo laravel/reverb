@@ -366,6 +366,49 @@ it('can publish and subscribe to a client whisper', function () {
     $newConnection->assertReceived('{"event":"client-start-typing","channel":"test-channel","data":{"id":123,"name":"Joe Dixon"}}');
 });
 
+it('can publish and subscribe to presence member events', function () {
+    $this->usingRedis();
+
+    $connection = connect();
+    subscribe('presence-test-channel', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+
+    $newConnection = connect();
+    subscribe('presence-test-channel', connection: $newConnection, data: ['user_id' => 2, 'user_info' => ['name' => 'Test User 2']]);
+
+    $connection->assertReceived('{"event":"pusher_internal:member_added","data":"{\\"user_id\\":2,\\"user_info\\":{\\"name\\":\\"Test User 2\\"}}","channel":"presence-test-channel"}', 1);
+
+    disconnect($newConnection);
+
+    $connection->assertReceived('{"event":"pusher_internal:member_removed","data":"{\\"user_id\\":2}","channel":"presence-test-channel"}', 1);
+});
+
+it('includes existing members in subscription_succeeded when scaling', function () {
+    $this->usingRedis();
+
+    subscribe('presence-test-channel', data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+
+    $response = subscribe('presence-test-channel', data: ['user_id' => 2, 'user_info' => ['name' => 'Test User 2']]);
+
+    expect($response)->toContain('pusher_internal:subscription_succeeded');
+    expect($response)->toContain('"count\\":2');
+    expect($response)->toContain('"ids\\":[1,2]');
+    expect($response)->toContain('"hash\\":{\\"1\\":{\\"name\\":\\"Test User 1\\"},\\"2\\":{\\"name\\":\\"Test User 2\\"}}');
+});
+
+it('does not cache internal events on a presence cache channel when scaling', function () {
+    $this->usingRedis();
+
+    $connection = connect();
+    subscribe('presence-cache-test-channel', connection: $connection, data: ['user_id' => 1, 'user_info' => ['name' => 'Test User 1']]);
+
+    $newConnection = connect();
+    subscribe('presence-cache-test-channel', connection: $newConnection, data: ['user_id' => 2, 'user_info' => ['name' => 'Test User 2']]);
+
+    $connection->assertReceived('{"event":"pusher_internal:member_added","data":"{\\"user_id\\":2,\\"user_info\\":{\\"name\\":\\"Test User 2\\"}}","channel":"presence-cache-test-channel"}');
+
+    expect(channels()->find('presence-cache-test-channel')->hasCachedPayload())->toBeFalse();
+});
+
 it('cannot connect from an invalid origin', function () {
     $connection = await(
         wsConnect('ws://0.0.0.0:8080/app/reverb-key-3')

@@ -4,6 +4,7 @@ use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\Channels\PresenceCacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelConnectionManager;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionUnauthorized;
 use Laravel\Reverb\Tests\FakeConnection;
 
@@ -71,7 +72,7 @@ it('can return data stored on the connection', function () {
 });
 
 it('sends notification of subscription', function () {
-    $channel = new PresenceCacheChannel('presence-cache-test-channel');
+    $channel = channels()->findOrCreate('presence-cache-test-channel');
 
     $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
@@ -87,7 +88,7 @@ it('sends notification of subscription', function () {
 });
 
 it('sends notification of subscription with data', function () {
-    $channel = new PresenceCacheChannel('presence-cache-test-channel');
+    $channel = channels()->findOrCreate('presence-cache-test-channel');
     $data = json_encode(['name' => 'Joe']);
 
     $this->channelConnectionManager->expects('add')->with($this->connection, ['name' => 'Joe']);
@@ -112,7 +113,7 @@ it('sends notification of subscription with data', function () {
 });
 
 it('sends notification of an unsubscribe', function () {
-    $channel = new PresenceCacheChannel('presence-cache-test-channel');
+    $channel = channels()->findOrCreate('presence-cache-test-channel');
     $data = json_encode(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
 
     $channel->subscribe(
@@ -141,7 +142,7 @@ it('sends notification of an unsubscribe', function () {
 });
 
 it('receives no data when no previous event triggered', function () {
-    $channel = new PresenceCacheChannel('presence-cache-test-channel');
+    $channel = channels()->findOrCreate('presence-cache-test-channel');
 
     $this->channelConnectionManager->expects('add')->with($this->connection, []);
 
@@ -159,4 +160,37 @@ it('stores last triggered event', function () {
 
     expect($channel->hasCachedPayload())->toBeTrue();
     expect($channel->cachedPayload())->toEqual(['foo' => 'bar']);
+});
+
+it('does not cache internal events on a presence cache channel', function () {
+    $channel = channels()->findOrCreate('presence-cache-test-channel');
+    $data = json_encode(['user_info' => ['name' => 'Joe'], 'user_id' => 1]);
+
+    $this->channelConnectionManager->allows('all')->returns([]);
+
+    $channel->subscribe(
+        $this->connection,
+        validAuth(
+            $this->connection->id(),
+            'presence-cache-test-channel',
+            $data
+        ),
+        $data
+    );
+
+    expect($channel->hasCachedPayload())->toBeFalse();
+
+    $this->channelConnectionManager->expects('find')->returns(new ChannelConnection($this->connection, ['user_info' => ['name' => 'Joe'], 'user_id' => 1]));
+
+    $channel->unsubscribe($this->connection);
+
+    expect($channel->hasCachedPayload())->toBeFalse();
+
+    EventDispatcher::dispatchSynchronously($this->connection->app(), [
+        'event' => 'pusher_internal:member_added',
+        'data' => json_encode(['user_id' => 2]),
+        'channel' => 'presence-cache-test-channel',
+    ]);
+
+    expect($channel->hasCachedPayload())->toBeFalse();
 });

@@ -8,10 +8,14 @@ use Illuminate\Support\Str;
 use Laravel\Reverb\Contracts\Connection;
 use Laravel\Reverb\Protocols\Pusher\Channels\CacheChannel;
 use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
+use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\ServerProviderManager;
 
 class EventHandler
 {
+    use InteractsWithChannelInformation;
+
     /**
      * Create a new Pusher event instance.
      */
@@ -82,7 +86,24 @@ class EventHandler
      */
     protected function afterSubscribe(Channel $channel, Connection $connection): void
     {
-        $this->sendInternally($connection, 'subscription_succeeded', $channel->data(), $channel->name());
+        if ($this->isPresenceChannel($channel) && app(ServerProviderManager::class)->subscribesToEvents()) {
+            app(MetricsHandler::class)
+                ->gather($connection->app(), 'presence_data', ['channel' => $channel->name()])
+                ->catch(fn () => $channel->data())
+                ->then(fn (array $data) => $this->sendSubscriptionSucceeded($channel, $connection, $data));
+
+            return;
+        }
+
+        $this->sendSubscriptionSucceeded($channel, $connection, $channel->data());
+    }
+
+    /**
+     * Send the subscription succeeded payload for the given channel.
+     */
+    protected function sendSubscriptionSucceeded(Channel $channel, Connection $connection, array $data): void
+    {
+        $this->sendInternally($connection, 'subscription_succeeded', $data, $channel->name());
 
         match (true) {
             $channel instanceof CacheChannel => $this->sendCachedPayload($channel, $connection),

@@ -3,6 +3,10 @@
 namespace Laravel\Reverb\Protocols\Pusher\Channels\Concerns;
 
 use Laravel\Reverb\Contracts\Connection;
+use Laravel\Reverb\Protocols\Pusher\EventDispatcher;
+use Laravel\Reverb\Protocols\Pusher\MetricsHandler;
+use Laravel\Reverb\ServerProviderManager;
+use React\Promise\PromiseInterface;
 
 trait InteractsWithPresenceChannels
 {
@@ -17,7 +21,9 @@ trait InteractsWithPresenceChannels
 
         $userData = $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : [];
 
-        if ($this->userIsSubscribed($userData['user_id'] ?? null)) {
+        $userId = $userData['user_id'] ?? null;
+
+        if ($this->userIsSubscribed($userId)) {
             parent::subscribe($connection, $auth, $data);
 
             return;
@@ -25,7 +31,28 @@ trait InteractsWithPresenceChannels
 
         parent::subscribe($connection, $auth, $data);
 
-        parent::broadcastInternally(
+        if ($userId && app(ServerProviderManager::class)->subscribesToEvents()) {
+            $this->userConnections($connection, $userId)->then(function (array $connections) use ($connection, $userData) {
+                if ($this->hasEarlierConnection($connections, $connection)) {
+                    return;
+                }
+
+                $this->broadcastMemberAdded($connection, $userData);
+            });
+
+            return;
+        }
+
+        $this->broadcastMemberAdded($connection, $userData);
+    }
+
+    /**
+     * Notify the channel the given user has been added.
+     */
+    protected function broadcastMemberAdded(Connection $connection, array $userData): void
+    {
+        EventDispatcher::dispatch(
+            $connection->app(),
             [
                 'event' => 'pusher_internal:member_added',
                 'data' => json_encode((object) $userData),
@@ -44,22 +71,61 @@ trait InteractsWithPresenceChannels
 
         parent::unsubscribe($connection);
 
-        if (
-            ! $subscription ||
-            ! $subscription->data('user_id') ||
-            $this->userIsSubscribed($subscription->data('user_id'))
-        ) {
+        $userId = $subscription?->data('user_id');
+
+        if (! $userId || $this->userIsSubscribed($userId)) {
             return;
         }
 
-        parent::broadcast(
+        if (app(ServerProviderManager::class)->subscribesToEvents()) {
+            $this->userConnections($connection, $userId)->then(function (array $connections) use ($connection, $userId) {
+                if ($connections === []) {
+                    $this->broadcastMemberRemoved($connection, $userId);
+                }
+            });
+
+            return;
+        }
+
+        $this->broadcastMemberRemoved($connection, $userId);
+    }
+
+    /**
+     * Notify the channel the given user has been removed.
+     */
+    protected function broadcastMemberRemoved(Connection $connection, int|string $userId): void
+    {
+        EventDispatcher::dispatch(
+            $connection->app(),
             [
                 'event' => 'pusher_internal:member_removed',
-                'data' => json_encode(['user_id' => $subscription->data('user_id')]),
+                'data' => json_encode(['user_id' => $userId]),
                 'channel' => $this->name(),
             ],
             $connection
         );
+    }
+
+    /**
+     * Get the given user's connections to the channel across all servers.
+     */
+    protected function userConnections(Connection $connection, int|string $userId): PromiseInterface
+    {
+        return app(MetricsHandler::class)->gather(
+            $connection->app(),
+            'presence_connections',
+            ['channel' => $this->name(), 'user_id' => $userId]
+        )->catch(fn () => []);
+    }
+
+    /**
+     * Determine if the user has an earlier connection than the one given on any server.
+     */
+    protected function hasEarlierConnection(array $connections, Connection $connection): bool
+    {
+        $earliest = collect($connections)->sortBy([['subscribed_at', 'asc'], ['id', 'asc']])->first();
+
+        return isset($earliest['id']) && $earliest['id'] !== $connection->id();
     }
 
     /**
@@ -85,7 +151,7 @@ trait InteractsWithPresenceChannels
             'presence' => [
                 'count' => $connections->count() ?? 0,
                 'ids' => $connections->map(fn ($connection) => $connection['user_id'])->values()->all(),
-                'hash' => $connections->keyBy('user_id')->map->user_info->toArray(),
+                'hash' => $connections->pluck('user_info', 'user_id')->map(fn ($info) => $info ?? (object) [])->all(),
             ],
         ];
     }
