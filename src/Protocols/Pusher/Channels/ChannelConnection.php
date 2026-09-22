@@ -37,19 +37,19 @@ class ChannelConnection
     }
 
     /**
-     * Get the time at which the connection subscribed to the channel.
-     */
-    public function subscribedAt(): float
-    {
-        return $this->subscribedAt;
-    }
-
-    /**
      * Send a message to the connection.
      */
     public function send(string $message): void
     {
         $this->connection->send($message);
+    }
+
+    /**
+     * Get the time at which the connection subscribed to the channel.
+     */
+    public function subscribedAt(): float
+    {
+        return $this->subscribedAt;
     }
 
     /**
