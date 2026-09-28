@@ -41,7 +41,7 @@
         "ratchet/pawl": "^0.4.1",
         "react/async": "^4.2",
         "react/http": "^1.9",
-        "jasonmccreary/double": "~0.10"
+        "jasonmccreary/double": "^1.0"
     },
     "autoload": {
         "psr-4": {
