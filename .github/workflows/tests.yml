@@ -28,17 +28,22 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2, 8.3, 8.4, 8.5]
-        laravel: [10, 11, 12, 13]
+        php: [8.3, 8.4, 8.5]
+        laravel: [11, 12, 13]
+        experimental: [false]
+        include:
+          - php: 8.2
+            laravel: 10
+            experimental: false
+          - php: 8.3
+            laravel: 10
+            experimental: false
+          - php: 8.6
+            laravel: 13
+            experimental: true
         exclude:
           - php: 8.5
-            laravel: 10
-          - php: 8.5
             laravel: 11
-          - php: 8.4
-            laravel: 10
-          - php: 8.2
-            laravel: 13
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 
@@ -59,7 +64,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer update --prefer-dist --no-interaction --no-progress --with="laravel/framework:^${{ matrix.laravel }}"
+          composer update --prefer-dist --no-interaction --no-progress --with="laravel/framework:^${{ matrix.laravel }}" ${{ matrix.experimental == true && '--ignore-platform-reqs' || '' }}
 
       - name: Execute tests
         run: vendor/bin/pest
