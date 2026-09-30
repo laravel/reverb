@@ -3,7 +3,6 @@
 namespace Laravel\Reverb\Servers\Reverb\Http;
 
 use Closure;
-use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Message;
 use Illuminate\Support\Arr;
 use Laravel\Reverb\Servers\Reverb\Concerns\ClosesConnections;
@@ -32,7 +31,7 @@ class Router
      */
     public function __construct(protected UrlMatcherInterface $matcher)
     {
-        $this->negotiator = new ServerNegotiator(new RequestVerifier, new HttpFactory);
+        $this->negotiator = new ServerNegotiator(new RequestVerifier, new HandshakeResponseFactory);
     }
 
     /**
