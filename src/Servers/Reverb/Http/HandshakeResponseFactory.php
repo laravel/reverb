@@ -12,8 +12,7 @@ class HandshakeResponseFactory implements ResponseFactoryInterface
     /**
      * Create a new response for the WebSocket handshake.
      *
-     * The handshake negotiator sets the "Sec-WebSocket-Version" header as an
-     * integer, which "guzzlehttp/psr7" 3.x no longer casts to a string.
+     * The handshake negotiator sets the "Sec-WebSocket-Version" header as an integer, which "guzzlehttp/psr7" 3.x no longer casts to a string.
      */
     public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
