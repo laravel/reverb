@@ -37,7 +37,7 @@
     "require-dev": {
         "orchestra/testbench": "^8.36|^9.15|^10.8|^11.0",
         "pestphp/pest": "^2.0|^3.0|^4.0",
-        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan": "2.2.16",
         "ratchet/pawl": "^0.4.1",
         "react/async": "^4.2",
         "react/http": "^1.9",
