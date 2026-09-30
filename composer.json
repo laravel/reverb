@@ -21,7 +21,7 @@
     "require": {
         "php": "^8.2",
         "clue/redis-react": "^2.6",
-        "guzzlehttp/psr7": "^2.6",
+        "guzzlehttp/psr7": "^2.6|^3.0",
         "illuminate/console": "^10.47|^11.0|^12.0|^13.0",
         "illuminate/contracts": "^10.47|^11.0|^12.0|^13.0",
         "illuminate/http": "^10.47|^11.0|^12.0|^13.0",
