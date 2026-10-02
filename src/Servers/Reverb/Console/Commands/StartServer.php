@@ -22,6 +22,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
+use Throwable;
 
 #[AsCommand(name: 'reverb:start')]
 class StartServer extends Command implements SignalableCommandInterface
@@ -58,21 +59,28 @@ class StartServer extends Command implements SignalableCommandInterface
 
         $loop = Loop::get();
 
-        $server = ServerFactory::make(
-            $host = $this->option('host') ?: $config['host'],
-            $port = $this->option('port') ?: $config['port'],
-            $path = $this->option('path') ?: $config['path'] ?? '',
-            $hostname = $this->option('hostname') ?: $config['hostname'],
-            $config['max_request_size'] ?? 10_000,
-            $config['options'] ?? [],
-            loop: $loop
-        );
+        try {
+            $server = ServerFactory::make(
+                $host = $this->option('host') ?: $config['host'],
+                $port = $this->option('port') ?: $config['port'],
+                $path = $this->option('path') ?: $config['path'] ?? '',
+                $hostname = $this->option('hostname') ?: $config['hostname'],
+                $config['max_request_size'] ?? 10_000,
+                $config['options'] ?? [],
+                loop: $loop
+            );
 
-        $this->ensureHorizontalScalability($loop);
-        $this->ensureStaleConnectionsAreCleaned($loop);
-        $this->ensureRestartCommandIsRespected($server, $loop, $host, $port);
-        $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
-        $this->ensureTelescopeEntriesAreCollected($loop, $config['telescope_ingest_interval'] ?? 15);
+            $this->ensureHorizontalScalability($loop);
+            $this->ensureStaleConnectionsAreCleaned($loop);
+            $this->ensureRestartCommandIsRespected($server, $loop, $host, $port);
+            $this->ensurePulseEventsAreCollected($loop, $config['pulse_ingest_interval']);
+            $this->ensureTelescopeEntriesAreCollected($loop, $config['telescope_ingest_interval'] ?? 15);
+        } catch (Throwable $e) {
+            // Prevent ReactPHP from running the loop on shutdown, which would leave the server running...
+            Loop::stop();
+
+            throw $e;
+        }
 
         $this->components->info('Starting '.($server->isSecure() ? 'secure ' : '')."server on {$host}:{$port}{$path}".(($hostname && $hostname !== $host) ? " ({$hostname})" : ''));
 
