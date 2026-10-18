@@ -256,6 +256,29 @@ it('can handle a client whisper', function () {
     $newConnection->assertReceived('{"event":"client-start-typing","channel":"test-channel","data":{"id":123,"name":"Joe Dixon"}}');
 });
 
+it('can handle a client whisper when another application has active connections', function () {
+    $connection = connect();
+    subscribe('test-channel', connection: $connection);
+
+    $newConnection = connect();
+    subscribe('test-channel', connection: $newConnection);
+
+    subscribe('test-channel', connection: connect(key: 'reverb-key-2'));
+
+    $connection->send(
+        json_encode([
+            'event' => 'client-start-typing',
+            'channel' => 'test-channel',
+            'data' => [
+                'id' => 123,
+                'name' => 'Joe Dixon',
+            ],
+        ])
+    );
+
+    $newConnection->assertReceived('{"event":"client-start-typing","channel":"test-channel","data":{"id":123,"name":"Joe Dixon"}}');
+});
+
 it('can subscribe a connection to multiple channels', function () {
     $connection = connect();
     subscribe('test-channel', connection: $connection);
