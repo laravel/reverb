@@ -1,6 +1,25 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.12.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.13.0...main)
+
+## [v1.13.0](https://github.com/laravel/reverb/compare/v1.12.0...v1.13.0) - 2026-10-19
+
+### What's Changed
+
+* Bump to Double v1 by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/reverb/pull/409
+* Supports PHPStan 2 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/reverb/pull/412
+* Declare react/promise ^3.2 as a required dependency by [@Jonathan8312](https://github.com/Jonathan8312) in https://github.com/laravel/reverb/pull/411
+* Support guzzlehttp/psr7 3.x (and Guzzle 8) by [@Jonathan8312](https://github.com/Jonathan8312) in https://github.com/laravel/reverb/pull/410
+* Remove security policy in favor of the org-wide default by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/415
+* Bump shivammathur/setup-php from 2.37.2 to 2.40.0 in the github-actions group by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/reverb/pull/416
+* [1.x] Scope client event membership check to the connection's application by [@iqbalhasandev](https://github.com/iqbalhasandev) in https://github.com/laravel/reverb/pull/418
+
+### New Contributors
+
+* [@Jonathan8312](https://github.com/Jonathan8312) made their first contribution in https://github.com/laravel/reverb/pull/411
+* [@iqbalhasandev](https://github.com/iqbalhasandev) made their first contribution in https://github.com/laravel/reverb/pull/418
+
+**Full Changelog**: https://github.com/laravel/reverb/compare/v1.12.0...v1.13.0
 
 ## [v1.12.0](https://github.com/laravel/reverb/compare/v1.11.1...v1.12.0) - 2026-09-22
 
