@@ -3,6 +3,7 @@
 namespace Laravel\Reverb;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Doctor\Doctor;
 use Laravel\Pulse\Pulse;
 use Laravel\Reverb\Console\Commands\InstallCommand;
 use Laravel\Reverb\Contracts\Logger;
@@ -35,6 +36,8 @@ class ReverbServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerDiagnostics();
+
         if ($this->app->runningInConsole()) {
             $this->commands(InstallCommand::class);
 
@@ -57,5 +60,23 @@ class ReverbServiceProvider extends ServiceProvider
         }
 
         $this->app->make(ServerProviderManager::class)->boot();
+    }
+
+    /**
+     * Register the package's Doctor diagnostics.
+     */
+    protected function registerDiagnostics(): void
+    {
+        if ($this->app->bound(Doctor::class)) {
+            $this->app->make(Doctor::class)->diagnostics([
+                Diagnostics\ReverbConfigurationValuesAreSet::class,
+                Diagnostics\ReverbConnectionIsReachable::class,
+                Diagnostics\ReverbDefaultServerIsDefined::class,
+                Diagnostics\ReverbAppsAreConfigured::class,
+                Diagnostics\ReverbBroadcasterCredentialsMatchApp::class,
+                Diagnostics\ReverbAllowedOriginsCoverAppUrl::class,
+                Diagnostics\ReverbScalingRedisIsReachable::class,
+            ]);
+        }
     }
 }
