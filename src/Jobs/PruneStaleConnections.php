@@ -41,15 +41,18 @@ class PruneStaleConnections
 
                     $connections->remove($connection);
 
-                    $channels
-                        ->for($connection->app())
-                        ->unsubscribeFromAll($connection);
+                    $manager = $channels->for($connection->app());
+
+                    // Keep the subscriber data, such as the presence user, for event listeners...
+                    $channelConnection = $manager->connections()[$connection->id()] ?? new ChannelConnection($connection);
+
+                    $manager->unsubscribeFromAll($connection);
 
                     $connection->disconnect();
 
                     Log::info('Connection Pruned', $connection->id());
 
-                    ConnectionPruned::dispatch(new ChannelConnection($connection));
+                    ConnectionPruned::dispatch($channelConnection);
                 }
             });
     }

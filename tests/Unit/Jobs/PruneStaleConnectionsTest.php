@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Event;
 use JMac\Testing\Double;
+use Laravel\Reverb\Events\ConnectionPruned;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelBroker;
 use Laravel\Reverb\Protocols\Pusher\ConnectionRegistry;
@@ -13,9 +15,12 @@ beforeEach(function () {
 });
 
 it('cleans up stale connections', function () {
-    $connections = factory(5);
+    Event::fake([ConnectionPruned::class]);
+
+    $connections = factory(5, ['user_id' => 1]);
     $channel = ChannelBroker::create('test-channel');
 
+    $this->channelManager->allows('connections')->returns(collect($connections)->keyBy->id()->all());
     $this->channelManager->allows('unsubscribeFromAll');
 
     collect($connections)->each(function ($connection) use ($channel) {
@@ -32,4 +37,8 @@ it('cleans up stale connections', function () {
     );
 
     expect(app(ConnectionRegistry::class)->for($connections[0]->app()))->toBeEmpty();
+
+    Event::assertDispatchedTimes(ConnectionPruned::class, 5);
+    Event::assertDispatched(ConnectionPruned::class, fn ($event) => $event->connection->data('user_id') === 1);
+    Event::assertNotDispatched(ConnectionPruned::class, fn ($event) => $event->connection->data('user_id') !== 1);
 });
