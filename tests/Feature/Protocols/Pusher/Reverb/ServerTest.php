@@ -11,6 +11,7 @@ use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as wsConnect;
 use function React\Async\await;
+use function React\Promise\Timer\timeout;
 
 uses(ReverbTestCase::class);
 
@@ -438,14 +439,18 @@ it('cannot connect from an invalid origin', function () {
     );
 
     $promise = new Deferred;
+    $closed = new Deferred;
 
     $connection->on('message', function ($message) use ($promise) {
         $promise->resolve((string) $message);
     });
 
+    $connection->on('close', fn () => $closed->resolve(true));
+
     $message = await($promise->promise());
 
     expect($message)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Origin not allowed\"}"}');
+    expect(await(timeout($closed->promise(), 1)))->toBeTrue();
 });
 
 it('can connect from a valid origin', function () {
@@ -460,14 +465,18 @@ it('cannot connect when over the max connection limit', function () {
     $connection = await(wsConnect('ws://0.0.0.0:8080/app/reverb-key-2'));
 
     $promise = new Deferred;
+    $closed = new Deferred;
 
     $connection->on('message', function ($message) use ($promise) {
         $promise->resolve((string) $message);
     });
 
+    $connection->on('close', fn () => $closed->resolve(true));
+
     $message = await($promise->promise());
 
     expect($message)->toBe('{"event":"pusher:error","data":"{\"code\":4004,\"message\":\"Application is over connection quota\"}"}');
+    expect(await(timeout($closed->promise(), 1)))->toBeTrue();
 });
 
 it('limits the size of messages', function () {

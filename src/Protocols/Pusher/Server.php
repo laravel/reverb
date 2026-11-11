@@ -44,6 +44,8 @@ class Server
             Log::info('Connection Established', $connection->id());
         } catch (Exception $e) {
             $this->error($connection, $e);
+
+            $connection->terminate();
         }
     }
 
