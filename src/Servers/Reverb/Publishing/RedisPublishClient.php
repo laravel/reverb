@@ -44,13 +44,15 @@ class RedisPublishClient extends RedisClient
      */
     public function publish(array $payload): PromiseInterface
     {
+        $message = json_encode($payload, JSON_THROW_ON_ERROR);
+
         if (! $this->isConnected($this->client)) {
             $this->queueEvent($payload);
 
             return new Promise(fn () => new RuntimeException);
         }
 
-        return $this->client->publish($this->channel, json_encode($payload));
+        return $this->client->publish($this->channel, $message);
     }
 
     /**

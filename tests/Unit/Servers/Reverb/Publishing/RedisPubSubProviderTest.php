@@ -23,6 +23,47 @@ afterAll(function () {
     $property->setValue($loop, null);
 });
 
+function fakeRedisClient(): Client
+{
+    return new class implements Client
+    {
+        use EventEmitterTrait;
+
+        public array $calls = [];
+
+        public function __call($name, $args)
+        {
+            $this->calls[] = [$name, $args];
+
+            return new Promise(fn () => null);
+        }
+
+        public function end()
+        {
+            $this->close();
+        }
+
+        public function close()
+        {
+            $this->emit('close');
+        }
+    };
+}
+
+function connectedProvider(?Client $publisher = null, ?Client $subscriber = null, ?PubSubIncomingMessageHandler $handler = null): RedisPubSubProvider
+{
+    $clientFactory = Double::for(RedisClientFactory::class);
+    $clientFactory->expects('make')->times(2)->returns(
+        new Promise(fn (callable $resolve) => $publisher && $resolve($publisher)),
+        new Promise(fn (callable $resolve) => $subscriber && $resolve($subscriber)),
+    );
+
+    $provider = new RedisPubSubProvider($clientFactory, $handler ?? Double::for(PubSubIncomingMessageHandler::class), 'reverb');
+    $provider->connect(Double::for(LoopInterface::class));
+
+    return $provider;
+}
+
 it('can successfully reconnect', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
     $loop = Double::for(LoopInterface::class);
@@ -75,34 +116,7 @@ it('queues publish events', function () {
 it('can process queued publish events', function () {
     $clientFactory = Double::for(RedisClientFactory::class);
 
-    $client = new class implements Client
-    {
-        use EventEmitterTrait;
-
-        /**
-         * Commands invoked on the client via __call(), in order.
-         *
-         * @var array<int, array{0: string, 1: array}>
-         */
-        public array $calls = [];
-
-        public function __call($name, $args)
-        {
-            $this->calls[] = [$name, $args];
-
-            return new Promise(fn () => null);
-        }
-
-        public function end()
-        {
-            $this->close();
-        }
-
-        public function close()
-        {
-            $this->emit('close');
-        }
-    };
+    $client = fakeRedisClient();
 
     // Publisher client, then subscriber client, then publisher client again
     $clientFactory->expects('make')->times(3)->returns(
@@ -139,4 +153,36 @@ it('does not attempt to reconnect after a controlled disconnection', function ()
     $provider = new RedisPubSubProvider($clientFactory, Double::for(PubSubIncomingMessageHandler::class), 'reverb');
     $loop->addTimer(1, fn () => $provider->disconnect());
     $provider->connect($loop);
+});
+
+it('throws instead of publishing a payload that cannot be encoded', function () {
+    $redis = fakeRedisClient();
+    $provider = connectedProvider(publisher: $redis);
+
+    expect(fn () => $provider->publish(['data' => INF]))->toThrow(JsonException::class);
+    expect($redis->calls)->toBeEmpty();
+});
+
+it('keeps handling messages after one fails', function () {
+    $redis = fakeRedisClient();
+    $handler = new class implements PubSubIncomingMessageHandler
+    {
+        public array $handled = [];
+
+        public function handle(string $payload): void
+        {
+            $this->handled[] = json_decode($payload, associative: true, flags: JSON_THROW_ON_ERROR);
+        }
+
+        public function listen(string $event, callable $callback): void {}
+
+        public function stopListening(string $event): void {}
+    };
+
+    connectedProvider(subscriber: $redis, handler: $handler);
+
+    $redis->emit('message', ['reverb', '']);
+    $redis->emit('message', ['reverb', '{"type":"message"}']);
+
+    expect($handler->handled)->toBe([['type' => 'message']]);
 });

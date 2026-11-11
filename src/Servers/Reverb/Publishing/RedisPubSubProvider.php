@@ -2,10 +2,12 @@
 
 namespace Laravel\Reverb\Servers\Reverb\Publishing;
 
+use Laravel\Reverb\Loggers\Log;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubIncomingMessageHandler;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use Throwable;
 
 class RedisPubSubProvider implements PubSubProvider
 {
@@ -66,7 +68,11 @@ class RedisPubSubProvider implements PubSubProvider
         $this->subscriber->subscribe();
 
         $this->subscriber->on('message', function (string $channel, string $payload) {
-            $this->messageHandler->handle($payload);
+            try {
+                $this->messageHandler->handle($payload);
+            } catch (Throwable $e) {
+                Log::error('Failed to handle message from Redis: '.$e->getMessage());
+            }
         });
     }
 
