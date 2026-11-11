@@ -7,6 +7,7 @@ use Laravel\Pulse\Pulse;
 use Laravel\Reverb\Console\Commands\InstallCommand;
 use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Loggers\NullLogger;
+use Laravel\Reverb\Protocols\Pusher\ConnectionRegistry;
 use Laravel\Reverb\Pulse\Livewire;
 use Livewire\LivewireManager;
 
@@ -24,6 +25,8 @@ class ReverbServiceProvider extends ServiceProvider
         $this->app->instance(Logger::class, new NullLogger);
 
         $this->app->singleton(ServerProviderManager::class);
+
+        $this->app->singleton(ConnectionRegistry::class);
 
         $this->app->make(ServerProviderManager::class)->register();
 

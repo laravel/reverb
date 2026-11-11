@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Arr;
+use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
+use Laravel\Reverb\Protocols\Pusher\ConnectionRegistry;
 use Laravel\Reverb\Tests\ReverbTestCase;
 use Ratchet\RFC6455\Messaging\Frame;
 use React\Http\Browser;
@@ -11,6 +13,7 @@ use React\Promise\Deferred;
 
 use function Ratchet\Client\connect as wsConnect;
 use function React\Async\await;
+use function React\Async\delay;
 use function React\Promise\Timer\timeout;
 
 uses(ReverbTestCase::class);
@@ -236,6 +239,19 @@ it('it can disconnect inactive subscribers', function () {
     $connection->assertReceived('{"event":"pusher:error","data":"{\"code\":4201,\"message\":\"Pong reply not received in time\"}"}');
 });
 
+it('it can disconnect inactive connections without subscriptions', function () {
+    $connection = connect();
+
+    Arr::first(app(ConnectionRegistry::class)->for(app(ApplicationProvider::class)->findByKey('reverb-key')))->setLastSeenAt(time() - 60 * 10);
+
+    (new PingInactiveConnections)->handle(channels());
+
+    (new PruneStaleConnections)->handle(channels());
+
+    $connection->assertReceived('{"event":"pusher:ping"}');
+    $connection->assertReceived('{"event":"pusher:error","data":"{\\"code\\":4201,\\"message\\":\\"Pong reply not received in time\\"}"}');
+});
+
 it('can handle a client whisper', function () {
     $connection = connect();
     subscribe('test-channel', connection: $connection);
@@ -459,8 +475,12 @@ it('can connect from a valid origin', function () {
     connect();
 });
 
-it('cannot connect when over the max connection limit', function () {
-    subscribe('test-channel', connection: connect(key: 'reverb-key-2'));
+it('cannot connect when over the max connection limit', function (bool $subscribed) {
+    $existing = connect(key: 'reverb-key-2');
+
+    if ($subscribed) {
+        subscribe('test-channel', connection: $existing);
+    }
 
     $connection = await(wsConnect('ws://0.0.0.0:8080/app/reverb-key-2'));
 
@@ -477,6 +497,15 @@ it('cannot connect when over the max connection limit', function () {
 
     expect($message)->toBe('{"event":"pusher:error","data":"{\"code\":4004,\"message\":\"Application is over connection quota\"}"}');
     expect(await(timeout($closed->promise(), 1)))->toBeTrue();
+})->with(['subscribed' => true, 'unsubscribed' => false]);
+
+it('frees connection quota when a connection closes', function () {
+    disconnect(connect(key: 'reverb-key-2'));
+
+    // Give the server a moment to handle the closed socket...
+    delay(0.1);
+
+    connect(key: 'reverb-key-2');
 });
 
 it('limits the size of messages', function () {
