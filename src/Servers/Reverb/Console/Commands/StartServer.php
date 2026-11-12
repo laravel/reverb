@@ -11,7 +11,7 @@ use Laravel\Reverb\Contracts\Logger;
 use Laravel\Reverb\Jobs\PingInactiveConnections;
 use Laravel\Reverb\Jobs\PruneStaleConnections;
 use Laravel\Reverb\Loggers\CliLogger;
-use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
+use Laravel\Reverb\Protocols\Pusher\ConnectionRegistry;
 use Laravel\Reverb\ServerProviderManager;
 use Laravel\Reverb\Servers\Reverb\Contracts\PubSubProvider;
 use Laravel\Reverb\Servers\Reverb\Factory as ServerFactory;
@@ -129,9 +129,7 @@ class StartServer extends Command implements SignalableCommandInterface
             ->all()
             ->each(function (Application $application) {
                 collect(
-                    $this->laravel->make(ChannelManager::class)
-                        ->for($application)
-                        ->connections()
+                    $this->laravel->make(ConnectionRegistry::class)->for($application)
                 )->each->disconnect();
             });
     }

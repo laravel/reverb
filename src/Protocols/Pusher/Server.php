@@ -23,7 +23,7 @@ class Server
     /**
      * Create a new server instance.
      */
-    public function __construct(protected ChannelManager $channels, protected EventHandler $handler)
+    public function __construct(protected ChannelManager $channels, protected EventHandler $handler, protected ConnectionRegistry $connections)
     {
         //
     }
@@ -38,6 +38,8 @@ class Server
             $this->verifyOrigin($connection);
 
             $connection->touch();
+
+            $this->connections->add($connection);
 
             $this->handler->handle($connection, 'pusher:connection_established');
 
@@ -107,6 +109,8 @@ class Server
      */
     public function close(Connection $connection): void
     {
+        $this->connections->remove($connection);
+
         $this->channels
             ->for($connection->app())
             ->unsubscribeFromAll($connection);
@@ -151,9 +155,7 @@ class Server
             return;
         }
 
-        $connections = $this->channels->for($connection->app())->connections();
-
-        if (count($connections) >= $connection->app()->maxConnections()) {
+        if ($this->connections->count($connection->app()) >= $connection->app()->maxConnections()) {
             throw new ConnectionLimitExceeded;
         }
     }

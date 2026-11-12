@@ -6,6 +6,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Events\ConnectionPruned;
 use Laravel\Reverb\Loggers\Log;
+use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
+use Laravel\Reverb\Protocols\Pusher\ConnectionRegistry;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 
 class PruneStaleConnections
@@ -19,10 +21,12 @@ class PruneStaleConnections
     {
         Log::info('Pruning Stale Connections');
 
+        $connections = app(ConnectionRegistry::class);
+
         app(ApplicationProvider::class)
             ->all()
-            ->each(function ($application) use ($channels) {
-                foreach ($channels->for($application)->connections() as $connection) {
+            ->each(function ($application) use ($channels, $connections) {
+                foreach ($connections->for($application) as $connection) {
                     if (! $connection->isStale()) {
                         continue;
                     }
@@ -35,15 +39,20 @@ class PruneStaleConnections
                         ]),
                     ]));
 
-                    $channels
-                        ->for($connection->app())
-                        ->unsubscribeFromAll($connection->connection());
+                    $connections->remove($connection);
+
+                    $manager = $channels->for($connection->app());
+
+                    // Keep the subscriber data, such as the presence user, for event listeners...
+                    $channelConnection = $manager->connections()[$connection->id()] ?? new ChannelConnection($connection);
+
+                    $manager->unsubscribeFromAll($connection);
 
                     $connection->disconnect();
 
                     Log::info('Connection Pruned', $connection->id());
 
-                    ConnectionPruned::dispatch($connection);
+                    ConnectionPruned::dispatch($channelConnection);
                 }
             });
     }
