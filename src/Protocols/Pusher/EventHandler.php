@@ -11,6 +11,7 @@ use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\ServerProviderManager;
+use Throwable;
 
 class EventHandler
 {
@@ -67,16 +68,34 @@ class EventHandler
             'auth' => $auth,
             'channel_data' => $data,
         ], [
-            'channel' => ['nullable', 'string'],
+            'channel' => ['nullable', 'string', 'max:164'],
             'auth' => ['nullable', 'string'],
             'channel_data' => ['nullable', 'json'],
         ])->validate();
 
-        $channel = $this->channels
-            ->for($connection->app())
-            ->findOrCreate($channel);
+        if (! $connection->canSubscribeTo($channel)) {
+            $this->send($connection, 'subscription_error', [
+                'type' => 'LimitReached',
+                'error' => 'Connection is over channel quota',
+                'status' => 4300,
+            ], $channel);
 
-        $channel->subscribe($connection, $auth, $data);
+            return;
+        }
+
+        $channels = $this->channels->for($connection->app());
+
+        $channel = $channels->findOrCreate($channel);
+
+        try {
+            $channel->subscribe($connection, $auth, $data);
+        } catch (Throwable $e) {
+            if ($channel->connections() === []) {
+                $channels->remove($channel);
+            }
+
+            throw $e;
+        }
 
         $this->afterSubscribe($channel, $connection);
     }

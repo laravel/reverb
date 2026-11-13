@@ -333,6 +333,7 @@ it('fails to subscribe to a private channel with invalid auth signature', functi
     $response = subscribe('private-test-channel', auth: 'invalid-signature');
 
     expect($response)->toBe('{"event":"pusher:error","data":"{\"code\":4009,\"message\":\"Connection is unauthorized\"}"}');
+    expect(channels()->all())->toHaveCount(0);
 });
 
 it('fails to subscribe to a presence channel with invalid auth signature', function () {
@@ -526,6 +527,32 @@ it('removes a channel when no subscribers remain', function () {
     $connection->await();
 
     expect(channels()->all())->toHaveCount(0);
+});
+
+it('limits the number of channels a connection can subscribe to', function (string $key) {
+    $connection = connect(key: $key);
+    $app = app(ApplicationProvider::class)->findByKey($key);
+
+    for ($i = 0; $i < 1000; $i++) {
+        subscribe("test-channel-{$i}", connection: $connection);
+    }
+
+    expect(subscribe('test-channel-1000', connection: $connection))
+        ->toBe('{"event":"pusher:subscription_error","data":"{\"type\":\"LimitReached\",\"error\":\"Connection is over channel quota\",\"status\":4300}","channel":"test-channel-1000"}');
+    expect(channels($app)->find('test-channel-1000'))->toBeNull();
+
+    expect(subscribe('test-channel-0', connection: $connection))->toContain('subscription_succeeded');
+
+    $connection->send(json_encode(['event' => 'pusher:unsubscribe', 'data' => ['channel' => 'test-channel-0']]));
+
+    expect(subscribe('test-channel-1000', connection: $connection))->toContain('subscription_succeeded');
+})->with(['configured' => 'reverb-key', 'missing from config' => 'reverb-key-2']);
+
+it('limits the length of channel names', function () {
+    expect(subscribe(str_repeat('a', 164)))->toContain('subscription_succeeded');
+
+    expect(subscribe(str_repeat('b', 165)))
+        ->toBe('{"event":"pusher:error","data":"{\"code\":4200,\"message\":\"Invalid message format\"}"}');
 });
 
 it('fails to subscribe to private channel with no auth token', function () {

@@ -67,6 +67,8 @@ class Channel
     public function subscribe(Connection $connection, ?string $auth = null, ?string $data = null): void
     {
         $this->connections->add($connection, $data ? json_decode($data, associative: true, flags: JSON_THROW_ON_ERROR) : []);
+
+        $connection->addChannel($this->name);
     }
 
     /**
@@ -75,6 +77,8 @@ class Channel
     public function unsubscribe(Connection $connection): void
     {
         $this->connections->remove($connection);
+
+        $connection->removeChannel($this->name);
 
         if ($this->connections->isEmpty()) {
             app(ChannelManager::class)->for($connection->app())->remove($this);
