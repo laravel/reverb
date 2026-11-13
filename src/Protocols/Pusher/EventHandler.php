@@ -68,17 +68,19 @@ class EventHandler
             'auth' => $auth,
             'channel_data' => $data,
         ], [
-            'channel' => ['nullable', 'string', 'max:164'],
+            'channel' => ['nullable', 'string'],
             'auth' => ['nullable', 'string'],
             'channel_data' => ['nullable', 'json'],
         ])->validate();
 
+        if (Str::length($channel) > 164) {
+            $this->sendSubscriptionError($connection, $channel, 'InvalidChannelName', 'Channel name is too long');
+
+            return;
+        }
+
         if (! $connection->canSubscribeTo($channel)) {
-            $this->send($connection, 'subscription_error', [
-                'type' => 'LimitReached',
-                'error' => 'Connection is over channel quota',
-                'status' => 4300,
-            ], $channel);
+            $this->sendSubscriptionError($connection, $channel, 'LimitReached', 'Connection is over channel quota');
 
             return;
         }
@@ -98,6 +100,18 @@ class EventHandler
         }
 
         $this->afterSubscribe($channel, $connection);
+    }
+
+    /**
+     * Send a subscription error for the given channel.
+     */
+    protected function sendSubscriptionError(Connection $connection, string $channel, string $type, string $error): void
+    {
+        $this->send($connection, 'subscription_error', [
+            'type' => $type,
+            'error' => $error,
+            'status' => 4300,
+        ], $channel);
     }
 
     /**

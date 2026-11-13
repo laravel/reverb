@@ -5,6 +5,19 @@ use Laravel\Reverb\ApplicationManager;
 use Laravel\Reverb\Contracts\ApplicationProvider;
 use Laravel\Reverb\Tests\FakeApplicationProvider;
 
+it('limits channels per connection when the configuration omits the setting', function () {
+    config(['reverb.apps.apps' => [[
+        'app_id' => 'id',
+        'key' => 'key',
+        'secret' => 'secret',
+        'ping_interval' => 60,
+        'allowed_origins' => ['*'],
+        'max_message_size' => 10_000,
+    ]]]);
+
+    expect($this->app->make(ApplicationProvider::class)->findByKey('key')->maxChannelsPerConnection())->toBe(1000);
+});
+
 it('retrieves applications from custom provider', function () {
     $this->app->make(ApplicationManager::class)->extend('fake', fn () => new FakeApplicationProvider);
 
