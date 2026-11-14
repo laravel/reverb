@@ -74,6 +74,7 @@ class ConfigApplicationProvider implements ApplicationProvider
             $app['accept_client_events_from'] ?? 'all',
             $app['rate_limiting'] ?? null,
             $app['options'] ?? [],
+            $app['max_channels_per_connection'] ?? 1000,
         );
     }
 }

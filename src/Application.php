@@ -19,6 +19,7 @@ class Application
         protected string $acceptClientEventsFrom = 'members',
         protected ?array $rateLimiting = null,
         protected array $options = [],
+        protected int $maxChannelsPerConnection = 1000,
     ) {
         //
     }
@@ -87,6 +88,14 @@ class Application
     public function hasMaxConnectionLimit(): bool
     {
         return $this->maxConnections !== null;
+    }
+
+    /**
+     * Get the maximum number of channels a single connection may subscribe to.
+     */
+    public function maxChannelsPerConnection(): int
+    {
+        return $this->maxChannelsPerConnection;
     }
 
     /**

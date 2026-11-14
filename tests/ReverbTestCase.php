@@ -58,6 +58,7 @@ class ReverbTestCase extends TestCase
             'activity_timeout' => 30,
             'max_message_size' => 1_000_000,
             'max_connections' => 1,
+            'max_channels_per_connection' => 3,
         ]);
 
         $app['config']->set('reverb.apps.apps.2', [

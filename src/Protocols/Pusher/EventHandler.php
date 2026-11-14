@@ -11,6 +11,7 @@ use Laravel\Reverb\Protocols\Pusher\Channels\Channel;
 use Laravel\Reverb\Protocols\Pusher\Concerns\InteractsWithChannelInformation;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\ServerProviderManager;
+use Throwable;
 
 class EventHandler
 {
@@ -72,13 +73,45 @@ class EventHandler
             'channel_data' => ['nullable', 'json'],
         ])->validate();
 
-        $channel = $this->channels
-            ->for($connection->app())
-            ->findOrCreate($channel);
+        if (Str::length($channel) > 164) {
+            $this->sendSubscriptionError($connection, $channel, 'InvalidChannelName', 'Channel name is too long');
 
-        $channel->subscribe($connection, $auth, $data);
+            return;
+        }
+
+        if (! $connection->canSubscribeTo($channel)) {
+            $this->sendSubscriptionError($connection, $channel, 'LimitReached', 'Connection is over channel quota');
+
+            return;
+        }
+
+        $channels = $this->channels->for($connection->app());
+
+        $channel = $channels->findOrCreate($channel);
+
+        try {
+            $channel->subscribe($connection, $auth, $data);
+        } catch (Throwable $e) {
+            if ($channel->connections() === []) {
+                $channels->remove($channel);
+            }
+
+            throw $e;
+        }
 
         $this->afterSubscribe($channel, $connection);
+    }
+
+    /**
+     * Send a subscription error for the given channel.
+     */
+    protected function sendSubscriptionError(Connection $connection, string $channel, string $type, string $error): void
+    {
+        $this->send($connection, 'subscription_error', [
+            'type' => $type,
+            'error' => $error,
+            'status' => 4300,
+        ], $channel);
     }
 
     /**
