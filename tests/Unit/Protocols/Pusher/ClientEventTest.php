@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use JMac\Testing\Double;
 use Laravel\Reverb\Protocols\Pusher\Channels\ChannelConnection;
 use Laravel\Reverb\Protocols\Pusher\ClientEvent;
@@ -92,6 +93,34 @@ it('does not forward unauthenticated client message when in members mode', funct
         ]),
     ]);
     $connectionTwo->connection()->assertNothingReceived();
+});
+
+it('requires channel membership when accept_client_events_from is not configured', function () {
+    $this->app['config']->set('reverb.apps.apps.0', Arr::except(
+        $this->app['config']->get('reverb.apps.apps.0'), 'accept_client_events_from'
+    ));
+    channels()->findOrCreate('private-test-channel');
+
+    $connection = new FakeConnection;
+
+    $this->channelConnectionManager->expects('find')->returns(null);
+    $this->channelConnectionManager->expects('all')->never();
+
+    ClientEvent::handle(
+        $connection, [
+            'event' => 'client-test-message',
+            'channel' => 'private-test-channel',
+            'data' => ['foo' => 'bar'],
+        ]
+    );
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4009,
+            'message' => 'The client is not a member of the specified channel.',
+        ]),
+    ]);
 });
 
 it('does not forward client message when set to none', function () {
