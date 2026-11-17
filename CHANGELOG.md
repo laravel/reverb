@@ -1,6 +1,19 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/reverb/compare/v1.13.0...main)
+## [Unreleased](https://github.com/laravel/reverb/compare/v1.14.0...main)
+
+## [v1.14.0](https://github.com/laravel/reverb/compare/v1.13.0...v1.14.0) - 2026-11-16
+
+### What's Changed
+
+* Dependency floor bump by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/420
+* Handle unencodable payloads when publishing to Redis by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/421
+* Close connections rejected on open by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/419
+* Track open connections in a connection registry by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/422
+* Limit channel subscriptions per connection and channel name length by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/423
+* [1.x] Default client events to channel members by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/reverb/pull/424
+
+**Full Changelog**: https://github.com/laravel/reverb/compare/v1.13.0...v1.14.0
 
 ## [v1.13.0](https://github.com/laravel/reverb/compare/v1.12.0...v1.13.0) - 2026-10-19
 
