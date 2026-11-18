@@ -434,6 +434,25 @@ it('does not call the origin verification callback when the origin is allowed', 
     ],
 ]);
 
+it('does not call the origin verification callback when the origin has no host', function (string $origin) {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
+
+    Reverb::verifyOriginUsing(fn (string $origin, Application $app): bool => true);
+
+    $this->server->open($connection = new FakeConnection(origin: $origin));
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4009,
+            'message' => 'Origin not allowed',
+        ]),
+    ]);
+})->with([
+    'opaque origin' => ['null'],
+    'malformed origin' => ['http://'],
+]);
+
 it('it rejects a connection when the app is over the connection limit', function () {
     $this->app['config']->set('reverb.apps.apps.0.max_connections', 1);
     $this->server->open($connection = new FakeConnection);
