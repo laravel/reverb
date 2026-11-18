@@ -2,7 +2,6 @@
 
 namespace Laravel\Reverb;
 
-use Closure;
 use Illuminate\Foundation\DevCommands;
 
 class Reverb
@@ -10,9 +9,9 @@ class Reverb
     /**
      * The callback used to verify origins that are not in an application's allowed origins.
      *
-     * @var (Closure(string, Application): bool)|null
+     * @var (callable(string, Application): bool)|null
      */
-    protected static ?Closure $verifyOriginCallback = null;
+    protected static $verifyOriginCallback;
 
     /**
      * Register the Reverb dev commands.
@@ -27,9 +26,9 @@ class Reverb
     /**
      * Register a callback to verify origins that are not in an application's allowed origins.
      *
-     * @param  (Closure(string, Application): bool)|null  $callback
+     * @param  (callable(string, Application): bool)|null  $callback
      */
-    public static function verifyOriginUsing(?Closure $callback): void
+    public static function verifyOriginUsing(?callable $callback): void
     {
         static::$verifyOriginCallback = $callback;
     }
