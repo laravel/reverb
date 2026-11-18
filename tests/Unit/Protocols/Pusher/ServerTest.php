@@ -374,6 +374,37 @@ it('rejects an unlisted origin when the origin verification callback rejects it'
     ]);
 });
 
+it('accepts any callable as the origin verification callback', function (callable $callback) {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
+
+    Reverb::verifyOriginUsing($callback);
+
+    $this->server->open($connection = new FakeConnection(origin: 'http://tenant.example.com'));
+
+    $connection->assertReceived([
+        'event' => 'pusher:connection_established',
+        'data' => json_encode([
+            'socket_id' => $connection->id(),
+            'activity_timeout' => 30,
+        ]),
+    ]);
+})->with([
+    'invokable object' => [new class
+    {
+        public function __invoke(string $origin, Application $app): bool
+        {
+            return $origin === 'tenant.example.com';
+        }
+    }],
+    'object method' => [[new class
+    {
+        public function verify(string $origin, Application $app): bool
+        {
+            return $origin === 'tenant.example.com';
+        }
+    }, 'verify']],
+]);
+
 it('does not call the origin verification callback when the origin is allowed', function (string $origin, array $allowedOrigins) {
     $this->app['config']->set('reverb.apps.apps.0.allowed_origins', $allowedOrigins);
 
