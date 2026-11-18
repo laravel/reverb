@@ -1,12 +1,18 @@
 <?php
 
 use JMac\Testing\Double;
+use Laravel\Reverb\Application;
 use Laravel\Reverb\Protocols\Pusher\Contracts\ChannelManager;
 use Laravel\Reverb\Protocols\Pusher\Server;
+use Laravel\Reverb\Reverb;
 use Laravel\Reverb\Tests\FakeConnection;
 
 beforeEach(function () {
     $this->server = $this->app->make(Server::class);
+});
+
+afterEach(function () {
+    Reverb::verifyOriginUsing(null);
 });
 
 it('can handle a connection', function () {
@@ -318,6 +324,82 @@ it('accepts a connection from an valid origin', function (string $origin, array 
     'wildcard' => [
         'http://sub.localhost',
         ['localhost', '*.localhost'],
+    ],
+]);
+
+it('rejects an unlisted origin when no origin verification callback is registered', function () {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
+    $this->server->open($connection = new FakeConnection(origin: 'http://tenant.example.com'));
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4009,
+            'message' => 'Origin not allowed',
+        ]),
+    ]);
+});
+
+it('accepts an unlisted origin when the origin verification callback allows it', function () {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
+
+    Reverb::verifyOriginUsing(function (string $origin, Application $app) {
+        return $origin === 'tenant.example.com' && $app->id() === '123456';
+    });
+
+    $this->server->open($connection = new FakeConnection(origin: 'http://tenant.example.com'));
+
+    $connection->assertReceived([
+        'event' => 'pusher:connection_established',
+        'data' => json_encode([
+            'socket_id' => $connection->id(),
+            'activity_timeout' => 30,
+        ]),
+    ]);
+});
+
+it('rejects an unlisted origin when the origin verification callback rejects it', function () {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
+
+    Reverb::verifyOriginUsing(fn (string $origin, Application $app) => false);
+
+    $this->server->open($connection = new FakeConnection(origin: 'http://tenant.example.com'));
+
+    $connection->assertReceived([
+        'event' => 'pusher:error',
+        'data' => json_encode([
+            'code' => 4009,
+            'message' => 'Origin not allowed',
+        ]),
+    ]);
+});
+
+it('does not call the origin verification callback when the origin is allowed', function (string $origin, array $allowedOrigins) {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', $allowedOrigins);
+
+    Reverb::verifyOriginUsing(fn () => throw new RuntimeException('Origin verification callback should not be called.'));
+
+    $this->server->open($connection = new FakeConnection(origin: $origin));
+
+    $connection->assertReceived([
+        'event' => 'pusher:connection_established',
+        'data' => json_encode([
+            'socket_id' => $connection->id(),
+            'activity_timeout' => 30,
+        ]),
+    ]);
+})->with([
+    'static match' => [
+        'http://laravel.com',
+        ['laravel.com'],
+    ],
+    'wildcard match' => [
+        'http://sub.laravel.com',
+        ['*.laravel.com'],
+    ],
+    'any origin' => [
+        'http://tenant.example.com',
+        ['*'],
     ],
 ]);
 
