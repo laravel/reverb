@@ -14,6 +14,7 @@ use Laravel\Reverb\Protocols\Pusher\Exceptions\ConnectionLimitExceeded;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\InvalidOrigin;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\PusherException;
 use Laravel\Reverb\Protocols\Pusher\Exceptions\RateLimitExceeded;
+use Laravel\Reverb\Reverb;
 use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\RFC6455\Messaging\FrameInterface;
 use Throwable;
@@ -205,6 +206,10 @@ class Server
             if (Str::is($allowedOrigin, $origin)) {
                 return;
             }
+        }
+
+        if (is_string($origin) && Reverb::originIsAllowedByCallback($origin, $connection->app())) {
+            return;
         }
 
         throw new InvalidOrigin;
