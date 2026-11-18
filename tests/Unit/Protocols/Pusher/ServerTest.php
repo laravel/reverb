@@ -405,6 +405,22 @@ it('accepts any callable as the origin verification callback', function (callabl
     }, 'verify']],
 ]);
 
+it('accepts an origin verification callback that only takes the origin', function () {
+    $this->app['config']->set('reverb.apps.apps.0.allowed_origins', ['laravel.com']);
+
+    Reverb::verifyOriginUsing(fn (string $origin): bool => $origin === 'tenant.example.com');
+
+    $this->server->open($connection = new FakeConnection(origin: 'http://tenant.example.com'));
+
+    $connection->assertReceived([
+        'event' => 'pusher:connection_established',
+        'data' => json_encode([
+            'socket_id' => $connection->id(),
+            'activity_timeout' => 30,
+        ]),
+    ]);
+});
+
 it('does not call the origin verification callback when the origin is allowed', function (string $origin, array $allowedOrigins) {
     $this->app['config']->set('reverb.apps.apps.0.allowed_origins', $allowedOrigins);
 
